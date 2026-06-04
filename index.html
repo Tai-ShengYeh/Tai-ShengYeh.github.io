@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tai-Sheng Yeh ｜ 食品科學教學課程</title>
+<meta name="description" content="葉泰生的食品科學互動教學課程：光譜 × 食品分析化學計量學、食品安全檢測、食品營養華語閱讀。互動教材、教學影片、可重現工作流。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#FFFFFF;--paper2:#F5F2E9;--ink:#1A1A1A;--soft:#52493b;--teal:#0E7C7B;--cover:#119C9A;--coral:#E36414;--gold:#C8941F;--line:#E4DECC;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans TC',system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6;}
+  a{color:var(--teal);text-decoration:none;} a:hover{text-decoration:underline;}
+  h1,h2,h3{font-weight:900;line-height:1.2;}
+  .hero{background:var(--cover);color:#fff;text-align:center;padding:72px 22px 60px;}
+  .hero h1{font-size:clamp(30px,5vw,52px);letter-spacing:.02em;}
+  .hero .accent{color:#FFDE7A;}
+  .hero p{font-size:clamp(15px,2.2vw,20px);color:rgba(255,255,255,.9);font-weight:500;margin-top:14px;max-width:720px;margin-inline:auto;}
+  .hero .stats{display:flex;gap:30px;justify-content:center;flex-wrap:wrap;margin-top:26px;}
+  .hero .stats b{display:block;font-size:30px;font-weight:900;color:#FFDE7A;}
+  .hero .stats span{font-size:13px;color:rgba(255,255,255,.85);font-weight:500;}
+  main{max-width:1080px;margin:0 auto;padding:0 22px;}
+  section{padding:54px 0 8px;}
+  .kicker{color:var(--coral);font-weight:900;font-size:14px;letter-spacing:.14em;text-transform:uppercase;}
+  section h2{font-size:clamp(24px,3.5vw,34px);margin:6px 0 4px;}
+  section .lead{color:var(--soft);font-size:16px;margin-bottom:8px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin:24px 0;}
+  .card{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;transition:transform .15s ease,box-shadow .15s ease;}
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.08);}
+  .card .tag{font-size:12px;font-weight:900;color:#fff;background:var(--teal);border-radius:999px;padding:3px 11px;align-self:flex-start;margin-bottom:10px;}
+  .card .tag.coral{background:var(--coral);} .card .tag.gold{background:var(--gold);}
+  .card h3{font-size:21px;margin-bottom:6px;}
+  .card p{color:var(--soft);font-size:14.5px;font-weight:500;flex:1;}
+  .card .links{margin-top:14px;display:flex;gap:14px;align-items:center;}
+  .card .go{font-weight:900;color:var(--coral);}
+  .card .repo{font-size:13px;color:var(--soft);}
+  footer{background:var(--ink);color:#cfc8b6;text-align:center;padding:34px 22px;margin-top:56px;font-size:13.5px;}
+  footer b{color:var(--gold);} footer a{color:#9fd3d2;}
+  @media(max-width:560px){.hero .stats{gap:18px;}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>食品科學<span class="accent">教學課程</span></h1>
+  <p>葉泰生（Tai-Sheng Yeh）｜ 互動教材 · 教學影片 · Python + Orange 可重現工作流</p>
+  <div class="stats">
+    <div><b>9</b><span>線上課程</span></div>
+    <div><b>4</b><span>光譜化學計量學</span></div>
+    <div><b>40+</b><span>教學影片</span></div>
+  </div>
+</header>
+<main>
+
+  <section>
+    <span class="kicker">Spectroscopy × Chemometrics</span>
+    <h2>光譜 × 食品分析（化學計量學）</h2>
+    <p class="lead">四種光譜技術配 PCA / PLS / PLS-DA，三層教學：看影片建直覺 → 讀 Python 學算法 → 用 Orange 親手做。</p>
+    <div class="grid">
+      <div class="card"><span class="tag">NIR</span><h3>近紅外光譜</h3>
+        <p>PCA 探索 + PLS 定量，Tecator 肉品資料；預測脂肪含量。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/chemometrics-teaching/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/chemometrics-teaching">GitHub</a></div></div>
+      <div class="card"><span class="tag">MS</span><h3>質譜</h3>
+        <p>PCA 探索 + PLS-DA 鑑別，白酒 GC-MS 代謝體；分辨葡萄品種。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/ms-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/ms-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">Raman</span><h3>拉曼光譜</h3>
+        <p>拉曼光譜在食品分析的應用；互動投影片＋形成性評量小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/raman-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/raman-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">Hyperspectral</span><h3>高光譜影像</h3>
+        <p>高光譜資料分析；Python + Orange + SpectroFood，中英投影片與可重現工作流。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/hyperspectral-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/hyperspectral-food-analysis">GitHub</a></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">Food Safety · Detection</span>
+    <h2>食品安全 · 檢測</h2>
+    <div class="grid">
+      <div class="card"><span class="tag coral">3 小時</span><h3>食品中微塑膠檢測</h3>
+        <p>NIR、FTIR、Raman、Py-GC-MS、LC-MS 多技術整合的互動教材。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/microplastic-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/microplastic-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">高中 · 60 分</span><h3>微塑膠 × 食品安全</h3>
+        <p>高中彈性課程，22 頁 60 分鐘互動教學投影片。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/microplastic-teaching/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/microplastic-teaching">GitHub</a></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">Food &amp; Nutrition · CSL (A2–B1)</span>
+    <h2>食品營養 · 華語閱讀</h2>
+    <p class="lead">A2–B1 華語學習者的食品營養文獻閱讀與寫作，含互動工具、小遊戲與課堂活動。</p>
+    <div class="grid">
+      <div class="card"><span class="tag gold">A2–B1</span><h3>食品營養華語文獻閱讀</h3>
+        <p>互動 HTML 教學工具、課堂活動與班級報告。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-nutrition-chinese-teaching/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-nutrition-chinese-teaching">GitHub</a></div></div>
+      <div class="card"><span class="tag gold">A2–B1</span><h3>無可可巧克力</h3>
+        <p>華語文獻閱讀與寫作、小遊戲與課堂投票。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/cocoa-free-chocolate-lesson/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/cocoa-free-chocolate-lesson">GitHub</a></div></div>
+      <div class="card"><span class="tag gold">A2–B1</span><h3>GLP-1 食品營養華語</h3>
+        <p>GLP-1 主題的華語課堂互動小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/glp1-chinese-class/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/glp1-chinese-class">GitHub</a></div></div>
+    </div>
+  </section>
+
+</main>
+<footer>
+  © Tai-Sheng Yeh（葉泰生）· 食品科學教學課程入口<br>
+  教材以 Python（scikit-learn）、Orange Data Mining 與 <b>claude-code-video-kit</b> 製作 ·
+  <a href="https://github.com/Tai-ShengYeh">GitHub @Tai-ShengYeh</a>
+</footer>
+</body>
+</html>
