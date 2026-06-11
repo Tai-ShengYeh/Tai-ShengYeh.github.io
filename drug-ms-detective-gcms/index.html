@@ -60,12 +60,13 @@
 
   /* chromatogram */
   .chrom{position:relative;background:#0d1a2e;border:1px solid #2a456a;border-radius:14px;padding:30px 14px 46px;margin:14px 0;overflow-x:auto}
-  .track{position:relative;height:120px;min-width:660px;border-bottom:3px solid #3b5b86;margin-top:30px}
+  .track{position:relative;height:120px;min-width:660px;border-bottom:3px solid #3b5b86;margin-top:30px;margin-bottom:58px}
   .peak{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;cursor:pointer}
   .peak .flag{font-size:30px;display:block;transition:.2s;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
   .peak .blob{width:22px;margin:0 auto;border-radius:50% 50% 6px 6px}
-  .peak label{display:block;font-size:12px;color:#cfe0fb;margin-top:6px;white-space:nowrap}
   .peak:hover .flag{transform:translateY(-6px) scale(1.15)}
+  .peaklabel{position:absolute;top:100%;transform:translateX(-50%);font-size:12px;color:#cfe0fb;white-space:nowrap;text-align:center;cursor:pointer}
+  .peaklabel .conn{display:block;width:2px;margin:0 auto;background:transparent}
   .axis{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:space-between;min-width:660px;color:#7f9bc0;font-size:12px;padding:0 6px}
   .axis-title{color:#9fb7d8;font-size:13px;text-align:center;margin-top:6px}
 
@@ -507,15 +508,22 @@ const DRUGS = [
 (function(){
   const track=document.getElementById("track"),axis=document.getElementById("axis"),info=document.getElementById("rtInfo");
   const maxT=25;
-  DRUGS.forEach((d,i)=>{
+  const sorted=[...DRUGS].sort((a,b)=>a.rt-b.rt);
+  let prevX=-99,prevLevel=1;
+  sorted.forEach((d,i)=>{
+    const x=d.rt/maxT*100,h=52+(i%3)*22;
+    const show=()=>{info.innerHTML=`${d.emoji} <b>${d.name}</b>　🚩 滯留時間：<b>${d.rt} 分</b>　👑 基峰：${d.base}　🧩 碎片：${d.frags.join("、")}`;info.style.borderLeftColor=d.color;};
     const peak=document.createElement("div");
-    peak.className="peak";peak.style.left=(d.rt/maxT*100)+"%";
-    const h=52+(i%3)*22;
+    peak.className="peak";peak.style.left=x+"%";
     peak.innerHTML=`<span class="flag">🚩</span>
-      <div class="blob" style="height:${h}px;background:linear-gradient(${d.color},#dff)"></div>
-      <label>${d.short}</label>`;
-    peak.onclick=()=>{info.innerHTML=`${d.emoji} <b>${d.name}</b>　🚩 滯留時間：<b>${d.rt} 分</b>　👑 基峰：${d.base}　🧩 碎片：${d.frags.join("、")}`;info.style.borderLeftColor=d.color;};
-    track.appendChild(peak);
+      <div class="blob" style="height:${h}px;background:linear-gradient(${d.color},#dff)"></div>`;
+    peak.onclick=show;track.appendChild(peak);
+    // staggered label: if too close to the previous flag, drop it to a lower row
+    const close=(x-prevX)<9;const level=close?(prevLevel===0?1:0):0;prevLevel=level;prevX=x;
+    const lab=document.createElement("div");lab.className="peaklabel";lab.style.left=x+"%";
+    lab.style.marginTop="5px";
+    lab.innerHTML=`<span class="conn" style="height:${level*26}px"></span>${d.short}`;
+    lab.onclick=show;track.appendChild(lab);
   });
   for(let t=0;t<=25;t+=5){const s=document.createElement("span");s.textContent=t+"分";axis.appendChild(s);}
 })();
