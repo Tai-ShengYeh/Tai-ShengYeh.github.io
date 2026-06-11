@@ -88,6 +88,22 @@
   .frag::after{right:-7px;top:50%;transform:translateY(-50%)}
   .crown{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:14px}
 
+  /* puzzle drag game */
+  .puzzleboard{position:relative;height:175px;border-bottom:2px solid #3b5b86;margin:30px 10px 6px;min-width:300px}
+  .slot{position:absolute;bottom:0;transform:translateX(-50%);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 8px}
+  .slot .ghostmz{font-size:12px;color:#7790b4;margin-bottom:3px;font-weight:800}
+  .slot .ghost{width:30px;border-radius:6px 6px 0 0;border:2px dashed #4a6896;background:rgba(255,255,255,.05)}
+  .slot .placed{width:30px;border-radius:6px 6px 0 0;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+  .slot.filled .ghostmz{color:#eaf2ff}
+  .slot.hot .ghost{border-color:#ffd43b;background:rgba(255,212,59,.15)}
+  .slot .crownmark{font-size:15px;margin-bottom:1px}
+  .tray{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;min-height:60px;background:#0d1a2e;border:1px solid #2a456a;border-radius:12px;padding:14px}
+  .ppiece{cursor:pointer}
+  .ppiece.sel{outline:3px solid #ffd43b;outline-offset:3px;transform:translateY(-5px)}
+  .ppiece.gone{display:none}
+  .shake{animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(-50%)}25%{transform:translateX(calc(-50% - 6px))}75%{transform:translateX(calc(-50% + 6px))}}
+
   /* GC steps machine */
   .machine{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin:16px 0;text-align:center}
   .mbox{background:#142339;border:2px solid #34557e;border-radius:16px;padding:12px;min-width:120px}
@@ -168,6 +184,7 @@
   <a href="#g2">🎮 抓毒品</a>
   <a href="#g3">🎮 指紋比對</a>
   <a href="#g4">🎮 防毒達人</a>
+  <a href="#g5">🧩 拼圖挑戰</a>
   <a href="#aids">🖨️ 教具</a>
 </nav>
 
@@ -418,6 +435,25 @@
   </div>
 </section>
 
+<!-- GAME 5: assemble fingerprint puzzle -->
+<section id="g5">
+  <h2>🧩 遊戲 5：指紋拼圖大挑戰</h2>
+  <p class="lead">把碎片拼回指紋圖！先點下面一塊碎片，再點上面它該放的位置。小心混進來的「假碎片」會放不進去喔！</p>
+  <div class="game">
+    <div id="p5target" style="font-weight:800;color:#ffe066;font-size:18px;margin-bottom:6px"></div>
+    <div class="puzzleboard" id="p5board"></div>
+    <div class="specaxis"><span>0</span><span>100</span><span>200</span><span>300</span><span>400 m/z</span></div>
+    <div style="margin-top:14px;color:#9fb7d8">👇 碎片盒（點一塊 → 再點上面對應的空格）</div>
+    <div class="tray" id="p5tray"></div>
+    <div class="feedback" id="p5fb"></div>
+    <div>完成毒品數：<span class="score" id="p5score">0</span> / 5</div>
+    <div style="margin-top:10px">
+      <button class="btn" id="p5next" style="display:none">下一種毒品 ▶</button>
+      <button class="btn" id="p5again" style="display:none;background:#69db7c">再玩一次 🔄</button>
+    </div>
+  </div>
+</section>
+
 <!-- TEACHING AIDS -->
 <section id="aids">
   <h2>🖨️ 老師教具區（可列印） ✂️</h2>
@@ -497,12 +533,12 @@ const DRUGS = [
   const btns=document.getElementById("specBtns"),spec=document.getElementById("spectrum"),nm=document.getElementById("specName");
   function draw(d){
     nm.innerHTML=`${d.emoji} ${d.name} 的指紋圖（👑 基峰 ${d.base}）`;
-    spec.innerHTML="";const SCALE=420;
-    d.spec.forEach(([mz,it])=>{
+    spec.innerHTML="";
+    specLayout(d.spec).forEach(p=>{
       const bar=document.createElement("div");bar.className="specbar";
-      bar.style.left=(mz/SCALE*100)+"%";bar.style.height=it+"%";
-      bar.style.background=(mz===d.base)?d.color:"#9fb7d8";
-      bar.innerHTML=`<span class="mz">${mz}</span>`;
+      bar.style.left=p.x+"%";bar.style.height=p.it+"%";
+      bar.style.background=(p.mz===d.base)?d.color:"#9fb7d8";
+      bar.innerHTML=`<span class="mz">${p.mz}</span>`;
       spec.appendChild(bar);
     });
   }
@@ -516,6 +552,14 @@ const DRUGS = [
 /* helpers */
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function pickWrong(k,n){return shuffle(DRUGS.filter(d=>d.key!==k)).slice(0,n);}
+/* lay out m/z peaks on a 0-420 scale, but keep a minimum gap so near-equal masses (180/182, 104/105/106) don't overlap */
+function specLayout(spec){
+  const SCALE=420,MINGAP=9;
+  const arr=spec.slice().sort((a,b)=>a[0]-b[0]).map(p=>({mz:p[0],it:p[1],x:p[0]/SCALE*100}));
+  for(let i=1;i<arr.length;i++){if(arr[i].x-arr[i-1].x<MINGAP)arr[i].x=arr[i-1].x+MINGAP;}
+  arr.forEach(p=>{if(p.x>96)p.x=96;});
+  return arr;
+}
 
 /* GAME 1: fragments -> name */
 (function(){
@@ -625,6 +669,78 @@ function pickWrong(k,n){return shuffle(DRUGS.filter(d=>d.key!==k)).slice(0,n);}
       opts.appendChild(b);});
   }
   next.onclick=()=>{idx++;load();};load();
+})();
+
+/* GAME 5: assemble the fingerprint puzzle (tap piece -> tap slot) */
+(function(){
+  const SCALE=420;
+  const target=document.getElementById("p5target"),board=document.getElementById("p5board"),
+        tray=document.getElementById("p5tray"),fb=document.getElementById("p5fb"),
+        score=document.getElementById("p5score"),next=document.getElementById("p5next"),again=document.getElementById("p5again");
+  let order=shuffle(DRUGS),oi=0,completed=0,sel=null;
+
+  function load(){
+    const d=order[oi];sel=null;fb.textContent="";next.style.display="none";
+    target.innerHTML=`${d.emoji} 請拼出 <b>${d.name}</b> 的指紋圖（共 ${d.frags.length} 塊）`;
+    // build empty slots from the fragment pieces (must match the tray exactly), heights looked up from the spectrum
+    board.innerHTML="";
+    const specMap={};d.spec.forEach(s=>specMap[s[0]]=s[1]);
+    const fragSpec=d.frags.map(mz=>[mz,specMap[mz]!=null?specMap[mz]:35]);
+    specLayout(fragSpec).forEach(p=>{
+      const mz=p.mz,h=Math.round(p.it*1.4);
+      const slot=document.createElement("div");slot.className="slot";slot.style.left=p.x+"%";
+      slot.dataset.mz=mz;slot.dataset.h=h;slot.dataset.color=d.color;slot.dataset.base=(mz===d.base)?"1":"0";
+      slot.innerHTML=`<div class="ghostmz">${mz}</div><div class="ghost" style="height:${h}px"></div>`;
+      slot.onmouseenter=()=>{if(sel&&!slot.classList.contains("filled"))slot.classList.add("hot");};
+      slot.onmouseleave=()=>slot.classList.remove("hot");
+      slot.onclick=()=>tryPlace(slot,d);
+      board.appendChild(slot);
+    });
+    // tray: correct pieces + up to 3 decoys (m/z not in this drug)
+    const correct=d.frags.map(f=>({mz:f}));
+    const pool=[];DRUGS.filter(x=>x.key!==d.key).forEach(x=>x.frags.forEach(f=>{if(!d.frags.includes(f))pool.push(f);}));
+    const decoys=shuffle([...new Set(pool)]).slice(0,3).map(f=>({mz:f}));
+    tray.innerHTML="";
+    shuffle([...correct,...decoys]).forEach(p=>{
+      const el=document.createElement("div");el.className="frag ppiece";el.style.background="#9cf";el.textContent=p.mz;el.dataset.mz=p.mz;
+      el.onclick=()=>{if(el.classList.contains("gone"))return;
+        tray.querySelectorAll(".ppiece").forEach(x=>x.classList.remove("sel"));
+        sel=el;el.classList.add("sel");
+        fb.innerHTML='<span class="tag">已選 '+p.mz+'，現在點上面的空格！</span>';};
+      tray.appendChild(el);
+    });
+  }
+
+  function tryPlace(slot,d){
+    if(slot.classList.contains("filled"))return;
+    if(!sel){fb.innerHTML='<span class="no">先點下面碎片盒裡的一塊碎片喔！</span>';return;}
+    if(parseInt(sel.dataset.mz)===parseInt(slot.dataset.mz)){
+      slot.classList.add("filled");slot.classList.remove("hot");
+      const crown=slot.dataset.base==="1"?'<div class="crownmark">👑</div>':'';
+      slot.innerHTML=`${crown}<div class="ghostmz">${slot.dataset.mz}</div><div class="placed" style="height:${slot.dataset.h}px;background:${slot.dataset.color}"></div>`;
+      slot.onclick=null;
+      sel.classList.add("gone");sel=null;
+      fb.innerHTML='<span class="ok">✅ 對了！放得好！</span>';
+      checkWin(d);
+    }else{
+      fb.innerHTML='<span class="no">❌ 這塊不是放這裡～看看數字對不對。</span>';
+      slot.classList.add("shake");setTimeout(()=>slot.classList.remove("shake"),300);
+    }
+  }
+
+  function checkWin(d){
+    const done=[...board.querySelectorAll(".slot")].every(s=>s.classList.contains("filled"));
+    if(done){
+      completed++;score.textContent=completed;
+      fb.innerHTML=`<span class="ok">🎉 完成！這就是 ${d.name} 的指紋（基峰 👑 ${d.base}）！</span>`;
+      if(oi<order.length-1)next.style.display="inline-block";
+      else{again.style.display="inline-block";fb.innerHTML+=`<br>🏆 五種毒品全部拼完，你是指紋拼圖大師！`;}
+    }
+  }
+
+  next.onclick=()=>{oi++;load();};
+  again.onclick=()=>{order=shuffle(DRUGS);oi=0;completed=0;score.textContent=0;again.style.display="none";load();};
+  load();
 })();
 </script>
 </body>
