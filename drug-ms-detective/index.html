@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>質譜毒品偵探 ── 質譜小學堂（5、6 年級版）</title>
+<style>
+  :root{
+    --bg:#0f1b2d; --panel:#16263d; --panel2:#1d3a5c;
+    --ink:#eaf2ff; --sub:#a9c0e0; --line:#2a4straight;
+    --amp:#ff6b6b; --mmc:#ffa94d; --ket:#ffe066; --eto:#69db7c; --her:#4dabf7;
+    --gold:#ffd43b; --good:#51cf66; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#0f1b2d,#152a45 60%,#0f1b2d);
+    color:#eaf2ff;line-height:1.7;
+  }
+  header.hero{
+    text-align:center;padding:46px 20px 30px;
+    background:radial-gradient(900px 400px at 50% -120px,rgba(77,171,247,.30),transparent),
+               radial-gradient(700px 360px at 80% 0,rgba(255,212,59,.14),transparent);
+  }
+  .hero h1{font-size:clamp(28px,5.6vw,50px);margin:.1em 0;letter-spacing:1px}
+  .hero .badge{display:inline-block;background:#ffd43b;color:#1b2a44;font-weight:900;
+    border-radius:999px;padding:6px 16px;font-size:15px;margin-bottom:10px}
+  .hero p{color:#a9c0e0;max-width:760px;margin:10px auto 0;font-size:clamp(15px,2.4vw,19px)}
+  .hero .crew{font-size:46px;letter-spacing:8px;margin-top:14px}
+
+  nav{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+    padding:12px;background:rgba(15,27,45,.92);backdrop-filter:blur(8px);border-bottom:1px solid #243a59}
+  nav a{color:#cfe0fb;text-decoration:none;font-weight:700;font-size:14px;
+    padding:7px 13px;border-radius:999px;border:1px solid #2c4straight;background:#16263d;transition:.15s}
+  nav a{border-color:#2c4f7a}
+  nav a:hover{background:#24467a;color:#fff;transform:translateY(-2px)}
+
+  main{max-width:1000px;margin:0 auto;padding:10px 16px 80px}
+  section{background:rgba(22,38,61,.7);border:1px solid #25405f;border-radius:22px;
+    padding:26px 22px;margin:22px 0;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+  section h2{font-size:clamp(22px,4vw,30px);margin:0 0 4px;display:flex;align-items:center;gap:12px}
+  section .lead{color:#9fb7d8;margin:2px 0 18px;font-size:16px}
+  h3{font-size:20px;margin:22px 0 8px;color:#ffe9a8}
+  .tag{font-size:13px;background:#24467a;color:#dceb ;padding:3px 10px;border-radius:999px;color:#cfe0fb}
+
+  .cardrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:14px 0}
+  .card{background:#142339;border:1px solid #2a456a;border-radius:16px;padding:16px;text-align:center}
+  .card .big{font-size:40px}
+  .card b{display:block;margin:6px 0 2px;font-size:17px}
+  .card small{color:#9fb7d8}
+
+  .analogy{background:linear-gradient(135deg,#1c3câ,#1b2f4d);border-left:6px solid #ffd43b;
+    border-radius:12px;padding:12px 16px;margin:12px 0;background:#172c49}
+  .analogy b{color:#ffe066}
+
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px;overflow:hidden;border-radius:12px}
+  th,td{padding:10px 8px;text-align:center;border-bottom:1px solid #2a456a}
+  th{background:#24467a;color:#fff}
+  tr:nth-child(even) td{background:#142339}
+  .pill{display:inline-block;background:#0e1b30;border:1px solid #34557e;border-radius:8px;
+    padding:2px 9px;margin:2px;font-weight:800;font-variant-numeric:tabular-nums}
+
+  .drug-amp{color:var(--amp)} .drug-mmc{color:var(--mmc)} .drug-ket{color:var(--ket)}
+  .drug-eto{color:var(--eto)} .drug-her{color:var(--her)}
+  .dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+  /* chromatogram */
+  .chrom{position:relative;background:#0d1a2e;border:1px solid #2a456a;border-radius:14px;
+    padding:30px 14px 46px;margin:14px 0;overflow-x:auto}
+  .track{position:relative;height:120px;min-width:640px;border-bottom:3px solid #3b5b86;margin-top:30px}
+  .peak{position:absolute;bottom:0;transform:translateX(-50%);text-align:center;cursor:pointer}
+  .peak .flag{font-size:30px;display:block;transition:.2s;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+  .peak .blob{width:24px;margin:0 auto;border-radius:50% 50% 6px 6px;background:linear-gradient(#fff,#9cf)}
+  .peak label{display:block;font-size:12px;color:#cfe0fb;margin-top:6px;white-space:nowrap}
+  .peak:hover .flag{transform:translateY(-6px) scale(1.15)}
+  .axis{position:absolute;left:0;right:0;bottom:8px;display:flex;justify-content:space-between;
+    min-width:640px;color:#7f9bc0;font-size:12px;padding:0 6px}
+  .axis-title{color:#9fb7d8;font-size:13px;text-align:center;margin-top:6px}
+
+  /* puzzle pieces */
+  .puzzle-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:14px 0}
+  .puzzle{border-radius:16px;padding:14px;border:2px dashed rgba(255,255,255,.35);position:relative}
+  .puzzle h4{margin:0 0 8px;font-size:18px;display:flex;align-items:center;gap:8px}
+  .frag{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:46px;
+    margin:4px;border-radius:10px;font-weight:900;font-size:17px;color:#10203a;
+    background:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15);position:relative}
+  .frag::before,.frag::after{content:"";position:absolute;width:14px;height:14px;border-radius:50%;background:inherit}
+  .frag::before{left:-7px;top:50%;transform:translateY(-50%)}
+  .frag::after{right:-7px;top:50%;transform:translateY(-50%)}
+
+  /* MRM gate */
+  .mrm{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:18px 0;text-align:center}
+  .gate{background:#142339;border:2px solid #34557e;border-radius:16px;padding:14px;min-width:130px}
+  .gate .ic{font-size:34px}
+  .gate b{display:block;color:#ffe066}
+  .arrow{font-size:30px;color:#7f9bc0}
+  .mrm-demo{background:#0d1a2e;border:1px solid #2a456a;border-radius:14px;padding:16px;margin-top:8px}
+
+  /* games */
+  .game{background:#11203a;border:1px solid #2f5081;border-radius:16px;padding:18px;margin-top:12px}
+  .opts{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+  button.opt,button.btn{font-family:inherit;cursor:pointer;border:none;border-radius:12px;
+    font-weight:800;font-size:16px;padding:12px 16px;transition:.15s}
+  button.opt{background:#1d3a63;color:#eaf2ff;border:1px solid #3a5f93}
+  button.opt:hover{background:#27508a;transform:translateY(-2px)}
+  button.btn{background:#ffd43b;color:#19283f}
+  button.btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+  .feedback{font-weight:800;margin-top:10px;min-height:26px}
+  .score{font-weight:900;color:#ffd43b}
+  .ok{color:var(--good)} .no{color:var(--bad)}
+  .qcard{font-size:17px}
+  .fragline{font-size:24px;letter-spacing:2px;margin:10px 0}
+
+  .matchgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:560px){.matchgrid{grid-template-columns:1fr}}
+  .matchcol h4{margin:0 0 8px}
+  .mitem{background:#1d3a63;border:1px solid #3a5f93;border-radius:12px;padding:11px;margin:8px 0;cursor:pointer;font-weight:700}
+  .mitem.sel{outline:3px solid #ffd43b}
+  .mitem.done{opacity:.45;pointer-events:none;background:#234d2e;border-color:#3fae5a}
+
+  /* print teaching aids */
+  .printcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+  .pcard{border:2px solid #1b2a44;border-radius:14px;padding:14px;color:#10203a;background:#fff}
+  .pcard h4{margin:.1em 0;font-size:19px}
+  .pcard .rt{font-weight:900;font-size:15px}
+  .pcard .frags b{display:inline-block;background:#10203a;color:#fff;border-radius:8px;padding:4px 9px;margin:3px;font-size:16px}
+  .noprint{}
+  footer{text-align:center;color:#7f9bc0;font-size:13px;padding:30px 16px}
+
+  @media print{
+    body{background:#fff;color:#000}
+    nav,.hero p,.hero .crew,.game,footer,.noprint{display:none!important}
+    section{break-inside:avoid;box-shadow:none;border:1px solid #999;background:#fff;color:#000}
+    h2,h3{color:#000}
+    .printcards{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="badge">質譜小學堂 · 第四關「驗毒」</div>
+  <h1>🔬 質譜毒品偵探</h1>
+  <p>歡迎加入「食品安全偵探隊」！<br>
+     今天我們要用一台超級厲害的機器 ── <b>質譜儀（LC-MS/MS）</b>，<br>
+     學會怎麼把藏起來的毒品一個一個抓出來。</p>
+  <div class="crew">🕵️‍♂️🔬🧪🚩🧩</div>
+</header>
+
+<nav>
+  <a href="#why">① 為什麼要質譜</a>
+  <a href="#steps">② 質譜三步驟</a>
+  <a href="#time">③ 插旗：滯留時間</a>
+  <a href="#puzzle">④ 拼圖：質譜碎片</a>
+  <a href="#mrm">⑤ MRM 雙重門禁</a>
+  <a href="#g1">🎮 遊戲1 拼圖配對</a>
+  <a href="#g2">🎮 遊戲2 抓毒品</a>
+  <a href="#g3">🎮 遊戲3 守門員</a>
+  <a href="#aids">🖨️ 列印教具</a>
+</nav>
+
+<main>
+
+<!-- ① WHY -->
+<section id="why">
+  <h2>① 為什麼需要「質譜」這位超級偵探？ 🕵️</h2>
+  <p class="lead">想像警察叔叔在一杯飲料裡，要找出有沒有偷加壞東西……</p>
+  <p>毒品藏在飲料、藥粉或尿液裡的時候，<b>用眼睛看不到、用鼻子聞不到</b>。
+     而且常常只有<b>非常非常少</b>的一點點 ── 大概就像在一座游泳池裡滴入一滴墨水。
+     普通的方法根本找不到，這時候就要請出我們的超級偵探：<b>質譜儀</b>。</p>
+
+  <div class="analogy">
+    🪪 <b>比喻：質譜儀＝分子的「身分證掃描器」。</b>
+    每一種分子都有自己獨一無二的「身分證」，質譜儀掃一下，就知道「你是誰、你有多少」。
+  </div>
+
+  <div class="cardrow">
+    <div class="card"><div class="big">🔎</div><b>超級靈敏</b><small>一滴墨水在泳池裡也找得到</small></div>
+    <div class="card"><div class="big">🎯</div><b>超級精準</b><small>一大堆分子裡只認出毒品</small></div>
+    <div class="card"><div class="big">⚖️</div><b>會秤重</b><small>用「分子的重量」來認人</small></div>
+  </div>
+
+  <h3>機器的名字：LC-MS/MS</h3>
+  <p>它的全名有點長，我們拆開來看就懂了：</p>
+  <div class="cardrow">
+    <div class="card"><div class="big">🚌</div><b>LC（液相層析）</b><small>把一大群分子「排隊分開」</small></div>
+    <div class="card"><div class="big">⚖️</div><b>MS（質譜）</b><small>幫每個分子「秤重＋拍照」</small></div>
+    <div class="card"><div class="big">🧩</div><b>/MS（再一次）</b><small>把分子「敲碎」再秤一次，更準！</small></div>
+  </div>
+</section>
+
+<!-- ② STEPS -->
+<section id="steps">
+  <h2>② 質譜的三個步驟 🎬</h2>
+  <p class="lead">質譜就像玩「三關闖關遊戲」，每個分子都要走過這三關。</p>
+
+  <div class="cardrow">
+    <div class="card" style="border-color:#69db7c">
+      <div class="big">📡</div><b>第1關 離子化</b>
+      <small>幫分子裝上一個「電」，<br>讓機器可以追蹤它</small>
+    </div>
+    <div class="card" style="border-color:#ffd43b">
+      <div class="big">🚶‍♂️🚶‍♀️</div><b>第2關 分離</b>
+      <small>按照分子的「重量（m/z）」<br>排隊，輕的、重的分開站</small>
+    </div>
+    <div class="card" style="border-color:#4dabf7">
+      <div class="big">📸</div><b>第3關 偵測</b>
+      <small>幫每個分子「拍照」，<br>畫成一張「質譜圖」</small>
+    </div>
+  </div>
+
+  <div class="analogy">📡 <b>離子化＝幫分子裝 GPS。</b>裝上去機器才追得到它跑去哪。</div>
+  <div class="analogy">🚶 <b>分離＝叫分子排隊。</b>按身材（重量）排，胖的瘦的站不同位置。</div>
+  <div class="analogy">📸 <b>偵測＝拍照留念。</b>把每個分子的樣子記錄下來，變成一張圖。</div>
+
+  <p>📌 小知識：圖上橫軸（左右）是 <b>m/z（分子的重量）</b>，
+     直軸（上下）是 <b>訊號高低（有多少）</b>。峰越高，代表那種分子越多。</p>
+</section>
+
+<!-- ③ RETENTION TIME -->
+<section id="time">
+  <h2>③ 滯留時間：用「插旗子」找出誰先到 🚩</h2>
+  <p class="lead">不同的毒品，跑過機器的「賽跑跑道」時，到達終點的時間不一樣！</p>
+
+  <p>還記得 LC（排隊那一關）嗎？它就像一條<b>長長的賽跑跑道</b>。
+     每種毒品跑步的速度不同，所以<b>抵達終點的時間（滯留時間）都不一樣</b>。
+     我們就在每個毒品到達的地方<b>插上一支旗子 🚩</b>，標記「這個時間到的是誰」。</p>
+
+  <div class="chrom">
+    <div class="axis-title">⏱️ 毒品賽跑終點線（點旗子看看是誰！）</div>
+    <div class="track" id="track">
+      <!-- peaks injected by JS -->
+    </div>
+    <div class="axis" id="axis"></div>
+    <div class="axis-title">← 時間（分鐘）→　越右邊＝跑越久才到</div>
+  </div>
+  <div id="rtInfo" class="analogy" style="min-height:24px">👆 點上面的旗子，看看每種毒品幾分鐘到終點。</div>
+
+  <div class="analogy">
+    🚩 <b>滯留時間（Retention Time）＝賽跑到終點的時間。</b>
+    每種毒品的時間像「固定的習慣」，海洛因最慢（23.8 分）才慢吞吞地到，
+    甲基安非他命最快（8.6 分）就衝過終點。光看「幾分到」就能猜出是誰！
+  </div>
+</section>
+
+<!-- ④ PUZZLE -->
+<section id="puzzle">
+  <h2>④ 質譜碎片：每種毒品的「拼圖指紋」🧩</h2>
+  <p class="lead">把分子敲碎之後，碎成的小塊（碎片）長得不一樣，就像每個人的指紋！</p>
+
+  <p>在 /MS 那一關，機器會用力把分子<b>「敲碎」</b>，碎成好幾塊小碎片。
+     每種毒品敲碎後，碎片的「重量組合」都不一樣 ──
+     我們把這些碎片畫成<b>拼圖塊 🧩</b>，每塊上面的數字就是那塊碎片的重量（m/z）。
+     只要碎片組合對得上，就能確定「抓到的就是它」！</p>
+
+  <div class="puzzle-wrap" id="puzzleWrap"></div>
+
+  <div class="analogy">
+    🧩 <b>質譜碎片（m/z）＝分子的指紋拼圖。</b>
+    注意看：甲基安非他命和卡西酮都有 <b>58</b> 和 <b>91</b> 這兩塊，
+    但一個有 <b>56</b>、一個有 <b>65</b> ── 就是這一塊不同，讓我們分得出兄弟兩個！
+  </div>
+
+  <h3>📋 五位嫌犯資料卡（偵探筆記）</h3>
+  <table>
+    <tr><th>毒品名稱</th><th>🚩 滯留時間（分）</th><th>🧩 質譜碎片（m/z）</th></tr>
+    <tr><td><span class="dot" style="background:var(--amp)"></span>甲基安非他命</td><td>8.614</td><td><span class="pill">58</span><span class="pill">91</span><span class="pill">56</span></td></tr>
+    <tr><td><span class="dot" style="background:var(--mmc)"></span>4-甲基甲基卡西酮</td><td>12.235</td><td><span class="pill">58</span><span class="pill">91</span><span class="pill">65</span></td></tr>
+    <tr><td><span class="dot" style="background:var(--ket)"></span>愷他命 Ketamine</td><td>16.933</td><td><span class="pill">180</span><span class="pill">209</span><span class="pill">152</span></td></tr>
+    <tr><td><span class="dot" style="background:var(--eto)"></span>依托咪酯 Etomidate</td><td>17.038</td><td><span class="pill">105</span><span class="pill">104</span><span class="pill">77</span><span class="pill">244</span></td></tr>
+    <tr><td><span class="dot" style="background:var(--her)"></span>海洛因 Heroin</td><td>23.843</td><td><span class="pill">369</span><span class="pill">327</span><span class="pill">215</span><span class="pill">268</span></td></tr>
+  </table>
+</section>
+
+<!-- ⑤ MRM -->
+<section id="mrm">
+  <h2>⑤ MRM：質譜的「雙重門禁」🚪🚪</h2>
+  <p class="lead">MRM 是讓質譜「超級準」的秘密武器 ── 要通過兩道門才算數！</p>
+
+  <p>MRM 的全名是 <b>「多重反應監測」（Multiple Reaction Monitoring）</b>。
+     聽起來很難，其實就像機場海關的<b>兩道安檢門</b>：</p>
+
+  <div class="mrm">
+    <div class="gate"><div class="ic">🚪</div><b>第一道門</b>整個分子的重量對不對？<br><small>（先量「爸爸分子」）</small></div>
+    <div class="arrow">➡️</div>
+    <div class="gate" style="border-color:#ff6b6b"><div class="ic">💥</div><b>中間</b>用力敲碎！<br><small>把分子打成小碎片</small></div>
+    <div class="arrow">➡️</div>
+    <div class="gate"><div class="ic">🚪</div><b>第二道門</b>某一塊碎片重量對不對？<br><small>（再量「小孩碎片」）</small></div>
+  </div>
+
+  <div class="analogy">
+    🚪🚪 <b>為什麼要兩道門？因為這樣「幾乎不可能認錯人」！</b><br>
+    只有「整個分子的重量」<u>和</u>「敲碎後某塊碎片的重量」<b>兩個都剛好對上</b>，
+    警報才會響 🚨。就算別的分子重量碰巧一樣，敲碎後的碎片也會不同，所以騙不過 MRM！
+  </div>
+
+  <div class="mrm-demo">
+    <h3 style="margin-top:0">🔍 看一個例子：抓海洛因</h3>
+    <p>① 第一道門：量到「整個海洛因分子」的重量 ✔️<br>
+       ② 用力敲碎 💥<br>
+       ③ 第二道門：剛好量到碎片 <b>369</b> 或 <b>327</b> ✔️<br>
+       ➡️ 兩道門都對上！🚨 <b>確定是海洛因！</b></p>
+  </div>
+
+  <div class="analogy">
+    🧠 <b>合起來看：</b>偵探抓壞人靠兩個證據 ──
+    <b>🚩 什麼時候到（滯留時間）</b> ＋ <b>🧩 指紋拼圖對不對（MRM 碎片）</b>。
+    兩個都對上，毒品就無所遁形！
+  </div>
+</section>
+
+<!-- GAME 1: PUZZLE MATCH -->
+<section id="g1">
+  <h2>🎮 遊戲 1：拼圖配對 ── 這組碎片是誰？ 🧩</h2>
+  <p class="lead">看碎片拼圖，猜猜看是哪一種毒品。答對得分！</p>
+  <div class="game">
+    <div class="qcard" id="g1q">準備中…</div>
+    <div class="fragline" id="g1frag"></div>
+    <div class="opts" id="g1opts"></div>
+    <div class="feedback" id="g1fb"></div>
+    <div>分數：<span class="score" id="g1score">0</span> 　第 <span id="g1n">1</span> / 5 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g1next" style="display:none">下一題 ▶</button></div>
+  </div>
+</section>
+
+<!-- GAME 2: CATCH THE DRUG (RT + fragment) -->
+<section id="g2">
+  <h2>🎮 遊戲 2：抓毒品 ── 兩個線索一起看 🚩🧩</h2>
+  <p class="lead">偵探升級！這次同時給你「滯留時間」和「碎片線索」，找出正確的毒品。</p>
+  <div class="game">
+    <div class="qcard" id="g2q">準備中…</div>
+    <div class="opts" id="g2opts"></div>
+    <div class="feedback" id="g2fb"></div>
+    <div>分數：<span class="score" id="g2score">0</span> 　第 <span id="g2n">1</span> / 5 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g2next" style="display:none">下一題 ▶</button></div>
+  </div>
+</section>
+
+<!-- GAME 3: MRM GATE KEEPER -->
+<section id="g3">
+  <h2>🎮 遊戲 3：MRM 守門員 ── 該不該響警報？ 🚨</h2>
+  <p class="lead">你是 MRM 機器的守門員。兩道門的重量都對上才能按警報，只對一個就要放行！</p>
+  <div class="game">
+    <div class="qcard" id="g3q">準備中…</div>
+    <div class="opts">
+      <button class="opt" id="g3alarm">🚨 按警報（兩道門都對）</button>
+      <button class="opt" id="g3pass">✅ 放行（沒有完全對上）</button>
+    </div>
+    <div class="feedback" id="g3fb"></div>
+    <div>分數：<span class="score" id="g3score">0</span> 　第 <span id="g3n">1</span> / 5 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g3next" style="display:none">下一題 ▶</button></div>
+  </div>
+</section>
+
+<!-- TEACHING AIDS -->
+<section id="aids">
+  <h2>🖨️ 老師教具區（可列印） ✂️</h2>
+  <p class="lead">按瀏覽器列印（Ctrl + P），就能印出「嫌犯卡」和「拼圖碎片＋旗子」，剪下來在課堂玩。</p>
+
+  <h3>🪪 五張嫌犯資料卡</h3>
+  <div class="printcards">
+    <div class="pcard" style="border-color:var(--amp)"><h4>🟥 甲基安非他命</h4><div class="rt">🚩 滯留時間：8.614 分（跑最快）</div><div class="frags">🧩 <b>58</b><b>91</b><b>56</b></div></div>
+    <div class="pcard" style="border-color:var(--mmc)"><h4>🟧 4-甲基甲基卡西酮</h4><div class="rt">🚩 滯留時間：12.235 分</div><div class="frags">🧩 <b>58</b><b>91</b><b>65</b></div></div>
+    <div class="pcard" style="border-color:#c2a300"><h4>🟨 愷他命 Ketamine</h4><div class="rt">🚩 滯留時間：16.933 分</div><div class="frags">🧩 <b>180</b><b>209</b><b>152</b></div></div>
+    <div class="pcard" style="border-color:var(--eto)"><h4>🟩 依托咪酯 Etomidate</h4><div class="rt">🚩 滯留時間：17.038 分</div><div class="frags">🧩 <b>105</b><b>104</b><b>77</b><b>244</b></div></div>
+    <div class="pcard" style="border-color:var(--her)"><h4>🟦 海洛因 Heroin</h4><div class="rt">🚩 滯留時間：23.843 分（跑最慢）</div><div class="frags">🧩 <b>369</b><b>327</b><b>215</b><b>268</b></div></div>
+  </div>
+
+  <h3 style="margin-top:22px">📝 課堂玩法建議</h3>
+  <ul>
+    <li><b>賽跑插旗：</b>在教室地上貼一條「時間數線」（0～25 分），請小組拿著嫌犯卡，站到自己滯留時間的位置插旗子，看誰先到、誰最後到。</li>
+    <li><b>拼圖配對：</b>把碎片數字做成小卡（拼圖塊），打散後請學生拼回正確的毒品 ── 特別比較「58、91」相同，但「56 vs 65」不同的兩兄弟。</li>
+    <li><b>MRM 雙門關卡：</b>兩位同學當「第一道門」和「第二道門」，手上各拿一個重量數字；只有兩道門都喊「對！」全班才一起喊「警報 🚨」。</li>
+    <li><b>偵探結案：</b>老師念出「幾分到 ＋ 有哪些碎片」，學生搶答是哪一位嫌犯。</li>
+  </ul>
+
+  <h3>🎯 學習重點小結（給老師）</h3>
+  <ul>
+    <li>質譜＝用「分子的重量」來認分子，超靈敏、超精準。</li>
+    <li>三步驟：離子化（裝 GPS）→ 分離（排隊）→ 偵測（拍照）。</li>
+    <li>滯留時間（🚩）：每種毒品跑到終點的時間固定 → 第一個線索。</li>
+    <li>質譜碎片（🧩）：敲碎後的碎片組合像指紋 → 第二個線索。</li>
+    <li>MRM（🚪🚪）：整個分子＋某塊碎片「兩道門都對」才算數 → 所以超準、不會認錯。</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  質譜小學堂 · 第四關「質譜檢驗驗毒」教學互動教材　|　資料來源：5 種毒品碎片資料表<br>
+  概念參考：質譜小學堂系列（離子化→分離→偵測、MRM 雙重確認）
+</footer>
+
+<script>
+const DRUGS = [
+  {key:"amp", name:"甲基安非他命",        short:"甲基安非他命", rt:8.614,  frags:[58,91,56],          color:"#ff6b6b", emoji:"🟥"},
+  {key:"mmc", name:"4-甲基甲基卡西酮",     short:"卡西酮",       rt:12.235, frags:[58,91,65],          color:"#ffa94d", emoji:"🟧"},
+  {key:"ket", name:"愷他命 Ketamine",      short:"愷他命",       rt:16.933, frags:[180,209,152],       color:"#ffe066", emoji:"🟨"},
+  {key:"eto", name:"依托咪酯 Etomidate",   short:"依托咪酯",     rt:17.038, frags:[105,104,77,244],    color:"#69db7c", emoji:"🟩"},
+  {key:"her", name:"海洛因 Heroin",        short:"海洛因",       rt:23.843, frags:[369,327,215,268],   color:"#4dabf7", emoji:"🟦"},
+];
+
+/* ---------- ③ Chromatogram with flags ---------- */
+(function(){
+  const track = document.getElementById("track");
+  const axis  = document.getElementById("axis");
+  const info  = document.getElementById("rtInfo");
+  const maxT = 25;
+  DRUGS.forEach((d,i)=>{
+    const x = (d.rt/maxT)*100;
+    const peak = document.createElement("div");
+    peak.className="peak";
+    peak.style.left = x+"%";
+    const h = 50 + (i%3)*22; // varied peak heights
+    peak.innerHTML =
+      `<span class="flag">🚩</span>
+       <div class="blob" style="height:${h}px;background:linear-gradient(${d.color},#dff)"></div>
+       <label>${d.short}</label>`;
+    peak.onclick=()=>{
+      info.innerHTML = `${d.emoji} <b>${d.name}</b>　🚩 滯留時間：<b>${d.rt} 分</b>　🧩 碎片：${d.frags.join("、")}`;
+      info.style.borderLeftColor = d.color;
+    };
+    track.appendChild(peak);
+  });
+  for(let t=0;t<=25;t+=5){
+    const s=document.createElement("span"); s.textContent=t+"分"; axis.appendChild(s);
+  }
+})();
+
+/* ---------- ④ Puzzle pieces ---------- */
+(function(){
+  const wrap=document.getElementById("puzzleWrap");
+  DRUGS.forEach(d=>{
+    const div=document.createElement("div");
+    div.className="puzzle";
+    div.style.borderColor=d.color;
+    div.style.background="rgba(255,255,255,.04)";
+    div.innerHTML=`<h4>${d.emoji} ${d.short}</h4>`+
+      d.frags.map(f=>`<span class="frag" style="background:${d.color}">${f}</span>`).join("");
+    wrap.appendChild(div);
+  });
+})();
+
+/* ---------- helpers ---------- */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pickWrong(correctKey,n){return shuffle(DRUGS.filter(d=>d.key!==correctKey)).slice(0,n);}
+
+/* ---------- GAME 1: puzzle -> name ---------- */
+(function(){
+  let order=shuffle(DRUGS), idx=0, score=0, locked=false;
+  const q=document.getElementById("g1q"),frag=document.getElementById("g1frag"),
+        opts=document.getElementById("g1opts"),fb=document.getElementById("g1fb"),
+        sc=document.getElementById("g1score"),n=document.getElementById("g1n"),
+        next=document.getElementById("g1next");
+  function load(){
+    locked=false; fb.textContent=""; next.style.display="none";
+    const d=order[idx];
+    q.innerHTML=`第 ${idx+1} 題：這組「碎片拼圖」是哪一種毒品？`;
+    frag.innerHTML=d.frags.map(f=>`<span class="frag" style="background:#9cf">${f}</span>`).join(" ");
+    n.textContent=idx+1;
+    const choices=shuffle([d,...pickWrong(d.key,3)]);
+    opts.innerHTML="";
+    choices.forEach(c=>{
+      const b=document.createElement("button");b.className="opt";b.textContent=c.emoji+" "+c.short;
+      b.onclick=()=>{
+        if(locked)return;locked=true;
+        if(c.key===d.key){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 答對了！就是 ${d.name}。</span>`;}
+        else{fb.innerHTML=`<span class="no">❌ 再想想～正確答案是 ${d.name}（碎片 ${d.frags.join("、")}）。</span>`;}
+        idx<order.length-1?next.style.display="inline-block":endGame();
+      };
+      opts.appendChild(b);
+    });
+  }
+  function endGame(){fb.innerHTML+=`<br>🏁 全部答完！總分 <b>${score}/5</b>，${score>=4?"偵探高手！🏆":"再玩一次會更熟喔！"}`;}
+  next.onclick=()=>{idx++;load();};
+  load();
+})();
+
+/* ---------- GAME 2: RT + fragment -> name ---------- */
+(function(){
+  let order=shuffle(DRUGS), idx=0, score=0, locked=false;
+  const q=document.getElementById("g2q"),opts=document.getElementById("g2opts"),
+        fb=document.getElementById("g2fb"),sc=document.getElementById("g2score"),
+        n=document.getElementById("g2n"),next=document.getElementById("g2next");
+  function load(){
+    locked=false;fb.textContent="";next.style.display="none";
+    const d=order[idx];n.textContent=idx+1;
+    const oneFrag=shuffle(d.frags)[0];
+    q.innerHTML=`第 ${idx+1} 題 🕵️：偵探量到 ── 🚩 大約 <b>${d.rt} 分</b>到終點，
+      🧩 碎片裡有一塊是 <b>${oneFrag}</b>。<br>這是哪一種毒品？`;
+    const choices=shuffle([d,...pickWrong(d.key,3)]);
+    opts.innerHTML="";
+    choices.forEach(c=>{
+      const b=document.createElement("button");b.className="opt";b.textContent=c.emoji+" "+c.short;
+      b.onclick=()=>{
+        if(locked)return;locked=true;
+        if(c.key===d.key){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 破案！正是 ${d.name}。</span>`;}
+        else{fb.innerHTML=`<span class="no">❌ 不是喔～答案是 ${d.name}（${d.rt}分，碎片 ${d.frags.join("、")}）。</span>`;}
+        idx<order.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 總分 <b>${score}/5</b>！`;
+      };
+      opts.appendChild(b);
+    });
+  }
+  next.onclick=()=>{idx++;load();};
+  load();
+})();
+
+/* ---------- GAME 3: MRM gate keeper ---------- */
+(function(){
+  // Build 5 rounds: some valid (parent+fragment both belong to same drug), some not.
+  const sc=document.getElementById("g3score"),n=document.getElementById("g3n"),
+        q=document.getElementById("g3q"),fb=document.getElementById("g3fb"),
+        next=document.getElementById("g3next"),
+        bAlarm=document.getElementById("g3alarm"),bPass=document.getElementById("g3pass");
+  let rounds=[], idx=0, score=0, locked=false;
+
+  function build(){
+    rounds=[];
+    const ds=shuffle(DRUGS);
+    ds.forEach((d,i)=>{
+      const valid = i%2===0; // alternate
+      if(valid){
+        rounds.push({parent:d, frag:shuffle(d.frags)[0], parentName:d.name, ok:true});
+      }else{
+        const other=shuffle(DRUGS.filter(x=>x.key!==d.key))[0];
+        // fragment that does NOT belong to d
+        let badFrag=shuffle(other.frags).find(f=>!d.frags.includes(f));
+        if(badFrag===undefined) badFrag=999;
+        rounds.push({parent:d, frag:badFrag, parentName:d.name, ok:false});
+      }
+    });
+    rounds=shuffle(rounds);
+  }
+  function load(){
+    locked=false;fb.textContent="";next.style.display="none";
+    bAlarm.disabled=false;bPass.disabled=false;
+    const r=rounds[idx];n.textContent=idx+1;
+    q.innerHTML=`第 ${idx+1} 題 🚪🚪：<br>
+      🚪 第一道門：量到「<b>${r.parentName}</b>」整個分子 ✔️<br>
+      💥 敲碎！<br>
+      🚪 第二道門：量到一塊碎片是 <b>${r.frag}</b><br>
+      <span class="tag">問：這塊碎片是 ${r.parentName} 的嗎？該按警報還是放行？</span>`;
+  }
+  function answer(saidAlarm){
+    if(locked)return;locked=true;bAlarm.disabled=true;bPass.disabled=true;
+    const r=rounds[idx];
+    const correct = (saidAlarm===r.ok);
+    if(correct){
+      score++;sc.textContent=score;
+      fb.innerHTML=`<span class="ok">✅ 判斷正確！${r.ok
+        ? "碎片 "+r.frag+" 真的是 "+r.parentName+" 的 → 兩道門都對，按警報 🚨！"
+        : "碎片 "+r.frag+" 不是 "+r.parentName+" 的 → 第二道門沒對上，要放行 ✅。"}</span>`;
+    }else{
+      fb.innerHTML=`<span class="no">❌ 再想想～${r.ok
+        ? "其實碎片 "+r.frag+" 正是 "+r.parentName+" 的，應該按警報 🚨。"
+        : "其實碎片 "+r.frag+" 不屬於 "+r.parentName+"，兩道門沒同時對上，應該放行 ✅。"}</span>`;
+    }
+    idx<rounds.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 守門完成！總分 <b>${score}/5</b>，${score>=4?"超棒的守門員！🏆":"多練習就會更厲害！"}`;
+  }
+  bAlarm.onclick=()=>answer(true);
+  bPass.onclick=()=>answer(false);
+  next.onclick=()=>{idx++;load();};
+  build();load();
+})();
+</script>
+</body>
+</html>
