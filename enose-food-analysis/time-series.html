@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>電子鼻 × 食品分析：進階課 — Time-series Feature Engineering</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<style>
+@font-face{font-family:'GenSeki';src:url('assets/fonts/GenSekiGothic2TW-H.otf') format('opentype');font-weight:900;font-display:swap;}
+@font-face{font-family:'GenSeki';src:url('assets/fonts/GenSekiGothic2TW-B.otf') format('opentype');font-weight:700;font-display:swap;}
+@font-face{font-family:'GenSeki';src:url('assets/fonts/GenSekiGothic2TW-M.otf') format('opentype');font-weight:500;font-display:swap;}
+:root{--paper:#F7FBFF;--paper2:#EAF5FF;--paper3:#FFF8E8;--ink:#122033;--ink-soft:#475569;--blue:#1D75D8;--cyan:#0EA5A8;--orange:#E56B1F;--gold:#C7921B;--green:#26966D;--line:#C9DCEB;--deep:#10243D;--code:#1f2329;}
+*{box-sizing:border-box;} html{scroll-behavior:smooth;} body{margin:0;font-family:'GenSeki','Noto Sans TC',system-ui,sans-serif;font-weight:500;color:var(--ink);background:linear-gradient(180deg,#F7FBFF 0%,#FFFFFF 44%,#F3F9FF 100%);line-height:1.7;font-size:18px;} h1,h2,h3{font-weight:900;line-height:1.2;} a{color:var(--blue);text-decoration:none;} a:hover{text-decoration:underline;} code,pre,kbd{font-family:'JetBrains Mono','Fira Code',Consolas,monospace;}
+nav{position:sticky;top:0;z-index:50;background:rgba(16,36,61,.96);backdrop-filter:blur(6px);display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 22px;box-shadow:0 8px 24px rgba(15,36,61,.14);} nav .brand{color:#fff;font-weight:900;font-size:18px;margin-right:auto;} nav .brand b{color:#78D8FF;} nav a{color:#e6f4ff;font-weight:700;font-size:14.5px;padding:6px 11px;border-radius:8px;} nav a:hover{background:rgba(255,255,255,.12);text-decoration:none;color:#fff;}
+.hero{background:radial-gradient(circle at 20% 10%,rgba(120,216,255,.28),transparent 30%),linear-gradient(135deg,#10243D 0%,#16457C 50%,#0E6871 100%);color:#fff;padding:84px 22px 72px;text-align:center;} .hero h1{font-size:clamp(34px,6vw,64px);margin:0 0 14px;} .hero .accent{color:#FFD166;} .hero p.sub{font-size:clamp(17px,2.4vw,24px);color:#DCEEFF;font-weight:700;max-width:900px;margin:0 auto 28px;} .hero .facts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:12px;} .hero .fact{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px 20px;min-width:150px;} .hero .fact b{display:block;font-size:30px;color:#FFD166;font-weight:900;} .hero .fact span{font-size:14px;color:#DCEEFF;font-weight:700;}
+main{max-width:1080px;margin:0 auto;padding:0 22px;} section{padding:64px 0 8px;scroll-margin-top:64px;border-top:1px solid var(--line);} section:first-of-type{border-top:none;} .kicker{color:var(--orange);font-weight:900;font-size:15px;letter-spacing:.14em;text-transform:uppercase;} section h2{font-size:clamp(28px,4vw,42px);margin:6px 0 8px;} section h3{font-size:23px;margin:34px 0 10px;color:var(--blue);} p{margin:14px 0;} .lead{font-size:20px;color:var(--ink-soft);} .grid{display:grid;gap:18px;margin:24px 0;} .g4{grid-template-columns:repeat(4,1fr);} .g3{grid-template-columns:repeat(3,1fr);} .g2{grid-template-columns:repeat(2,1fr);} .card{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 12px 28px rgba(29,117,216,.06);} .card h4{margin:0 0 8px;font-size:19px;font-weight:900;color:var(--blue);} .card.orange h4{color:var(--orange);} .card.green h4{color:var(--green);} .card.cyan h4{color:var(--cyan);} .card .big{font-size:40px;font-weight:900;color:var(--orange);line-height:1;margin:4px 0 6px;} .card small{color:var(--ink-soft);font-weight:700;}
+figure{margin:26px 0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center;box-shadow:0 16px 36px rgba(16,36,61,.07);} figure svg{max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto;} figcaption{font-size:15px;color:var(--ink-soft);font-weight:700;margin-top:10px;} figcaption b{color:var(--orange);} .callout{border-left:6px solid var(--blue);background:var(--paper2);border-radius:0 14px 14px 0;padding:18px 22px;margin:24px 0;font-size:18px;} .callout.orange{border-color:var(--orange);background:var(--paper3);} .callout .tag{font-weight:900;color:var(--blue);} .callout.orange .tag{color:var(--orange);} .eq{background:#fff;border:1px dashed var(--blue);border-radius:12px;padding:14px 18px;margin:18px 0;text-align:center;font-size:20px;}
+pre{background:var(--code);border-radius:14px;padding:0;margin:18px 0;overflow:auto;border:1px solid #2c313a;} pre code{display:block;padding:20px 22px;font-size:14.5px;line-height:1.6;background:transparent;} table{width:100%;border-collapse:collapse;margin:24px 0;font-size:16.5px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 24px rgba(16,36,61,.06);} th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;} th{background:var(--blue);color:#fff;font-weight:900;} tr:last-child td{border-bottom:none;} td b.orange{color:var(--orange);} .flow{background:#1f2329;color:#e9f2ff;border-radius:14px;padding:20px;overflow:auto;font-size:13.5px;line-height:1.5;} .badge{display:inline-block;background:#DDF3FF;color:#13558C;border:1px solid #BDE7FF;border-radius:999px;padding:4px 10px;font-size:13px;font-weight:900;margin:2px 4px 2px 0;} footer{background:var(--deep);color:#DCEEFF;padding:40px 22px;margin-top:60px;text-align:center;font-size:14px;} footer b{color:#FFD166;} @media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr);}} @media(max-width:760px){.g4,.g3,.g2{grid-template-columns:1fr;} body{font-size:17px;} nav .brand{width:100%;}}
+</style>
+</head>
+<body>
+<nav>
+  <span class="brand">電子鼻 × 食品分析 <b>·</b> Time-series Features</span>
+  <a href="./">入門分類</a>
+  <a href="regression.html">中階 Regression</a>
+  <a href="#curve">曲線</a>
+  <a href="#dataset">資料</a>
+  <a href="#features">特徵</a>
+  <a href="#python">Python</a>
+  <a href="#modeling">建模</a>
+  <a href="#orange">Orange</a>
+</nav>
+<header class="hero">
+  <h1>進階課：Time-series e-nose <span class="accent">Feature Engineering</span></h1>
+  <p class="sub">前兩章直接使用整理好的感測器表格；這一章從原始時間序列開始，把每支 sensor 的反應曲線轉成可用於 PCA、PLS-DA、SVR 與 Random Forest 的特徵表。</p>
+  <div class="facts">
+    <div class="fact"><b>曲線</b><span>raw sensor response</span></div>
+    <div class="fact"><b>特徵</b><span>baseline / max / AUC</span></div>
+    <div class="fact"><b>CSV</b><span>Orange-ready table</span></div>
+    <div class="fact"><b>模型</b><span>PCA + ML</span></div>
+  </div>
+</header>
+<main>
+
+<section id="curve">
+  <span class="kicker">先看原始訊號</span>
+  <h2>電子鼻原始資料通常是一段反應曲線，不是一個數字</h2>
+  <p class="lead">當樣本放進腔體後，感測器反應會從 baseline 開始上升，接著進入較穩定的區域；清洗或抽氣時，又會逐漸回復。這整段曲線包含很多資訊：反應強度、反應速度、穩態值與恢復能力。</p>
+  <figure>
+    <svg viewBox="0 0 940 420" role="img" aria-label="電子鼻時間序列反應曲線示意圖">
+      <rect x="70" y="45" width="790" height="300" rx="18" fill="#fff" stroke="#C9DCEB"/>
+      <line x1="120" y1="305" x2="810" y2="305" stroke="#475569" stroke-width="2"/>
+      <line x1="120" y1="305" x2="120" y2="80" stroke="#475569" stroke-width="2"/>
+      <path d="M120 275 C175 275 190 272 220 270 C255 255 280 190 315 145 C350 105 410 110 455 112 C530 115 590 118 650 116 C690 124 705 180 730 220 C750 255 780 273 810 278" fill="none" stroke="#1D75D8" stroke-width="6"/>
+      <line x1="120" y1="275" x2="810" y2="275" stroke="#E56B1F" stroke-dasharray="8 8" stroke-width="3"/>
+      <line x1="220" y1="305" x2="220" y2="80" stroke="#26966D" stroke-dasharray="6 8" stroke-width="3"/>
+      <line x1="650" y1="305" x2="650" y2="80" stroke="#26966D" stroke-dasharray="6 8" stroke-width="3"/>
+      <text x="170" y="260" font-size="18" font-weight="900" fill="#E56B1F">baseline</text>
+      <text x="315" y="112" font-size="18" font-weight="900" fill="#1D75D8">response rise</text>
+      <text x="520" y="100" font-size="18" font-weight="900" fill="#1D75D8">steady state</text>
+      <text x="705" y="205" font-size="18" font-weight="900" fill="#1D75D8">recovery</text>
+      <text x="465" y="385" text-anchor="middle" font-size="22" font-weight="900" fill="#10243D">Time</text>
+      <text x="42" y="210" text-anchor="middle" font-size="22" font-weight="900" fill="#10243D" transform="rotate(-90 42 210)">Sensor response</text>
+    </svg>
+    <figcaption>時間序列 e-nose 的任務：把這條曲線轉成幾個能描述氣味反應的特徵。</figcaption>
+  </figure>
+  <div class="callout"><span class="tag">本章目標：</span>把每個樣本、每個 sensor 的 time-series 轉成一列特徵，例如 <code>MQ3_max</code>、<code>MQ3_auc</code>、<code>MQ3_slope</code>，最後輸出成 <code>sample × features</code> 表格。</div>
+</section>
+
+<section id="dataset">
+  <span class="kicker">適合練習的資料</span>
+  <h2>建議資料：葡萄酒酸敗或釀造醋電子鼻時間序列</h2>
+  <p class="lead">進階課需要原始時間序列資料。最適合的公開資料是葡萄酒酸敗 e-nose dataset，因為每個檔案就是多個 sensor 隨時間的反應；也可以使用釀造醋或水果新鮮度資料。</p>
+  <table>
+    <tr><th>資料集</th><th>特性</th><th>適合練習</th></tr>
+    <tr><td><a href="https://data.mendeley.com/datasets/vpc887d53s/3" target="_blank" rel="noopener">Wine spoilage thresholds</a></td><td>每個樣本 180 秒、約 3330 data points；包含濕度、溫度與 MQ sensor readings。</td><td><b class="orange">最推薦</b>：time-series feature extraction、PCA、spoiled threshold classification。</td></tr>
+    <tr><td><a href="https://data.mendeley.com/datasets/w5fcvyj398/1" target="_blank" rel="noopener">Chinese brewed vinegar</a></td><td>6 類醋，每類 25 samples，每個 sensor 有 4500 data points。</td><td>多分類、品牌 / 類型辨識、穩態特徵比較。</td></tr>
+    <tr><td><a href="https://zenodo.org/records/17285312" target="_blank" rel="noopener">Food Freshness Electronic Nose</a></td><td>水果與食物新鮮度，多個 CSV，含 D1–D5 時間標籤。</td><td>食材分類、新鮮度天數分類、混合樣本討論。</td></tr>
+  </table>
+  <p><span class="badge">time-series</span><span class="badge">baseline correction</span><span class="badge">feature extraction</span><span class="badge">Orange-ready CSV</span></p>
+</section>
+
+<section id="features">
+  <span class="kicker">Feature Engineering</span>
+  <h2>一條曲線可以萃取哪些特徵？</h2>
+  <p class="lead">特徵工程不是亂取數字，而是把感測器反應的物理意義轉成模型能使用的欄位。你可以把每個 sensor 的曲線拆成四類資訊：背景、強度、速度與形狀。</p>
+  <table>
+    <tr><th>特徵</th><th>公式 / 作法</th><th>代表意義</th></tr>
+    <tr><td>baseline</td><td>前 5–10 秒平均</td><td>樣本進入前的背景值。</td></tr>
+    <tr><td>max response</td><td><code>max(signal - baseline)</code></td><td>最大反應強度；常與 VOC 濃度相關。</td></tr>
+    <tr><td>steady-state mean</td><td>最後穩定區間平均</td><td>接近平衡時的氣味指紋。</td></tr>
+    <tr><td>AUC</td><td>baseline-corrected curve 的面積</td><td>整體反應量。</td></tr>
+    <tr><td>initial slope</td><td>反應初期線性斜率</td><td>感測器對 VOC 的反應速度。</td></tr>
+    <tr><td>time to max</td><td>最大值出現的時間</td><td>反應快慢與動力學差異。</td></tr>
+    <tr><td>recovery ratio</td><td>清洗結束後回復比例</td><td>感測器是否殘留或飽和。</td></tr>
+  </table>
+  <div class="eq">\[ \Delta R(t)=R(t)-R_0 \quad 或 \quad \frac{\Delta R(t)}{R_0}=\frac{R(t)-R_0}{R_0} \]</div>
+  <div class="callout orange"><span class="tag">小心：</span>不同 sensor 可能是電阻上升或下降反應。做特徵前先畫圖確認方向，必要時使用絕對值、反向轉換，或用 <code>max(abs(ΔR/R0))</code>。</div>
+</section>
+
+<section id="workflow">
+  <span class="kicker">資料流程</span>
+  <h2>從一堆 txt / xlsx 檔，整理成一張特徵表</h2>
+  <pre class="flow"><code>原始資料夾
+  ├── sample_001.txt      每個檔案 = 一個樣本的時間序列
+  ├── sample_002.txt
+  └── ...
+        ↓ Python 逐檔讀取
+        ↓ baseline correction
+        ↓ 對每個 sensor 萃取 max / mean / AUC / slope / time_to_max
+        ↓ 從檔名或 metadata 取得 class label
+        ↓ 合併成 sample × features table
+features.csv
+  sample_id | class | MQ3_max | MQ3_auc | MQ3_slope | MQ4_max | ...</code></pre>
+  <p>這張 <code>features.csv</code> 就是接下來做 PCA、PLS-DA、SVM、Random Forest 或 Orange workflow 的共同起點。</p>
+</section>
+
+<section id="python">
+  <span class="kicker">Python 實作</span>
+  <h2>把 time-series 轉成 feature table</h2>
+  <p class="lead">下面程式碼用通用寫法示範。不同資料集的欄名與檔案格式可能不同，你只需要修改 <code>sensor_cols</code>、標籤解析方式與取樣時間欄位。</p>
+
+  <h3>1. 讀取一個 time-series 檔案</h3>
+  <pre><code class="language-python">from pathlib import Path
+import pandas as pd
+import numpy as np
+
+# 例：wine spoilage dataset 解壓後，每個 txt/csv 是一個樣本
+file_path = Path("Dataset/HQ_Wines/HQ_Wine01-B01_R01.txt")
+
+# 依實際分隔符調整 sep：常見是 comma、semicolon、tab 或 whitespace
+df = pd.read_csv(file_path, sep=None, engine="python")
+print(df.head())
+print(df.columns.tolist())</code></pre>
+
+  <h3>2. 對單一 sensor 萃取特徵</h3>
+  <pre><code class="language-python">def extract_sensor_features(t, x, baseline_seconds=10, steady_seconds=30):
+    """Return feature dict for one sensor time series."""
+    t = np.asarray(t, dtype=float)
+    x = np.asarray(x, dtype=float)
+
+    # baseline: first N seconds
+    base_mask = t <= (t.min() + baseline_seconds)
+    r0 = np.nanmean(x[base_mask])
+
+    # baseline-corrected and normalized response
+    dx = x - r0
+    if abs(r0) > 1e-12:
+        ndx = dx / r0
+    else:
+        ndx = dx
+
+    # steady-state: last N seconds
+    steady_mask = t >= (t.max() - steady_seconds)
+
+    # initial slope: first 20 seconds after baseline window
+    slope_mask = (t > t.min() + baseline_seconds) & (t <= t.min() + baseline_seconds + 20)
+    if slope_mask.sum() >= 2:
+        slope = np.polyfit(t[slope_mask], ndx[slope_mask], 1)[0]
+    else:
+        slope = np.nan
+
+    idx_max = int(np.nanargmax(np.abs(ndx)))
+
+    return {
+        "baseline": r0,
+        "max_abs": float(np.nanmax(np.abs(ndx))),
+        "max_signed": float(ndx[idx_max]),
+        "time_to_max": float(t[idx_max] - t.min()),
+        "steady_mean": float(np.nanmean(ndx[steady_mask])),
+        "steady_std": float(np.nanstd(ndx[steady_mask], ddof=1)),
+        "auc_abs": float(np.trapz(np.abs(ndx), t)),
+        "initial_slope": float(slope),
+    }</code></pre>
+
+  <h3>3. 對一個樣本的所有 sensor 萃取特徵</h3>
+  <pre><code class="language-python">def extract_sample_features(df, sensor_cols, time_col=None, sample_id="sample"):
+    if time_col is None:
+        # 如果沒有 time 欄位，就用 row index 當時間；若知道取樣率，請換成秒
+        t = np.arange(len(df), dtype=float)
+    else:
+        t = df[time_col].to_numpy(float)
+
+    row = {"sample_id": sample_id}
+    for col in sensor_cols:
+        feats = extract_sensor_features(t, df[col].to_numpy(float))
+        for k, v in feats.items():
+            row[f"{col}_{k}"] = v
+    return row
+
+sensor_cols = [c for c in df.columns if "MQ" in c or "sensor" in c.lower()]
+row = extract_sample_features(df, sensor_cols, time_col=None, sample_id=file_path.stem)
+row</code></pre>
+
+  <h3>4. 批次處理整個資料夾</h3>
+  <pre><code class="language-python">def label_from_path(path):
+    # wine dataset 範例：父資料夾 AQ_Wines / HQ_Wines / LQ_Wines 可當 class
+    parent = path.parent.name
+    if parent.startswith("AQ"):
+        return "average_quality"
+    if parent.startswith("HQ"):
+        return "high_quality"
+    if parent.startswith("LQ"):
+        return "low_quality"
+    if parent.lower().startswith("ethanol"):
+        return "ethanol"
+    return parent
+
+root = Path("Dataset")
+files = sorted(list(root.rglob("*.txt")) + list(root.rglob("*.csv")) + list(root.rglob("*.xlsx")))
+rows = []
+
+for path in files:
+    if path.suffix.lower() == ".xlsx":
+        raw = pd.read_excel(path)
+    else:
+        raw = pd.read_csv(path, sep=None, engine="python")
+
+    sensor_cols = [c for c in raw.columns if "MQ" in c or "sensor" in c.lower()]
+    if not sensor_cols:
+        # 如果沒有標準欄名，可手動指定，例如 raw.columns[2:8]
+        sensor_cols = list(raw.columns[2:8])
+
+    feat = extract_sample_features(raw, sensor_cols, time_col=None, sample_id=path.stem)
+    feat["class"] = label_from_path(path)
+    feat["source_file"] = str(path)
+    rows.append(feat)
+
+features = pd.DataFrame(rows)
+features.to_csv("enose_time_series_features.csv", index=False)
+features.head()</code></pre>
+
+  <h3>5. 產生 Orange 可讀的版本</h3>
+  <pre><code class="language-python"># Orange 對乾淨 CSV 最友善：一列一樣本、class 欄當 target、其他數值欄當 features
+orange_df = features.drop(columns=["source_file"], errors="ignore")
+orange_df.to_csv("orange_enose_time_series_features.csv", index=False)
+print(orange_df.shape)</code></pre>
+</section>
+
+<section id="modeling">
+  <span class="kicker">建模與解釋</span>
+  <h2>特徵表完成後，再回到熟悉的 PCA 與機器學習</h2>
+  <p class="lead">一旦把 time-series 轉成 <code>sample × features</code>，接下來就和前兩章一樣：先 PCA 看結構，再用分類或回歸模型驗證特徵是否真的有預測能力。</p>
+  <div class="grid g3">
+    <div class="card"><h4>PCA</h4><p>檢查不同 wine quality、vinegar brand 或 freshness day 是否自然分群。</p></div>
+    <div class="card cyan"><h4>Classification</h4><p>用 SVM / Random Forest / PLS-DA 判斷樣本類別。</p></div>
+    <div class="card orange"><h4>Regression</h4><p>若有連續標籤，可用 PLS / SVR 預測酸敗程度、TVC 或濃度。</p></div>
+  </div>
+  <pre><code class="language-python">from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+
+features = pd.read_csv("enose_time_series_features.csv")
+y = features["class"]
+X = features.drop(columns=["class", "sample_id", "source_file"], errors="ignore")
+X = X.apply(pd.to_numeric, errors="coerce").fillna(X.median(numeric_only=True))
+
+# PCA visualization
+Xp = StandardScaler().fit_transform(X)
+T = PCA(n_components=2).fit_transform(Xp)
+
+# Classification
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, stratify=y, random_state=42
+)
+model = Pipeline([("scaler", StandardScaler()), ("svc", SVC(kernel="rbf", C=10))])
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+print(classification_report(y_test, pred))</code></pre>
+  <div class="callout orange"><span class="tag">解釋模型：</span>Random Forest 的 feature importance 或 permutation importance 可以告訴你，是哪個 sensor 的 <code>max</code>、<code>AUC</code> 或 <code>slope</code> 對分類最重要。</div>
+</section>
+
+<section id="orange">
+  <span class="kicker">Orange Data Mining</span>
+  <h2>Orange 從 feature table 開始，不直接吃原始曲線</h2>
+  <p class="lead">Orange 很適合做 PCA、分類與模型比較，但它不適合直接批次處理大量 time-series 檔案。因此建議用 Python 先輸出 <code>orange_enose_time_series_features.csv</code>，再進 Orange。</p>
+  <pre class="flow"><code>Python feature extraction
+  → orange_enose_time_series_features.csv
+  → Orange File
+  → Select Columns
+      Features: MQ*_max_abs, MQ*_auc_abs, MQ*_initial_slope, ...
+      Target: class
+      Meta: sample_id
+  → Preprocess
+      Impute / Standardize
+  → PCA
+  → Scatter Plot
+  → Test and Score
+       ← SVM
+       ← Random Forest
+       ← Logistic Regression
+  → Confusion Matrix</code></pre>
+  <table>
+    <tr><th>Orange 欄位角色</th><th>放什麼</th></tr>
+    <tr><td>Features</td><td>所有數值型曲線特徵，例如 <code>MQ3_max_abs</code>、<code>MQ3_auc_abs</code>、<code>MQ3_initial_slope</code>。</td></tr>
+    <tr><td>Target</td><td>樣本類別，例如 wine quality、vinegar brand、freshness day。</td></tr>
+    <tr><td>Meta</td><td><code>sample_id</code>、<code>source_file</code>，用來追蹤樣本但不參與建模。</td></tr>
+  </table>
+</section>
+
+<section id="check">
+  <span class="kicker">檢查自己</span>
+  <h2>完成本章後，你應該能回答這些問題</h2>
+  <div class="grid g2">
+    <div class="card"><h4>觀念題</h4><ol><li>為什麼 time-series e-nose 需要先做 feature extraction？</li><li>baseline correction 和 normalization 差在哪裡？</li><li>AUC、max response、initial slope 分別代表什麼感測意義？</li><li>為什麼 sample id 和 source file 不能當作 feature？</li></ol></div>
+    <div class="card orange"><h4>實作題</h4><ol><li>你能否從一個資料夾批次產生 <code>features.csv</code>？</li><li>PCA 是否能用你萃取的特徵分開類別？</li><li>哪一類特徵對模型最重要：強度、速度、穩態，還是 AUC？</li><li>如果模型表現很好，如何檢查是否有 data leakage？</li></ol></div>
+  </div>
+  <div class="callout"><span class="tag">最後一句話：</span>原始曲線不是負擔，而是資訊來源。好的 feature engineering 會把感測器反應的動力學、強度與穩態差異保留下來，讓 PCA 與機器學習模型真正讀懂食品氣味變化。</div>
+</section>
+</main>
+<footer>
+  <p><b>電子鼻 × 食品分析：進階課 — Time-series Feature Engineering</b></p>
+  <p>Raw e-nose curves → engineered features → PCA / ML / Orange Data Mining</p>
+</footer>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.hljs) hljs.highlightAll();
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '\\[', right: '\\]', display: true},
+      {left: '$', right: '$', display: false},
+      {left: '\\(', right: '\\)', display: false}
+    ]});
+  }
+});
+</script>
+</body>
+</html>

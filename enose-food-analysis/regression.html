@@ -26,6 +26,7 @@ pre{background:var(--code);border-radius:14px;padding:0;margin:18px 0;overflow:a
 <nav>
   <span class="brand">電子鼻 × 食品分析 <b>·</b> Regression</span>
   <a href="./">入門分類</a>
+  <a href="time-series.html">進階 Time-series</a>
   <a href="#target">目標</a>
   <a href="#data">資料</a>
   <a href="#features">特徵</a>
@@ -275,6 +276,7 @@ for name, model in models.items():
     <div class="card"><h4>觀念題</h4><ol><li>分類與回歸在食品品質分析中差在哪裡？</li><li>為什麼 PLS 適合感測器陣列資料？</li><li>LV 太多會造成什麼問題？</li><li>為什麼 <code>minute</code> 可能造成 data leakage？</li></ol></div>
     <div class="card orange"><h4>結果解讀題</h4><ol><li>Measured vs predicted 圖是否接近對角線？</li><li>RMSECV 最小時的 LV 數是多少？</li><li>高 TVC 區域是否被系統性低估？</li><li>PLS、SVR、Random Forest 哪個最適合這組資料？為什麼？</li></ol></div>
   </div>
+  <div class="callout orange"><span class="tag">進階延伸：</span>如果你想從原始電子鼻曲線開始，自行萃取 max response、AUC、initial slope 等特徵，請接著看 <a href="time-series.html">進階課：Time-series Feature Engineering</a>。</div>
 </section>
 </main>
 <footer>
