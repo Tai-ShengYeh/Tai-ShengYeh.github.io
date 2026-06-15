@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LC-MS/MS 質譜定性・定量原理與數據品管 ── 進階教學</title>
+<style>
+  :root{
+    --bg:#0f1b2d; --panel:#16263d;
+    --ink:#eaf2ff; --sub:#a9c0e0;
+    --amp:#ff6b6b; --mmc:#ffa94d; --ket:#ffe066; --eto:#69db7c; --her:#4dabf7;
+    --gold:#ffd43b; --good:#51cf66; --bad:#ff6b6b; --warn:#ff8787; --info:#4dabf7;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#0f1b2d,#152a45 60%,#0f1b2d);color:#eaf2ff;line-height:1.75}
+  header.hero{text-align:center;padding:46px 20px 30px;
+    background:radial-gradient(900px 400px at 50% -120px,rgba(105,219,124,.24),transparent),
+               radial-gradient(700px 360px at 80% 0,rgba(77,171,247,.16),transparent)}
+  .hero h1{font-size:clamp(25px,5.2vw,44px);margin:.1em 0;letter-spacing:1px}
+  .hero .badge{display:inline-block;background:#69db7c;color:#08331c;font-weight:900;
+    border-radius:999px;padding:6px 16px;font-size:15px;margin-bottom:10px}
+  .hero p{color:#a9c0e0;max-width:820px;margin:10px auto 0;font-size:clamp(15px,2.4vw,19px)}
+  .hero .crew{font-size:40px;letter-spacing:7px;margin-top:14px}
+  .hero .links{margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .hero .backlink{display:inline-block;color:#9be7ad;text-decoration:none;
+    border:1px solid #2c4f7a;border-radius:999px;padding:7px 16px;font-size:13.5px;font-weight:700;background:#16263d}
+  .hero .backlink:hover{background:#24467a;color:#fff}
+
+  nav{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+    padding:12px;background:rgba(15,27,45,.93);backdrop-filter:blur(8px);border-bottom:1px solid #243a59}
+  nav a{color:#cfe0fb;text-decoration:none;font-weight:700;font-size:13.5px;
+    padding:7px 12px;border-radius:999px;border:1px solid #2c4f7a;background:#16263d;transition:.15s}
+  nav a:hover{background:#24467a;color:#fff;transform:translateY(-2px)}
+  nav a.lab{background:#173a2a;border-color:#3c8a5e;color:#bff5d3}
+
+  main{max-width:1040px;margin:0 auto;padding:10px 16px 80px}
+  section{background:rgba(22,38,61,.7);border:1px solid #25405f;border-radius:22px;
+    padding:26px 22px;margin:22px 0;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+  section h2{font-size:clamp(22px,4vw,30px);margin:0 0 4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  section .lead{color:#9fb7d8;margin:2px 0 18px;font-size:16px}
+  h3{font-size:20px;margin:24px 0 8px;color:#ffe9a8}
+  h4{font-size:17px;margin:16px 0 6px;color:#bfe2ff}
+  p{margin:8px 0}
+  .tag{font-size:13px;background:#24467a;padding:3px 10px;border-radius:999px;color:#cfe0fb}
+  code{background:#0d1a2e;border:1px solid #2a456a;border-radius:6px;padding:1px 7px;font-size:14px;color:#ffe066;
+    font-family:"Cascadia Code",Consolas,monospace}
+
+  .cardrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:14px 0}
+  .card{background:#142339;border:1px solid #2a456a;border-radius:16px;padding:16px;text-align:center}
+  .card .big{font-size:38px}
+  .card b{display:block;margin:6px 0 2px;font-size:17px}
+  .card small{color:#9fb7d8}
+
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+  @media(max-width:680px){.twocol{grid-template-columns:1fr}}
+  .box{background:#13243d;border:1px solid #2a456a;border-radius:16px;padding:16px}
+  .box.qual{border-color:#4dabf7;box-shadow:inset 0 0 0 1px rgba(77,171,247,.25)}
+  .box.quant{border-color:#69db7c;box-shadow:inset 0 0 0 1px rgba(105,219,124,.25)}
+  .box h4{margin-top:0}
+
+  .analogy{background:#172c49;border-left:6px solid #ffd43b;border-radius:12px;padding:12px 16px;margin:12px 0}
+  .analogy b{color:#ffe066}
+  .note{background:#11253a;border-left:6px solid #4dabf7;border-radius:12px;padding:12px 16px;margin:12px 0;color:#dbeaff}
+  .warnbox{background:#2c1620;border-left:6px solid #ff8787;border-radius:12px;padding:12px 16px;margin:12px 0;color:#ffdbe0}
+
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14.5px;border-radius:12px;overflow:hidden}
+  th,td{padding:9px 8px;text-align:center;border-bottom:1px solid #2a456a;vertical-align:middle}
+  th{background:#1f6f3e;color:#fff;font-size:14px}
+  table.qcq th{background:#1d5a8a}
+  tr:nth-child(even) td{background:#142339}
+  td.l{text-align:left}
+  .pass{color:var(--good);font-weight:800}
+  .fail{color:var(--bad);font-weight:800}
+  .pill{display:inline-block;background:#0e1b30;border:1px solid #34557e;border-radius:8px;
+    padding:2px 9px;margin:2px;font-weight:800;font-variant-numeric:tabular-nums}
+  .pill.base{background:#1f6f3e;border-color:#3fae5a;color:#fff}
+  .arrow{color:#ffd43b;font-weight:900;margin:0 4px}
+
+  /* transition diagram */
+  .mrm{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;margin:16px 0;text-align:center}
+  .ionbox{background:#142339;border:2px solid #34557e;border-radius:16px;padding:12px 16px;min-width:120px}
+  .ionbox .ic{font-size:28px}
+  .ionbox b{display:block;color:#9be7ad;margin-top:2px}
+  .ionbox small{color:#9fb7d8;display:block}
+  .stage{font-size:12px;color:#7f9bc0;display:block;margin-top:4px}
+
+  /* interactive */
+  .lab{background:#0d1a2e;border:1px solid #2f5081;border-radius:16px;padding:18px;margin-top:12px}
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:10px 0}
+  .controls label{font-size:14px;color:#cfe0fb;display:flex;flex-direction:column;gap:4px;font-weight:700}
+  select,input[type=number]{font-family:inherit;background:#16263d;color:#eaf2ff;border:1px solid #34557e;
+    border-radius:10px;padding:8px 10px;font-size:15px}
+  input[type=range]{accent-color:#4dabf7}
+  button.btn{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-weight:800;font-size:15px;
+    padding:10px 16px;transition:.15s;background:#ffd43b;color:#19283f}
+  button.btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+  button.opt{font-family:inherit;cursor:pointer;border:1px solid #3a5f93;border-radius:12px;font-weight:800;
+    font-size:15px;padding:11px 15px;background:#1d3a63;color:#eaf2ff;transition:.15s}
+  button.opt:hover{background:#27508a;transform:translateY(-2px)}
+  .opts{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+  .readout{font-size:15px;line-height:2;background:#11203a;border:1px solid #2f5081;border-radius:12px;padding:12px 16px;margin-top:10px}
+  .readout b{color:#ffe066}
+  .verdict{font-weight:900;font-size:18px;margin-top:8px}
+  .feedback{font-weight:800;margin-top:10px;min-height:24px}
+  .score{font-weight:900;color:#ffd43b}
+  .ok{color:var(--good)} .no{color:var(--bad)}
+
+  .gauge{position:relative;height:42px;border-radius:999px;background:#22344f;overflow:hidden;margin:14px 0 6px}
+  .gauge .band{position:absolute;top:0;bottom:0;background:rgba(105,219,124,.32);border-left:2px dashed #69db7c;border-right:2px dashed #69db7c}
+  .gauge .ref{position:absolute;top:0;bottom:0;width:3px;background:#ffd43b}
+  .gauge .meas{position:absolute;top:0;bottom:0;width:4px;background:#ff6b6b;transition:left .12s}
+  .gaugeaxis{display:flex;justify-content:space-between;color:#7f9bc0;font-size:11px;margin:0 2px}
+
+  .calwrap{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start}
+  @media(max-width:720px){.calwrap{grid-template-columns:1fr}}
+  svg.cal{width:100%;height:auto;background:#0b1626;border:1px solid #2a456a;border-radius:12px}
+
+  footer{text-align:center;color:#7f9bc0;font-size:13px;padding:30px 16px}
+  ul{margin:8px 0 8px 2px;padding-left:22px}
+  li{margin:5px 0}
+  .ref-cite{color:#8aa6cc;font-size:12.5px;margin-top:6px}
+
+  @media print{
+    body{background:#fff;color:#000}
+    nav,.hero p,.hero .crew,.hero .links,.lab,footer{display:none!important}
+    section{break-inside:avoid;box-shadow:none;border:1px solid #999;background:#fff;color:#000}
+    h2,h3,h4{color:#000}.box,.analogy,.note,.warnbox{background:#fff;color:#000}
+  }
+</style>
+</head>
+<body>
+
+<style>
+.modbar{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:center;padding:9px 14px;background:#0a1422;border-bottom:2px solid #ffd43b;font-size:13px;font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif}
+.modbar a{color:#cfe0fb;text-decoration:none;font-weight:700;padding:3px 9px;border-radius:8px;border:1px solid transparent}
+.modbar a:hover{background:#24467a;color:#fff}
+.modbar .mb-home{color:#ffd43b;font-weight:900}
+.modbar a.cur{color:#9be7ad;border-color:#3c8a5e;background:#11271a}
+@media print{.modbar{display:none}}
+</style>
+<div class="modbar">
+  <a class="mb-home" href="index.html">🏠 質譜教學模組</a>
+  <a href="質譜毒品偵探_GCMS版.html">🕵️ 毒品偵探</a>
+  <a href="質譜定性定量與品管_小學版.html">🧒 定性定量·兒童</a>
+  <a href="質譜定性定量與品管_GCMS進階版.html">🔬 GC-MS 進階</a>
+  <a href="質譜定性定量與品管_LCMS進階版.html" class="cur">💧 LC-MS 進階</a>
+</div>
+
+<header class="hero">
+  <div class="badge">質譜進階篇 · LC-MS/MS · 定性 × 定量 × 數據品管</div>
+  <h1>💧 LC-MS/MS 定性・定量原理與數據品管</h1>
+  <p>液相層析串聯質譜（LC-MS/MS）是痕量檢驗的主力。這一篇講清楚 <b>ESI 軟游離</b>、
+     <b>MRM 母離子→子離子轉換（transition）</b>如何做<b>定性確認</b>與<b>定量</b>，
+     並整理 LC-MS/MS 專屬的品管重點 ── 尤其是 <b>基質效應（ion suppression）</b>，
+     對應 EU 2002/657/EC、SANTE/11312 與方法確效規範。</p>
+  <div class="crew">💧🔁🎯📈🧱✅</div>
+  <div class="links">
+    <a class="backlink" href="質譜定性定量與品管_GCMS進階版.html">🔬 GC-MS 進階版</a>
+    <a class="backlink" href="質譜毒品偵探_GCMS版.html">🕵️ 小學偵探版</a>
+  </div>
+</header>
+
+<nav>
+  <a href="#overview">① LC-MS/MS 概念</a>
+  <a href="#qual">② 定性原理</a>
+  <a href="#qualqc">③ 定性品管判準</a>
+  <a href="#ip">④ 確認點數</a>
+  <a href="#quant">⑤ 定量原理</a>
+  <a href="#matrix">⑥ 基質效應</a>
+  <a href="#quantqc">⑦ 定量品管</a>
+  <a href="#batch">⑧ 批次品管</a>
+  <a href="#lab-mrm" class="lab">🎯 離子比</a>
+  <a href="#lab-cal" class="lab">🧪 基質效應</a>
+  <a href="#lab-ip" class="lab">🧮 確認點數</a>
+  <a href="#quiz" class="lab">🎮 品管測驗</a>
+  <a href="#summary">📑 重點總結</a>
+</nav>
+
+<main>
+
+<!-- ① OVERVIEW -->
+<section id="overview">
+  <h2>① LC-MS/MS 是什麼？和 GC-MS 差在哪？ 💧</h2>
+  <p class="lead">同樣是質譜偵探，LC-MS/MS 用「液體」帶分子、用「軟游離」保留整顆分子、再用「兩段質譜」雙重確認。</p>
+
+  <div class="twocol">
+    <div class="box">
+      <h4>💧 LC（液相層析）＋ ESI 軟游離</h4>
+      <p>分析物溶在流動相中分離，<b>不需要氣化</b>，適合<b>怕熱、極性大、分子量大</b>的化合物。
+         ESI（電灑游離）很「溫柔」，通常產生完整的 <b>[M+H]⁺ 母離子</b>，碎得少。</p>
+    </div>
+    <div class="box">
+      <h4>🔁 MS/MS（串聯質譜）＝兩道門</h4>
+      <p>Q1 先挑出<b>母離子（precursor）</b> → 碰撞室打碎 → Q3 再挑出<b>子離子（product）</b>。
+         這一對「母→子」就是一個 <b>transition（轉換）</b>，專一性極高。</p>
+    </div>
+  </div>
+
+  <h3>🆚 GC-MS vs LC-MS/MS 怎麼選？</h3>
+  <table>
+    <tr><th></th><th>🔬 GC-MS（EI 全掃描）</th><th>💧 LC-MS/MS（ESI · MRM）</th></tr>
+    <tr><td class="l">分離相</td><td>氣體（需可氣化）</td><td>液體（怕熱大分子也行）</td></tr>
+    <tr><td class="l">游離方式</td><td>EI 硬游離，碎片多</td><td>ESI 軟游離，多為 [M+H]⁺</td></tr>
+    <tr><td class="l">定性靠什麼</td><td>碎片指紋＋NIST 圖庫比對</td><td>≥2 個 transition 的離子比</td></tr>
+    <tr><td class="l">圖庫</td><td>有通用 EI 圖庫 📖</td><td>多無通用圖庫，靠標準品建 MRM</td></tr>
+    <tr><td class="l">典型強項</td><td>揮發性、未知物篩查</td><td>痕量定量、極性/熱不穩定物</td></tr>
+  </table>
+  <div class="note">📌 互補關係：GC-MS 擅長「未知物比對圖庫」，LC-MS/MS 擅長「已知目標物的高靈敏定量確認」。</div>
+</section>
+
+<!-- ② QUALITATIVE -->
+<section id="qual">
+  <h2>② 定性原理：用 transition 與離子比確認身分 🔵</h2>
+  <p class="lead">LC-MS/MS 沒有通用圖庫，定性靠「同一母離子打出的兩個以上子離子，比例對不對」。</p>
+
+  <div class="mrm">
+    <div class="ionbox" style="border-color:#ffa94d"><div class="ic">💧</div><b>母離子</b><small>[M+H]⁺</small><span class="stage">Q1 篩選</span></div>
+    <div class="arrow">→💥→</div>
+    <div class="ionbox" style="border-color:#ff6b6b"><div class="ic">🎯</div><b>定量子離子</b><small>quantifier</small><span class="stage">Q3 · 算面積</span></div>
+    <div class="ionbox" style="border-color:#4dabf7"><div class="ic">🔍</div><b>確認子離子</b><small>qualifier</small><span class="stage">Q3 · 核身分</span></div>
+  </div>
+
+  <h3>🔁 什麼是 transition（轉換）？</h3>
+  <p>一個 transition 寫成 <code>母離子 m/z → 子離子 m/z</code>，例如愷他命的 <code>238 → 125</code>。
+     每個化合物至少要監測 <b>2 個 transition</b>：</p>
+  <ul>
+    <li><b>定量 transition（quantifier）</b>：訊號最強、最穩，用來定量。</li>
+    <li><b>確認 transition（qualifier）</b>：第二個轉換，用來核對身分。</li>
+  </ul>
+
+  <h3>📊 transition 離子比 ── 定性關鍵</h3>
+  <p>同一化合物，<b>確認 transition ÷ 定量 transition</b> 的面積比是固定的。
+     樣品測到的比值若偏離標準品太多 → 退件。</p>
+  <div class="note">📖 <b>例（海洛因）：</b>定量 <code>370→165</code>、確認 <code>370→328</code>（相對約 60%）。
+     若樣品 328/165 ≈ 58% → ✔ 過關；若 ≈ 20% → ❌ 退件。互動見
+     <a href="#lab-mrm" style="color:#9be7ad">🎯 離子比判定器</a>。</div>
+
+  <h3>📋 五種毒品的 LC-MS/MS 監測離子（教學示例）</h3>
+  <table>
+    <tr><th>化合物</th><th>母離子 [M+H]⁺</th><th>🎯 定量 transition</th><th>🔍 確認 transition（相對%）</th></tr>
+    <tr><td class="l"><span style="color:var(--amp)">●</span> 甲基安非他命</td><td>150</td><td>150→91</td><td>150→119（42%）</td></tr>
+    <tr><td class="l"><span style="color:var(--mmc)">●</span> 4-甲基甲基卡西酮</td><td>178</td><td>178→160</td><td>178→145（55%）</td></tr>
+    <tr><td class="l"><span style="color:var(--ket)">●</span> 愷他命 Ketamine</td><td>238</td><td>238→125</td><td>238→179（33%）</td></tr>
+    <tr><td class="l"><span style="color:var(--eto)">●</span> 依托咪酯 Etomidate</td><td>245</td><td>245→113</td><td>245→125（48%）</td></tr>
+    <tr><td class="l"><span style="color:var(--her)">●</span> 海洛因 Heroin</td><td>370</td><td>370→165</td><td>370→328（60%）</td></tr>
+  </table>
+  <div class="ref-cite">※ 上述 m/z 為常見文獻值教學示例，實際依儀器調諧與碰撞能量略有差異。</div>
+</section>
+
+<!-- ③ QUAL QC -->
+<section id="qualqc">
+  <h2>③ 定性品管判準（LC-MS/MS）✅</h2>
+  <p class="lead">LC-MS/MS 的確認判準明確：足夠的 transition、對得上的離子比、RT 一致。</p>
+
+  <table>
+    <tr><th>判準項目</th><th>常見要求</th><th>意義</th></tr>
+    <tr><td class="l">🚩 滯留時間 RT/RRT</td><td>與標準品 <b>±0.1 min</b> 或 RRT 相對 <b>±2.5%（LC）</b></td><td class="l">層析位置一致</td></tr>
+    <tr><td class="l">🔁 transition 數</td><td>至少 <b>2 個</b>（1 定量 + 1 確認）</td><td class="l">構成雙重確認</td></tr>
+    <tr><td class="l">📊 離子比</td><td>與標準品偏差在<b>容許範圍內</b>（見下表 / SANTE ±30%）</td><td class="l">排除干擾/誤判</td></tr>
+    <tr><td class="l">📈 訊雜比 S/N</td><td>各 transition <b>S/N ≥ 3</b>（定量常要 ≥10）</td><td class="l">訊號真實</td></tr>
+  </table>
+
+  <h3>📊 離子比容許範圍（EU 2002/657/EC · LC-MS）</h3>
+  <p>LC-MS 的容許窗比 GC-EI 稍寬：</p>
+  <table class="qcq">
+    <tr><th>確認離子相對強度</th><th>LC-MS 容許相對偏差</th><th>（對照 GC-EI）</th></tr>
+    <tr><td> &gt; 50%</td><td><b>± 20%</b></td><td>±10%</td></tr>
+    <tr><td> &gt; 20% ～ 50%</td><td><b>± 25%</b></td><td>±15%</td></tr>
+    <tr><td> &gt; 10% ～ 20%</td><td><b>± 30%</b></td><td>±20%</td></tr>
+    <tr><td> ≤ 10%</td><td><b>± 50%</b></td><td>±50%</td></tr>
+  </table>
+  <div class="ref-cite">※ 農藥殘留 SANTE/11312/2021 採更簡單規則：離子比與標準品差異 <b>≤ 相對 ±30%</b>。本頁互動以 EU LC-MS 表為預設、可切換 SANTE。</div>
+</section>
+
+<!-- ④ IP -->
+<section id="ip">
+  <h2>④ 確認點數（Identification Points）🧮</h2>
+  <p class="lead">LC-MS/MS 最常用的點數規則 ── 母離子 1 點、每個 transition 1.5 點。</p>
+  <table>
+    <tr><th>質譜技術</th><th>母離子 / 前驅物</th><th>每個產物 / transition</th></tr>
+    <tr><td class="l">低解析 MS/MS（LC-MS/MS · MRM）</td><td>1.0 點</td><td><b>每個 transition = 1.5 點</b></td></tr>
+    <tr><td class="l">高解析 MS（HRMS / QTOF）</td><td>2.0 點</td><td>每個離子 = 2.5 點</td></tr>
+  </table>
+  <div class="cardrow">
+    <div class="card"><div class="big">4️⃣</div><b>A 類禁用物質</b><small>需 ≥ 4 點</small></div>
+    <div class="card"><div class="big">3️⃣</div><b>B 類限量物質</b><small>需 ≥ 3 點</small></div>
+  </div>
+  <div class="note">🧮 LC-MS/MS 標準作法：<b>1 母離子 + 2 transition</b> = 1.0 + 1.5 + 1.5 = <b>4 點</b> ✔（達 A 類）。
+     只有 1 母 + 1 transition = 2.5 點 ❌。互動見 <a href="#lab-ip" style="color:#9be7ad">🧮 確認點數計算器</a>。</div>
+</section>
+
+<!-- ⑤ QUANT -->
+<section id="quant">
+  <h2>⑤ 定量原理：MRM 面積 × 內標校正 📈</h2>
+  <p class="lead">用「定量 transition 的峰面積」對著校正曲線換算濃度，並用內標補償波動。</p>
+
+  <h3>🔧 校正策略（LC-MS/MS 最重視內標）</h3>
+  <div class="cardrow">
+    <div class="card"><div class="big">📏</div><b>外標法</b><small>溶劑標準建線，最易受基質效應影響</small></div>
+    <div class="card"><div class="big">🧱</div><b>基質匹配</b><small>空白基質配標準品，補基質效應</small></div>
+    <div class="card"><div class="big">🧬</div><b>同位素內標</b><small>SIL-IS（如 d₃、¹³C），定量黃金標準</small></div>
+  </div>
+
+  <h3>📐 數學</h3>
+  <p style="text-align:center"><code>y = a·x + b</code>　·　未知反推 <code>x = (y − b) / a</code></p>
+  <p>內標法的 y 是面積比：<code>y = A(定量transition) ÷ A(內標transition)</code>，可消除進樣量與基質波動。</p>
+
+  <h3>🎚️ LOD / LOQ</h3>
+  <div class="twocol">
+    <div class="box"><h4>訊雜比法</h4><p><b>LOD</b>：S/N ≈ 3；<b>LOQ</b>：S/N ≈ 10</p></div>
+    <div class="box"><h4>校正曲線法</h4><p><code>LOD = 3.3σ/a</code>、<code>LOQ = 10σ/a</code></p></div>
+  </div>
+</section>
+
+<!-- ⑥ MATRIX EFFECT -->
+<section id="matrix">
+  <h2>⑥ 基質效應：LC-MS/MS 的頭號敵人 🧱</h2>
+  <p class="lead">ESI 游離時，樣品中的共流出雜質會「搶離子化」，造成訊號被<b>壓抑</b>或<b>增強</b> ── 這是 LC-MS/MS 定量最大的偏差來源。</p>
+
+  <div class="twocol">
+    <div class="box"><h4>📉 離子抑制（ion suppression）</h4><p>雜質競爭游離，使分析物訊號<b>變小</b> → 用溶劑校正會<b>低估</b>濃度。</p></div>
+    <div class="box"><h4>📈 離子增強（ion enhancement）</h4><p>少數情況訊號<b>變大</b> → 會<b>高估</b>濃度。</p></div>
+  </div>
+
+  <h3>🛠️ 對策</h3>
+  <ul>
+    <li><b>同位素內標（SIL-IS）</b>：與分析物同步被壓抑，面積比相消 ── 最有效。</li>
+    <li><b>基質匹配校正</b>：在相同基質中建線。</li>
+    <li><b>標準添加法</b>：直接在樣品中外推。</li>
+    <li><b>改善前處理</b>：SPE 淨化、稀釋（dilute-and-shoot）、改層析分離度。</li>
+  </ul>
+  <div class="note">🧪 <b>如何量化基質效應？</b>後管柱注入（post-column infusion）看訊號凹陷；或
+     <code>ME% = (基質中斜率 ÷ 溶劑中斜率 − 1) × 100%</code>。
+     親手體驗見 <a href="#lab-cal" style="color:#9be7ad">🧪 基質效應實驗室</a>。</div>
+</section>
+
+<!-- ⑦ QUANT QC -->
+<section id="quantqc">
+  <h2>⑦ 定量品管判準 📏✅</h2>
+  <table>
+    <tr><th>品管項目</th><th>常見可接受標準</th><th>檢核什麼</th></tr>
+    <tr><td class="l">📈 線性</td><td><b>R² ≥ 0.99</b>；殘差 &lt; 15–20%</td><td class="l">訊號與濃度成正比</td></tr>
+    <tr><td class="l">🎯 工作範圍</td><td>樣品濃度落在校正範圍內（不外插）</td><td class="l">有效定量區間</td></tr>
+    <tr><td class="l">♻️ 回收率</td><td><b>70–120%</b>（痕量可放寬）</td><td class="l">準確度</td></tr>
+    <tr><td class="l">🎲 精密度 RSD</td><td>≤ 10–20%（依濃度）</td><td class="l">再現性</td></tr>
+    <tr><td class="l">🧱 基質效應 ME%</td><td>盡量小；用 SIL-IS 校正後接近 100%</td><td class="l">游離壓抑/增強</td></tr>
+    <tr><td class="l">🧬 內標回收</td><td>IS 面積批內穩定</td><td class="l">前處理/進樣正常</td></tr>
+    <tr><td class="l">🎚️ ＞LOQ</td><td>結果須 ≥ LOQ，否則報 &lt;LOQ</td><td class="l">可定量區</td></tr>
+  </table>
+</section>
+
+<!-- ⑧ BATCH QC -->
+<section id="batch">
+  <h2>⑧ 每批必帶的品管樣品 📦</h2>
+  <table>
+    <tr><th>品管樣品</th><th>目的</th><th>頻率</th><th>可接受標準（例）</th></tr>
+    <tr><td class="l">🧴 試劑空白</td><td class="l">試劑/系統污染</td><td>每批</td><td>&lt; LOD</td></tr>
+    <tr><td class="l">🧫 基質空白</td><td class="l">背景干擾</td><td>每批</td><td>目標物 &lt; LOD</td></tr>
+    <tr><td class="l">➕ 基質添加</td><td class="l">回收率/準確度</td><td>每批 / 1:10</td><td>70–120%</td></tr>
+    <tr><td class="l">✅ 校正查核 CCV</td><td class="l">曲線是否成立</td><td>每 10 樣</td><td>±15–20%</td></tr>
+    <tr><td class="l">👯 重複樣</td><td class="l">精密度</td><td>1:10</td><td>RPD ≤ 20%</td></tr>
+    <tr><td class="l">🔁 帶出測試</td><td class="l">高濃度後殘留</td><td>高濃度樣後</td><td>&lt; LOD（或 ½ LOQ）</td></tr>
+    <tr><td class="l">🧬 內標監測</td><td class="l">IS 面積異常即示警</td><td>每一針</td><td>批內 ±30% 內</td></tr>
+  </table>
+  <div class="warnbox">🚫 CCV 超標、空白污染、回收/內標異常 → 整批數據存疑，須重驗受影響樣品。</div>
+</section>
+
+<!-- LAB: MRM ION RATIO -->
+<section id="lab-mrm">
+  <h2>🎯 互動實驗室 A：transition 離子比判定器</h2>
+  <p class="lead">選一種毒品的確認 transition，拖動「測到的相對強度」，看離子比是否落在容許窗內（可切換 EU / SANTE 規則）。</p>
+  <div class="lab">
+    <div class="controls">
+      <label>化合物<select id="ratioDrug"></select></label>
+      <label>確認 transition<select id="ratioIon"></select></label>
+      <label>判定規則
+        <select id="ratioRule">
+          <option value="eu">EU 2002/657（LC-MS 分級）</option>
+          <option value="sante">SANTE（一律 ±30%）</option>
+        </select>
+      </label>
+    </div>
+    <div class="controls">
+      <label style="flex:1">測到的確認 transition 相對強度：<b id="ratioMeasLbl" style="color:#ff6b6b">—</b>
+        <input type="range" id="ratioSlider" min="0" max="120" value="30" step="0.5" style="width:100%">
+      </label>
+    </div>
+    <div class="gauge" id="ratioGauge">
+      <div class="band" id="ratioBand"></div><div class="ref" id="ratioRef"></div><div class="meas" id="ratioMeas"></div>
+    </div>
+    <div class="gaugeaxis"><span>0%</span><span>確認 ÷ 定量 transition（%）</span><span>120%</span></div>
+    <div class="readout" id="ratioRead"></div>
+    <div class="verdict" id="ratioVerdict"></div>
+  </div>
+</section>
+
+<!-- LAB: MATRIX / CALIBRATION -->
+<section id="lab-cal">
+  <h2>🧪 互動實驗室 B：基質效應與內標校正</h2>
+  <p class="lead">拖動「離子抑制 %」，看溶劑外標法為何低估濃度，以及同位素內標如何把它救回來。</p>
+  <div class="lab">
+    <div class="calwrap">
+      <div>
+        <svg id="calSvg" class="cal" viewBox="0 0 460 320" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="gaugeaxis" style="margin-top:4px"><span>濃度（ng/mL）→</span><span></span></div>
+      </div>
+      <div>
+        <div class="controls" style="flex-direction:column;align-items:stretch">
+          <label>基質離子抑制程度：<b id="supLbl" style="color:#ff6b6b">0%</b>
+            <input type="range" id="supSlider" min="0" max="60" value="30" step="1">
+          </label>
+          <label style="flex-direction:row;align-items:center;gap:8px">
+            <input type="checkbox" id="useIS" style="width:18px;height:18px;accent-color:#69db7c"> 使用同位素內標（SIL-IS）校正
+          </label>
+          <label>真實濃度（ng/mL）
+            <input type="number" id="trueC" value="50" step="1" min="1" max="100">
+          </label>
+        </div>
+        <div class="readout" id="calRead"></div>
+        <div class="verdict" id="calVerdict"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LAB: IP -->
+<section id="lab-ip">
+  <h2>🧮 互動實驗室 C：確認點數計算器</h2>
+  <p class="lead">LC-MS/MS 預設：母離子 + transition。算出點數並判斷是否達門檻。</p>
+  <div class="lab">
+    <div class="controls">
+      <label>質譜技術
+        <select id="ipTech">
+          <option value="msms">低解析 MS/MS（LC-MS/MS）</option>
+          <option value="hrms">高解析 MS（HRMS/QTOF）</option>
+        </select>
+      </label>
+      <label>母離子數<input type="number" id="ipPrec" value="1" min="0" max="5" step="1"></label>
+      <label id="ipIonWrap">transition / 子離子數<input type="number" id="ipIon" value="2" min="0" max="10" step="1"></label>
+      <label>採認類別
+        <select id="ipClass">
+          <option value="4">A 類（需 ≥4 點）</option>
+          <option value="3">B 類（需 ≥3 點）</option>
+        </select>
+      </label>
+    </div>
+    <div class="readout" id="ipRead"></div>
+    <div class="verdict" id="ipVerdict"></div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <h2>🎮 LC-MS/MS 品管判定測驗</h2>
+  <div class="lab">
+    <div id="quizQ" style="font-size:17px;font-weight:700">準備中…</div>
+    <div class="opts" id="quizOpts"></div>
+    <div class="feedback" id="quizFb"></div>
+    <div>分數：<span class="score" id="quizScore">0</span>　第 <span id="quizN">1</span> / <span id="quizT">6</span> 題</div>
+    <div style="margin-top:10px"><button class="btn" id="quizNext" style="display:none">下一題 ▶</button></div>
+  </div>
+</section>
+
+<!-- SUMMARY -->
+<section id="summary">
+  <h2>📑 重點總結</h2>
+  <ul>
+    <li><b>LC-MS/MS = ESI 軟游離 + MRM 雙質譜</b>：保留整顆分子，用「母→子 transition」高度專一。</li>
+    <li><b>定性</b>：≥2 個 transition、離子比落在容許窗（EU LC-MS 分級或 SANTE ±30%）、RT 一致。</li>
+    <li><b>確認點數</b>：母離子 1 點、每 transition 1.5 點；1 母 + 2 transition = 4 點（A 類達標）。</li>
+    <li><b>定量</b>：MRM 面積對校正曲線，最重視<b>同位素內標</b>補償基質效應。</li>
+    <li><b>基質效應</b>是 LC-MS/MS 頭號偏差來源：溶劑外標會低估，SIL-IS / 基質匹配可救回。</li>
+    <li><b>品管</b>：R²≥0.99、回收 70–120%、RSD≤20%、ME% 受控、批次帶空白/CCV/重複/回收，任一不合格 → 重驗。</li>
+  </ul>
+  <p class="ref-cite">本頁為教學整理，數值門檻依各領域官方方法（EU 2002/657/EC、SANTE/11312、ICH Q2、FDA 生體分析指引、ISO/IEC 17025）而異，實作以適用 SOP 為準。</p>
+</section>
+
+</main>
+
+<footer>
+  質譜小學堂 · LC-MS/MS 進階篇「定性・定量原理與數據品管」教學互動教材<br>
+  與〈GC-MS 進階版〉〈質譜毒品偵探小學版〉同系列 · 數據為教學示例（ESI⁺ · MRM）<br>
+  ⚠️ 品管門檻為教學彙整，實作請依適用法規與方法 SOP
+</footer>
+
+<script>
+/* LC-MS/MS teaching data: precursor + quantifier transition + qualifier transitions (relative %) */
+const DRUGS = [
+  {key:"amp", name:"甲基安非他命",      emoji:"🟥", color:"#ff6b6b", prec:150, quant:91,  quals:[[119,42]]},
+  {key:"mmc", name:"4-甲基甲基卡西酮",   emoji:"🟧", color:"#ffa94d", prec:178, quant:160, quals:[[145,55]]},
+  {key:"ket", name:"愷他命 Ketamine",    emoji:"🟨", color:"#ffe066", prec:238, quant:125, quals:[[179,33],[207,20]]},
+  {key:"eto", name:"依托咪酯 Etomidate", emoji:"🟩", color:"#69db7c", prec:245, quant:113, quals:[[125,48]]},
+  {key:"her", name:"海洛因 Heroin",      emoji:"🟦", color:"#4dabf7", prec:370, quant:165, quals:[[328,60],[268,40]]},
+];
+
+/* ion-ratio tolerance */
+function euToleranceLC(relPct){ if(relPct>50)return 20; if(relPct>20)return 25; if(relPct>10)return 30; return 50; }
+function santeTolerance(){ return 30; }
+
+/* ===== LAB A: MRM ION RATIO ===== */
+(function(){
+  const selDrug=document.getElementById("ratioDrug"),selIon=document.getElementById("ratioIon"),
+        rule=document.getElementById("ratioRule"),slider=document.getElementById("ratioSlider"),
+        measLbl=document.getElementById("ratioMeasLbl"),band=document.getElementById("ratioBand"),
+        refEl=document.getElementById("ratioRef"),measEl=document.getElementById("ratioMeas"),
+        read=document.getElementById("ratioRead"),verdict=document.getElementById("ratioVerdict"),MAX=120;
+  DRUGS.forEach(d=>{const o=document.createElement("option");o.value=d.key;o.textContent=d.emoji+" "+d.name;selDrug.appendChild(o);});
+  function cur(){return DRUGS.find(d=>d.key===selDrug.value);}
+  function fillIons(){const d=cur();selIon.innerHTML="";
+    d.quals.forEach((s,i)=>{const o=document.createElement("option");o.value=i;o.textContent=`${d.prec}→${s[0]}（參考 ${s[1]}%）`;selIon.appendChild(o);});
+    sync();}
+  function sync(){const d=cur(),q=d.quals[selIon.value||0];slider.value=q[1];render();}
+  function render(){
+    const d=cur(),q=d.quals[selIon.value||0],ref=q[1];
+    const tol=rule.value==="eu"?euToleranceLC(ref):santeTolerance();
+    const lo=ref*(1-tol/100),hi=ref*(1+tol/100),meas=parseFloat(slider.value);
+    measLbl.textContent=meas.toFixed(1)+"%";
+    refEl.style.left=(ref/MAX*100)+"%";band.style.left=(lo/MAX*100)+"%";band.style.width=((hi-lo)/MAX*100)+"%";
+    measEl.style.left=(Math.min(meas,MAX)/MAX*100)+"%";
+    const dev=((meas-ref)/ref*100),pass=meas>=lo&&meas<=hi;
+    read.innerHTML=`化合物：<b>${d.emoji} ${d.name}</b>　定量 transition <b>${d.prec}→${d.quant}</b>（100%）<br>
+      確認 transition <b>${d.prec}→${q[0]}</b>：參考 <b>${ref}%</b>　→　${rule.value==="eu"?"EU":"SANTE"} 容許 <b>±${tol}%</b><br>
+      容許窗：<b>${lo.toFixed(1)}% ～ ${hi.toFixed(1)}%</b>　·　你測到：<b style="color:#ff6b6b">${meas.toFixed(1)}%</b>（偏差 ${dev>=0?"+":""}${dev.toFixed(1)}%）`;
+    verdict.innerHTML=pass?'<span class="pass">✅ 離子比合格 → 確認 transition 可採認</span>'
+      :'<span class="fail">❌ 離子比超窗 → 不可採認（疑干擾/共流出）</span>';
+  }
+  selDrug.onchange=fillIons;selIon.onchange=sync;rule.onchange=render;slider.oninput=render;fillIons();
+})();
+
+/* ===== LAB B: MATRIX EFFECT + IS ===== */
+(function(){
+  const svg=document.getElementById("calSvg"),sup=document.getElementById("supSlider"),
+        supLbl=document.getElementById("supLbl"),useIS=document.getElementById("useIS"),
+        trueC=document.getElementById("trueC"),read=document.getElementById("calRead"),verdict=document.getElementById("calVerdict");
+  const slopeSolvent=0.0100; // response per ng/mL in pure solvent (calibration built in solvent)
+  function draw(){
+    const s=parseFloat(sup.value)/100, isOn=useIS.checked, tc=Math.max(1,parseFloat(trueC.value)||50);
+    // sample measured response is suppressed by (1-s). With IS, IS is suppressed equally so ratio recovers.
+    const W=460,H=320,padL=56,padR=18,padT=18,padB=44,maxC=110,maxY=1.15;
+    const sx=c=>padL+(c/maxC)*(W-padL-padR), sy=y=>H-padB-(y/maxY)*(H-padT-padB);
+    let g=`<rect width="${W}" height="${H}" fill="#0b1626"/>`;
+    for(let v=0;v<=100;v+=25){const x=sx(v);g+=`<line x1="${x}" y1="${padT}" x2="${x}" y2="${H-padB}" stroke="#1b2d47"/><text x="${x}" y="${H-padB+17}" fill="#7f9bc0" font-size="11" text-anchor="middle">${v}</text>`;}
+    for(let v=0;v<=1;v+=0.25){const y=sy(v);g+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#1b2d47"/><text x="${padL-8}" y="${y+4}" fill="#7f9bc0" font-size="11" text-anchor="end">${v.toFixed(2)}</text>`;}
+    g+=`<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#3b5b86" stroke-width="2"/><line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#3b5b86" stroke-width="2"/>`;
+    g+=`<text x="14" y="${H/2}" fill="#9fb7d8" font-size="12" text-anchor="middle" transform="rotate(-90 14 ${H/2})">${isOn?"面積比 (分析物/內標)":"訊號面積"}</text>`;
+    // solvent calibration line (yellow) — slope slopeSolvent
+    g+=`<line x1="${sx(0)}" y1="${sy(0)}" x2="${sx(maxC)}" y2="${sy(slopeSolvent*maxC)}" stroke="#ffd43b" stroke-width="2.5"/>`;
+    g+=`<text x="${sx(maxC)-4}" y="${sy(slopeSolvent*maxC)-6}" fill="#ffd43b" font-size="11" text-anchor="end">溶劑校正線</text>`;
+    // measured sample point
+    // without IS: signal = slope*tc*(1-s)  -> read back conc via solvent line = tc*(1-s)
+    // with IS: ratio = (slope*tc*(1-s)) / (IS*(1-s)) = slope*tc/IS  -> suppression cancels, reads true
+    let measY, readC;
+    if(isOn){ measY=slopeSolvent*tc; readC=tc; }
+    else { measY=slopeSolvent*tc*(1-s); readC=tc*(1-s); }
+    g+=`<line x1="${sx(0)}" y1="${sy(measY)}" x2="${sx(readC)}" y2="${sy(measY)}" stroke="#ff6b6b" stroke-dasharray="4 3"/>`;
+    g+=`<line x1="${sx(readC)}" y1="${sy(measY)}" x2="${sx(readC)}" y2="${sy(0)}" stroke="#ff6b6b" stroke-dasharray="4 3"/>`;
+    g+=`<circle cx="${sx(readC)}" cy="${sy(measY)}" r="6" fill="#ff6b6b" stroke="#0b1626" stroke-width="1.5"/>`;
+    // true marker on x axis
+    g+=`<line x1="${sx(tc)}" y1="${sy(0)}" x2="${sx(tc)}" y2="${sy(0)-8}" stroke="#69db7c" stroke-width="3"/><text x="${sx(tc)}" y="${sy(0)+0}" fill="#69db7c" font-size="10" text-anchor="middle" dy="-12">真值</text>`;
+    svg.innerHTML=g;
+    supLbl.textContent=Math.round(s*100)+"%";
+    const err=(readC-tc)/tc*100;
+    read.innerHTML=`真實濃度：<b>${tc.toFixed(0)} ng/mL</b>　·　離子抑制：<b>${Math.round(s*100)}%</b>　·　校正方式：<b>${isOn?"同位素內標(SIL-IS)":"溶劑外標"}</b><br>
+      量得濃度：<b>${readC.toFixed(1)} ng/mL</b>　·　誤差：<b style="color:${Math.abs(err)<=10?'#51cf66':'#ff6b6b'}">${err>=0?"+":""}${err.toFixed(1)}%</b>`;
+    verdict.innerHTML = Math.abs(err)<=10
+      ? '<span class="pass">✅ 誤差在 ±10% 內 → 定量可信</span>'
+      : (isOn?'<span class="fail">⚠ 異常</span>'
+            :'<span class="fail">❌ 溶劑外標被基質壓抑 → 低估！請改用內標或基質匹配</span>');
+  }
+  sup.oninput=draw;useIS.onchange=draw;trueC.oninput=draw;draw();
+})();
+
+/* ===== LAB C: IP ===== */
+(function(){
+  const tech=document.getElementById("ipTech"),prec=document.getElementById("ipPrec"),
+        ion=document.getElementById("ipIon"),cls=document.getElementById("ipClass"),
+        read=document.getElementById("ipRead"),verdict=document.getElementById("ipVerdict"),ionWrap=document.getElementById("ipIonWrap");
+  function calc(){
+    const t=tech.value,nP=Math.max(0,parseInt(prec.value)||0),nI=Math.max(0,parseInt(ion.value)||0);
+    let pts,detail;
+    if(t==="msms"){pts=nP*1.0+nI*1.5;detail=`MS/MS：母離子 ${nP}×1.0 ＋ transition ${nI}×1.5 = <b>${pts.toFixed(1)} 點</b>`;ionWrap.firstChild.textContent="transition 數";}
+    else{pts=nP*2.0+nI*2.5;detail=`HRMS：母離子 ${nP}×2.0 ＋ 子離子 ${nI}×2.5 = <b>${pts.toFixed(1)} 點</b>`;ionWrap.firstChild.textContent="子離子數";}
+    const need=parseFloat(cls.value);
+    read.innerHTML=detail+`<br>採認門檻：<b>≥ ${need} 點</b>`;
+    verdict.innerHTML=pts>=need?`<span class="pass">✅ 達 ${need} 點 → 可作確認</span>`:`<span class="fail">❌ 僅 ${pts.toFixed(1)} 點，未達 ${need}</span>`;
+  }
+  tech.onchange=calc;prec.oninput=calc;ion.oninput=calc;cls.onchange=calc;calc();
+})();
+
+/* ===== QUIZ ===== */
+(function(){
+  const QUIZ=[
+    {q:"用 LC-MS/MS 確認一個 A 類禁用物質，最少要監測幾個 transition（搭配 1 個母離子）？",
+     opts:["1 個","2 個","3 個"],ans:1,
+     why:"母離子1點 + 每transition 1.5點；1母+2transition=4點達A類，所以至少2個transition。"},
+    {q:"樣品定量 transition 訊號很強，但確認 transition / 定量 transition 的離子比偏離標準品 +45%（參考30%、SANTE規則）。判定？",
+     opts:["報陽性，訊號夠強就好","退件，離子比超出 ±30% 容許窗","只看 RT"],ans:1,
+     why:"SANTE 規定離子比差異須 ≤±30%；偏離 +45% 超窗，不可採認。"},
+    {q:"在離子抑制 40% 的基質中，用『溶劑外標曲線』定量，結果會？",
+     opts:["準確","明顯低估（約少 40%）","明顯高估"],ans:1,
+     why:"離子抑制使訊號變小，溶劑外標未補償 → 讀到的濃度偏低。"},
+    {q:"要校正 LC-MS/MS 的基質效應，最有效的單一作法通常是？",
+     opts:["提高進樣量","使用同位素標記內標（SIL-IS）","降低 R² 要求"],ans:1,
+     why:"SIL-IS 與分析物同步被壓抑，面積比相消基質效應，是最有效的補償。"},
+    {q:"一批樣品中 CCV 偏差 −25%（標準 ±20%），且內標面積普遍偏低。最合適處置？",
+     opts:["照常報告","檢查游離/前處理問題，重新校正並重驗該批","只刪 CCV"],ans:1,
+     why:"CCV 超標加內標異常，代表系統/基質問題，須排除後重驗整批。"},
+    {q:"關於 ESI 軟游離，下列何者正確？",
+     opts:["產生大量碎片，像 EI 一樣","通常產生完整 [M+H]⁺，碎片少，所以要靠 MS/MS 打碎確認","不能用於定量"],ans:1,
+     why:"ESI 很溫柔，多得 [M+H]⁺；確認身分需在 MS/MS 把母離子打成子離子（transition）。"},
+  ];
+  let idx=0,score=0,locked=false;
+  const q=document.getElementById("quizQ"),opts=document.getElementById("quizOpts"),fb=document.getElementById("quizFb"),
+        sc=document.getElementById("quizScore"),n=document.getElementById("quizN"),t=document.getElementById("quizT"),next=document.getElementById("quizNext");
+  t.textContent=QUIZ.length;
+  function load(){locked=false;fb.textContent="";next.style.display="none";opts.innerHTML="";
+    const it=QUIZ[idx];n.textContent=idx+1;q.innerHTML=`第 ${idx+1} 題：${it.q}`;
+    it.opts.forEach((o,i)=>{const b=document.createElement("button");b.className="opt";b.textContent=o;
+      b.onclick=()=>{if(locked)return;locked=true;
+        if(i===it.ans){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 正確！${it.why}</span>`;}
+        else fb.innerHTML=`<span class="no">❌ 正解：「${it.opts[it.ans]}」。${it.why}</span>`;
+        idx<QUIZ.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 完成！總分 <b>${score}/${QUIZ.length}</b>`;};
+      opts.appendChild(b);});
+  }
+  next.onclick=()=>{idx++;load();};load();
+})();
+</script>
+</body>
+</html>

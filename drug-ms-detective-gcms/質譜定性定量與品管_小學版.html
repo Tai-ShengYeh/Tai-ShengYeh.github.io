@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>質譜小偵探：認是誰・量多少・機器健檢 ── 質譜小學堂（用毒品質譜訊號學定性・定量・品管）</title>
+<style>
+  :root{
+    --bg:#0f1b2d; --panel:#16263d;
+    --ink:#eaf2ff; --sub:#a9c0e0;
+    --amp:#ff6b6b; --mmc:#ffa94d; --ket:#ffe066; --eto:#69db7c; --her:#4dabf7;
+    --gold:#ffd43b; --good:#51cf66; --bad:#ff6b6b; --warn:#ff8787;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#0f1b2d,#152a45 60%,#0f1b2d);color:#eaf2ff;line-height:1.8}
+
+  /* ===== shared module ribbon ===== */
+  .modbar{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:center;
+    padding:9px 14px;background:#0a1422;border-bottom:2px solid #ffd43b;font-size:13px}
+  .modbar a{color:#cfe0fb;text-decoration:none;font-weight:700;padding:3px 9px;border-radius:8px;border:1px solid transparent}
+  .modbar a:hover{background:#24467a;color:#fff}
+  .modbar .mb-home{color:#ffd43b;font-weight:900}
+  .modbar a.cur{color:#9be7ad;border-color:#3c8a5e;background:#11271a}
+
+  header.hero{text-align:center;padding:40px 20px 28px;
+    background:radial-gradient(900px 400px at 50% -120px,rgba(255,212,59,.26),transparent),
+               radial-gradient(700px 360px at 80% 0,rgba(105,219,124,.16),transparent)}
+  .hero h1{font-size:clamp(25px,5.4vw,46px);margin:.1em 0;letter-spacing:1px}
+  .hero .badge{display:inline-block;background:#ffd43b;color:#1b2a44;font-weight:900;
+    border-radius:999px;padding:6px 16px;font-size:15px;margin-bottom:10px}
+  .hero p{color:#a9c0e0;max-width:790px;margin:10px auto 0;font-size:clamp(15px,2.4vw,19px)}
+  .hero .crew{font-size:42px;letter-spacing:7px;margin-top:14px}
+
+  nav{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+    padding:12px;background:rgba(15,27,45,.93);backdrop-filter:blur(8px);border-bottom:1px solid #243a59}
+  nav a{color:#cfe0fb;text-decoration:none;font-weight:700;font-size:13.5px;
+    padding:7px 12px;border-radius:999px;border:1px solid #2c4f7a;background:#16263d;transition:.15s}
+  nav a:hover{background:#24467a;color:#fff;transform:translateY(-2px)}
+  nav a.play{background:#3a2a12;border-color:#ffd43b;color:#ffe9a8}
+
+  main{max-width:1000px;margin:0 auto;padding:10px 16px 80px}
+  section{background:rgba(22,38,61,.7);border:1px solid #25405f;border-radius:22px;
+    padding:26px 22px;margin:22px 0;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+  section h2{font-size:clamp(22px,4.4vw,30px);margin:0 0 4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  section .lead{color:#9fb7d8;margin:2px 0 18px;font-size:16px}
+  h3{font-size:20px;margin:22px 0 8px;color:#ffe9a8}
+  p{margin:8px 0}
+
+  .cardrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:14px 0}
+  .card{background:#142339;border:1px solid #2a456a;border-radius:16px;padding:16px;text-align:center}
+  .card .big{font-size:42px}
+  .card b{display:block;margin:6px 0 2px;font-size:17px}
+  .card small{color:#9fb7d8}
+
+  .twocol{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0}
+  @media(max-width:640px){.twocol{grid-template-columns:1fr}}
+  .box{background:#13243d;border:1px solid #2a456a;border-radius:16px;padding:16px}
+  .box.q1{border-color:#4dabf7}.box.q2{border-color:#69db7c}
+  .box h3{margin-top:4px}
+
+  .analogy{background:#172c49;border-left:6px solid #ffd43b;border-radius:12px;padding:12px 16px;margin:12px 0}
+  .analogy b{color:#ffe066}
+  .steps{display:flex;flex-wrap:wrap;align-items:stretch;justify-content:center;gap:8px;margin:16px 0;text-align:center}
+  .mbox{background:#142339;border:2px solid #34557e;border-radius:16px;padding:12px;min-width:120px;flex:1;max-width:200px}
+  .mbox .ic{font-size:30px}
+  .mbox b{display:block;color:#9be7ad;margin-top:4px}
+  .mbox small{color:#9fb7d8;display:block}
+  .marrow{font-size:26px;color:#7f9bc0;align-self:center}
+
+  /* mass spectrum bars (m/z fingerprint) */
+  .spec{display:inline-flex;align-items:flex-end;gap:10px;height:130px;padding:22px 16px 26px;background:#0d1a2e;
+     border:1px solid #2a456a;border-radius:14px;vertical-align:bottom}
+  .spec .sbar{width:26px;border-radius:5px 5px 0 0;position:relative;display:flex;justify-content:center;
+     box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+  .spec .sbar .mz{position:absolute;top:100%;margin-top:5px;font-size:12px;color:#cfe0fb;white-space:nowrap;font-weight:700}
+  .spec .sbar .cr{position:absolute;bottom:100%;margin-bottom:2px;font-size:14px}
+  .spec.small{height:110px;padding:18px 12px 24px}
+  .spec.small .sbar{width:20px}
+
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px;border-radius:12px;overflow:hidden}
+  th,td{padding:10px 8px;text-align:center;border-bottom:1px solid #2a456a}
+  th{background:#1f6f3e;color:#fff}
+  tr:nth-child(even) td{background:#142339}
+  .dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .pill{display:inline-block;background:#0e1b30;border:1px solid #34557e;border-radius:8px;padding:2px 9px;margin:2px;font-weight:800}
+  .pill.base{background:#1f6f3e;border-color:#3fae5a;color:#fff}
+
+  /* games */
+  .game{background:#11203a;border:1px solid #2f5081;border-radius:16px;padding:18px;margin-top:12px}
+  .opts{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+  button.opt,button.btn{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-weight:800;font-size:16px;padding:12px 16px;transition:.15s}
+  button.opt{background:#1d3a63;color:#eaf2ff;border:1px solid #3a5f93}
+  button.opt:hover{background:#27508a;transform:translateY(-2px)}
+  button.btn{background:#ffd43b;color:#19283f}
+  button.btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+  .feedback{font-weight:800;margin-top:10px;min-height:26px}
+  .score{font-weight:900;color:#ffd43b}
+  .ok{color:var(--good)} .no{color:var(--bad)}
+  .qcard{font-size:17px;font-weight:700}
+
+  svg.ruler{width:100%;height:auto;background:#0b1626;border:1px solid #2a456a;border-radius:12px;margin-top:8px}
+
+  footer{text-align:center;color:#7f9bc0;font-size:13px;padding:30px 16px}
+  ul{margin:8px 0 8px 2px;padding-left:22px}li{margin:6px 0}
+
+  @media print{
+    body{background:#fff;color:#000}
+    .modbar,nav,.hero p,.hero .crew,.game,footer{display:none!important}
+    section{break-inside:avoid;box-shadow:none;border:1px solid #999;background:#fff;color:#000}
+    h2,h3{color:#000}.box,.analogy{background:#fff;color:#000}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== MODULE RIBBON ===== -->
+<div class="modbar">
+  <a class="mb-home" href="index.html">🏠 質譜教學模組</a>
+  <a href="質譜毒品偵探_GCMS版.html">🕵️ 毒品偵探</a>
+  <a href="質譜定性定量與品管_小學版.html" class="cur">🧒 定性定量·兒童</a>
+  <a href="質譜定性定量與品管_GCMS進階版.html">🔬 GC-MS 進階</a>
+  <a href="質譜定性定量與品管_LCMS進階版.html">💧 LC-MS 進階</a>
+</div>
+
+<header class="hero">
+  <div class="badge">質譜小學堂 · 認是誰 × 量多少 × 機器健檢</div>
+  <h1>🔬 質譜小偵探：認是誰・量多少</h1>
+  <p>質譜儀這台「驗毒超級偵探機器」在做<b>兩件事</b>：第一件「<b>這是哪種毒品？</b>」（認身分），
+     第二件「<b>有多少毒品？</b>」（量多少）。還有祕密任務 ── 怎麼確定機器<b>沒驗錯</b>！
+     這次我們用<b>真正的毒品質譜訊號</b>來玩遊戲學會它！</p>
+  <div class="crew">🕵️‍♀️🔍📏🧩🏥🎮</div>
+</header>
+
+<nav>
+  <a href="#two">① 機器做兩件事</a>
+  <a href="#qual">② 認是誰（定性）</a>
+  <a href="#quant">③ 量多少（定量）</a>
+  <a href="#qc">④ 機器健檢（品管）</a>
+  <a href="#g1" class="play">🎮 指紋配對</a>
+  <a href="#g2" class="play">🎮 校正尺</a>
+  <a href="#g3" class="play">🎮 機器健檢</a>
+  <a href="#g4" class="play">🎮 總複習</a>
+  <a href="#aids">🖨️ 教具</a>
+</nav>
+
+<main>
+
+<!-- ① TWO JOBS -->
+<section id="two">
+  <h2>① 質譜機器在做兩件事 🔬</h2>
+  <p class="lead">驗毒偵探機器：先「認出是哪種毒品」，再「量出有多少毒品」。</p>
+  <div class="twocol">
+    <div class="box q1">
+      <h3>🔵 第一件事：認是誰（定性）</h3>
+      <p>毒品被機器<b>撞碎</b>後，每種都有<b>固定的碎片指紋圖</b>（橫軸是碎片重量 m/z）。
+         比一比指紋，就知道「你是哪種毒品」。答案是：<b>是甲基安非他命？還是海洛因？</b></p>
+    </div>
+    <div class="box q2">
+      <h3>🟢 第二件事：量多少（定量）</h3>
+      <p>毒品<b>越多</b>，最高那塊碎片（<b>基峰 👑</b>）的<b>柱子就越高</b>。
+         用「<b>校正尺</b>」對照高度，就能讀出<b>有多少毒品</b>（幾 ng/mL）。答案是：<b>一個數字</b>。</p>
+    </div>
+  </div>
+  <div class="analogy">🧠 <b>一句話：</b>「認是誰」看<b>碎片指紋圖案</b>；「量多少」看<b>基峰柱子高度</b>。兩件事都要對，才算破案！</div>
+</section>
+
+<!-- ② QUALITATIVE -->
+<section id="qual">
+  <h2>② 認是誰：比指紋，也要比「比例」🔍</h2>
+  <p class="lead">每種毒品撞碎後，有幾塊固定的碎片，做成一張<b>質譜指紋圖</b>。最高的那塊叫 <b>基峰 👑</b>。</p>
+
+  <p>下面是 5 種毒品<b>真正的</b>質譜指紋（柱子上的數字是碎片重量 m/z，👑 是基峰）：</p>
+  <div class="cardrow" id="fpCards"></div>
+
+  <div class="analogy">🧩 <b>為什麼要比「比例」？</b>看看 <b>🟥 甲基安非他命</b> 和 <b>🟧 卡西酮</b> ──
+     兩個的基峰<b>都是 58</b>！但其他碎片不一樣：一個是 <b>91、134</b>，另一個是 <b>65、119</b>。
+     <b>光看最高那塊會認錯，要連其他塊的比例都對上，才能確定是哪一種！</b></div>
+
+  <div class="steps">
+    <div class="mbox" style="border-color:#4dabf7"><div class="ic">🔍</div><b>看碎片</b><small>有哪幾塊 m/z</small></div>
+    <div class="marrow">➡️</div>
+    <div class="mbox" style="border-color:#ffd43b"><div class="ic">👑</div><b>找基峰＋比例</b><small>最高那塊＋高矮對不對</small></div>
+    <div class="marrow">➡️</div>
+    <div class="mbox" style="border-color:#69db7c"><div class="ic">✅</div><b>確定身分</b><small>都對 → 就是它！</small></div>
+  </div>
+  <p>👉 去玩 <a href="#g1" style="color:#ffe066">🎮 遊戲 1：毒品指紋配對</a>！</p>
+</section>
+
+<!-- ③ QUANTITATIVE -->
+<section id="quant">
+  <h2>③ 量多少：用基峰做「校正尺」📏</h2>
+  <p class="lead">毒品越多 → 基峰 👑 柱子越高。但「多高＝多少 ng/mL」要先做一把尺！</p>
+
+  <h3>🪄 校正尺是怎麼做出來的？</h3>
+  <div class="steps">
+    <div class="mbox" style="border-color:#ffa94d"><div class="ic">🧪</div><b>① 拿已知的</b><small>10、20、30、40 ng/mL<br>標準毒品各一管</small></div>
+    <div class="marrow">➡️</div>
+    <div class="mbox" style="border-color:#4dabf7"><div class="ic">📊</div><b>② 量基峰高度</b><small>記下每管的<br>基峰柱子多高</small></div>
+    <div class="marrow">➡️</div>
+    <div class="mbox" style="border-color:#69db7c"><div class="ic">📏</div><b>③ 連成一條尺</b><small>高度 ↔ 濃度</small></div>
+    <div class="marrow">➡️</div>
+    <div class="mbox" style="border-color:#ffd43b"><div class="ic">❓</div><b>④ 量未知的</b><small>對照尺讀出<br>幾 ng/mL</small></div>
+  </div>
+
+  <div class="analogy">📏 <b>就像量身高！</b>牆上先畫好刻度（已知幾公分），頭頂到哪格就知道幾公分。
+     校正尺也是 ── 先畫好「多少 ng/mL ＝ 基峰多高」，再看未知檢體的基峰多高，
+     <b>對照刻度</b>就知道驗出多少毒品。</div>
+
+  <h3>⚠️ 兩個小規矩</h3>
+  <div class="cardrow">
+    <div class="card"><div class="big">📐</div><b>不能超出尺的範圍</b><small>尺只到 40 ng/mL，<br>就不能亂讀成 100</small></div>
+    <div class="card"><div class="big">🔎</div><b>太少會看不清</b><small>太淡時只能說<br>「幾乎沒有 / 未檢出」</small></div>
+  </div>
+  <p>👉 去玩 <a href="#g2" style="color:#ffe066">🎮 遊戲 2：校正尺量毒品</a>！</p>
+</section>
+
+<!-- ④ QC -->
+<section id="qc">
+  <h2>④ 怎麼知道機器沒驗錯？機器健檢 4 招 🏥</h2>
+  <p class="lead">驗毒最重要的本領 ── 確定「驗出來的結果」是<b>可信的</b>，不能冤枉人也不能放過！</p>
+
+  <div class="cardrow">
+    <div class="card"><div class="big">🧼</div><b>① 先驗乾淨檢體</b><small>確定機器是<b>乾淨</b>的，<br>沒有上一管殘留的毒</small></div>
+    <div class="card"><div class="big">✅</div><b>② 對答案</b><small>放一管<b>已知 30 ng/mL</b>的，<br>看機器有沒有驗對</small></div>
+    <div class="card"><div class="big">🔁</div><b>③ 驗兩次</b><small>同一管驗兩次，<br>兩次<b>差不多</b>才可信</small></div>
+    <div class="card"><div class="big">🧪</div><b>④ 偷加再找回</b><small>偷偷加 20 ng/mL，<br>看機器<b>找不找得到</b></small></div>
+  </div>
+
+  <table>
+    <tr><th>招式</th><th>大人的名字</th><th>機器健康的話會…</th></tr>
+    <tr><td>🧼 驗乾淨檢體</td><td>空白測試</td><td>驗出「未檢出」</td></tr>
+    <tr><td>✅ 對答案</td><td>品管查核 (QC)</td><td>30 驗成「約 30」</td></tr>
+    <tr><td>🔁 驗兩次</td><td>重複性</td><td>兩次很接近</td></tr>
+    <tr><td>🧪 偷加找回</td><td>回收率</td><td>加 20，找回「約 20」</td></tr>
+  </table>
+
+  <div class="analogy">🩺 <b>像考試的監考老師！</b>乾淨檢體＝檢查考卷沒被偷寫；對答案＝放一題已知答案抽查；
+     驗兩次＝同題做兩遍看穩不穩；偷加找回＝藏一管已知的毒看機器抓不抓得到。
+     <b>只要有一招不過關，這次結果就先不能信，要重驗！</b></div>
+  <p>👉 去玩 <a href="#g3" style="color:#ffe066">🎮 遊戲 3：機器健康檢查</a>！</p>
+</section>
+
+<!-- GAME 1 -->
+<section id="g1">
+  <h2>🎮 遊戲 1：毒品指紋配對 🔍</h2>
+  <p class="lead">看神祕質譜指紋（👑 是基峰，注意每塊的<b>高矮比例</b>），猜猜是哪一種毒品！</p>
+  <div class="game">
+    <div class="qcard" id="g1q">準備中…</div>
+    <div id="g1fp" style="margin:14px 0"></div>
+    <div class="opts" id="g1opts"></div>
+    <div class="feedback" id="g1fb"></div>
+    <div>分數：<span class="score" id="g1score">0</span>　第 <span id="g1n">1</span> / 5 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g1next" style="display:none">下一題 ▶</button></div>
+  </div>
+</section>
+
+<!-- GAME 2 -->
+<section id="g2">
+  <h2>🎮 遊戲 2：校正尺量毒品 📏</h2>
+  <p class="lead">藍點是用「已知濃度」做好的校正尺。紅色未知檢體的基峰這麼高，大約是多少 ng/mL？</p>
+  <div class="game">
+    <svg id="g2svg" class="ruler" viewBox="0 0 460 300" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="qcard" id="g2q" style="margin-top:10px">這管未知檢體，大約有多少毒品？</div>
+    <div class="opts" id="g2opts"></div>
+    <div class="feedback" id="g2fb"></div>
+    <div>分數：<span class="score" id="g2score">0</span>　第 <span id="g2n">1</span> / 5 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g2next" style="display:none">下一管 ▶</button></div>
+  </div>
+</section>
+
+<!-- GAME 3 -->
+<section id="g3">
+  <h2>🎮 遊戲 3：機器健康檢查 🏥</h2>
+  <p class="lead">你是小小品管員！看看這次的檢查結果，機器是「健康✅」還是「生病❌」？</p>
+  <div class="game">
+    <div class="qcard" id="g3q">準備中…</div>
+    <div class="opts">
+      <button class="opt" id="g3ok">✅ 健康，可以相信</button>
+      <button class="opt" id="g3bad">❌ 生病，要重驗</button>
+    </div>
+    <div class="feedback" id="g3fb"></div>
+    <div>分數：<span class="score" id="g3score">0</span>　第 <span id="g3n">1</span> / 6 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g3next" style="display:none">下一個檢查 ▶</button></div>
+  </div>
+</section>
+
+<!-- GAME 4 -->
+<section id="g4">
+  <h2>🎮 遊戲 4：小小品管員總複習 🧠</h2>
+  <p class="lead">把「認是誰、量多少、機器健檢」都複習一遍！</p>
+  <div class="game">
+    <div class="qcard" id="g4q">準備中…</div>
+    <div class="opts" id="g4opts"></div>
+    <div class="feedback" id="g4fb"></div>
+    <div>分數：<span class="score" id="g4score">0</span>　第 <span id="g4n">1</span> / 6 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g4next" style="display:none">下一題 ▶</button></div>
+  </div>
+</section>
+
+<!-- AIDS -->
+<section id="aids">
+  <h2>🖨️ 老師教具區 ✂️</h2>
+  <p class="lead">按 Ctrl + P 列印，剪下來在課堂玩。</p>
+  <h3>📋 5 種毒品的質譜指紋（真實 GC-MS 數據）</h3>
+  <table>
+    <tr><th>毒品</th><th>👑 基峰</th><th>🧩 碎片 m/z</th></tr>
+    <tr><td><span class="dot" style="background:var(--amp)"></span>甲基安非他命</td><td>58</td><td><span class="pill base">58</span><span class="pill">91</span><span class="pill">134</span></td></tr>
+    <tr><td><span class="dot" style="background:var(--mmc)"></span>4-甲基甲基卡西酮</td><td>58</td><td><span class="pill base">58</span><span class="pill">65</span><span class="pill">119</span></td></tr>
+    <tr><td><span class="dot" style="background:var(--ket)"></span>愷他命 Ketamine</td><td>180</td><td><span class="pill base">180</span><span class="pill">182</span><span class="pill">209</span><span class="pill">152</span></td></tr>
+    <tr><td><span class="dot" style="background:var(--eto)"></span>依托咪酯 Etomidate</td><td>105</td><td><span class="pill base">105</span><span class="pill">104</span><span class="pill">106</span><span class="pill">244</span></td></tr>
+    <tr><td><span class="dot" style="background:var(--her)"></span>海洛因 Heroin</td><td>327</td><td><span class="pill base">327</span><span class="pill">369</span><span class="pill">268</span><span class="pill">204</span><span class="pill">162</span></td></tr>
+  </table>
+
+  <h3>🎯 三句話總結</h3>
+  <ul>
+    <li><b>認是誰（定性）：</b>比質譜指紋的「碎片」＋「比例」，連基峰一起對才算認出來（小心 58 兄弟！）。</li>
+    <li><b>量多少（定量）：</b>先用已知濃度做「校正尺」，再對照基峰高度讀出多少 ng/mL。</li>
+    <li><b>機器健檢（品管）：</b>驗乾淨檢體、對答案、驗兩次、偷加找回 ── 有一招不過就要重驗。</li>
+  </ul>
+  <h3>🧪 課堂活動建議</h3>
+  <ul>
+    <li><b>指紋猜謎：</b>用積木堆出不同「高矮比例」的碎片柱，比較 58 兄弟（91/134 vs 65/119）誰是誰。</li>
+    <li><b>身高校正尺：</b>牆上貼刻度，先量幾位同學（已知身高）當尺，再量「神祕同學」對照讀數。</li>
+    <li><b>小小監考員：</b>老師念出檢查情境（乾淨檢體居然驗出海洛因…），學生舉牌判斷「健康／生病」並說理由。</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>
+  質譜小學堂 ·「認是誰・量多少・機器健檢」小學版（用毒品質譜訊號）<br>
+  資料來源：5 種毒品 GC-MS 圖譜（Shimadzu EI Scan）　·　珍愛生命，向毒品說不<br>
+  反毒諮詢專線 0800-770-885
+</footer>
+
+<script>
+/* real 5-drug GC-MS data: base peak + fragment spectrum (m/z, relative intensity %) */
+const DRUGS=[
+  {key:"amp", name:"甲基安非他命",      short:"甲基安非他命", emoji:"🟥", color:"#ff6b6b", base:58,  spec:[[58,100],[91,16],[134,9]]},
+  {key:"mmc", name:"4-甲基甲基卡西酮",   short:"卡西酮(喵喵)", emoji:"🟧", color:"#ffa94d", base:58,  spec:[[58,100],[65,13],[119,8]]},
+  {key:"ket", name:"愷他命 Ketamine",    short:"愷他命(K)",    emoji:"🟨", color:"#ffe066", base:180, spec:[[152,22],[180,100],[182,32],[209,18]]},
+  {key:"eto", name:"依托咪酯 Etomidate", short:"依托咪酯",     emoji:"🟩", color:"#69db7c", base:105, spec:[[104,42],[105,100],[106,16],[244,11]]},
+  {key:"her", name:"海洛因 Heroin",      short:"海洛因",       emoji:"🟦", color:"#4dabf7", base:327, spec:[[43,55],[162,25],[204,45],[268,60],[327,100],[369,72]]},
+];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* render a mass-spectrum fingerprint (bars by m/z, base peak crowned) */
+function specBars(d,neutral,small){
+  const arr=d.spec.slice().sort((a,b)=>a[0]-b[0]);
+  return `<div class="spec${small?' small':''}">`+arr.map(([mz,it])=>{
+    const isBase=(mz===d.base);
+    const col=isBase?(neutral?"#ffd43b":d.color):(neutral?"#9fb7d8":d.color);
+    return `<div class="sbar" style="height:${Math.max(7,it*0.78)}px;background:${col}">`+
+      `${isBase?'<span class="cr">👑</span>':''}<span class="mz">${mz}</span></div>`;
+  }).join("")+`</div>`;
+}
+
+/* show the 5 drug fingerprints */
+(function(){
+  const wrap=document.getElementById("fpCards");
+  DRUGS.forEach(d=>{
+    const div=document.createElement("div");div.className="card";
+    div.innerHTML=`<div class="big">${d.emoji}</div><b>${d.short}</b>${specBars(d,false,true)}`;
+    wrap.appendChild(div);
+  });
+})();
+
+/* GAME 1: fingerprint -> drug */
+(function(){
+  let order=shuffle(DRUGS),idx=0,score=0,locked=false;
+  const q=document.getElementById("g1q"),fp=document.getElementById("g1fp"),opts=document.getElementById("g1opts"),
+        fb=document.getElementById("g1fb"),sc=document.getElementById("g1score"),n=document.getElementById("g1n"),next=document.getElementById("g1next");
+  function load(){
+    locked=false;fb.textContent="";next.style.display="none";opts.innerHTML="";
+    const d=order[idx];n.textContent=idx+1;
+    q.innerHTML=`第 ${idx+1} 題：這張神祕質譜指紋是哪一種毒品？（看基峰 👑 和比例！）`;
+    fp.innerHTML=specBars(d,true,false);
+    shuffle([d,...shuffle(DRUGS.filter(x=>x.key!==d.key)).slice(0,3)]).forEach(c=>{
+      const b=document.createElement("button");b.className="opt";b.textContent=c.emoji+" "+c.short;
+      b.onclick=()=>{if(locked)return;locked=true;
+        if(c.key===d.key){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 答對！基峰 ${d.base}、碎片對上了，就是 ${d.emoji}${d.short}。</span>`;}
+        else fb.innerHTML=`<span class="no">❌ 正確是 ${d.emoji}${d.short}（基峰 ${d.base}）。看基峰＋比例就分得出來！</span>`;
+        idx<order.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 總分 <b>${score}/5</b>！`;};
+      opts.appendChild(b);
+    });
+  }
+  next.onclick=()=>{idx++;load();};load();
+})();
+
+/* GAME 2: calibration ruler -> read drug concentration */
+(function(){
+  const svg=document.getElementById("g2svg"),q=document.getElementById("g2q"),opts=document.getElementById("g2opts"),
+        fb=document.getElementById("g2fb"),sc=document.getElementById("g2score"),n=document.getElementById("g2n"),next=document.getElementById("g2next");
+  const slope=0.020;             // base-peak height fraction per ng/mL
+  const cal=[10,20,30,40];       // known standards (ng/mL)
+  const unknowns=[15,25,35,20,30];
+  let idx=0,score=0,locked=false,answer=0;
+  function draw(uC){
+    const W=460,H=300,padL=46,padR=16,padT=18,padB=44,maxC=50,maxH=1.0;
+    const sx=c=>padL+(c/maxC)*(W-padL-padR), sy=h=>H-padB-(h)*(H-padT-padB);
+    let g=`<rect width="${W}" height="${H}" fill="#0b1626"/>`;
+    for(let v=0;v<=50;v+=10){const x=sx(v);g+=`<line x1="${x}" y1="${padT}" x2="${x}" y2="${H-padB}" stroke="#1b2d47"/><text x="${x}" y="${H-padB+17}" fill="#7f9bc0" font-size="11" text-anchor="middle">${v}</text>`;}
+    g+=`<text x="${W/2}" y="${H-6}" fill="#9fb7d8" font-size="12" text-anchor="middle">毒品濃度 (ng/mL) →</text>`;
+    g+=`<line x1="${padL}" y1="${padT}" x2="${padL}" y2="${H-padB}" stroke="#3b5b86" stroke-width="2"/><line x1="${padL}" y1="${H-padB}" x2="${W-padR}" y2="${H-padB}" stroke="#3b5b86" stroke-width="2"/>`;
+    g+=`<text x="14" y="${H/2}" fill="#9fb7d8" font-size="12" text-anchor="middle" transform="rotate(-90 14 ${H/2})">基峰柱子多高</text>`;
+    g+=`<line x1="${sx(0)}" y1="${sy(0)}" x2="${sx(maxC)}" y2="${sy(slope*maxC)}" stroke="#ffd43b" stroke-width="2.5"/>`;
+    cal.forEach(c=>{g+=`<circle cx="${sx(c)}" cy="${sy(slope*c)}" r="6" fill="#4dabf7" stroke="#0b1626" stroke-width="1.5"/><text x="${sx(c)}" y="${sy(slope*c)-10}" fill="#7fb6ff" font-size="10" text-anchor="middle">${c}</text>`;});
+    const uh=slope*uC;
+    g+=`<line x1="${sx(0)}" y1="${sy(uh)}" x2="${sx(uC)}" y2="${sy(uh)}" stroke="#ff6b6b" stroke-dasharray="4 3"/>`;
+    g+=`<line x1="${sx(uC)}" y1="${sy(uh)}" x2="${sx(uC)}" y2="${sy(0)}" stroke="#ff6b6b" stroke-dasharray="4 3"/>`;
+    g+=`<circle cx="${sx(uC)}" cy="${sy(uh)}" r="7" fill="none" stroke="#ff6b6b" stroke-width="2.5"/>`;
+    g+=`<text x="${sx(0)+6}" y="${sy(uh)-6}" fill="#ff6b6b" font-size="11">未知檢體的基峰高度</text>`;
+    svg.innerHTML=g;
+  }
+  function load(){
+    locked=false;fb.textContent="";next.style.display="none";opts.innerHTML="";
+    answer=unknowns[idx];n.textContent=idx+1;draw(answer);
+    q.innerHTML=`第 ${idx+1} 管：對照藍色校正尺，紅色未知檢體大約有多少毒品？`;
+    let choices=[...new Set([answer,answer-10,answer+10,answer+5])].filter(v=>v>0);
+    while(choices.length<4){const extra=answer+ (choices.length*4); if(!choices.includes(extra))choices.push(extra);}
+    shuffle(choices).slice(0,4).forEach(v=>{
+      const b=document.createElement("button");b.className="opt";b.textContent=v+" ng/mL";
+      b.onclick=()=>{if(locked)return;locked=true;
+        if(v===answer){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 對！對照刻度就是 ${answer} ng/mL。</span>`;}
+        else fb.innerHTML=`<span class="no">❌ 再對照一次～正確是 ${answer} ng/mL。</span>`;
+        idx<unknowns.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 總分 <b>${score}/5</b>！`;};
+      opts.appendChild(b);
+    });
+  }
+  next.onclick=()=>{idx++;load();};load();
+})();
+
+/* GAME 3: machine health (QC) with drug context */
+(function(){
+  const CHECKS=[
+    {t:"🧼 驗一管「乾淨檢體」（應該沒有毒），機器卻驗出「海洛因 15 ng/mL」。",healthy:false,why:"乾淨檢體應該『未檢出』！驗到毒 → 機器被上一管污染了，要先洗乾淨再重驗。"},
+    {t:"✅ 放一管「已知 30 ng/mL」的品管樣，機器驗出「約 30 ng/mL」。",healthy:true,why:"答案對得上 → 機器很準，可以相信。"},
+    {t:"🔁 同一管驗兩次：第一次 50 ng/mL、第二次 49 ng/mL。",healthy:true,why:"兩次很接近 → 機器很穩定，可信。"},
+    {t:"🔁 同一管驗兩次：第一次 50 ng/mL、第二次只有 12 ng/mL。",healthy:false,why:"兩次差很多 → 機器不穩定，這個數字不能信，要重驗。"},
+    {t:"🧪 偷偷加了 20 ng/mL 毒品，機器卻一點都沒驗到。",healthy:false,why:"加了卻找不到 → 機器漏掉東西（回收不好），結果會偏低，要檢查。"},
+    {t:"✅ 品管樣 30 ng/mL 驗成約 30，乾淨檢體也『未檢出』。",healthy:true,why:"答案對、又乾淨 → 機器健康，可以放心相信這次的證據。"},
+  ];
+  let order=shuffle(CHECKS),idx=0,score=0,locked=false;
+  const q=document.getElementById("g3q"),fb=document.getElementById("g3fb"),sc=document.getElementById("g3score"),
+        n=document.getElementById("g3n"),next=document.getElementById("g3next"),
+        bOk=document.getElementById("g3ok"),bBad=document.getElementById("g3bad");
+  function load(){locked=false;fb.textContent="";next.style.display="none";bOk.disabled=false;bBad.disabled=false;
+    const c=order[idx];n.textContent=idx+1;q.innerHTML=`第 ${idx+1} 題：${c.t}`;}
+  function ans(saidHealthy){
+    if(locked)return;locked=true;bOk.disabled=true;bBad.disabled=true;
+    const c=order[idx],correct=(saidHealthy===c.healthy);
+    if(correct){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 判斷正確！${c.why}</span>`;}
+    else fb.innerHTML=`<span class="no">❌ 再想想～${c.why}</span>`;
+    idx<order.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 你是小小品管員！總分 <b>${score}/${order.length}</b> 🏥`;
+  }
+  bOk.onclick=()=>ans(true);bBad.onclick=()=>ans(false);next.onclick=()=>{idx++;load();};load();
+})();
+
+/* GAME 4: review quiz (drug-themed) */
+(function(){
+  const QUIZ=[
+    {q:"質譜機器驗毒做的「第一件事」是什麼？",opts:["量有多少毒品","認出是哪種毒品","把毒品變不見"],ans:1,why:"第一件事是『認是誰』(定性)，比質譜指紋認出是哪種毒品。"},
+    {q:"甲基安非他命和卡西酮的基峰都是 58，怎麼分出來？",opts:["分不出來","看其他碎片的比例（91、134 vs 65、119）","看顏色"],ans:1,why:"基峰一樣時，要比其他碎片的比例才分得出來！"},
+    {q:"檢體裡毒品越多，基峰（最高的碎片）柱子會？",opts:["越高","越矮","不變"],ans:0,why:"越多越高，所以可以用基峰高度來量多少。"},
+    {q:"『校正尺』是怎麼做出來的？",opts:["用已知濃度先量，連成高度↔濃度的尺","用猜的","問同學"],ans:0,why:"先量已知濃度，畫出『基峰高度↔濃度』的尺，再量未知。"},
+    {q:"驗『乾淨檢體』卻驗出毒品，代表？",opts:["機器很棒","機器被污染了，要洗乾淨重驗","檢體太髒"],ans:1,why:"乾淨檢體應該未檢出，驗到毒代表被污染。"},
+    {q:"同一管驗兩次，結果差很多，代表？",opts:["機器很穩","機器不穩，數字不能信","驗對了"],ans:1,why:"兩次差很多→不穩定，要重驗才可信。"},
+  ];
+  let idx=0,score=0,locked=false;
+  const q=document.getElementById("g4q"),opts=document.getElementById("g4opts"),fb=document.getElementById("g4fb"),
+        sc=document.getElementById("g4score"),n=document.getElementById("g4n"),next=document.getElementById("g4next");
+  function load(){
+    locked=false;fb.textContent="";next.style.display="none";opts.innerHTML="";
+    const it=QUIZ[idx];n.textContent=idx+1;q.innerHTML=`第 ${idx+1} 題：${it.q}`;
+    it.opts.forEach((o,i)=>{
+      const b=document.createElement("button");b.className="opt";b.textContent=o;
+      b.onclick=()=>{if(locked)return;locked=true;
+        if(i===it.ans){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 答對！${it.why}</span>`;}
+        else fb.innerHTML=`<span class="no">❌ 正解：「${it.opts[it.ans]}」。${it.why}</span>`;
+        idx<QUIZ.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 你是小小品管員！總分 <b>${score}/${QUIZ.length}</b> 🎉`;};
+      opts.appendChild(b);
+    });
+  }
+  next.onclick=()=>{idx++;load();};load();
+})();
+</script>
+</body>
+</html>
