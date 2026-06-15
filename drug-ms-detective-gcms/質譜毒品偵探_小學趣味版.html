@@ -57,7 +57,7 @@
   /* ===== RACE ===== */
   .race{background:#0c1a2e;border:1px solid #2a456a;border-radius:16px;padding:16px 14px;margin:14px 0}
   .racehead{text-align:center;color:#ffe9a8;font-weight:800;margin-bottom:12px}
-  .lane{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:8px;height:52px;
+  .lane{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:8px;height:60px;
     border-bottom:1px dashed #24405f}
   .lane:last-child{border-bottom:none}
   .lname{font-weight:800;font-size:14px;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden}
@@ -65,13 +65,15 @@
   .ltrack{position:relative;height:100%;background:repeating-linear-gradient(90deg,#0e2036 0 28px,#102640 28px 56px);
     border-radius:8px;overflow:visible}
   .finishline{position:absolute;right:2%;top:0;bottom:0;width:0;border-left:3px dashed #ffd43b}
-  .runner{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:24px;white-space:nowrap;z-index:3;
-    filter:drop-shadow(0 3px 4px rgba(0,0,0,.5));transition:left 0s}
+  /* runner = vertical stack: time pill above, icon below; never overlaps */
+  .runner{position:absolute;left:0;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;
+    align-items:center;white-space:nowrap;z-index:3;transition:left 0s}
+  .runner .rt{font-size:11px;font-weight:800;color:#ffd43b;background:rgba(8,16,28,.92);border:1px solid #3a5f93;
+    border-radius:8px;padding:0 6px;margin-bottom:2px;opacity:0;transition:opacity .25s;line-height:1.55}
+  .runner .ic{font-size:23px;line-height:1;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5))}
   .runner .badge2{font-size:18px}
-  .runner.arrived{animation:hop .4s ease 2}
-  @keyframes hop{0%,100%{transform:translateY(-50%)}50%{transform:translateY(-90%)}}
-  .flag{position:absolute;top:6px;font-size:20px;opacity:0;transition:opacity .2s;z-index:2}
-  .rt{position:absolute;bottom:4px;font-size:12px;font-weight:800;color:#ffd43b;opacity:0;transition:opacity .2s;white-space:nowrap}
+  .runner.arrived .ic{animation:hop .45s ease 2}
+  @keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
   .timeaxis{position:relative;height:20px;margin:6px 0 0 128px}
   .timeaxis span{position:absolute;transform:translateX(-50%);font-size:11px;color:#7f9bc0}
   .racebtns{text-align:center;margin-top:14px}
@@ -385,8 +387,7 @@ function pictureSVG(d){
     const lane=document.createElement("div");lane.className="lane";lane.dataset.key=d.key;
     lane.innerHTML=`<div class="lname"><span class="dot" style="background:${d.color}"></span>${d.short}</div>
       <div class="ltrack"><div class="finishline"></div>
-        <div class="runner">🏃<span class="badge2">${d.emoji}</span></div>
-        <div class="flag">🚩</div><div class="rt"></div></div>`;
+        <div class="runner"><span class="rt"></span><span class="ic">🏃<span class="badge2">${d.emoji}</span></span></div></div>`;
     lanesEl.appendChild(lane);
   });
   for(let t=0;t<=MAXT;t+=5){const s=document.createElement("span");s.textContent=t+"分";s.style.left=(t/MAXT*92)+"%";axis.appendChild(s);}
@@ -402,23 +403,22 @@ function pictureSVG(d){
   }
   function run(){
     const arrivedKeys={};
-    function arrive(d,runner,flag,rt){
+    function arrive(d,runner,rt){
       if(arrivedKeys[d.key])return;arrivedKeys[d.key]=true;
-      runner.classList.add("arrived");flag.style.opacity=1;rt.textContent=d.rt.toFixed(1)+"分";rt.style.opacity=1;
+      runner.classList.add("arrived");rt.textContent="🚩 "+d.rt.toFixed(1)+"分";rt.style.opacity=1;
       order.push(d);finishes++;
       if(finishes===DRUGS.length)done();
     }
     lanesEl.querySelectorAll(".lane").forEach(lane=>{
       const d=DRUGS.find(x=>x.key===lane.dataset.key),runner=lane.querySelector(".runner"),
-            flag=lane.querySelector(".flag"),rt=lane.querySelector(".rt");
+            rt=lane.querySelector(".runner .rt");
       const pos=d.rt/MAXT*92, dur=d.rt/MAXT*5+0.2;
-      flag.style.left=pos+"%";rt.style.left=pos+"%";
       // start from 0, force reflow, then transition to finish (no rAF dependency)
       runner.style.transition="none";runner.style.left="0%";void runner.offsetWidth;
       runner.style.transition=`left ${dur.toFixed(2)}s linear`;runner.style.left=pos+"%";
       runner.addEventListener("transitionend",function te(e){
-        if(e.propertyName!=="left")return;runner.removeEventListener("transitionend",te);arrive(d,runner,flag,rt);});
-      setTimeout(()=>arrive(d,runner,flag,rt), dur*1000+200); // fallback if transitionend is throttled
+        if(e.propertyName!=="left")return;runner.removeEventListener("transitionend",te);arrive(d,runner,rt);});
+      setTimeout(()=>arrive(d,runner,rt), dur*1000+200); // fallback if transitionend is throttled
     });
     resetBtn.style.display="inline-block";
   }
@@ -433,8 +433,8 @@ function pictureSVG(d){
     finishes=0;order=[];result.style.display="none";cd.textContent="";
     lanesEl.querySelectorAll(".lane").forEach(lane=>{
       const runner=lane.querySelector(".runner");runner.style.transition="none";runner.style.left="0%";
-      runner.classList.remove("arrived");lane.querySelector(".flag").style.opacity=0;
-      const rt=lane.querySelector(".rt");rt.style.opacity=0;rt.textContent="";
+      runner.classList.remove("arrived");
+      const rt=lane.querySelector(".runner .rt");rt.style.opacity=0;rt.textContent="";
     });
     void lanesEl.offsetWidth; // reflow
     startBtn.disabled=false;resetBtn.style.display="none";
