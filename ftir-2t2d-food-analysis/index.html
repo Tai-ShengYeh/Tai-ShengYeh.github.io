@@ -180,10 +180,19 @@ print(sync_maps[0].shape)</code></pre></div>
     </section>
 
     <section id="orange" class="wrap">
-      <div class="section-head"><div><div class="kicker">Orange workflow</div><h2>如果用 Orange Data Mining，先走一維光譜基礎流程</h2></div></div>
-      <p class="lead">Orange 不一定要直接做 2D-COS。教學上可以先讓學生理解光譜矩陣與分類，再用 Python 產生 2T2D maps。這樣比較不會把「資料整理」與「2D correlation」兩個難點混在一起。</p>
-      <div class="workflow"><div class="workflow-row"><span class="node">File</span><span class="arrow">→</span><span class="node">Select Columns</span><span class="arrow">→</span><span class="node">Preprocess</span><span class="arrow">→</span><span class="node">PCA</span><span class="arrow">→</span><span class="node">Scatter Plot</span><span class="arrow">→</span><span class="node">Test & Score</span><span class="arrow">→</span><span class="node">Confusion Matrix</span></div></div>
-      <div class="cards" style="margin-top:16px"><article class="card"><h3>入門問題</h3><p>Arabica 與 Robusta 在 PCA score plot 是否自然分開？哪幾個 wavenumber 對 PC loading 影響最大？</p></article><article class="card"><h3>中階問題</h3><p>比較 raw、SNV、standard scaling、Savitzky–Golay derivative 對分類表現的影響。</p></article><article class="card"><h3>進階問題</h3><p>把 Python 產生的 2T2D maps 輸出成影像或 flattened features，再比較 SVM / Random Forest / CNN。</p></article></div>
+      <div class="section-head"><div><div class="kicker">Orange workflow</div><h2>Orange Data Mining 也可以做 2D Correlation Plot</h2></div></div>
+      <p class="lead">除了 Python 版 2T2D-COS，Orange Data Mining 的 Spectroscopy add-on 也有 <strong>2D Correlation Plot</strong> widget。教學上建議先用 Orange 做互動式探索，讓學生看懂「一維光譜如何變成二維相關圖」；再用 Python 重現流程、輸出圖檔與建立機器學習特徵。</p>
+      <figure class="realfig"><img src="assets/orange_2d_correlation_plot.jpg" alt="Orange Spectroscopy add-on showing the 2D Correlation Plot widget"><figcaption class="caption"><strong>Orange 2D Correlation Plot。</strong>安裝 Orange Spectroscopy add-on 後，可在 Spectroscopy 類別中找到此 widget。它適合課堂即時展示 synchronous / asynchronous correlation map，讓學生不用先寫程式也能理解 2D-COS 視覺化。</figcaption></figure>
+      <div class="grid-2" style="margin-top:16px">
+        <div class="workflow"><h3>一維光譜 baseline 流程</h3><div class="workflow-row"><span class="node">File</span><span class="arrow">→</span><span class="node">Select Columns</span><span class="arrow">→</span><span class="node">Preprocess</span><span class="arrow">→</span><span class="node">PCA</span><span class="arrow">→</span><span class="node">Scatter Plot</span><span class="arrow">→</span><span class="node">Test & Score</span><span class="arrow">→</span><span class="node">Confusion Matrix</span></div></div>
+        <div class="workflow"><h3>Orange 2D correlation 延伸流程</h3><div class="workflow-row"><span class="node">File / Spectra</span><span class="arrow">→</span><span class="node">Preprocess Spectra</span><span class="arrow">→</span><span class="node">Select Rows / Groups</span><span class="arrow">→</span><span class="node">Average Spectra</span><span class="arrow">→</span><span class="node">2D Correlation Plot</span></div></div>
+      </div>
+      <div class="cards" style="margin-top:16px">
+        <article class="card"><h3>Orange 的定位</h3><p>Orange 適合入門與互動探索：學生可以拖拉 widget、調整前處理、立即觀察波數 × 波數的相關圖樣，理解哪些 fingerprint 區域會一起變化。</p></article>
+        <article class="card"><h3>Python 的定位</h3><p>Python 適合可重現分析：可固定 reference trace、批次輸出 synchronous / asynchronous maps、產生 flattened features，進一步接 SVM、Random Forest 或 CNN。</p></article>
+        <article class="card"><h3>教學提醒</h3><p>Orange 的 2D Correlation Plot 是視覺探索工具；若要做嚴格模型評估，reference spectrum 與 class mean 必須在訓練 fold 內計算，避免把測試資料洩漏進模型。</p></article>
+      </div>
+      <div class="callout" style="margin-top:18px"><strong>建議課堂順序：</strong>先用 FTIR 一維光譜完成 PCA / PLS-DA baseline，再開 Orange 2D Correlation Plot 觀察 band-to-band pattern，最後回到 Python 產生可保存、可重現、可延伸到機器學習的 2T2D-COS 圖。</div>
     </section>
 
     <section id="learning" class="wrap">
