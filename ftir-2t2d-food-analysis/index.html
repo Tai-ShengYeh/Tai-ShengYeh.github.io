@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Food FTIR Spectra × 2T2D-COS 教學頁</title>
+  <style>
+    :root{
+      --bg:#f5fbff; --paper:#ffffff; --ink:#102033; --muted:#5a6d83;
+      --blue:#1769ff; --cyan:#00a6d6; --sky:#dff4ff; --orange:#f59e0b;
+      --green:#0f9f6e; --line:#d8e8f3; --nav:#0d1b2a; --code:#101828;
+      --shadow:0 18px 45px rgba(23,105,255,.10); --radius:22px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;background:linear-gradient(180deg,#f1f9ff 0%,#fff 42%,#f7fbff 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",Arial,sans-serif;line-height:1.68}
+    a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}
+    .nav{position:sticky;top:0;z-index:20;background:rgba(13,27,42,.96);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .nav-inner{max-width:1120px;margin:auto;display:flex;align-items:center;gap:18px;padding:12px 22px;overflow-x:auto}
+    .brand{color:#fff;font-weight:800;white-space:nowrap;letter-spacing:.02em}.brand small{display:block;color:#9fdcff;font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase}.nav a{color:#d9ecff;font-size:14px;white-space:nowrap;padding:8px 10px;border-radius:999px}.nav a:hover{background:rgba(255,255,255,.1);text-decoration:none}
+    .wrap{max-width:1120px;margin:auto;padding:0 22px}.hero{padding:72px 0 42px}.hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:26px;align-items:stretch}.badge{display:inline-flex;gap:8px;align-items:center;background:#e7f6ff;color:#075985;border:1px solid #bfe9ff;border-radius:999px;padding:7px 12px;font-weight:700;font-size:14px}.hero h1{font-size:clamp(38px,6vw,72px);line-height:1.02;margin:18px 0 18px;letter-spacing:-.05em}.hero p{font-size:20px;color:var(--muted);max-width:760px}.hero-card{background:var(--paper);border:1px solid var(--line);border-radius:28px;padding:24px;box-shadow:var(--shadow);position:relative;overflow:hidden}.hero-card:before{content:"";position:absolute;inset:-90px -80px auto auto;width:210px;height:210px;background:radial-gradient(circle,#a7e8ff,transparent 70%)}
+    .spectrum{height:260px;border-radius:20px;background:linear-gradient(180deg,#fbfdff,#edf8ff);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin-bottom:18px}.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.fact{background:#f8fcff;border:1px solid var(--line);border-radius:18px;padding:14px}.fact b{display:block;font-size:22px;color:var(--blue)}.fact span{font-size:13px;color:var(--muted)}
+    section{padding:54px 0}.kicker{font-size:13px;text-transform:uppercase;letter-spacing:.14em;color:var(--cyan);font-weight:900}.section-head{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:22px}.section-head h2{font-size:clamp(28px,4vw,44px);line-height:1.12;margin:.25em 0 0;letter-spacing:-.03em}.lead{font-size:18px;color:var(--muted);max-width:820px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 10px 28px rgba(16,32,51,.05)}.card h3{margin:0 0 8px;font-size:21px}.card p,.card li{color:var(--muted)}.tag{display:inline-flex;background:#eef8ff;border:1px solid #ccecff;color:#0a6180;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:800;margin:3px 4px 3px 0}.orange{color:#9a5b00;background:#fff7e6;border-color:#fedca2}.green{color:#096b4c;background:#eafaf4;border-color:#c2f1df}.callout{border-radius:24px;padding:22px 24px;border:1px solid #bfe9ff;background:linear-gradient(135deg,#effaff,#fff);box-shadow:var(--shadow)}.callout strong{color:#075985}.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.steps{counter-reset:s}.step{position:relative;padding-left:58px}.step:before{counter-increment:s;content:counter(s);position:absolute;left:0;top:4px;width:38px;height:38px;border-radius:13px;background:var(--blue);color:#fff;display:grid;place-items:center;font-weight:900}.figure{background:#fff;border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 12px 32px rgba(16,32,51,.06)}
+    pre{background:var(--code);color:#d7e7ff;border-radius:20px;padding:20px;overflow:auto;font-size:13px;line-height:1.55;border:1px solid #22344f} code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}.inline-code{background:#eef5ff;border:1px solid #d8e8f3;border-radius:7px;padding:1px 6px;color:#0c4a6e;font-family:Consolas,monospace}.workflow{background:#f8fcff;border:1px dashed #9cd8ff;border-radius:22px;padding:18px}.workflow-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.node{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px 12px;font-weight:800;color:#18324d;box-shadow:0 7px 16px rgba(16,32,51,.05)}.arrow{color:var(--cyan);font-weight:900}.table{display:grid;gap:10px}.row{display:grid;grid-template-columns:170px 1fr;gap:12px;border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px}.row b{color:#173b67}.quiz{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.q{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}.q b{color:var(--blue)}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 13px;font-weight:800;cursor:pointer;color:#173b67}.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}.dataset-panel{display:none}.dataset-panel.active{display:block}.footer{background:#0d1b2a;color:#dbeafe;padding:34px 0;margin-top:40px}.footer p{color:#aac3df}
+    @media(max-width:860px){.hero-grid,.grid-2{grid-template-columns:1fr}.cards{grid-template-columns:1fr}.facts,.quiz{grid-template-columns:1fr}.section-head{display:block}.row{grid-template-columns:1fr}.hero{padding-top:42px}}
+  </style>
+</head>
+<body>
+  <nav class="nav"><div class="nav-inner"><div class="brand">Food FTIR × 2T2D-COS<small>student teaching page</small></div><a href="#data">資料集</a><a href="#concept">2T2D 概念</a><a href="#python">Python</a><a href="#orange">Orange</a><a href="#learning">自我檢核</a></div></nav>
+  <main>
+    <header class="hero wrap">
+      <div class="hero-grid">
+        <div>
+          <span class="badge">公開食品光譜資料 × 可重現教學</span>
+          <h1>從 Mendeley Food FTIR spectra 開始學 2T2D-COS</h1>
+          <p>這一章會帶你把一維食品 FTIR 光譜整理成 <strong>sample × wavenumber</strong> 矩陣，先做 PCA / PLS-DA 的基礎判別，再進一步把光譜轉成 two-trace 2D correlation maps，作為機器學習或影像模型的輸入。</p>
+        </div>
+        <aside class="hero-card">
+          <div class="spectrum" aria-label="stylized FTIR spectrum and 2D map">
+            <svg width="92%" height="220" viewBox="0 0 520 220" role="img">
+              <defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#1769ff"/><stop offset="1" stop-color="#00a6d6"/></linearGradient></defs>
+              <rect x="12" y="18" width="235" height="170" rx="18" fill="#fff" stroke="#cfe8f7"/>
+              <path d="M30 138 C60 120,72 156,98 86 C116 38,135 155,158 96 C182 35,205 120,230 72" fill="none" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/>
+              <text x="30" y="170" fill="#5a6d83" font-size="13">FTIR spectrum</text>
+              <g transform="translate(292,18)">
+                <rect width="170" height="170" rx="18" fill="#fff" stroke="#cfe8f7"/>
+                <g opacity=".92">
+                  <rect x="18" y="18" width="32" height="32" fill="#dff4ff"/><rect x="50" y="18" width="32" height="32" fill="#8bdcff"/><rect x="82" y="18" width="32" height="32" fill="#1769ff"/><rect x="114" y="18" width="32" height="32" fill="#f59e0b"/>
+                  <rect x="18" y="50" width="32" height="32" fill="#bdefff"/><rect x="50" y="50" width="32" height="32" fill="#1769ff"/><rect x="82" y="50" width="32" height="32" fill="#ffca66"/><rect x="114" y="50" width="32" height="32" fill="#fff1cc"/>
+                  <rect x="18" y="82" width="32" height="32" fill="#0ea5e9"/><rect x="50" y="82" width="32" height="32" fill="#ffc04d"/><rect x="82" y="82" width="32" height="32" fill="#dff4ff"/><rect x="114" y="82" width="32" height="32" fill="#1769ff"/>
+                  <rect x="18" y="114" width="32" height="32" fill="#fff5dc"/><rect x="50" y="114" width="32" height="32" fill="#bdefff"/><rect x="82" y="114" width="32" height="32" fill="#1769ff"/><rect x="114" y="114" width="32" height="32" fill="#00a6d6"/>
+                </g>
+                <text x="18" y="166" fill="#5a6d83" font-size="13">2T2D map</text>
+              </g>
+            </svg>
+          </div>
+          <div class="facts"><div class="fact"><b>4</b><span>food FTIR CSV files</span></div><div class="fact"><b>56–983</b><span>spectra per task</span></div><div class="fact"><b>MIR</b><span>DRIFT / ATR spectra</span></div><div class="fact"><b>CC BY-NC</b><span>academic teaching use</span></div></div>
+        </aside>
+      </div>
+    </header>
+
+    <section id="data" class="wrap">
+      <div class="section-head"><div><div class="kicker">Dataset first</div><h2>先認識這個 Mendeley 食品 FTIR 資料包</h2></div></div>
+      <p class="lead">資料來源是 <a href="https://data.mendeley.com/datasets/frrv2yd9rg/1" target="_blank" rel="noopener">Data for: Spectra Data Classification with Kernel Extreme Learning</a>。它不是專門為 2T2D-COS 建立的資料集，但因為每個樣本都有完整 FTIR spectrum 與類別標籤，非常適合用來教「從一維光譜生成 2D correlation image」。</p>
+      <div class="cards">
+        <article class="card"><h3>Instant coffee</h3><p>56 個 MIR-DRIFT spectra；Arabica vs Robusta。最適合第一個示範，資料小、類別清楚。</p><span class="tag">classification</span><span class="tag">coffee authentication</span></article>
+        <article class="card"><h3>Olive oil</h3><p>120 spectra，來自 60 個 extra virgin olive oils，每個樣本有 duplicate acquisition。適合討論 replicate 與產地判別。</p><span class="tag green">replicates</span><span class="tag">origin</span></article>
+        <article class="card"><h3>Fruit puree</h3><p>983 個 ATR-FTIR spectra；Strawberry vs non-strawberry / adulterated puree。適合進階分類與 spectral-image model。</p><span class="tag orange">adulteration</span><span class="tag">large n</span></article>
+      </div>
+      <div class="callout" style="margin-top:18px"><strong>建議起點：</strong>先用 <span class="inline-code">FTIR_Spectra_instant_coffee.csv</span>。完成一次完整流程後，再換 fruit puree 做較大的食品摻偽案例。</div>
+    </section>
+
+    <section id="concept" class="wrap">
+      <div class="section-head"><div><div class="kicker">Concept</div><h2>2T2D-COS 在這裡扮演什麼角色？</h2></div></div>
+      <div class="grid-2">
+        <div class="card step"><h3>從一維到二維</h3><p>原始 FTIR 是一條曲線：每個 wavenumber 對應一個吸收強度。2T2D-COS 把兩條光譜，例如「class mean spectrum」與「單一樣本 spectrum」，轉成一張二維 correlation map。</p></div>
+        <div class="card step"><h3>讓模型看到交互關係</h3><p>一般 PCA / PLS-DA 直接看各波數的強度；2D map 則呈現 band-to-band 的共同變化。這可作為 CNN 或 image-based ML 的輸入，也可用來討論哪些區域共同貢獻分類。</p></div>
+      </div>
+      <div class="figure" style="margin-top:18px">
+        <h3>教學版 two-trace 計算流程</h3>
+        <div class="table">
+          <div class="row"><b>Reference trace</b><span>選一條參考光譜，例如 Arabica 的平均光譜，或全部訓練資料的平均光譜。</span></div>
+          <div class="row"><b>Sample trace</b><span>取單一樣本光譜，與 reference 組成 2 × p 的矩陣，p 是波數點數。</span></div>
+          <div class="row"><b>Synchronous map</b><span>觀察兩條光譜在波數對之間的共同變動；適合入門視覺化。</span></div>
+          <div class="row"><b>Asynchronous map</b><span>使用 Hilbert–Noda matrix 產生相位/順序差異的資訊；可作為進階討論。</span></div>
+        </div>
+      </div>
+      <div class="callout" style="margin-top:18px"><strong>科學提醒：</strong>正式投稿時要清楚說明採用的 2D-COS / 2T2D 公式、前處理與 reference 選法。本頁的目標是教學與可重現練習，因此會先用最容易理解的 two-trace implementation。</div>
+    </section>
+
+    <section id="python" class="wrap">
+      <div class="section-head"><div><div class="kicker">Python workflow</div><h2>學生可以直接改成 notebook 的 Python 骨架</h2></div></div>
+      <p class="lead">下面程式會下載 Mendeley zip、讀取 coffee FTIR CSV、整理成 <span class="inline-code">X: samples × wavenumbers</span>，再產生每個樣本相對於所屬類別平均光譜的 2T2D-COS maps。</p>
+      <pre><code>import io, zipfile, requests
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.svm import SVC
+
+url = "https://data.mendeley.com/public-api/zip/frrv2yd9rg/download/1"
+r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+r.raise_for_status()
+z = zipfile.ZipFile(io.BytesIO(r.content))
+
+coffee_file = [f for f in z.namelist() if "instant_coffee" in f and f.endswith(".csv")][0]
+raw = pd.read_csv(z.open(coffee_file), header=None)
+
+sample_id = raw.iloc[0, 1:].astype(str).to_numpy()
+group_code = raw.iloc[1, 1:].astype(str).to_numpy()
+y = raw.iloc[2, 1:].astype(str).to_numpy()      # Arabica / Robusta
+wavenumber = pd.to_numeric(raw.iloc[3:, 0]).to_numpy()
+X = raw.iloc[3:, 1:].T.astype(float).to_numpy() # samples × wavenumbers
+
+print(X.shape, y[:5], wavenumber.min(), wavenumber.max())</code></pre>
+      <div class="grid-2">
+        <div><h3>PCA / SVM baseline</h3><pre><code>Xz = StandardScaler().fit_transform(X)
+pca = PCA(n_components=2).fit_transform(Xz)
+
+clf = SVC(kernel="linear")
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
+scores = cross_val_score(clf, Xz, y, cv=cv)
+print("CV accuracy:", scores.mean(), scores.std())</code></pre></div>
+        <div><h3>產生 2T2D maps</h3><pre><code>def noda_matrix(m):
+    N = np.zeros((m, m))
+    for j in range(m):
+        for k in range(m):
+            if j != k:
+                N[j, k] = 1 / (np.pi * (k - j))
+    return N
+
+def two_trace_2dcos(sample, reference):
+    Y = np.vstack([reference, sample])
+    Y = Y - Y.mean(axis=0, keepdims=True)
+    N = noda_matrix(Y.shape[0])
+    sync = Y.T @ Y / (Y.shape[0] - 1)
+    async = Y.T @ N @ Y / (Y.shape[0] - 1)
+    return sync, async
+
+class_mean = {c: X[y == c].mean(axis=0) for c in np.unique(y)}
+sync_maps, async_maps = [], []
+for xi, yi in zip(X, y):
+    s, a = two_trace_2dcos(xi, class_mean[yi])
+    sync_maps.append(s)
+    async_maps.append(a)
+
+print(sync_maps[0].shape)</code></pre></div>
+      </div>
+    </section>
+
+    <section id="orange" class="wrap">
+      <div class="section-head"><div><div class="kicker">Orange workflow</div><h2>如果用 Orange Data Mining，先走一維光譜基礎流程</h2></div></div>
+      <p class="lead">Orange 不一定要直接做 2D-COS。教學上可以先讓學生理解光譜矩陣與分類，再用 Python 產生 2T2D maps。這樣比較不會把「資料整理」與「2D correlation」兩個難點混在一起。</p>
+      <div class="workflow"><div class="workflow-row"><span class="node">File</span><span class="arrow">→</span><span class="node">Select Columns</span><span class="arrow">→</span><span class="node">Preprocess</span><span class="arrow">→</span><span class="node">PCA</span><span class="arrow">→</span><span class="node">Scatter Plot</span><span class="arrow">→</span><span class="node">Test & Score</span><span class="arrow">→</span><span class="node">Confusion Matrix</span></div></div>
+      <div class="cards" style="margin-top:16px"><article class="card"><h3>入門問題</h3><p>Arabica 與 Robusta 在 PCA score plot 是否自然分開？哪幾個 wavenumber 對 PC loading 影響最大？</p></article><article class="card"><h3>中階問題</h3><p>比較 raw、SNV、standard scaling、Savitzky–Golay derivative 對分類表現的影響。</p></article><article class="card"><h3>進階問題</h3><p>把 Python 產生的 2T2D maps 輸出成影像或 flattened features，再比較 SVM / Random Forest / CNN。</p></article></div>
+    </section>
+
+    <section id="learning" class="wrap">
+      <div class="section-head"><div><div class="kicker">Self check</div><h2>完成後，你應該能回答這些問題</h2></div></div>
+      <div class="quiz">
+        <div class="q"><b>01</b><p>為什麼不能把 duplicate acquisition 當成完全獨立樣本來隨機切分 train/test？</p></div>
+        <div class="q"><b>02</b><p>class mean spectrum 當 reference trace 有什麼優點？有什麼可能造成資料洩漏的風險？</p></div>
+        <div class="q"><b>03</b><p>2T2D synchronous map 與原始一維 spectrum 相比，多提供了哪一類資訊？</p></div>
+        <div class="q"><b>04</b><p>如果換成 fruit puree dataset，Strawberry vs non-strawberry 的模型評估應該看 accuracy 之外的哪些指標？</p></div>
+      </div>
+      <div class="callout" style="margin-top:18px"><strong>下一步：</strong>把 coffee 章節做完後，建議直接複製同一份 notebook，改讀 <span class="inline-code">MIR_Fruit_purees.csv</span>，讓學生比較小型乾淨資料與大型摻偽資料的差異。</div>
+    </section>
+  </main>
+  <footer class="footer"><div class="wrap"><strong>Food FTIR spectra × 2T2D-COS teaching artifact</strong><p>資料來源：Mendeley Data DOI 10.17632/frrv2yd9rg.1；原始食品光譜來源包含 coffee varietal identification、olive oil origin、fresh meats、fruit puree adulteration。頁面用途：課堂教學、notebook 起手式、Orange workflow 引導。</p></div></footer>
+</body>
+</html>
