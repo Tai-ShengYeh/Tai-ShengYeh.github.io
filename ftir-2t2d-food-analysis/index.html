@@ -91,6 +91,11 @@
         <div class="chem-row"><div><span class="band-no">8</span></div><div>890–980 cm⁻¹</div><div>carbohydrate ring vibration、C–H deformation</div><div>屬於低波數 fingerprint 區，常與醣類環狀振動、多醣結構和烘焙後基質差異相關，適合作為分類訊號但不適合過度單一化合物指認。</div></div>
       </div>
       <div class="callout"><strong>判讀重點：</strong>這個資料的差異光譜多數區域為 Arabica mean 較高，但這不等於「Arabica 的某單一成分一定較高」。FTIR 是重疊訊號；較穩健的說法是：Arabica / Robusta 的判別主要來自 carbonyl / aromatic / carbohydrate fingerprint 等區域的整體組成差異。若要宣稱 caffeine、chlorogenic acids 或 trigonelline 的濃度高低，應搭配 HPLC、LC-MS 或標準品校正。參考：Downey et al. (1997) coffee varietal identification 資料來源；Sahachairungrueng et al. (2022) 指出 coffee FTIR/NIR 訊號包含水分、chlorogenic acid、caffeine、trigonelline 與 carbohydrates；Ribeiro et al. (2012) 指出 1700–1600 cm⁻¹ 與 coffee 中 chlorogenic acids、caffeine 相關。</div>
+      <div class="cards" style="margin-top:18px">
+        <article class="card"><h3>參考比對｜FTIR 咖啡鑑別課</h3><p>已完成的一維 FTIR × PCA / PLS-DA 教學頁，可作為本頁 2T2D-COS 前的 baseline：先看原始 FTIR 光譜如何做 Arabica vs Robusta 鑑別，再比較 2T2D 影像化後多了哪些 band-to-band pattern。</p><div class="links"><a class="go" href="https://tai-shengyeh.github.io/ftir-food-analysis/teaching.html" target="_blank" rel="noopener">開啟 FTIR 教學頁 →</a></div></article>
+        <article class="card"><h3>參考比對｜GC 咖啡品種課</h3><p>GC 層析指紋同樣用 Arabica vs Robusta 作為食品真偽案例。可拿來對照：FTIR 是官能基 / 整體組成 fingerprint；GC 是揮發性或層析峰型 fingerprint，兩者的化學選擇性與特徵解釋方式不同。</p><div class="links"><a class="go" href="https://tai-shengyeh.github.io/coffee-gc-analysis/teaching.html" target="_blank" rel="noopener">開啟 GC 教學頁 →</a></div></article>
+        <article class="card"><h3>課堂比較問題</h3><p>同樣是 coffee authentication，FTIR、GC、2T2D-COS 分別回答不同問題：FTIR 看官能基區域，GC 看分離後峰型，2T2D-COS 看光譜區域之間的相關圖樣。學生可比較哪一種最容易解釋、哪一種最適合快速篩檢。</p></article>
+      </div>
       <figure class="realfig"><img src="assets/coffee_2t2d_sync_compare.png" alt="Two-trace synchronous 2D-COS maps comparing Arabica and Robusta samples against Arabica mean reference"><figcaption class="caption"><strong>圖 5｜two-trace synchronous 2D-COS 對照圖。</strong>左圖是 Arabica 樣本相對 Arabica mean，右圖是 Robusta 樣本相對 Arabica mean；為了教學可讀性，波數點已下採樣。這張圖可以讓學生比較「一維光譜差異」如何轉換成「二維 correlation pattern」。</figcaption></figure>
       <div class="callout"><strong>課堂使用方式：</strong>先要求學生用 Python 重現圖 1–3；確認資料讀取、標準化、PCA 都正確後，再重現圖 5。若圖 5 顏色方向相反，通常是 reference trace 或差異定義相反，不一定代表計算錯誤。</div>
     </section>
