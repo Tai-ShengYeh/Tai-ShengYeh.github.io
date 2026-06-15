@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>電子鼻 × 食品分析：中階課 — Regression 與品質指標預測</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<style>
+@font-face{font-family:'GenSeki';src:url('assets/fonts/GenSekiGothic2TW-H.otf') format('opentype');font-weight:900;font-display:swap;}
+@font-face{font-family:'GenSeki';src:url('assets/fonts/GenSekiGothic2TW-B.otf') format('opentype');font-weight:700;font-display:swap;}
+@font-face{font-family:'GenSeki';src:url('assets/fonts/GenSekiGothic2TW-M.otf') format('opentype');font-weight:500;font-display:swap;}
+:root{--paper:#F7FBFF;--paper2:#EAF5FF;--paper3:#FFF8E8;--ink:#122033;--ink-soft:#475569;--blue:#1D75D8;--cyan:#0EA5A8;--orange:#E56B1F;--gold:#C7921B;--green:#26966D;--line:#C9DCEB;--deep:#10243D;--code:#1f2329;}
+*{box-sizing:border-box;} html{scroll-behavior:smooth;} body{margin:0;font-family:'GenSeki','Noto Sans TC',system-ui,sans-serif;font-weight:500;color:var(--ink);background:linear-gradient(180deg,#F7FBFF 0%,#FFFFFF 44%,#F3F9FF 100%);line-height:1.7;font-size:18px;} h1,h2,h3{font-weight:900;line-height:1.2;} a{color:var(--blue);text-decoration:none;} a:hover{text-decoration:underline;} code,pre,kbd{font-family:'JetBrains Mono','Fira Code',Consolas,monospace;}
+nav{position:sticky;top:0;z-index:50;background:rgba(16,36,61,.96);backdrop-filter:blur(6px);display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 22px;box-shadow:0 8px 24px rgba(15,36,61,.14);} nav .brand{color:#fff;font-weight:900;font-size:18px;margin-right:auto;} nav .brand b{color:#78D8FF;} nav a{color:#e6f4ff;font-weight:700;font-size:14.5px;padding:6px 11px;border-radius:8px;} nav a:hover{background:rgba(255,255,255,.12);text-decoration:none;color:#fff;}
+.hero{background:radial-gradient(circle at 20% 10%,rgba(120,216,255,.28),transparent 30%),linear-gradient(135deg,#10243D 0%,#16457C 50%,#0E6871 100%);color:#fff;padding:84px 22px 72px;text-align:center;} .hero h1{font-size:clamp(34px,6vw,64px);margin:0 0 14px;} .hero .accent{color:#FFD166;} .hero p.sub{font-size:clamp(17px,2.4vw,24px);color:#DCEEFF;font-weight:700;max-width:880px;margin:0 auto 28px;} .hero .facts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:12px;} .hero .fact{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px 20px;min-width:150px;} .hero .fact b{display:block;font-size:30px;color:#FFD166;font-weight:900;} .hero .fact span{font-size:14px;color:#DCEEFF;font-weight:700;}
+main{max-width:1080px;margin:0 auto;padding:0 22px;} section{padding:64px 0 8px;scroll-margin-top:64px;border-top:1px solid var(--line);} section:first-of-type{border-top:none;} .kicker{color:var(--orange);font-weight:900;font-size:15px;letter-spacing:.14em;text-transform:uppercase;} section h2{font-size:clamp(28px,4vw,42px);margin:6px 0 8px;} section h3{font-size:23px;margin:34px 0 10px;color:var(--blue);} p{margin:14px 0;} .lead{font-size:20px;color:var(--ink-soft);} .grid{display:grid;gap:18px;margin:24px 0;} .g4{grid-template-columns:repeat(4,1fr);} .g3{grid-template-columns:repeat(3,1fr);} .g2{grid-template-columns:repeat(2,1fr);} .card{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 12px 28px rgba(29,117,216,.06);} .card h4{margin:0 0 8px;font-size:19px;font-weight:900;color:var(--blue);} .card.orange h4{color:var(--orange);} .card.green h4{color:var(--green);} .card.cyan h4{color:var(--cyan);} .card .big{font-size:40px;font-weight:900;color:var(--orange);line-height:1;margin:4px 0 6px;} .card small{color:var(--ink-soft);font-weight:700;}
+figure{margin:26px 0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center;box-shadow:0 16px 36px rgba(16,36,61,.07);} figure svg{max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto;} figcaption{font-size:15px;color:var(--ink-soft);font-weight:700;margin-top:10px;} figcaption b{color:var(--orange);} .callout{border-left:6px solid var(--blue);background:var(--paper2);border-radius:0 14px 14px 0;padding:18px 22px;margin:24px 0;font-size:18px;} .callout.orange{border-color:var(--orange);background:var(--paper3);} .callout .tag{font-weight:900;color:var(--blue);} .callout.orange .tag{color:var(--orange);} .eq{background:#fff;border:1px dashed var(--blue);border-radius:12px;padding:14px 18px;margin:18px 0;text-align:center;font-size:20px;}
+pre{background:var(--code);border-radius:14px;padding:0;margin:18px 0;overflow:auto;border:1px solid #2c313a;} pre code{display:block;padding:20px 22px;font-size:14.5px;line-height:1.6;background:transparent;} table{width:100%;border-collapse:collapse;margin:24px 0;font-size:16.5px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 24px rgba(16,36,61,.06);} th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;} th{background:var(--blue);color:#fff;font-weight:900;} tr:last-child td{border-bottom:none;} td b.orange{color:var(--orange);} .flow{background:#1f2329;color:#e9f2ff;border-radius:14px;padding:20px;overflow:auto;font-size:13.5px;line-height:1.5;} .badge{display:inline-block;background:#DDF3FF;color:#13558C;border:1px solid #BDE7FF;border-radius:999px;padding:4px 10px;font-size:13px;font-weight:900;margin:2px 4px 2px 0;} footer{background:var(--deep);color:#DCEEFF;padding:40px 22px;margin-top:60px;text-align:center;font-size:14px;} footer b{color:#FFD166;} @media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr);}} @media(max-width:760px){.g4,.g3,.g2{grid-template-columns:1fr;} body{font-size:17px;} nav .brand{width:100%;}}
+</style>
+</head>
+<body>
+<nav>
+  <span class="brand">電子鼻 × 食品分析 <b>·</b> Regression</span>
+  <a href="./">入門分類</a>
+  <a href="#target">目標</a>
+  <a href="#data">資料</a>
+  <a href="#features">特徵</a>
+  <a href="#pls">PLS</a>
+  <a href="#evaluate">評估</a>
+  <a href="#python">Python</a>
+  <a href="#orange">Orange</a>
+</nav>
+<header class="hero">
+  <h1>中階課：用電子鼻預測<span class="accent">品質指標</span></h1>
+  <p class="sub">入門課把食品分成 fresh / spoiled；這一章往前一步，直接預測連續品質指標，例如微生物總生菌數 TVC、腐敗程度、游離脂肪酸 FFA 或摻偽比例。</p>
+  <div class="facts">
+    <div class="fact"><b>y</b><span>連續品質指標</span></div>
+    <div class="fact"><b>PLS</b><span>化學計量學回歸核心</span></div>
+    <div class="fact"><b>RMSE</b><span>預測誤差</span></div>
+    <div class="fact"><b>R²</b><span>解釋與預測能力</span></div>
+  </div>
+</header>
+<main>
+<section id="target">
+  <span class="kicker">從分類到定量</span>
+  <h2>不只判斷好壞，而是預測「品質數值」</h2>
+  <p class="lead">分類模型回答的是「這個樣本屬於哪一類？」回歸模型回答的是「這個樣本的品質指標是多少？」在食品分析中，回歸通常更接近實務決策，因為它能提供連續尺度的風險或品質程度。</p>
+  <div class="grid g3">
+    <div class="card"><h4>分類問題</h4><p><code>fresh / acceptable / spoiled</code><br>適合快速篩檢與分級。</p></div>
+    <div class="card cyan"><h4>回歸問題</h4><p><code>TVC = 6.2 log CFU/g</code><br>適合品質趨勢、保存期限與標準限值判斷。</p></div>
+    <div class="card orange"><h4>品質指標</h4><p>微生物數、FFA、pH、揮發性鹽基態氮、摻偽比例，都可以成為 <code>y</code>。</p></div>
+  </div>
+  <div class="callout"><span class="tag">本章核心問題：</span>只看電子鼻感測器訊號 <code>X</code>，能不能預測牛肉腐敗相關的連續品質指標 <code>y</code>？</div>
+</section>
+
+<section id="data">
+  <span class="kicker">本章資料</span>
+  <h2>主範例：用牛肉 e-nose 資料預測 TVC</h2>
+  <p class="lead">沿用入門課的牛肉新鮮度資料集，但這次不把 <code>class</code> 當目標，而是用 <code>TVC</code> 作為連續目標值。TVC 是 total viable count，代表微生物總生菌數，是肉品腐敗與食品安全的重要參考。</p>
+  <table>
+    <tr><th>欄位</th><th>在本章角色</th><th>注意事項</th></tr>
+    <tr><td><code>MQ1 ... MQ10</code></td><td>主要輸入特徵 X</td><td>感測器對腐敗 VOCs 的反應。</td></tr>
+    <tr><td><code>humidity</code>、<code>temperature</code></td><td>可選擇加入 X</td><td>比較加入前後是否改善模型；也要思考是否代表環境偏差。</td></tr>
+    <tr><td><code>TVC</code></td><td><b class="orange">回歸目標 y</b></td><td>可能需要 log 轉換或確認單位。</td></tr>
+    <tr><td><code>class</code></td><td>輔助解釋</td><td>這次不是 y，但可用顏色標示預測圖。</td></tr>
+    <tr><td><code>minute</code></td><td>輔助觀察</td><td>不建議直接放入 X，避免模型只記住時間。</td></tr>
+  </table>
+  <h3>可延伸資料集</h3>
+  <p><span class="badge">Cocoa butter FFA</span><span class="badge">Pork percentage</span><span class="badge">Wine spoilage threshold</span></p>
+  <p>同樣的回歸流程也可套用到可可脂 FFA 預測、牛/豬混合比例預測，或葡萄酒酸敗程度預測。差別只在於 <code>y</code> 換成不同的品質指標。</p>
+</section>
+
+<section id="features">
+  <span class="kicker">特徵工程</span>
+  <h2>回歸模型最怕把「時間」誤當成「氣味」</h2>
+  <p class="lead">如果資料依儲存時間排列，TVC 通常也會隨時間上升。這時候如果把 <code>minute</code> 放進模型，模型可能只是在學時間，而不是從氣味指紋預測品質。</p>
+  <div class="grid g3">
+    <div class="card"><h4>建議特徵組 A</h4><p>只用 MQ sensors。這是最乾淨的電子鼻指紋模型。</p></div>
+    <div class="card cyan"><h4>建議特徵組 B</h4><p>MQ sensors + humidity + temperature。測試環境補償是否有效。</p></div>
+    <div class="card orange"><h4>不建議一開始使用</h4><p><code>minute</code>、<code>class</code>、樣本序號。這些欄位可能造成 data leakage。</p></div>
+  </div>
+  <div class="callout orange"><span class="tag">誠實驗證：</span>如果同一塊肉的連續時間點被隨機切到 train 和 test，測試結果可能過度樂觀。進階做法是依批次、樣本或實驗日分組切分。</div>
+</section>
+
+<section id="pls">
+  <span class="kicker">方法核心</span>
+  <h2>PLS regression：化學計量學最常用的品質預測工具</h2>
+  <p class="lead">PLS（Partial Least Squares）會尋找一組 latent variables，讓 X 的變化能最大程度解釋 y。它特別適合感測器、光譜、質譜這類變數彼此高度相關的資料。</p>
+  <div class="eq">\[ X \rightarrow T \quad \text{and} \quad y \approx Tq \]</div>
+  <table>
+    <tr><th>概念</th><th>意思</th></tr>
+    <tr><td>Latent variables, LV</td><td>把多個感測器壓縮成少數幾個與品質指標最相關的方向。</td></tr>
+    <tr><td>交叉驗證選 LV 數</td><td>LV 太少會 underfit，LV 太多會學到雜訊。</td></tr>
+    <tr><td>Autoscaling</td><td>感測器尺度不同時，PLS 前通常需要標準化。</td></tr>
+    <tr><td>Prediction plot</td><td>用 measured vs predicted 檢查模型是否有系統性偏差。</td></tr>
+  </table>
+  <figure>
+    <svg viewBox="0 0 900 420" role="img" aria-label="Measured vs predicted plot 示意圖">
+      <rect x="70" y="40" width="740" height="310" rx="18" fill="#fff" stroke="#C9DCEB"/>
+      <line x1="130" y1="305" x2="745" y2="85" stroke="#C9DCEB" stroke-width="5"/>
+      <line x1="130" y1="305" x2="760" y2="305" stroke="#475569" stroke-width="2"/>
+      <line x1="130" y1="305" x2="130" y2="80" stroke="#475569" stroke-width="2"/>
+      <text x="450" y="385" text-anchor="middle" font-size="22" font-weight="900" fill="#10243D">Measured TVC</text>
+      <text x="42" y="200" text-anchor="middle" font-size="22" font-weight="900" fill="#10243D" transform="rotate(-90 42 200)">Predicted TVC</text>
+      <g opacity=".92">
+        <circle cx="170" cy="284" r="8" fill="#26966D"/><circle cx="225" cy="260" r="8" fill="#26966D"/><circle cx="285" cy="243" r="8" fill="#1D75D8"/><circle cx="338" cy="222" r="8" fill="#1D75D8"/>
+        <circle cx="410" cy="190" r="8" fill="#1D75D8"/><circle cx="470" cy="182" r="8" fill="#E56B1F"/><circle cx="535" cy="151" r="8" fill="#E56B1F"/><circle cx="610" cy="132" r="8" fill="#E56B1F"/><circle cx="690" cy="108" r="8" fill="#E56B1F"/>
+      </g>
+      <text x="650" y="78" font-size="18" font-weight="900" fill="#475569">理想線 y = x</text>
+    </svg>
+    <figcaption>回歸模型最重要的圖：Measured vs Predicted。點越接近對角線，預測越準。</figcaption>
+  </figure>
+</section>
+
+<section id="evaluate">
+  <span class="kicker">模型評估</span>
+  <h2>用 R²、RMSECV、RMSEP 判斷模型是否真的可用</h2>
+  <p class="lead">回歸模型不能只看圖漂亮。你需要用交叉驗證和獨立測試集量化誤差，並確認模型在高品質與低品質區間都沒有明顯偏差。</p>
+  <div class="grid g3">
+    <div class="card"><h4>R²</h4><p>模型解釋 y 變異的比例。越接近 1 越好，但高 R² 不代表沒有偏差。</p></div>
+    <div class="card cyan"><h4>RMSECV</h4><p>交叉驗證誤差。用來選擇 LV 數與比較模型設定。</p></div>
+    <div class="card orange"><h4>RMSEP</h4><p>外部測試集誤差。最接近實際應用表現。</p></div>
+  </div>
+  <div class="eq">\[ RMSE=\sqrt{\frac{1}{n}\sum_{i=1}^{n}(y_i-\hat{y}_i)^2} \]</div>
+  <table>
+    <tr><th>檢查項目</th><th>你要看什麼</th></tr>
+    <tr><td>Residual plot</td><td>殘差是否隨濃度變大？是否有曲線形狀？</td></tr>
+    <tr><td>LV selection</td><td>RMSECV 是否在某個 LV 後不再下降？</td></tr>
+    <tr><td>High TVC region</td><td>腐敗高風險區是否被低估？</td></tr>
+    <tr><td>Train / test split</td><td>切分方式是否符合真實應用情境？</td></tr>
+  </table>
+</section>
+
+<section id="python">
+  <span class="kicker">Python 實作</span>
+  <h2>PLS、SVR、Random Forest regression 的最小完整流程</h2>
+  <h3>1. 讀取資料並定義 X、y</h3>
+  <pre><code class="language-python">import zipfile, requests
+from pathlib import Path
+import pandas as pd
+
+DATA_DIR = Path("data")
+DATA_DIR.mkdir(exist_ok=True)
+url = "https://data.mendeley.com/public-api/zip/mwmhh766fc/download/2"
+zip_path = DATA_DIR / "mendeley_beef_enose.zip"
+
+if not zip_path.exists():
+    r = requests.get(url, timeout=60)
+    r.raise_for_status()
+    zip_path.write_bytes(r.content)
+
+with zipfile.ZipFile(zip_path) as z:
+    z.extractall(DATA_DIR / "beef_raw")
+
+csv_file = list((DATA_DIR / "beef_raw").rglob("*.csv"))[0]
+df = pd.read_csv(csv_file)
+print(df.shape)
+print(df.columns.tolist())
+
+# 依實際欄位微調：TVC 是本章的連續目標 y
+exclude = {"TVC", "class", "minute", "time"}
+feature_cols = [c for c in df.columns if c not in exclude]
+X = df[feature_cols].apply(pd.to_numeric, errors="coerce")
+y = pd.to_numeric(df["TVC"], errors="coerce")
+
+mask = y.notna()
+X = X.loc[mask].fillna(X.median(numeric_only=True))
+y = y.loc[mask]
+print(X.shape, y.describe())</code></pre>
+
+  <h3>2. 用交叉驗證選擇 PLS 的 LV 數</h3>
+  <pre><code class="language-python">import numpy as np
+from sklearn.model_selection import KFold, cross_val_predict
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+cv = KFold(n_splits=5, shuffle=True, random_state=42)
+results = []
+
+for n_lv in range(1, min(11, X.shape[1] + 1)):
+    model = Pipeline([
+        ("scaler", StandardScaler()),
+        ("pls", PLSRegression(n_components=n_lv))
+    ])
+    y_cv = cross_val_predict(model, X, y, cv=cv).ravel()
+    rmsecv = mean_squared_error(y, y_cv, squared=False)
+    r2cv = r2_score(y, y_cv)
+    results.append((n_lv, rmsecv, r2cv))
+
+res = pd.DataFrame(results, columns=["LV", "RMSECV", "R2CV"])
+print(res)
+best_lv = int(res.loc[res.RMSECV.idxmin(), "LV"])
+print("Best LV:", best_lv)</code></pre>
+
+  <h3>3. 外部測試集評估</h3>
+  <pre><code class="language-python">from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.30, random_state=42
+)
+
+pls = Pipeline([
+    ("scaler", StandardScaler()),
+    ("pls", PLSRegression(n_components=best_lv))
+])
+pls.fit(X_train, y_train)
+y_pred = pls.predict(X_test).ravel()
+
+rmsep = mean_squared_error(y_test, y_pred, squared=False)
+r2p = r2_score(y_test, y_pred)
+print(f"RMSEP = {rmsep:.3f}")
+print(f"R2 test = {r2p:.3f}")
+
+plt.figure(figsize=(5.5,5.5))
+plt.scatter(y_test, y_pred, alpha=0.8)
+lo = min(y_test.min(), y_pred.min())
+hi = max(y_test.max(), y_pred.max())
+plt.plot([lo, hi], [lo, hi], "--", color="gray")
+plt.xlabel("Measured TVC")
+plt.ylabel("Predicted TVC")
+plt.title("PLS regression: measured vs predicted")
+plt.tight_layout()
+plt.show()</code></pre>
+
+  <h3>4. 與非線性模型比較</h3>
+  <pre><code class="language-python">from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
+
+models = {
+    "PLS": Pipeline([("scaler", StandardScaler()), ("pls", PLSRegression(n_components=best_lv))]),
+    "SVR-RBF": Pipeline([("scaler", StandardScaler()), ("svr", SVR(C=10, gamma="scale"))]),
+    "Random Forest": RandomForestRegressor(n_estimators=300, random_state=42)
+}
+
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    pred = np.asarray(model.predict(X_test)).ravel()
+    print(name, "RMSEP", mean_squared_error(y_test, pred, squared=False), "R2", r2_score(y_test, pred))</code></pre>
+</section>
+
+<section id="orange">
+  <span class="kicker">Orange Data Mining</span>
+  <h2>用 Orange 建立品質指標預測流程</h2>
+  <p class="lead">Orange 可以做 regression。重點是在 <b>Select Columns</b> 中把 <code>TVC</code> 設成 Target，而不是把 <code>class</code> 設成 Target。</p>
+  <pre class="flow"><code>File
+  → Select Columns
+      Features: MQ sensor responses, humidity, temperature
+      Target: TVC
+      Meta: class, minute
+  → Preprocess
+      Impute / Standardize
+  → Test and Score
+       ← Linear Regression
+       ← Random Forest
+       ← Support Vector Regression
+       ← PLS Regression（若已安裝相關 add-on；否則用 Python 做）
+  → Predictions
+  → Scatter Plot
+      x = measured TVC, y = predicted TVC
+  → Data Table</code></pre>
+  <div class="callout"><span class="tag">Orange 操作提醒：</span>如果 Orange 沒有 PLS Regression widget，可以先用 Orange 做 SVR / Random Forest regression；PLS 則用 Python notebook 示範。</div>
+</section>
+
+<section id="check">
+  <span class="kicker">檢查自己</span>
+  <h2>完成本章後，你應該能回答這些問題</h2>
+  <div class="grid g2">
+    <div class="card"><h4>觀念題</h4><ol><li>分類與回歸在食品品質分析中差在哪裡？</li><li>為什麼 PLS 適合感測器陣列資料？</li><li>LV 太多會造成什麼問題？</li><li>為什麼 <code>minute</code> 可能造成 data leakage？</li></ol></div>
+    <div class="card orange"><h4>結果解讀題</h4><ol><li>Measured vs predicted 圖是否接近對角線？</li><li>RMSECV 最小時的 LV 數是多少？</li><li>高 TVC 區域是否被系統性低估？</li><li>PLS、SVR、Random Forest 哪個最適合這組資料？為什麼？</li></ol></div>
+  </div>
+</section>
+</main>
+<footer>
+  <p><b>電子鼻 × 食品分析：中階課 — Regression 與品質指標預測</b></p>
+  <p>Quality index prediction with electronic nose data · Python + Orange Data Mining</p>
+</footer>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.hljs) hljs.highlightAll();
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '\\[', right: '\\]', display: true},
+      {left: '$', right: '$', display: false},
+      {left: '\\(', right: '\\)', display: false}
+    ]});
+  }
+});
+</script>
+</body>
+</html>

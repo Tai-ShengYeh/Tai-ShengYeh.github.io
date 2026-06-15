@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>電子鼻 × 食品分析：PCA 與分類模型</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+
+<style>
+@font-face{font-family:'GenSeki';src:url('assets/fonts/GenSekiGothic2TW-H.otf') format('opentype');font-weight:900;font-display:swap;}
+@font-face{font-family:'GenSeki';src:url('assets/fonts/GenSekiGothic2TW-B.otf') format('opentype');font-weight:700;font-display:swap;}
+@font-face{font-family:'GenSeki';src:url('assets/fonts/GenSekiGothic2TW-M.otf') format('opentype');font-weight:500;font-display:swap;}
+
+:root{
+  --paper:#F7FBFF; --paper2:#EAF5FF; --paper3:#FFF8E8; --ink:#122033; --ink-soft:#475569;
+  --blue:#1D75D8; --cyan:#0EA5A8; --orange:#E56B1F; --gold:#C7921B; --green:#26966D;
+  --line:#C9DCEB; --deep:#10243D; --code:#1f2329;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;font-family:'GenSeki','Noto Sans TC',system-ui,sans-serif;font-weight:500;color:var(--ink);
+  background:linear-gradient(180deg,#F7FBFF 0%,#FFFFFF 44%,#F3F9FF 100%);line-height:1.7;font-size:18px;}
+h1,h2,h3{font-weight:900;line-height:1.2;letter-spacing:.01em;}
+a{color:var(--blue);text-decoration:none;} a:hover{text-decoration:underline;}
+code,pre,kbd{font-family:'JetBrains Mono','Fira Code',Consolas,monospace;}
+
+nav{position:sticky;top:0;z-index:50;background:rgba(16,36,61,.96);backdrop-filter:blur(6px);
+  display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 22px;box-shadow:0 8px 24px rgba(15,36,61,.14);}
+nav .brand{color:#fff;font-weight:900;font-size:18px;margin-right:auto;}
+nav .brand b{color:#78D8FF;}
+nav a{color:#e6f4ff;font-weight:700;font-size:14.5px;padding:6px 11px;border-radius:8px;}
+nav a:hover{background:rgba(255,255,255,.12);text-decoration:none;color:#fff;}
+
+.hero{background:radial-gradient(circle at 20% 10%,rgba(120,216,255,.28),transparent 30%),
+  linear-gradient(135deg,#10243D 0%,#133A66 48%,#0E6871 100%);color:#fff;padding:84px 22px 72px;text-align:center;}
+.hero h1{font-size:clamp(34px,6vw,66px);margin:0 0 14px;}
+.hero h1 .accent{color:#FFD166;}
+.hero p.sub{font-size:clamp(17px,2.4vw,24px);color:#DCEEFF;font-weight:700;max-width:820px;margin:0 auto 28px;}
+.hero .facts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:12px;}
+.hero .fact{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px 20px;min-width:150px;}
+.hero .fact b{display:block;font-size:30px;color:#FFD166;font-weight:900;}
+.hero .fact span{font-size:14px;color:#DCEEFF;font-weight:700;}
+
+main{max-width:1080px;margin:0 auto;padding:0 22px;}
+section{padding:64px 0 8px;scroll-margin-top:64px;border-top:1px solid var(--line);}
+section:first-of-type{border-top:none;}
+.kicker{color:var(--orange);font-weight:900;font-size:15px;letter-spacing:.14em;text-transform:uppercase;}
+section h2{font-size:clamp(28px,4vw,42px);margin:6px 0 8px;}
+section h3{font-size:23px;margin:34px 0 10px;color:var(--blue);}
+p{margin:14px 0;}
+.lead{font-size:20px;color:var(--ink-soft);}
+
+.grid{display:grid;gap:18px;margin:24px 0;}
+.g4{grid-template-columns:repeat(4,1fr);} .g3{grid-template-columns:repeat(3,1fr);} .g2{grid-template-columns:repeat(2,1fr);}
+.card{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 12px 28px rgba(29,117,216,.06);}
+.card h4{margin:0 0 8px;font-size:19px;font-weight:900;color:var(--blue);}
+.card.orange h4{color:var(--orange);} .card.green h4{color:var(--green);} .card.cyan h4{color:var(--cyan);}
+.card .big{font-size:40px;font-weight:900;color:var(--orange);line-height:1;margin:4px 0 6px;}
+.card small{color:var(--ink-soft);font-weight:700;}
+
+figure{margin:26px 0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center;box-shadow:0 16px 36px rgba(16,36,61,.07);}
+figure img, figure svg{max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto;}
+figcaption{font-size:15px;color:var(--ink-soft);font-weight:700;margin-top:10px;}
+figcaption b{color:var(--orange);}
+
+.callout{border-left:6px solid var(--blue);background:var(--paper2);border-radius:0 14px 14px 0;padding:18px 22px;margin:24px 0;font-size:18px;}
+.callout.orange{border-color:var(--orange);background:var(--paper3);}
+.callout .tag{font-weight:900;color:var(--blue);} .callout.orange .tag{color:var(--orange);}
+.eq{background:#fff;border:1px dashed var(--blue);border-radius:12px;padding:14px 18px;margin:18px 0;text-align:center;font-size:20px;}
+
+pre{background:var(--code);border-radius:14px;padding:0;margin:18px 0;overflow:auto;border:1px solid #2c313a;}
+pre code{display:block;padding:20px 22px;font-size:14.5px;line-height:1.6;background:transparent;}
+.codecap{font-size:14px;font-weight:700;color:var(--ink-soft);margin:18px 0 -8px;}
+details{background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px 18px;margin:14px 0;}
+summary{font-weight:900;cursor:pointer;padding:10px 0;color:var(--blue);}
+
+table{width:100%;border-collapse:collapse;margin:24px 0;font-size:16.5px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 12px 24px rgba(16,36,61,.06);}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+th{background:var(--blue);color:#fff;font-weight:900;}
+tr:last-child td{border-bottom:none;}
+td b.blue{color:var(--blue);} td b.orange{color:var(--orange);} td b.green{color:var(--green);}
+.flow{background:#1f2329;color:#e9f2ff;border-radius:14px;padding:20px;overflow:auto;font-size:13.5px;line-height:1.5;}
+.btnrow{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0;}
+.btn{background:var(--blue);color:#fff;font-weight:900;padding:12px 20px;border-radius:12px;font-size:15px;}
+.btn.orange{background:var(--orange);} .btn:hover{text-decoration:none;opacity:.92;}
+.badge{display:inline-block;background:#DDF3FF;color:#13558C;border:1px solid #BDE7FF;border-radius:999px;padding:4px 10px;font-size:13px;font-weight:900;margin:2px 4px 2px 0;}
+
+footer{background:var(--deep);color:#DCEEFF;padding:40px 22px;margin-top:60px;text-align:center;font-size:14px;}
+footer b{color:#FFD166;}
+@media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:760px){.g4,.g3,.g2{grid-template-columns:1fr;} body{font-size:17px;} nav .brand{width:100%;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">電子鼻 × 食品分析 <b>·</b> PCA / 分類模型</span>
+  <a href="#start">開始</a>
+  <a href="#data">資料</a>
+  <a href="#preprocess">前處理</a>
+  <a href="#pca">PCA</a>
+  <a href="#classification">分類</a>
+  <a href="regression.html">中階 Regression</a>
+  <a href="#python">Python</a>
+  <a href="#orange">Orange</a>
+  <a href="#check">檢查自己</a>
+</nav>
+
+<header class="hero">
+  <h1>用電子鼻，聞出<span class="accent">食品品質</span></h1>
+  <p class="sub">這一章會帶你用真實的 electronic nose 食品資料，從感測器數字開始，做 PCA 分群，再建立分類模型判斷食品品質。</p>
+  <div class="facts">
+    <div class="fact"><b>10</b><span>MOS gas sensors</span></div>
+    <div class="fact"><b>4553</b><span>牛肉新鮮度資料列</span></div>
+    <div class="fact"><b>PCA</b><span>先看資料結構</span></div>
+    <div class="fact"><b>ML</b><span>再做品質分類</span></div>
+  </div>
+</header>
+
+<main>
+
+<section id="start">
+  <span class="kicker">先抓住大方向</span>
+  <h2>電子鼻不是「聞到某一種味道」，而是記錄一組氣味指紋</h2>
+  <p class="lead">想像你把一塊牛肉放進密閉容器中。牛肉會釋放出許多揮發性化合物，尤其在變質過程中，氣味會明顯改變。電子鼻會用一排氣體感測器同時量測這些變化。</p>
+  <p>每個感測器都不是完全專一的。它可能同時對酒精、硫化物、胺類或其他 VOCs 有反應。這聽起來像缺點，但多個感測器合在一起時，就會形成一個模式。這個模式就是我們要分析的「氣味指紋」。</p>
+  <figure>
+    <svg viewBox="0 0 980 310" role="img" aria-label="電子鼻食品分析流程圖">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#1D75D8"/><stop offset="1" stop-color="#0EA5A8"/></linearGradient>
+        <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M2,2 L10,6 L2,10" fill="#1D75D8"/></marker>
+      </defs>
+      <rect x="30" y="70" width="170" height="160" rx="22" fill="#EAF5FF" stroke="#BBD7EC"/>
+      <text x="115" y="125" text-anchor="middle" font-size="28" font-weight="900" fill="#10243D">食品樣本</text>
+      <text x="115" y="162" text-anchor="middle" font-size="20" fill="#475569">牛肉 / 酒 / 水果</text>
+      <text x="115" y="195" text-anchor="middle" font-size="20" fill="#475569">釋放 VOCs</text>
+      <line x1="210" y1="150" x2="330" y2="150" stroke="#1D75D8" stroke-width="5" marker-end="url(#arrow)"/>
+      <rect x="340" y="54" width="260" height="192" rx="24" fill="#fff" stroke="#BBD7EC"/>
+      <text x="470" y="94" text-anchor="middle" font-size="27" font-weight="900" fill="#10243D">感測器陣列</text>
+      <g transform="translate(380 118)">
+        <circle cx="0" cy="0" r="24" fill="#DDF3FF" stroke="#1D75D8"/><circle cx="70" cy="0" r="24" fill="#E6FBF9" stroke="#0EA5A8"/><circle cx="140" cy="0" r="24" fill="#FFF1D6" stroke="#E56B1F"/>
+        <circle cx="35" cy="70" r="24" fill="#EAF5FF" stroke="#1D75D8"/><circle cx="105" cy="70" r="24" fill="#E6FBF9" stroke="#0EA5A8"/><circle cx="175" cy="70" r="24" fill="#FFF1D6" stroke="#E56B1F"/>
+      </g>
+      <line x1="610" y1="150" x2="730" y2="150" stroke="#1D75D8" stroke-width="5" marker-end="url(#arrow)"/>
+      <rect x="740" y="70" width="200" height="160" rx="22" fill="url(#g)"/>
+      <text x="840" y="118" text-anchor="middle" font-size="27" font-weight="900" fill="#fff">資料分析</text>
+      <text x="840" y="154" text-anchor="middle" font-size="20" fill="#EAF5FF">PCA / 分類模型</text>
+      <text x="840" y="187" text-anchor="middle" font-size="20" fill="#EAF5FF">新鮮 / 可接受 / 腐敗</text>
+    </svg>
+    <figcaption>電子鼻把食品氣味轉成一列數字。接下來的工作，是用化學計量學讀懂這列數字。</figcaption>
+  </figure>
+  <div class="grid g3">
+    <div class="card"><h4>你會看到什麼</h4>一張資料表：每一列是一個量測時間點，每一欄是一個感測器或環境變數。</div>
+    <div class="card cyan"><h4>你要先做什麼</h4>把資料整理成 <code>X</code> 和 <code>y</code>。<code>X</code> 是感測器反應，<code>y</code> 是品質類別。</div>
+    <div class="card orange"><h4>你最後要回答什麼</h4>只看電子鼻訊號，我們能不能判斷牛肉是新鮮、可接受，還是已經腐敗？</div>
+  </div>
+</section>
+
+<section id="data">
+  <span class="kicker">本章資料</span>
+  <h2>牛肉新鮮度 electronic nose dataset</h2>
+  <p class="lead">我們使用公開資料集：<a href="https://data.mendeley.com/datasets/mwmhh766fc/2" target="_blank" rel="noopener">Electronic nose dataset for beef quality monitoring under an uncontrolled environment</a>。研究者用 MOS 氣體感測器監測牛肉在儲存過程中的氣味變化，並提供品質類別與微生物數量。</p>
+  <div class="grid g4">
+    <div class="card"><div class="big">4553</div><small>筆量測資料</small></div>
+    <div class="card"><div class="big">10</div><small>個 MOS 氣體感測器</small></div>
+    <div class="card"><div class="big">TVC</div><small>微生物總生菌數</small></div>
+    <div class="card"><div class="big">CSV</div><small>可整理後進 Python / Orange</small></div>
+  </div>
+  <h3>資料表怎麼讀？</h3>
+  <p>先把資料想成這樣：</p>
+  <pre><code>minute | class | TVC | MQ1 | MQ2 | MQ3 | ... | MQ10 | humidity | temperature</code></pre>
+  <table>
+    <tr><th>欄位</th><th>意思</th><th>這一章怎麼用</th></tr>
+    <tr><td><code>minute</code></td><td>量測時間</td><td>先保留觀察，但不要直接放進分類模型。否則模型可能只是在記住時間。</td></tr>
+    <tr><td><code>class</code></td><td>品質類別</td><td>這是我們要預測的答案，也就是 <code>y</code>。</td></tr>
+    <tr><td><code>TVC</code></td><td>微生物數量</td><td>本章先不用。之後可以拿來做 PLS regression。</td></tr>
+    <tr><td><code>MQ1 ... MQ10</code></td><td>氣體感測器反應</td><td>這是主要輸入變數，也就是 <code>X</code>。</td></tr>
+    <tr><td><code>humidity</code>、<code>temperature</code></td><td>濕度與溫度</td><td>可以納入模型，也可以先拿掉，比較結果是否改變。</td></tr>
+  </table>
+  <div class="callout"><span class="tag">先記住：</span>在分類問題中，答案欄位不能放進輸入變數。也就是說，<code>class</code> 不能出現在 <code>X</code> 裡。</div>
+
+  <h3>另一個很適合練習的資料：牛肉中豬肉摻偽</h3>
+  <p>如果你對食品真偽分析有興趣，可以再看這個資料集：<a href="https://data.mendeley.com/datasets/5yhggs7zy7/1" target="_blank" rel="noopener">The Dataset for Pork Adulteration from Electronic Nose System</a>。它有七個牛肉 / 豬肉混合比例，從 100% beef 到 100% pork。這種資料很適合用 PCA 看比例梯度，也適合用 PLS-DA 做摻偽判別。</p>
+  <p><span class="badge">食品真偽</span><span class="badge">摻偽檢測</span><span class="badge">halal authentication</span><span class="badge">PLS-DA</span></p>
+</section>
+
+<section id="preprocess">
+  <span class="kicker">資料前處理</span>
+  <h2>先整理資料，再開始建模</h2>
+  <p class="lead">電子鼻資料不能一拿到就丟進模型。不同感測器的數值範圍可能差很多，有些欄位也不是模型應該看的資訊。前處理做得不好，模型看起來可能很準，但其實學到的是錯的東西。</p>
+  <div class="grid g3">
+    <div class="card"><h4>第 1 步：決定 X 和 y</h4><code>X</code> 放感測器反應；<code>y</code> 放品質類別。不要把 <code>class</code>、<code>TVC</code>、<code>minute</code> 混進 X。</div>
+    <div class="card cyan"><h4>第 2 步：檢查缺失值</h4>如果某些欄位有空值，可以刪除、補中位數，或回到原始資料確認原因。</div>
+    <div class="card orange"><h4>第 3 步：標準化</h4>對每一個 sensor 欄位做 autoscaling，讓不同尺度的感測器可以公平比較。</div>
+  </div>
+  <div class="eq">\[ z_{ij}=\frac{x_{ij}-\bar{x}_{j}}{s_j} \]</div>
+  <p>這個公式的意思是：對每一個感測器欄位，先減掉平均值，再除以標準差。做完後，每個變數的平均值會接近 0，標準差會接近 1。</p>
+  <div class="callout orange"><span class="tag">為什麼要標準化？</span>如果某個 sensor 的數值範圍天生比較大，PCA 可能會被它主導。標準化可以避免「數值大」被誤解成「比較重要」。</div>
+
+  <h3>如果你拿到的是原始時間序列</h3>
+  <p>有些 e-nose 資料不是一列代表一個樣本，而是一個樣本有一整段反應曲線。這時候可以先把曲線轉成特徵，再分析。</p>
+  <table>
+    <tr><th>從曲線取出的特徵</th><th>你可以怎麼理解</th></tr>
+    <tr><td>baseline</td><td>放入樣本前的背景反應。</td></tr>
+    <tr><td>maximum response</td><td>感測器反應最高點。</td></tr>
+    <tr><td>steady-state mean</td><td>最後一段時間的平均反應。</td></tr>
+    <tr><td>AUC</td><td>整段反應曲線下面積，代表總反應量。</td></tr>
+    <tr><td>initial slope</td><td>反應剛開始上升的速度。</td></tr>
+  </table>
+</section>
+
+<section id="pca">
+  <span class="kicker">第一個分析</span>
+  <h2>用 PCA 先看資料長什麼樣子</h2>
+  <p class="lead">PCA 是非監督式方法。它不看 <code>class</code>，只看感測器資料 <code>X</code>。如果不同品質的樣本在 PCA 圖上自然分開，代表電子鼻訊號中真的有品質差異的資訊。</p>
+  <div class="eq">\[ X \approx T P^\top \]</div>
+  <div class="grid g2">
+    <div class="card"><h4>Scores：樣本的位置</h4>每一個點是一筆樣本。你可以看 fresh、acceptable、spoiled 是否聚在不同區域。</div>
+    <div class="card cyan"><h4>Loadings：感測器的貢獻</h4>哪個 sensor 對 PC1 或 PC2 影響大，就可能是造成樣本分離的重要訊號。</div>
+  </div>
+  <figure>
+    <svg viewBox="0 0 900 420" role="img" aria-label="PCA score plot 示意圖">
+      <rect x="50" y="35" width="800" height="330" rx="18" fill="#fff" stroke="#C9DCEB"/>
+      <line x1="110" y1="320" x2="790" y2="320" stroke="#475569" stroke-width="2"/>
+      <line x1="110" y1="320" x2="110" y2="80" stroke="#475569" stroke-width="2"/>
+      <text x="450" y="390" text-anchor="middle" font-size="22" font-weight="900" fill="#10243D">PC1</text>
+      <text x="45" y="205" text-anchor="middle" font-size="22" font-weight="900" fill="#10243D" transform="rotate(-90 45 205)">PC2</text>
+      <g opacity=".92">
+        <circle cx="180" cy="250" r="10" fill="#26966D"/><circle cx="215" cy="232" r="10" fill="#26966D"/><circle cx="238" cy="270" r="10" fill="#26966D"/><circle cx="270" cy="245" r="10" fill="#26966D"/>
+        <circle cx="380" cy="210" r="10" fill="#1D75D8"/><circle cx="420" cy="238" r="10" fill="#1D75D8"/><circle cx="455" cy="200" r="10" fill="#1D75D8"/><circle cx="500" cy="230" r="10" fill="#1D75D8"/>
+        <circle cx="620" cy="150" r="10" fill="#E56B1F"/><circle cx="655" cy="175" r="10" fill="#E56B1F"/><circle cx="700" cy="130" r="10" fill="#E56B1F"/><circle cx="735" cy="160" r="10" fill="#E56B1F"/>
+      </g>
+      <text x="220" y="300" text-anchor="middle" font-size="18" font-weight="900" fill="#26966D">fresh</text>
+      <text x="450" y="270" text-anchor="middle" font-size="18" font-weight="900" fill="#1D75D8">acceptable</text>
+      <text x="680" y="110" text-anchor="middle" font-size="18" font-weight="900" fill="#E56B1F">spoiled</text>
+    </svg>
+    <figcaption>如果 fresh 和 spoiled 沿著 PC1 分開，PC1 很可能和腐敗過程中的 VOC 變化有關。</figcaption>
+  </figure>
+  <details>
+    <summary>看 PCA 圖時，請試著回答</summary>
+    <ol>
+      <li>不同品質類別有沒有分開？還是混在一起？</li>
+      <li>有沒有離群點？它可能是量測錯誤，還是真的特殊樣本？</li>
+      <li>PC1 可能代表什麼？腐敗程度、時間、溫度，還是其他因素？</li>
+      <li>如果 humidity 在 loading 中很重要，你會把它視為有用資訊還是干擾？</li>
+    </ol>
+  </details>
+</section>
+
+<section id="classification">
+  <span class="kicker">第二個分析</span>
+  <h2>建立分類模型：讓電腦判斷食品品質</h2>
+  <p class="lead">PCA 幫我們看出資料結構，但 PCA 本身不是分類器。若要預測一個未知樣本是 fresh 還是 spoiled，需要建立 supervised classification model。</p>
+  <div class="grid g4">
+    <div class="card"><h4>kNN</h4>看未知樣本附近的鄰居屬於哪一類。概念最直覺。</div>
+    <div class="card"><h4>SVM</h4>尋找能分開類別的邊界。常用於感測器與光譜資料。</div>
+    <div class="card"><h4>Random Forest</h4>由多棵決策樹投票。可以觀察哪些變數重要。</div>
+    <div class="card orange"><h4>PLS-DA</h4>化學計量學常用的分類方法。用 latent variables 連結 X 與類別 y。</div>
+  </div>
+  <h3>不要只看 accuracy</h3>
+  <p>食品安全問題中，錯誤的代價不一樣。把 fresh 判成 spoiled 可能造成浪費；把 spoiled 判成 fresh 可能造成健康風險。因此你一定要看 confusion matrix。</p>
+  <table>
+    <tr><th>真實情況</th><th>模型預測</th><th>可能後果</th></tr>
+    <tr><td>fresh</td><td>spoiled</td><td>食品被丟掉，造成浪費。</td></tr>
+    <tr><td>spoiled</td><td>fresh</td><td><b class="orange">食品安全風險最高</b>，這種錯誤要特別避免。</td></tr>
+  </table>
+  <div class="callout"><span class="tag">判讀重點：</span>如果模型整體 accuracy 很高，但 spoiled 類別的 recall 很低，這個模型在食品安全上仍然不可靠。</div>
+</section>
+
+<section id="python">
+  <span class="kicker">Python 實作</span>
+  <h2>一步一步做出 PCA 與分類模型</h2>
+  <p class="lead">下面的程式碼可以放進 Jupyter Notebook。你可以先跑通流程，再慢慢修改特徵欄位、分類器與驗證方式。</p>
+
+  <h3>1. 下載與讀取資料</h3>
+  <pre><code class="language-python">import zipfile, requests
+from pathlib import Path
+import pandas as pd
+
+DATA_DIR = Path("data")
+DATA_DIR.mkdir(exist_ok=True)
+
+url = "https://data.mendeley.com/public-api/zip/mwmhh766fc/download/2"
+zip_path = DATA_DIR / "mendeley_beef_enose.zip"
+
+if not zip_path.exists():
+    r = requests.get(url, timeout=60)
+    r.raise_for_status()
+    zip_path.write_bytes(r.content)
+
+with zipfile.ZipFile(zip_path) as z:
+    z.extractall(DATA_DIR / "beef_raw")
+
+csv_files = list((DATA_DIR / "beef_raw").rglob("*.csv"))
+df = pd.read_csv(csv_files[0])
+print(df.shape)
+df.head()</code></pre>
+
+  <h3>2. 定義 X 和 y</h3>
+  <pre><code class="language-python">print(df.columns.tolist())
+
+label_col = "class"
+exclude = {"class", "TVC", "minute", "time"}
+feature_cols = [c for c in df.columns if c not in exclude]
+
+X = df[feature_cols].apply(pd.to_numeric, errors="coerce")
+y = df[label_col]
+
+X = X.fillna(X.median(numeric_only=True))
+print(X.shape)
+print(y.value_counts())</code></pre>
+
+  <h3>3. PCA score plot</h3>
+  <pre><code class="language-python">from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+X_scaled = StandardScaler().fit_transform(X)
+pca = PCA(n_components=2, random_state=42)
+T = pca.fit_transform(X_scaled)
+
+plt.figure(figsize=(7,5))
+sns.scatterplot(x=T[:,0], y=T[:,1], hue=y, s=45, alpha=0.85)
+plt.xlabel(f"PC1 ({pca.explained_variance_ratio_[0]*100:.1f}%)")
+plt.ylabel(f"PC2 ({pca.explained_variance_ratio_[1]*100:.1f}%)")
+plt.title("PCA score plot of beef e-nose data")
+plt.tight_layout()
+plt.show()</code></pre>
+
+  <h3>4. 訓練分類模型</h3>
+  <pre><code class="language-python">from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import classification_report, ConfusionMatrixDisplay
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.30, stratify=y, random_state=42
+)
+
+models = {
+    "SVM-RBF": Pipeline([
+        ("scaler", StandardScaler()),
+        ("clf", SVC(kernel="rbf", C=10, gamma="scale"))
+    ]),
+    "Random Forest": RandomForestClassifier(n_estimators=300, random_state=42)
+}
+
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    pred = model.predict(X_test)
+    print("\n===", name, "===")
+    print(classification_report(y_test, pred))
+    ConfusionMatrixDisplay.from_predictions(y_test, pred, xticks_rotation=45)
+    plt.title(name)
+    plt.tight_layout()
+    plt.show()</code></pre>
+
+  <details>
+    <summary>如果你想試 PLS-DA</summary>
+    <pre><code class="language-python">from sklearn.cross_decomposition import PLSRegression
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
+from sklearn.model_selection import StratifiedKFold, cross_val_predict
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+le = LabelEncoder()
+y_int = le.fit_transform(y)
+Y = OneHotEncoder(sparse_output=False).fit_transform(y_int.reshape(-1, 1))
+
+Xs = StandardScaler().fit_transform(X)
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+y_score = cross_val_predict(PLSRegression(n_components=2), Xs, Y, cv=cv)
+y_pred = y_score.argmax(axis=1)
+
+print("CV accuracy:", accuracy_score(y_int, y_pred))
+print(confusion_matrix(y_int, y_pred))
+print(le.classes_)</code></pre>
+  </details>
+</section>
+
+<section id="orange">
+  <span class="kicker">Orange Data Mining</span>
+  <h2>不用寫太多程式，也能完成同樣流程</h2>
+  <p class="lead">Orange 的好處是你可以直接看到資料流。每一個 widget 都對應到一個分析步驟：讀資料、選欄位、標準化、PCA、模型比較、混淆矩陣。</p>
+
+  <h3>PCA 流程</h3>
+  <pre class="flow"><code>File
+  → Select Columns
+      Features: MQ sensor responses, humidity, temperature
+      Target: class
+      Meta: minute, TVC
+  → Preprocess
+      Impute / Standardize
+  → PCA
+  → Scatter Plot
+      x = PC1, y = PC2, color = class
+  → Data Table</code></pre>
+
+  <h3>分類流程</h3>
+  <pre class="flow"><code>File
+  → Select Columns
+  → Preprocess
+  → Test and Score
+       ← kNN
+       ← Logistic Regression
+       ← SVM
+       ← Random Forest
+  → Confusion Matrix
+  → ROC Analysis</code></pre>
+
+  <div class="grid g2">
+    <div class="card"><h4>試一次：只用感測器</h4>Features 只放 MQ sensor responses。記下 PCA 分群與分類結果。</div>
+    <div class="card orange"><h4>再試一次：加入溫濕度</h4>把 humidity 和 temperature 加入 Features。看看結果變好還是變差，並思考原因。</div>
+  </div>
+</section>
+
+<section id="check">
+  <span class="kicker">檢查自己</span>
+  <h2>完成後，你應該能回答這些問題</h2>
+  <div class="grid g2">
+    <div class="card"><h4>觀念題</h4>
+      <ol>
+        <li>為什麼電子鼻需要多變量分析？</li>
+        <li>PCA 為什麼是非監督式方法？</li>
+        <li>autoscaling 對 PCA 有什麼影響？</li>
+        <li>為什麼不能把 <code>class</code> 放進 <code>X</code>？</li>
+      </ol>
+    </div>
+    <div class="card orange"><h4>結果解讀題</h4>
+      <ol>
+        <li>PCA score plot 中，fresh 和 spoiled 是否分開？</li>
+        <li>哪一個分類模型表現最好？你怎麼判斷？</li>
+        <li>confusion matrix 中，哪一種錯誤最危險？</li>
+        <li>加入溫濕度後，模型是否更可靠？為什麼？</li>
+      </ol>
+    </div>
+  </div>
+  <div class="callout orange"><span class="tag">下一章：</span>如果你已經會把樣本分成 fresh / spoiled，可以進入 <a href="regression.html">中階課：Regression 與品質指標預測</a>，直接預測 TVC、FFA 或摻偽比例這類連續品質指標。</div>
+  <div class="callout"><span class="tag">最後一句話：</span>電子鼻給我們的是一組感測器指紋；PCA 幫你看出結構，分類模型幫你把結構轉成判斷。真正重要的是，你要能解釋模型為什麼這樣判斷，以及這個判斷在食品安全上代表什麼。</div>
+</section>
+
+</main>
+
+<footer>
+  <p><b>電子鼻 × 食品分析：PCA 與分類模型</b></p>
+  <p>Electronic nose food analysis teaching page · Python + Orange Data Mining</p>
+</footer>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.hljs) hljs.highlightAll();
+  if (window.renderMathInElement) {
+    renderMathInElement(document.body, {delimiters: [
+      {left: '$$', right: '$$', display: true},
+      {left: '\\[', right: '\\]', display: true},
+      {left: '$', right: '$', display: false},
+      {left: '\\(', right: '\\)', display: false}
+    ]});
+  }
+});
+</script>
+</body>
+</html>
