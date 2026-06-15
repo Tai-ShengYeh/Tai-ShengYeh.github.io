@@ -96,31 +96,30 @@
         <article class="card"><h3>參考比對｜GC 咖啡品種課</h3><p>GC 層析指紋同樣用 Arabica vs Robusta 作為食品真偽案例。可拿來對照：FTIR 是官能基 / 整體組成 fingerprint；GC 是揮發性或層析峰型 fingerprint，兩者的化學選擇性與特徵解釋方式不同。</p><div class="links"><a class="go" href="https://tai-shengyeh.github.io/coffee-gc-analysis/teaching.html" target="_blank" rel="noopener">開啟 GC 教學頁 →</a></div></article>
         <article class="card"><h3>課堂比較問題</h3><p>同樣是 coffee authentication，FTIR、GC、2T2D-COS 分別回答不同問題：FTIR 看官能基區域，GC 看分離後峰型，2T2D-COS 看光譜區域之間的相關圖樣。學生可比較哪一種最容易解釋、哪一種最適合快速篩檢。</p></article>
       </div>
-      <figure class="realfig"><img src="assets/coffee_2t2d_sync_compare.png" alt="Two-trace synchronous 2D-COS maps comparing Arabica and Robusta samples against Arabica mean reference"><figcaption class="caption"><strong>圖 5｜two-trace synchronous 2D-COS 對照圖。</strong>左圖是 Arabica 樣本相對 Arabica mean，右圖是 Robusta 樣本相對 Arabica mean；為了教學可讀性，波數點已下採樣。這張圖可以讓學生比較「一維光譜差異」如何轉換成「二維 correlation pattern」。</figcaption></figure>
+      <figure class="realfig"><img src="assets/coffee_2t2d_spectraview.png" alt="Three-way comparison computed with SpectraView: difference outer product vs real Noda 2T2D vs generalized 2D-COS on coffee FTIR"><figcaption class="caption"><strong>圖 5｜用 <a href="https://tai-shengyeh.github.io/spectraview/" target="_blank" rel="noopener">SpectraView</a> 重算的三方對照（真實 Briandet 咖啡資料、SNV 前處理）。</strong>上排同步 Φ、下排異步 Ψ。<b>(A) 原本頁面的做法</b>（two-trace 先減平均）＝差異光譜的外積：同步圖 100% rank-1、<b>異步圖完全空白（退化）</b>，等於把那張 1D 差異光譜換成 2D 畫法，並沒有多出資訊。<b>(B) SpectraView 的真 2T2D（Noda，不減平均）</b>：<b>異步圖非退化</b>（async/sync≈0.15），這才是「兩跡相關」真正多給的東西。<b>(C) 廣義 2D-COS</b>：需要一條<b>擾動序列</b>（此處為模擬烘焙的多製程示範），同步圖 rank&gt;1、異步圖解析出譜帶變化的<b>先後順序</b>——這才是 2D-COS 的威力所在。</figcaption></figure>
       <div class="callout"><strong>課堂使用方式：</strong>先要求學生用 Python 重現圖 1–3；確認資料讀取、標準化、PCA 都正確後，再重現圖 5。若圖 5 顏色方向相反，通常是 reference trace 或差異定義相反，不一定代表計算錯誤。</div>
     </section>
 
     <section id="concept" class="wrap">
       <div class="section-head"><div><div class="kicker">Concept</div><h2>2T2D-COS 在這裡扮演什麼角色？</h2></div></div>
       <div class="grid-2">
-        <div class="card step"><h3>從一維到二維</h3><p>原始 FTIR 是一條曲線：每個 wavenumber 對應一個吸收強度。2T2D-COS 把兩條光譜，例如「class mean spectrum」與「單一樣本 spectrum」，轉成一張二維 correlation map。</p></div>
-        <div class="card step"><h3>讓模型看到交互關係</h3><p>一般 PCA / PLS-DA 直接看各波數的強度；2D map 則呈現 band-to-band 的共同變化。這可作為 CNN 或 image-based ML 的輸入，也可用來討論哪些區域共同貢獻分類。</p></div>
+        <div class="card step"><h3>從一維到二維</h3><p>原始 FTIR 是一條曲線：每個 wavenumber 對應一個吸收強度。2D 相關把光譜轉成 wavenumber × wavenumber 的 correlation map，呈現哪些譜帶一起變動。</p></div>
+        <div class="card step"><h3>關鍵：兩跡 vs 擾動序列</h3><p>只有「樣本 vs 類別平均」兩條光譜時，同步圖其實就是<b>差異光譜的外積（rank-1）</b>，資訊和 1D 差異相同。要看到「1D 看不到的 band covariation」，需要一<b>系列隨擾動（烘焙時間、摻配比例…）變化的光譜</b>做廣義 2D-COS。</p></div>
       </div>
       <div class="figure" style="margin-top:18px">
-        <h3>教學版 two-trace 計算流程</h3>
+        <h3>三種「2D 相關」的差別（皆以 SpectraView 驗證）</h3>
         <div class="table">
-          <div class="row"><b>Reference trace</b><span>選一條參考光譜，例如 Arabica 的平均光譜，或全部訓練資料的平均光譜。</span></div>
-          <div class="row"><b>Sample trace</b><span>取單一樣本光譜，與 reference 組成 2 × p 的矩陣，p 是波數點數。</span></div>
-          <div class="row"><b>Synchronous map</b><span>觀察兩條光譜在波數對之間的共同變動；適合入門視覺化。</span></div>
-          <div class="row"><b>Asynchronous map</b><span>使用 Hilbert–Noda matrix 產生相位/順序差異的資訊；可作為進階討論。</span></div>
+          <div class="row"><b>差異外積<br><small>原頁面 two-trace</small></b><span>兩跡<b>先減平均</b> → 同步＝½(sample−ref)⊗(sample−ref)，<b>rank-1</b>；異步<b>恆為 0（退化）</b>。本質是 1D 差異光譜的 2D 版（圖 5 A）。</span></div>
+          <div class="row"><b>真 2T2D<br><small>Noda 2018</small></b><span><b>不減平均</b>：Φ=½(yₐ⊗yₐ+y_b⊗y_b)、Ψ=½(yₐ⊗y_b−y_b⊗yₐ)。<b>異步非退化</b>，兩條光譜也能得到相位/相對關係（圖 5 B）。</span></div>
+          <div class="row"><b>廣義 2D-COS<br><small>Noda generalized</small></b><span>需 m 條<b>擾動序列</b>：Φ=DᵀD/(m−1)、Ψ=Dᵀ·H·D/(m−1)（H=Hilbert–Noda）。同步可 rank&gt;1、異步解析譜帶變化的<b>先後順序</b>（圖 5 C）。</span></div>
         </div>
       </div>
-      <div class="callout" style="margin-top:18px"><strong>科學提醒：</strong>正式投稿時要清楚說明採用的 2D-COS / 2T2D 公式、前處理與 reference 選法。本頁的目標是教學與可重現練習，因此會先用最容易理解的 two-trace implementation。</div>
+      <div class="callout" style="margin-top:18px"><strong>更正與提醒：</strong>本頁早期版本把「樣本 vs 類別平均」的 two-trace 同步圖當作 2T2D 的賣點，但它在數學上就是差異光譜外積（異步退化為 0、同步 100% rank-1）。已用 <a href="https://tai-shengyeh.github.io/spectraview/" target="_blank" rel="noopener">SpectraView</a> 重算並排對照（圖 5），下方 Python 也修正為與 SpectraView 一致的 Noda 公式。另外：Arabica/Robusta 是<b>二分類</b>（本質 rank-1），沒有隱藏的多維 covariation 可揭示；要做真正的 2D-COS 教學，建議改用烘焙或摻配的<b>擾動序列</b>當擾動軸。</div>
     </section>
 
     <section id="python" class="wrap">
       <div class="section-head"><div><div class="kicker">Python workflow</div><h2>學生可以直接改成 notebook 的 Python 骨架</h2></div></div>
-      <p class="lead">下面程式會下載 Mendeley zip、讀取 coffee FTIR CSV、整理成 <span class="inline-code">X: samples × wavenumbers</span>，再產生每個樣本相對於所屬類別平均光譜的 2T2D-COS maps。</p>
+      <p class="lead">下面程式下載 Mendeley zip、讀取 coffee FTIR CSV、整理成 <span class="inline-code">X: samples × wavenumbers</span>，做 SNV 前處理，再用<b>與 <a href="https://tai-shengyeh.github.io/spectraview/" target="_blank" rel="noopener">SpectraView</a> 一致的 Noda 公式</b>算真 2T2D 與廣義 2D-COS（不是會讓異步退化為 0 的減平均版）。</p>
       <pre><code>import io, zipfile, requests
 import numpy as np
 import pandas as pd
@@ -152,31 +151,41 @@ clf = SVC(kernel="linear")
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
 scores = cross_val_score(clf, Xz, y, cv=cv)
 print("CV accuracy:", scores.mean(), scores.std())</code></pre></div>
-        <div><h3>產生 2T2D maps</h3><pre><code>def noda_matrix(m):
+        <div><h3>真 2T2D（= SpectraView cos2d.two_trace）</h3><pre><code># Noda 2018 two-trace 2D correlation.
+# 不要對兩條光譜減平均：只有兩條時減平均會得到 ya-yb 與 yb-ya，
+# 使異步圖恆為 0、同步圖塌成 1D 差異光譜的外積（rank-1）。
+# 另外避免變數名用 async（Python 3.7+ 是保留字）。
+def two_trace_2dcos(ya, yb):
+    sync = 0.5 * (np.outer(ya, ya) + np.outer(yb, yb))
+    asyn = 0.5 * (np.outer(ya, yb) - np.outer(yb, ya))
+    return sync, asyn
+
+# SNV 前處理，再算兩類平均的真 2T2D
+Xs = (X - X.mean(1, keepdims=True)) / X.std(1, keepdims=True)
+arab, robu = Xs[y == "Arabica"].mean(0), Xs[y == "Robusta"].mean(0)
+sync, asyn = two_trace_2dcos(arab, robu)
+ratio = np.abs(asyn).max() / np.abs(sync).max()
+print(sync.shape, "max|async|/max|sync| =", round(ratio, 3))  # ~0.15 非退化</code></pre></div>
+      </div>
+      <div style="margin-top:18px"><h3>廣義 2D-COS（擾動序列，= SpectraView cos2d.correlation）</h3><pre><code># 廣義 2D-COS：給一條「隨擾動變化」的光譜序列 M (m_spectra × n_wavenumbers)。
+def noda_matrix(m):
     N = np.zeros((m, m))
     for j in range(m):
         for k in range(m):
             if j != k:
-                N[j, k] = 1 / (np.pi * (k - j))
+                N[j, k] = 1.0 / (np.pi * (k - j))
     return N
 
-def two_trace_2dcos(sample, reference):
-    Y = np.vstack([reference, sample])
-    Y = Y - Y.mean(axis=0, keepdims=True)
-    N = noda_matrix(Y.shape[0])
-    sync = Y.T @ Y / (Y.shape[0] - 1)
-    async = Y.T @ N @ Y / (Y.shape[0] - 1)
-    return sync, async
+def generalized_2dcos(M, reference="mean"):
+    D = M - M.mean(axis=0) if reference == "mean" else M
+    m = D.shape[0]
+    sync = D.T @ D / (m - 1)
+    asyn = D.T @ (noda_matrix(m) @ D) / (m - 1)
+    return sync, asyn
 
-class_mean = {c: X[y == c].mean(axis=0) for c in np.unique(y)}
-sync_maps, async_maps = [], []
-for xi, yi in zip(X, y):
-    s, a = two_trace_2dcos(xi, class_mean[yi])
-    sync_maps.append(s)
-    async_maps.append(a)
-
-print(sync_maps[0].shape)</code></pre></div>
-      </div>
+# 把不同烘焙時間 / 摻配比例的光譜疊成 M，再 sync, asyn = generalized_2dcos(snv(M))。
+# Arabica/Robusta 分類沒有這種擾動軸，因此只能做兩跡 2T2D；
+# 要展現 band-to-band covariation 與先後順序，請改用真正的擾動序列。</code></pre></div>
     </section>
 
     <section id="orange" class="wrap">
