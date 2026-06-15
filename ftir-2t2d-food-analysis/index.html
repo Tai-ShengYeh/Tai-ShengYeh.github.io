@@ -72,7 +72,7 @@
 
     <section id="figures" class="wrap">
       <div class="section-head"><div><div class="kicker">Real figures</div><h2>先看真實 FTIR 圖，再進入 2T2D-COS</h2></div></div>
-      <p class="lead">以下圖形直接由 Mendeley coffee FTIR CSV 重新計算產生，不是示意圖。學生可以先用這些圖建立參考答案，再回到 Python / Orange 檢查自己是否得到相同趨勢。</p>
+      <p class="lead">以下圖形直接由 Mendeley coffee FTIR CSV 重新計算產生，不是示意圖。可作為參考答案，回到 Python / Orange 重算即可確認是否得到相同趨勢。</p>
       <figure class="realfig"><img src="assets/coffee_real_spectra.png" alt="Real FTIR spectra overlay for Arabica and Robusta instant coffee"><figcaption class="caption"><strong>圖 1｜原始光譜疊圖。</strong>藍色為 Arabica、橘色為 Robusta；淡線是單一樣本，粗線是類別平均。這張圖可用來討論資料變異與分類訊號是否肉眼可見。</figcaption></figure>
       <div class="figure-grid">
         <figure class="realfig"><img src="assets/coffee_mean_difference.png" alt="Class mean spectra and Robusta minus Arabica difference"><figcaption class="caption"><strong>圖 2｜類別平均與差異光譜。</strong>下方差異圖標示 Robusta 相對 Arabica 較高或較低的區域，適合連結到 loading / feature importance。</figcaption></figure>
@@ -95,10 +95,24 @@
         <article class="card"><h3>參考比對｜FTIR 咖啡鑑別課</h3><p>已完成的一維 FTIR × PCA / PLS-DA 教學頁，可作為本頁 2T2D-COS 前的 baseline：先看原始 FTIR 光譜如何做 Arabica vs Robusta 鑑別，再比較 2T2D 影像化後多了哪些 band-to-band pattern。</p><div class="links"><a class="go" href="https://tai-shengyeh.github.io/ftir-food-analysis/teaching.html" target="_blank" rel="noopener">開啟 FTIR 教學頁 →</a></div></article>
         <article class="card"><h3>參考比對｜GC 咖啡品種課</h3><p>GC 層析指紋同樣用 Arabica vs Robusta 作為食品真偽案例。可拿來對照：FTIR 是官能基 / 整體組成 fingerprint；GC 是揮發性或層析峰型 fingerprint，兩者的化學選擇性與特徵解釋方式不同。</p><div class="links"><a class="go" href="https://tai-shengyeh.github.io/coffee-gc-analysis/teaching.html" target="_blank" rel="noopener">開啟 GC 教學頁 →</a></div></article>
         <article class="card"><h3>參考比對｜PGMM 咖啡化學成分</h3><p>R 套件 <span class="inline-code">pgmm</span> 的經典 <span class="inline-code">coffee</span> 資料（Streuli：43 支咖啡 × 12 項化學/物理成分，Arabica vs Robusta），以 model-based clustering（PGMM）分群。與本頁互補：FTIR 是<b>光譜指紋</b>，PGMM 是<b>化學成分變數＋機率式分群</b>，可比較「光譜 vs 成分」「判別 vs 非監督分群」的差異。</p><div class="links"><a class="go" href="https://tai-shengyeh.github.io/coffee_pgmm_R_code/coffee_pgmm.html" target="_blank" rel="noopener">開啟 PGMM R 報告 →</a></div></article>
-        <article class="card"><h3>課堂比較問題</h3><p>同樣是 coffee authentication，FTIR、GC、PGMM 成分、2T2D-COS 分別回答不同問題：FTIR 看官能基區域，GC 看分離後峰型，PGMM 看化學成分的機率式分群，2T2D-COS 看光譜區域之間的相關圖樣。學生可比較哪一種最容易解釋、哪一種最適合快速篩檢。</p></article>
+        <article class="card"><h3>課堂比較問題</h3><p>同樣是 coffee authentication，FTIR、GC、PGMM 成分、2T2D-COS 分別回答不同問題：FTIR 看官能基區域，GC 看分離後峰型，PGMM 看化學成分的機率式分群，2T2D-COS 看光譜區域之間的相關圖樣。可比較哪一種最容易解釋、哪一種最適合快速篩檢。</p></article>
       </div>
       <figure class="realfig"><img src="assets/coffee_2t2d_spectraview.png" alt="Three-way comparison computed with SpectraView: difference outer product vs real Noda 2T2D vs generalized 2D-COS on coffee FTIR"><figcaption class="caption"><strong>圖 5｜用 <a href="https://tai-shengyeh.github.io/spectraview/" target="_blank" rel="noopener">SpectraView</a> 重算的三方對照（真實 Briandet 咖啡資料、SNV 前處理）。</strong>上排同步 Φ、下排異步 Ψ。<b>(A) two-trace 先減平均</b>（本頁早期版本的做法）＝差異光譜的外積：同步圖 100% rank-1、<b>異步圖完全空白（退化）</b>，等於把那張 1D 差異光譜換成 2D 畫法，並沒有多出資訊。<b>(B) SpectraView 的真 2T2D（Noda，不減平均）</b>：<b>異步圖非退化</b>（async/sync≈0.15），這才是「兩跡相關」真正多給的東西。<b>(C) 廣義 2D-COS</b>：需要一條<b>擾動序列</b>（此處為模擬烘焙的多製程示範），同步圖 rank&gt;1、異步圖解析出譜帶變化的<b>先後順序</b>——這才是 2D-COS 的威力所在。</figcaption></figure>
-      <div class="callout"><strong>課堂使用方式：</strong>先要求學生用 Python 重現圖 1–3；確認資料讀取、標準化、PCA 都正確後，再重現圖 5。若圖 5 顏色方向相反，通常是 reference trace 或差異定義相反，不一定代表計算錯誤。</div>
+      <div class="callout"><strong>課堂使用方式：</strong>先用 Python 重現圖 1–3；確認資料讀取、標準化、PCA 都正確後，再重現圖 5。若圖 5 顏色方向相反，通常是 reference trace 或差異定義相反，不一定代表計算錯誤。</div>
+
+      <div class="figure" style="margin-top:22px">
+        <h3>三方統整：真實成分（pgmm）→ FTIR 吸收帶 → 2D 差異圖</h3>
+        <p>同一批 Arabica / Robusta 咖啡，<a href="https://tai-shengyeh.github.io/ftir-food-analysis/teaching.html" target="_blank" rel="noopener">FTIR 鑑別課</a>用 R 套件 <span class="inline-code">pgmm</span> 的 <span class="inline-code">coffee</span> 真實化學成分（43 支、12 項）做 PCA，Arabica / Robusta 一樣自己分兩群（PC1 37.7%）。把「<b>量到的成分差異</b>」對到「它的 <b>FTIR 吸收帶</b>」，再對到本頁的 FTIR 差異光譜（圖 4）與 2D 圖（圖 5）：</p>
+        <div class="chem-table" aria-label="composition to FTIR band to 2D map">
+          <div class="chem-row header"><div>成分（pgmm 量測）</div><div>哪邊較高</div><div>對應 FTIR 吸收帶</div><div>在差異 / 2D 圖怎麼看</div></div>
+          <div class="chem-row"><div>脂肪 Fat（15.4% vs 9.1%）</div><div>Arabica</div><div>酯基 C=O ~1745、C–H ~2920 / 2855 cm⁻¹</div><div>~1745 區的差異有脂肪貢獻（DRIFT 800–1900 看不到 C–H stretch）</div></div>
+          <div class="chem-row"><div>咖啡因 Caffeine（1.2% vs 1.9%）</div><div>Robusta</div><div>C=O / C=N ~1700–1600 cm⁻¹</div><div>1700–1600 區 Robusta↑ 的訊號之一</div></div>
+          <div class="chem-row"><div>綠原酸類 Chlorogenic acids</div><div>Robusta</div><div>芳香 C=C、C–O ~1600–1000 cm⁻¹</div><div>1600–1000 廣域差異</div></div>
+          <div class="chem-row"><div>葫蘆巴鹼 Trigonelline</div><div>Arabica</div><div>環 C=N / C–N ~1600–1500 cm⁻¹</div><div>1600–1500 區 Arabica↑ 的貢獻</div></div>
+          <div class="chem-row"><div>碳水化合物 / 醣類</div><div>—</div><div>1007 / 957 / 903 cm⁻¹（C–O）</div><div>低波數 PLS-DA 主要鑑別波段</div></div>
+        </div>
+        <div class="callout" style="margin-top:14px"><strong>關鍵連結：</strong>1600–1750 cm⁻¹ 這一段<b>同時疊了</b>脂肪酯 C=O（Arabica↑）與咖啡因 / 綠原酸的 C=O/C=N（Robusta↑），所以 FTIR 差異光譜（圖 4）在這裡是<b>多成分的淨效果</b>、不是單一分子——這正是把它畫成「two-trace 同步圖」（圖 5 A）必然 <b>rank-1、只呈現「整體組成 fingerprint」差異</b>的原因。要回答「<b>是哪一個分子</b>讓某條吸收帶變化」，需要 pgmm 量到的成分（或 HPLC / LC-MS），FTIR 本身分不開。換句話說：<b>pgmm 給「成分真值」、FTIR 給「重疊指紋」、2D 同步圖只是把這個重疊指紋差異換成 2D 畫法</b>；真正多給資訊的是異步圖（圖 5 B）與擾動序列的廣義 2D-COS（圖 5 C）。</div>
+      </div>
     </section>
 
     <section id="concept" class="wrap">
@@ -119,7 +133,7 @@
     </section>
 
     <section id="python" class="wrap">
-      <div class="section-head"><div><div class="kicker">Python workflow</div><h2>學生可以直接改成 notebook 的 Python 骨架</h2></div></div>
+      <div class="section-head"><div><div class="kicker">Python workflow</div><h2>可直接改成 notebook 的 Python 骨架</h2></div></div>
       <p class="lead">下面程式下載 Mendeley zip、讀取 coffee FTIR CSV、整理成 <span class="inline-code">X: samples × wavenumbers</span>，做 SNV 前處理，再用<b>與 <a href="https://tai-shengyeh.github.io/spectraview/" target="_blank" rel="noopener">SpectraView</a> 一致的 Noda 公式</b>算真 2T2D 與廣義 2D-COS（不是會讓異步退化為 0 的減平均版）。</p>
       <pre><code>import io, zipfile, requests
 import numpy as np
@@ -191,14 +205,14 @@ def generalized_2dcos(M, reference="mean"):
 
     <section id="orange" class="wrap">
       <div class="section-head"><div><div class="kicker">Orange workflow</div><h2>Orange Data Mining 也可以做 2D Correlation Plot</h2></div></div>
-      <p class="lead">除了 Python 版 2T2D-COS，Orange Data Mining 的 Spectroscopy add-on 也有 <strong>2D Correlation Plot</strong> widget。教學上建議先用 Orange 做互動式探索，讓學生看懂「一維光譜如何變成二維相關圖」；再用 Python 重現流程、輸出圖檔與建立機器學習特徵。</p>
-      <figure class="realfig"><img src="assets/orange_2d_correlation_plot.jpg" alt="Orange Spectroscopy add-on showing the 2D Correlation Plot widget"><figcaption class="caption"><strong>Orange 2D Correlation Plot。</strong>安裝 Orange Spectroscopy add-on 後，可在 Spectroscopy 類別中找到此 widget。它適合課堂即時展示 synchronous / asynchronous correlation map，讓學生不用先寫程式也能理解 2D-COS 視覺化。</figcaption></figure>
+      <p class="lead">除了 Python 版 2T2D-COS，Orange Data Mining 的 Spectroscopy add-on 也有 <strong>2D Correlation Plot</strong> widget。建議先用 Orange 做互動式探索，看懂「一維光譜如何變成二維相關圖」；再用 Python 重現流程、輸出圖檔與建立機器學習特徵。</p>
+      <figure class="realfig"><img src="assets/orange_2d_correlation_plot.jpg" alt="Orange Spectroscopy add-on showing the 2D Correlation Plot widget"><figcaption class="caption"><strong>Orange 2D Correlation Plot。</strong>安裝 Orange Spectroscopy add-on 後，可在 Spectroscopy 類別中找到此 widget。它適合課堂即時展示 synchronous / asynchronous correlation map，不必先寫程式也能理解 2D-COS 視覺化。</figcaption></figure>
       <div class="grid-2" style="margin-top:16px">
         <div class="workflow"><h3>一維光譜 baseline 流程</h3><div class="workflow-row"><span class="node">File</span><span class="arrow">→</span><span class="node">Select Columns</span><span class="arrow">→</span><span class="node">Preprocess</span><span class="arrow">→</span><span class="node">PCA</span><span class="arrow">→</span><span class="node">Scatter Plot</span><span class="arrow">→</span><span class="node">Test & Score</span><span class="arrow">→</span><span class="node">Confusion Matrix</span></div></div>
         <div class="workflow"><h3>Orange 2D correlation 延伸流程</h3><div class="workflow-row"><span class="node">File / Spectra</span><span class="arrow">→</span><span class="node">Preprocess Spectra</span><span class="arrow">→</span><span class="node">Select Rows / Groups</span><span class="arrow">→</span><span class="node">Average Spectra</span><span class="arrow">→</span><span class="node">2D Correlation Plot</span></div></div>
       </div>
       <div class="cards" style="margin-top:16px">
-        <article class="card"><h3>Orange 的定位</h3><p>Orange 適合入門與互動探索：學生可以拖拉 widget、調整前處理、立即觀察波數 × 波數的相關圖樣，理解哪些 fingerprint 區域會一起變化。</p></article>
+        <article class="card"><h3>Orange 的定位</h3><p>Orange 適合入門與互動探索：拖拉 widget、調整前處理、立即觀察波數 × 波數的相關圖樣，看出哪些 fingerprint 區域會一起變化。</p></article>
         <article class="card"><h3>Python 的定位</h3><p>Python 適合可重現分析：可固定 reference trace、批次輸出 synchronous / asynchronous maps、產生 flattened features，進一步接 SVM、Random Forest 或 CNN。</p></article>
         <article class="card"><h3>教學提醒</h3><p>Orange 的 2D Correlation Plot 是視覺探索工具；若要做嚴格模型評估，reference spectrum 與 class mean 必須在訓練 fold 內計算，避免把測試資料洩漏進模型。</p></article>
       </div>
@@ -213,7 +227,7 @@ def generalized_2dcos(M, reference="mean"):
         <div class="q"><b>03</b><p>2T2D synchronous map 與原始一維 spectrum 相比，多提供了哪一類資訊？</p></div>
         <div class="q"><b>04</b><p>如果換成 fruit puree dataset，Strawberry vs non-strawberry 的模型評估應該看 accuracy 之外的哪些指標？</p></div>
       </div>
-      <div class="callout" style="margin-top:18px"><strong>下一步：</strong>把 coffee 章節做完後，建議直接複製同一份 notebook，改讀 <span class="inline-code">MIR_Fruit_purees.csv</span>，讓學生比較小型乾淨資料與大型摻偽資料的差異。</div>
+      <div class="callout" style="margin-top:18px"><strong>下一步：</strong>把 coffee 章節做完後，建議直接複製同一份 notebook，改讀 <span class="inline-code">MIR_Fruit_purees.csv</span>，比較小型乾淨資料與大型摻偽資料的差異。</div>
     </section>
   </main>
   <footer class="footer"><div class="wrap"><strong>Food FTIR spectra × 2T2D-COS teaching artifact</strong><p>資料來源：Mendeley Data DOI 10.17632/frrv2yd9rg.1；原始食品光譜來源包含 coffee varietal identification、olive oil origin、fresh meats、fruit puree adulteration。頁面用途：課堂教學、notebook 起手式、Orange workflow 引導。</p></div></footer>
