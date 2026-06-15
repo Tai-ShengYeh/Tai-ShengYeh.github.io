@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>質譜毒品偵探 · 小學趣味版 ── 大賽跑・指紋・化學結構拼圖</title>
+<style>
+  :root{
+    --bg:#0f1b2d; --panel:#16263d; --ink:#eaf2ff; --sub:#a9c0e0;
+    --amp:#ff6b6b; --mmc:#ffa94d; --ket:#ffe066; --eto:#69db7c; --her:#4dabf7;
+    --gold:#ffd43b; --good:#51cf66; --bad:#ff6b6b; --warn:#ff8787;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+    background:linear-gradient(160deg,#0f1b2d,#152a45 60%,#0f1b2d);color:#eaf2ff;line-height:1.8}
+
+  .modbar{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:center;
+    padding:9px 14px;background:#0a1422;border-bottom:2px solid #ffd43b;font-size:13px}
+  .modbar a{color:#cfe0fb;text-decoration:none;font-weight:700;padding:3px 9px;border-radius:8px;border:1px solid transparent}
+  .modbar a:hover{background:#24467a;color:#fff}
+  .modbar .mb-home{color:#ffd43b;font-weight:900}
+  .modbar a.cur{color:#9be7ad;border-color:#3c8a5e;background:#11271a}
+
+  header.hero{text-align:center;padding:40px 20px 28px;
+    background:radial-gradient(900px 400px at 50% -120px,rgba(105,219,124,.26),transparent),
+               radial-gradient(700px 360px at 80% 0,rgba(255,212,59,.16),transparent)}
+  .hero h1{font-size:clamp(25px,5.4vw,46px);margin:.1em 0;letter-spacing:1px}
+  .hero .badge{display:inline-block;background:#69db7c;color:#08331c;font-weight:900;
+    border-radius:999px;padding:6px 16px;font-size:15px;margin-bottom:10px}
+  .hero p{color:#a9c0e0;max-width:790px;margin:10px auto 0;font-size:clamp(15px,2.4vw,19px)}
+  .hero .crew{font-size:42px;letter-spacing:7px;margin-top:14px}
+
+  nav{position:sticky;top:0;z-index:50;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;
+    padding:12px;background:rgba(15,27,45,.93);backdrop-filter:blur(8px);border-bottom:1px solid #243a59}
+  nav a{color:#cfe0fb;text-decoration:none;font-weight:700;font-size:13.5px;
+    padding:7px 12px;border-radius:999px;border:1px solid #2c4f7a;background:#16263d;transition:.15s}
+  nav a:hover{background:#24467a;color:#fff;transform:translateY(-2px)}
+  nav a.play{background:#3a2a12;border-color:#ffd43b;color:#ffe9a8}
+
+  main{max-width:1000px;margin:0 auto;padding:10px 16px 80px}
+  section{background:rgba(22,38,61,.7);border:1px solid #25405f;border-radius:22px;
+    padding:26px 22px;margin:22px 0;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+  section h2{font-size:clamp(22px,4.4vw,30px);margin:0 0 4px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  section .lead{color:#9fb7d8;margin:2px 0 18px;font-size:16px}
+  h3{font-size:20px;margin:22px 0 8px;color:#ffe9a8}
+  p{margin:8px 0}
+
+  .machine{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin:16px 0;text-align:center}
+  .mbox{background:#142339;border:2px solid #34557e;border-radius:16px;padding:12px;min-width:130px;flex:1;max-width:210px}
+  .mbox .ic{font-size:32px}.mbox b{display:block;color:#9be7ad;margin-top:4px}.mbox small{color:#9fb7d8;display:block}
+  .marrow{font-size:28px;color:#7f9bc0;align-self:center}
+
+  .analogy{background:#172c49;border-left:6px solid #ffd43b;border-radius:12px;padding:12px 16px;margin:12px 0}
+  .analogy b{color:#ffe066}
+
+  /* ===== RACE ===== */
+  .race{background:#0c1a2e;border:1px solid #2a456a;border-radius:16px;padding:16px 14px;margin:14px 0}
+  .racehead{text-align:center;color:#ffe9a8;font-weight:800;margin-bottom:12px}
+  .lane{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:8px;height:52px;
+    border-bottom:1px dashed #24405f}
+  .lane:last-child{border-bottom:none}
+  .lname{font-weight:800;font-size:14px;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden}
+  .lname .dot{width:13px;height:13px;border-radius:50%;flex:none}
+  .ltrack{position:relative;height:100%;background:repeating-linear-gradient(90deg,#0e2036 0 28px,#102640 28px 56px);
+    border-radius:8px;overflow:visible}
+  .finishline{position:absolute;right:2%;top:0;bottom:0;width:0;border-left:3px dashed #ffd43b}
+  .runner{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:24px;white-space:nowrap;z-index:3;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,.5));transition:left 0s}
+  .runner .badge2{font-size:18px}
+  .runner.arrived{animation:hop .4s ease 2}
+  @keyframes hop{0%,100%{transform:translateY(-50%)}50%{transform:translateY(-90%)}}
+  .flag{position:absolute;top:6px;font-size:20px;opacity:0;transition:opacity .2s;z-index:2}
+  .rt{position:absolute;bottom:4px;font-size:12px;font-weight:800;color:#ffd43b;opacity:0;transition:opacity .2s;white-space:nowrap}
+  .timeaxis{position:relative;height:20px;margin:6px 0 0 128px}
+  .timeaxis span{position:absolute;transform:translateX(-50%);font-size:11px;color:#7f9bc0}
+  .racebtns{text-align:center;margin-top:14px}
+  .countdown{text-align:center;font-size:34px;font-weight:900;color:#ffd43b;min-height:0}
+
+  /* pictures (structure + spectrum) */
+  .picgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:14px 0}
+  .pic{background:#fff;border:1px solid #2a456a;border-radius:14px;padding:6px;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+  .pic svg{display:block;border-radius:10px}
+  .pic .cap{text-align:center;color:#41506a;font-size:12px;padding:2px 0 4px}
+
+  /* compact fingerprint */
+  .spec{display:inline-flex;align-items:flex-end;gap:10px;height:120px;padding:22px 16px 26px;background:#0d1a2e;
+     border:1px solid #2a456a;border-radius:14px;vertical-align:bottom}
+  .spec .sbar{width:24px;border-radius:5px 5px 0 0;position:relative;display:flex;justify-content:center;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+  .spec .sbar .mz{position:absolute;top:100%;margin-top:5px;font-size:12px;color:#cfe0fb;white-space:nowrap;font-weight:700}
+  .spec .sbar .cr{position:absolute;bottom:100%;margin-bottom:2px;font-size:14px}
+
+  /* games */
+  .game{background:#11203a;border:1px solid #2f5081;border-radius:16px;padding:18px;margin-top:12px}
+  .opts{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+  button.opt,button.btn{font-family:inherit;cursor:pointer;border:none;border-radius:12px;font-weight:800;font-size:16px;padding:12px 16px;transition:.15s}
+  button.opt{background:#1d3a63;color:#eaf2ff;border:1px solid #3a5f93}
+  button.opt:hover{background:#27508a;transform:translateY(-2px)}
+  button.opt.small{font-size:14px;padding:9px 13px}
+  button.btn{background:#ffd43b;color:#19283f}
+  button.btn:hover{filter:brightness(1.08);transform:translateY(-2px)}
+  button.btn.green{background:#69db7c}
+  button.btn:disabled{opacity:.5;cursor:default;transform:none}
+  .feedback{font-weight:800;margin-top:10px;min-height:26px}
+  .score{font-weight:900;color:#ffd43b}
+  .ok{color:var(--good)} .no{color:var(--bad)}
+  .qcard{font-size:17px;font-weight:700}
+
+  /* jigsaw */
+  .puzwrap{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;margin-top:6px}
+  @media(max-width:620px){.puzwrap{grid-template-columns:1fr;justify-items:center}}
+  .puzboard{width:300px;height:250px;display:grid;grid-template-columns:repeat(3,100px);grid-template-rows:repeat(3,83.34px);
+    background:#0b1626;border:3px solid #2f5081;border-radius:12px;overflow:hidden}
+  .ptile{width:100px;height:83.34px;background-repeat:no-repeat;background-size:300px 250px;cursor:pointer;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);transition:transform .08s}
+  .ptile:hover{filter:brightness(1.05)}
+  .ptile.sel{outline:3px solid #ffd43b;outline-offset:-3px;z-index:2;transform:scale(.95)}
+  .puzside{min-width:200px}
+  .refrow{display:flex;align-items:center;gap:8px;color:#9fb7d8;font-size:13px;margin-bottom:8px}
+  .puzref{width:160px;background:#fff;border-radius:10px;padding:4px;opacity:.9}
+  .puzref svg{display:block;border-radius:8px}
+
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:15px;border-radius:12px;overflow:hidden}
+  th,td{padding:10px 8px;text-align:center;border-bottom:1px solid #2a456a}
+  th{background:#1f6f3e;color:#fff}tr:nth-child(even) td{background:#142339}
+  .pill{display:inline-block;background:#0e1b30;border:1px solid #34557e;border-radius:8px;padding:2px 9px;margin:2px;font-weight:800}
+  .pill.base{background:#1f6f3e;border-color:#3fae5a;color:#fff}
+  .hotline{background:#3a1320;border:2px solid #ff8787;border-radius:16px;padding:14px;text-align:center;margin-top:14px}
+  .hotline .num{font-size:clamp(24px,6vw,36px);font-weight:900;color:#ffd43b;letter-spacing:2px}
+
+  footer{text-align:center;color:#7f9bc0;font-size:13px;padding:30px 16px}
+  ul{margin:8px 0 8px 2px;padding-left:22px}li{margin:6px 0}
+
+  @media print{
+    body{background:#fff;color:#000}.modbar,nav,.hero p,.hero .crew,.game,.race,footer{display:none!important}
+    section{break-inside:avoid;box-shadow:none;border:1px solid #999;background:#fff;color:#000}h2,h3{color:#000}.analogy{background:#fff;color:#000}
+  }
+</style>
+</head>
+<body>
+
+<div class="modbar">
+  <a class="mb-home" href="index.html">🏠 質譜教學模組</a>
+  <a href="質譜毒品偵探_GCMS版.html">🕵️ 毒品偵探</a>
+  <a href="質譜毒品偵探_小學趣味版.html" class="cur">🏃 小學趣味版</a>
+  <a href="質譜定性定量與品管_小學版.html">🧒 定性定量·兒童</a>
+  <a href="質譜定性定量與品管_GCMS進階版.html">🔬 GC-MS 進階</a>
+  <a href="質譜定性定量與品管_LCMS進階版.html">💧 LC-MS 進階</a>
+</div>
+
+<header class="hero">
+  <div class="badge">質譜小學堂 · 趣味版 · 大賽跑 × 指紋 × 化學結構拼圖</div>
+  <h1>🕵️ 質譜毒品偵探（小學趣味版）</h1>
+  <p>歡迎加入偵探隊！這次我們用 <b>GC-MS 機器</b> 抓毒品：先讓毒品分子<b>氣體大賽跑 🏃</b>
+     看誰先跑到終點，再把它們<b>撞碎成指紋 🧩</b>、配上<b>化學結構</b>，一個一個揪出來！</p>
+  <div class="crew">🏃‍♂️🚩🔬🧩🧪🎮</div>
+</header>
+
+<nav>
+  <a href="#steps">① GC-MS 三步驟</a>
+  <a href="#race">② 毒品大賽跑</a>
+  <a href="#fp">③ 指紋＋化學結構</a>
+  <a href="#g-puz" class="play">🧩 拼圖</a>
+  <a href="#g-match" class="play">🎮 指紋配對</a>
+  <a href="#g-race" class="play">🎮 賽跑偵探</a>
+  <a href="#aids">🖨️ 教具</a>
+</nav>
+
+<main>
+
+<!-- ① STEPS -->
+<section id="steps">
+  <h2>① GC-MS 抓毒品的三步驟 🎬</h2>
+  <p class="lead">毒品分子要闖三關，才會現出原形！</p>
+  <div class="machine">
+    <div class="mbox" style="border-color:#ffa94d"><div class="ic">🔥💨</div><b>第1關 氣化賽跑</b><small>加熱變氣體，<br>氦氣吹著跑過長管</small></div>
+    <div class="marrow">➡️</div>
+    <div class="mbox" style="border-color:#ff6b6b"><div class="ic">⚡💥</div><b>第2關 電子撞碎</b><small>用電子把分子<br>撞成固定碎片</small></div>
+    <div class="marrow">➡️</div>
+    <div class="mbox" style="border-color:#4dabf7"><div class="ic">📸🧩</div><b>第3關 拍指紋</b><small>畫出指紋圖，<br>配化學結構比對</small></div>
+  </div>
+  <div class="analogy">🏃 <b>第1關＝賽跑：</b>毒品變成氣體，被氦氣吹過長長的管子。
+     <b>輕巧、不黏管壁</b>的先跑到終點，<b>大隻又黏</b>的最後到 ── 每種毒品「幾分鐘跑到」都不一樣！
+     往下玩 <a href="#race" style="color:#ffe066">毒品大賽跑</a> 就知道！</div>
+</section>
+
+<!-- ② RACE -->
+<section id="race">
+  <h2>② 毒品大賽跑：誰先跑到終點？ 🏁</h2>
+  <p class="lead">每種毒品有自己的<b>跑道</b>，按下「開始賽跑」，看誰先衝過 🏁 終點線！跑到終點的時間就叫 <b>滯留時間</b>。</p>
+
+  <div class="race" id="raceBox">
+    <div class="racehead">🏃 5 種毒品同時起跑，輕的先到、重的後到！</div>
+    <div class="countdown" id="countdown"></div>
+    <div id="lanes"></div>
+    <div class="timeaxis" id="timeaxis"></div>
+    <div class="racebtns">
+      <button class="btn" id="raceStart">🏁 開始賽跑！</button>
+      <button class="btn green" id="raceReset" style="display:none">🔄 再跑一次</button>
+    </div>
+    <div id="raceResult" class="analogy" style="display:none"></div>
+  </div>
+
+  <div class="analogy">🚩 <b>為什麼有快有慢？</b>甲基安非他命最<b>輕巧</b>，8.7 分就先衝出來；
+     海洛因最<b>大隻又黏</b>，23.8 分才慢吞吞最後到。光看「幾分到」就能先猜出是誰！</div>
+</section>
+
+<!-- ③ FINGERPRINT + STRUCTURE -->
+<section id="fp">
+  <h2>③ 質譜指紋 ＋ 化學結構 🔍</h2>
+  <p class="lead">跑到終點後，機器把毒品<b>撞碎</b>成固定碎片，畫出<b>指紋圖</b>（橫軸是碎片重量 m/z），最高那塊叫 <b>基峰 👑</b>。</p>
+
+  <div class="picgrid" id="picGrid"></div>
+
+  <div class="analogy">🧩 <b>注意 58 兄弟！</b><b>🟥 甲基安非他命</b> 和 <b>🟧 卡西酮</b> 的基峰<b>都是 58</b>，
+     但其他碎片和<b>化學結構</b>不一樣 ── 要連比例和分子長相都對上，才能確定是哪一種！</div>
+  <p>👉 去玩 <a href="#g-puz" style="color:#ffe066">🧩 拼圖</a> 和 <a href="#g-match" style="color:#ffe066">🎮 指紋配對</a>！</p>
+</section>
+
+<!-- JIGSAW -->
+<section id="g-puz">
+  <h2>🧩 拼圖遊戲：質譜＋化學結構 🧩</h2>
+  <p class="lead">選一種毒品，把打散的 9 塊拼回完整的「指紋＋化學結構」圖！<br>
+     玩法：<b>點一塊 → 再點另一塊</b>，兩塊就<b>交換位置</b>。全部排對就完成！</p>
+  <div class="game">
+    <div class="opts" id="puzPick"></div>
+    <div class="puzwrap">
+      <div class="puzboard" id="puzBoard"></div>
+      <div class="puzside">
+        <div class="refrow"><input type="checkbox" id="puzRefChk" style="width:18px;height:18px;accent-color:#ffd43b"> <label for="puzRefChk">偷看完成圖</label></div>
+        <div class="puzref" id="puzRef" style="display:none"></div>
+        <div class="feedback" id="puzFb" style="margin-top:8px"></div>
+        <div style="margin-top:8px;color:#9fb7d8">完成毒品數：<span class="score" id="puzScore">0</span> / 5</div>
+        <div style="margin-top:10px">
+          <button class="btn" id="puzShuffle">🔀 重新打散</button>
+          <button class="btn green" id="puzNext" style="display:none">下一種 ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MATCH GAME -->
+<section id="g-match">
+  <h2>🎮 指紋配對 🔍</h2>
+  <p class="lead">看神祕指紋（👑 是基峰，注意比例），猜猜是哪一種毒品！</p>
+  <div class="game">
+    <div class="qcard" id="g1q">準備中…</div>
+    <div id="g1fp" style="margin:14px 0"></div>
+    <div class="opts" id="g1opts"></div>
+    <div class="feedback" id="g1fb"></div>
+    <div>分數：<span class="score" id="g1score">0</span>　第 <span id="g1n">1</span> / 5 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g1next" style="display:none">下一題 ▶</button></div>
+  </div>
+</section>
+
+<!-- RACE GAME -->
+<section id="g-race">
+  <h2>🎮 賽跑小偵探 🏃</h2>
+  <p class="lead">用「幾分鐘跑到終點（滯留時間）」當線索，找出是哪一種毒品！</p>
+  <div class="game">
+    <div class="qcard" id="g2q">準備中…</div>
+    <div class="opts" id="g2opts"></div>
+    <div class="feedback" id="g2fb"></div>
+    <div>分數：<span class="score" id="g2score">0</span>　第 <span id="g2n">1</span> / 5 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g2next" style="display:none">下一題 ▶</button></div>
+  </div>
+</section>
+
+<!-- AIDS -->
+<section id="aids">
+  <h2>🖨️ 老師教具區 ✂️</h2>
+  <p class="lead">按 Ctrl + P 列印，剪下來在課堂玩。</p>
+  <h3>🪪 五張嫌犯資料卡（真實 GC-MS 數據）</h3>
+  <table>
+    <tr><th>毒品</th><th>🚩 滯留時間</th><th>👑 基峰</th><th>🧩 主要碎片 m/z</th></tr>
+    <tr><td>🟥 甲基安非他命</td><td>8.7 分（最快）</td><td>58</td><td><span class="pill base">58</span><span class="pill">91</span><span class="pill">134</span></td></tr>
+    <tr><td>🟧 4-甲基甲基卡西酮</td><td>12.2 分</td><td>58</td><td><span class="pill base">58</span><span class="pill">65</span><span class="pill">119</span></td></tr>
+    <tr><td>🟨 愷他命 Ketamine</td><td>16.9 分</td><td>180</td><td><span class="pill base">180</span><span class="pill">182</span><span class="pill">209</span></td></tr>
+    <tr><td>🟩 依托咪酯 Etomidate</td><td>17.3 分</td><td>105</td><td><span class="pill base">105</span><span class="pill">77</span><span class="pill">244</span></td></tr>
+    <tr><td>🟦 海洛因 Heroin</td><td>23.8 分（最慢）</td><td>327</td><td><span class="pill base">327</span><span class="pill">369</span><span class="pill">268</span></td></tr>
+  </table>
+
+  <h3>🎯 三句話總結</h3>
+  <ul>
+    <li><b>大賽跑（滯留時間）：</b>每種毒品跑到終點的時間固定 → 第一個線索。</li>
+    <li><b>指紋＋化學結構：</b>撞碎後的碎片比例＋分子長相 → 第二個線索（小心 58 兄弟）。</li>
+    <li><b>兩個線索一起看</b>，毒品就無所遁形！</li>
+  </ul>
+
+  <div class="hotline">
+    🆘 認識毒品是為了<b>遠離毒品</b>！需要幫忙，打這支免費電話（24 小時）：
+    <div class="num">0800-770-885</div>
+    <small>反毒諮詢專線　·　珍愛生命，向毒品說不</small>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  質譜小學堂 · 小學趣味版「毒品大賽跑・指紋・化學結構拼圖」教學互動教材<br>
+  資料來源：5 種毒品 GC-MS 圖譜（NIST mainlib EI）　·　化學結構為教學簡化示意
+</footer>
+
+<script>
+/* ===== 5-drug data: retention time, base peak, fingerprint, rich spectrum, molecule ===== */
+const DRUGS=[
+  {key:"amp", name:"甲基安非他命", short:"甲基安非他命", emoji:"🟥", color:"#ff6b6b", rt:8.663, base:58,
+    spec:[[58,100],[91,28],[65,14],[134,9]],
+    rich:[[30,10],[42,12],[58,100],[65,14],[77,9],[91,28],[102,6],[115,7],[134,9],[146,5],[150,4]],
+    mol:{n:[[40,40],[63,53],[63,80],[40,93],[17,80],[17,53],[86,40],[109,53],[109,80],[132,40,'N'],[155,53]],
+         bonds:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[1,6],[6,7],[7,8],[7,9],[9,10]], ar:[[40,66.5,14]]}},
+  {key:"mmc", name:"4-甲基甲基卡西酮", short:"卡西酮(喵喵)", emoji:"🟧", color:"#ffa94d", rt:12.238, base:58,
+    spec:[[58,100],[65,12],[119,9],[160,8]],
+    rich:[[42,13],[58,100],[65,11],[91,9],[103,6],[119,9],[132,8],[146,7],[160,8],[177,6]],
+    mol:{n:[[40,40],[63,53],[63,80],[40,93],[17,80],[17,53],[86,40],[86,16,'O'],[109,53],[109,80],[132,40,'N'],[-6,94],[155,53]],
+         bonds:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[4,11],[1,6],[6,7,2],[6,8],[8,9],[8,10],[10,12]], ar:[[40,66.5,14]]}},
+  {key:"ket", name:"愷他命 Ketamine", short:"愷他命(K)", emoji:"🟨", color:"#ffe066", rt:16.928, base:180,
+    spec:[[180,100],[182,33],[209,18],[152,20]],
+    rich:[[42,9],[75,11],[102,12],[152,20],[180,100],[182,33],[209,18],[237,6]],
+    mol:{n:[[35,40],[58,53],[58,80],[35,93],[12,80],[12,53],[110,46],[133,59],[133,86],[110,99],[87,86],[87,59],[35,16,'Cl'],[64,46,'N'],[110,22,'O'],[64,22]],
+         bonds:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,12],[1,11],[6,7],[7,8],[8,9],[9,10],[10,11],[11,6],[6,14,2],[11,13],[13,15]], ar:[[35,66.5,14]]}},
+  {key:"eto", name:"依托咪酯 Etomidate", short:"依托咪酯", emoji:"🟩", color:"#69db7c", rt:17.324, base:105,
+    spec:[[105,100],[77,13],[244,11],[199,9]],
+    rich:[[51,9],[63,8],[77,13],[105,100],[142,5],[168,6],[199,9],[244,11]],
+    mol:{n:[[28,40],[45,50],[45,70],[28,80],[11,70],[11,50],[64,40],[64,18],[95,37],[113,49,'N'],[106,70],[84,70],[77,49,'N'],[124,84],[112,104,'O'],[146,80,'O'],[164,92],[182,80]],
+         bonds:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[1,6],[6,7],[6,12],[8,9],[9,10],[10,11],[11,12],[12,8],[10,13],[13,14,2],[13,15],[15,16],[16,17]],
+         ar:[[28,60,12],[95,53,10]]}},
+  {key:"her", name:"海洛因 Heroin", short:"海洛因", emoji:"🟦", color:"#4dabf7", rt:23.836, base:327,
+    spec:[[327,100],[369,80],[268,58],[204,45]],
+    rich:[[15,8],[43,62],[81,26],[146,22],[204,45],[268,58],[310,32],[327,100],[369,80]],
+    mol:{n:[[40,42],[56,51],[56,69],[40,78],[24,69],[24,51],[74,44],[90,55],[88,74],[72,82],[110,48],[118,66],[106,83],[86,94,'N'],[86,114],[8,42,'O'],[-8,52],[-8,30,'O'],[-24,44],[138,60,'O'],[156,68],[156,46,'O'],[174,60]],
+         bonds:[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[1,6],[6,7],[7,8],[8,9],[9,2],[7,10],[10,11],[11,12],[12,8],[9,13],[13,12],[13,14],[5,15],[15,16],[16,17,2],[16,18],[11,19],[19,20],[20,21,2],[20,22]],
+         ar:[[40,60,13]]}},
+];
+const MAXT=25;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ===== molecule renderer + picture (shared) ===== */
+function renderMolFit(m,box){
+  let minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9;
+  m.n.forEach(p=>{minx=Math.min(minx,p[0]);maxx=Math.max(maxx,p[0]);miny=Math.min(miny,p[1]);maxy=Math.max(maxy,p[1]);});
+  (m.ar||[]).forEach(c=>{minx=Math.min(minx,c[0]-c[2]);maxx=Math.max(maxx,c[0]+c[2]);miny=Math.min(miny,c[1]-c[2]);maxy=Math.max(maxy,c[1]+c[2]);});
+  const bw=maxx-minx||1,bh=maxy-miny||1,sc=Math.min((box[2]-box[0])/bw,(box[3]-box[1])/bh)*0.92;
+  const tx=box[0]+((box[2]-box[0])-bw*sc)/2-minx*sc,ty=box[1]+((box[3]-box[1])-bh*sc)/2-miny*sc;
+  let s=`<g transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${sc.toFixed(3)})" stroke-linecap="round">`;
+  m.bonds.forEach(bd=>{const a=m.n[bd[0]],b=m.n[bd[1]],o=bd[2]||1;
+    if(o===2){const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,ox=-dy/L*2.5,oy=dx/L*2.5;
+      s+=`<line x1="${(a[0]+ox).toFixed(1)}" y1="${(a[1]+oy).toFixed(1)}" x2="${(b[0]+ox).toFixed(1)}" y2="${(b[1]+oy).toFixed(1)}" stroke="#222" stroke-width="1.7"/>`;
+      s+=`<line x1="${(a[0]-ox).toFixed(1)}" y1="${(a[1]-oy).toFixed(1)}" x2="${(b[0]-ox).toFixed(1)}" y2="${(b[1]-oy).toFixed(1)}" stroke="#222" stroke-width="1.7"/>`;
+    } else s+=`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="#222" stroke-width="1.9"/>`;});
+  (m.ar||[]).forEach(c=>s+=`<circle cx="${c[0]}" cy="${c[1]}" r="${c[2]}" fill="none" stroke="#222" stroke-width="1.5"/>`);
+  m.n.forEach(p=>{if(p[2]){const col=p[2]==='N'?'#1565c0':p[2]==='O'?'#c62828':'#2e7d32';
+    s+=`<circle cx="${p[0]}" cy="${p[1]}" r="8" fill="#fff"/><text x="${p[0]}" y="${p[1]+4}" font-size="12" font-weight="800" text-anchor="middle" fill="${col}">${p[2]}</text>`;}});
+  return s+`</g>`;
+}
+function pictureSVG(d){
+  const maxmz=Math.max(...d.rich.map(p=>p[0])),maxX=Math.ceil(maxmz*1.07/10)*10;
+  const X0=34,X1=346,baseY=270,topY=180,xf=mz=>X0+mz/maxX*(X1-X0),hf=it=>it/100*(baseY-topY);
+  let bars="",labels="";
+  d.rich.slice().sort((a,b)=>a[0]-b[0]).forEach(([mz,it])=>{
+    const x=xf(mz),h=hf(it),isB=(mz===d.base);
+    bars+=`<line x1="${x.toFixed(1)}" y1="${baseY}" x2="${x.toFixed(1)}" y2="${(baseY-h).toFixed(1)}" stroke="${isB?'#d00':'#e53935'}" stroke-width="${isB?2.8:1.7}"/>`;
+    if(isB) labels+=`<text x="${x.toFixed(1)}" y="${(baseY-h-5).toFixed(1)}" font-size="13" font-weight="900" fill="#d00" text-anchor="middle">${mz}</text>`;
+    else if(it>=13) labels+=`<text x="${x.toFixed(1)}" y="${baseY+13}" font-size="10" fill="#1565c0" text-anchor="middle">${mz}</text>`;
+  });
+  let axis=`<line x1="${X0-4}" y1="${baseY}" x2="${X1+2}" y2="${baseY}" stroke="#555" stroke-width="1.4"/>`;
+  const step=maxX>240?60:(maxX>120?40:30);
+  for(let t=0;t<=maxX;t+=step){axis+=`<line x1="${xf(t).toFixed(1)}" y1="${baseY}" x2="${xf(t).toFixed(1)}" y2="${baseY+3}" stroke="#999"/><text x="${xf(t).toFixed(1)}" y="${baseY+24}" font-size="9.5" fill="#888" text-anchor="middle">${t}</text>`;}
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" width="100%">`+
+    `<rect x="0" y="0" width="360" height="300" rx="14" fill="#ffffff"/>`+
+    `<text x="180" y="25" font-size="16" font-weight="900" fill="#16263d" text-anchor="middle">${d.emoji} ${d.name}</text>`+
+    renderMolFit(d.mol,[18,40,342,158])+
+    `<text x="180" y="172" font-size="10.5" fill="#5a6a86" text-anchor="middle">↑ 化學結構　|　質譜指紋 ↓（橫軸 m/z）</text>`+
+    axis+bars+labels+`</svg>`;
+}
+
+/* ===== ② RACE ===== */
+(function(){
+  const lanesEl=document.getElementById("lanes"),axis=document.getElementById("timeaxis"),
+        startBtn=document.getElementById("raceStart"),resetBtn=document.getElementById("raceReset"),
+        result=document.getElementById("raceResult"),cd=document.getElementById("countdown");
+  const sorted=[...DRUGS].sort((a,b)=>a.rt-b.rt);
+  sorted.forEach(d=>{
+    const lane=document.createElement("div");lane.className="lane";lane.dataset.key=d.key;
+    lane.innerHTML=`<div class="lname"><span class="dot" style="background:${d.color}"></span>${d.short}</div>
+      <div class="ltrack"><div class="finishline"></div>
+        <div class="runner">🏃<span class="badge2">${d.emoji}</span></div>
+        <div class="flag">🚩</div><div class="rt"></div></div>`;
+    lanesEl.appendChild(lane);
+  });
+  for(let t=0;t<=MAXT;t+=5){const s=document.createElement("span");s.textContent=t+"分";s.style.left=(t/MAXT*92)+"%";axis.appendChild(s);}
+
+  let finishes=0,order=[];
+  function startRace(){
+    startBtn.disabled=true;resetBtn.style.display="none";result.style.display="none";finishes=0;order=[];
+    let c=3;cd.textContent="預備…";
+    const tick=setInterval(()=>{
+      if(c>0){cd.textContent=c;c--;}
+      else{clearInterval(tick);cd.textContent="跑！🏃";setTimeout(()=>cd.textContent="",900);run();}
+    },650);
+  }
+  function run(){
+    const arrivedKeys={};
+    function arrive(d,runner,flag,rt){
+      if(arrivedKeys[d.key])return;arrivedKeys[d.key]=true;
+      runner.classList.add("arrived");flag.style.opacity=1;rt.textContent=d.rt.toFixed(1)+"分";rt.style.opacity=1;
+      order.push(d);finishes++;
+      if(finishes===DRUGS.length)done();
+    }
+    lanesEl.querySelectorAll(".lane").forEach(lane=>{
+      const d=DRUGS.find(x=>x.key===lane.dataset.key),runner=lane.querySelector(".runner"),
+            flag=lane.querySelector(".flag"),rt=lane.querySelector(".rt");
+      const pos=d.rt/MAXT*92, dur=d.rt/MAXT*5+0.2;
+      flag.style.left=pos+"%";rt.style.left=pos+"%";
+      // start from 0, force reflow, then transition to finish (no rAF dependency)
+      runner.style.transition="none";runner.style.left="0%";void runner.offsetWidth;
+      runner.style.transition=`left ${dur.toFixed(2)}s linear`;runner.style.left=pos+"%";
+      runner.addEventListener("transitionend",function te(e){
+        if(e.propertyName!=="left")return;runner.removeEventListener("transitionend",te);arrive(d,runner,flag,rt);});
+      setTimeout(()=>arrive(d,runner,flag,rt), dur*1000+200); // fallback if transitionend is throttled
+    });
+    resetBtn.style.display="inline-block";
+  }
+  function done(){
+    const medals=["🥇","🥈","🥉","4️⃣","🐢"];
+    result.style.display="block";
+    result.innerHTML="🏁 <b>比賽結果（誰先跑到）：</b><br>"+order.map((d,i)=>
+      `${medals[i]} <b>${d.emoji} ${d.short}</b> ── ${d.rt.toFixed(1)} 分`).join("<br>")+
+      "<br>👉 最輕巧的最快到、最大隻的最後到！";
+  }
+  function reset(){
+    finishes=0;order=[];result.style.display="none";cd.textContent="";
+    lanesEl.querySelectorAll(".lane").forEach(lane=>{
+      const runner=lane.querySelector(".runner");runner.style.transition="none";runner.style.left="0%";
+      runner.classList.remove("arrived");lane.querySelector(".flag").style.opacity=0;
+      const rt=lane.querySelector(".rt");rt.style.opacity=0;rt.textContent="";
+    });
+    void lanesEl.offsetWidth; // reflow
+    startBtn.disabled=false;resetBtn.style.display="none";
+  }
+  startBtn.onclick=startRace;resetBtn.onclick=reset;
+})();
+
+/* ===== ③ pictures ===== */
+(function(){
+  const grid=document.getElementById("picGrid");
+  DRUGS.forEach(d=>{const div=document.createElement("div");div.className="pic";
+    div.innerHTML=pictureSVG(d)+`<div class="cap">${d.emoji} ${d.short}　🚩 ${d.rt.toFixed(1)}分　👑 基峰 ${d.base}</div>`;
+    grid.appendChild(div);});
+})();
+
+/* compact fingerprint bars */
+function specBars(d,neutral){
+  const arr=d.spec.slice().sort((a,b)=>a[0]-b[0]);
+  return `<div class="spec">`+arr.map(([mz,it])=>{const isBase=(mz===d.base);
+    const col=isBase?(neutral?"#ffd43b":d.color):(neutral?"#9fb7d8":d.color);
+    return `<div class="sbar" style="height:${Math.max(8,it*0.78)}px;background:${col}">${isBase?'<span class="cr">👑</span>':''}<span class="mz">${mz}</span></div>`;}).join("")+`</div>`;
+}
+
+/* ===== JIGSAW ===== */
+(function(){
+  const pick=document.getElementById("puzPick"),board=document.getElementById("puzBoard"),
+        refChk=document.getElementById("puzRefChk"),ref=document.getElementById("puzRef"),
+        fb=document.getElementById("puzFb"),scoreEl=document.getElementById("puzScore"),
+        shuffleBtn=document.getElementById("puzShuffle"),nextBtn=document.getElementById("puzNext");
+  const N=3,TW=100,TH=250/3;let cur=DRUGS[0],state=[],sel=-1,completed=new Set(),uri="";
+  DRUGS.forEach((d,i)=>{const b=document.createElement("button");b.className="opt small";b.textContent=d.emoji+" "+d.short;
+    b.onclick=()=>{cur=d;loadPuzzle();[...pick.children].forEach(c=>c.style.outline="");b.style.outline="3px solid #ffd43b";};pick.appendChild(b);});
+  function posFor(p){const r=Math.floor(p/N),c=p%N;return `${-c*TW}px ${-r*TH}px`;}
+  function scrambled(){let s;do{s=shuffle([0,1,2,3,4,5,6,7,8]);}while(s.every((v,i)=>v===i));return s;}
+  function loadPuzzle(){uri="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(pictureSVG(cur));
+    ref.innerHTML=pictureSVG(cur);state=scrambled();sel=-1;fb.innerHTML="";nextBtn.style.display="none";render();}
+  function render(){board.innerHTML="";state.forEach((piece,slot)=>{const t=document.createElement("div");
+    t.className="ptile"+(sel===slot?" sel":"");t.style.backgroundImage=`url("${uri}")`;t.style.backgroundPosition=posFor(piece);
+    t.onclick=()=>click(slot);board.appendChild(t);});}
+  function click(slot){if(completed.has(cur.key))return;if(sel===-1){sel=slot;render();return;}
+    if(sel===slot){sel=-1;render();return;}[state[sel],state[slot]]=[state[slot],state[sel]];sel=-1;render();checkWin();}
+  function checkWin(){if(state.every((v,i)=>v===i)){
+    if(!completed.has(cur.key)){completed.add(cur.key);scoreEl.textContent=completed.size;}
+    fb.innerHTML=`<span class="ok">🎉 完成！這就是 ${cur.emoji}${cur.name} 的「指紋＋化學結構」！</span>`;
+    if(completed.size<DRUGS.length)nextBtn.style.display="inline-block";
+    else fb.innerHTML+=`<br>🏆 五種全部拼完，你是質譜拼圖大師！`;}}
+  refChk.onchange=()=>ref.style.display=refChk.checked?"block":"none";
+  shuffleBtn.onclick=()=>{if(completed.has(cur.key))return;state=scrambled();sel=-1;render();fb.innerHTML="";};
+  nextBtn.onclick=()=>{const rest=DRUGS.filter(d=>!completed.has(d.key));if(rest.length){cur=rest[0];loadPuzzle();
+    [...pick.children].forEach((c,i)=>c.style.outline=DRUGS[i].key===cur.key?"3px solid #ffd43b":"");}};
+  pick.children[0].style.outline="3px solid #ffd43b";loadPuzzle();
+})();
+
+/* ===== GAME: fingerprint -> drug ===== */
+(function(){
+  let order=shuffle(DRUGS),idx=0,score=0,locked=false;
+  const q=document.getElementById("g1q"),fp=document.getElementById("g1fp"),opts=document.getElementById("g1opts"),
+        fb=document.getElementById("g1fb"),sc=document.getElementById("g1score"),n=document.getElementById("g1n"),next=document.getElementById("g1next");
+  function load(){locked=false;fb.textContent="";next.style.display="none";opts.innerHTML="";
+    const d=order[idx];n.textContent=idx+1;q.innerHTML=`第 ${idx+1} 題：這張神祕指紋是哪一種毒品？（看基峰 👑 和比例！）`;
+    fp.innerHTML=specBars(d,true);
+    shuffle([d,...shuffle(DRUGS.filter(x=>x.key!==d.key)).slice(0,3)]).forEach(c=>{
+      const b=document.createElement("button");b.className="opt";b.textContent=c.emoji+" "+c.short;
+      b.onclick=()=>{if(locked)return;locked=true;
+        if(c.key===d.key){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 答對！基峰 ${d.base}，就是 ${d.emoji}${d.short}。</span>`;}
+        else fb.innerHTML=`<span class="no">❌ 正確是 ${d.emoji}${d.short}（基峰 ${d.base}）。看基峰＋比例！</span>`;
+        idx<order.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 總分 <b>${score}/5</b>！`;};
+      opts.appendChild(b);});}
+  next.onclick=()=>{idx++;load();};load();
+})();
+
+/* ===== GAME: retention time -> drug ===== */
+(function(){
+  let order=shuffle(DRUGS),idx=0,score=0,locked=false;
+  const q=document.getElementById("g2q"),opts=document.getElementById("g2opts"),fb=document.getElementById("g2fb"),
+        sc=document.getElementById("g2score"),n=document.getElementById("g2n"),next=document.getElementById("g2next");
+  function load(){locked=false;fb.textContent="";next.style.display="none";opts.innerHTML="";
+    const d=order[idx];n.textContent=idx+1;
+    const fastest=[...DRUGS].sort((a,b)=>a.rt-b.rt)[0],slowest=[...DRUGS].sort((a,b)=>b.rt-a.rt)[0];
+    let ask;
+    if(idx===0){ask=`哪一種毒品<b>最快</b>跑到終點（滯留時間最短）？`;d._ans=fastest;}
+    else if(idx===1){ask=`哪一種毒品<b>最慢</b>到（跑最久）？`;d._ans=slowest;}
+    else{ask=`偵探量到一個毒品大約 <b>${d.rt.toFixed(1)} 分</b>跑到終點，這是哪一種？`;d._ans=d;}
+    q.innerHTML=`第 ${idx+1} 題 🏃：${ask}`;
+    const ansDrug=d._ans;
+    shuffle([ansDrug,...shuffle(DRUGS.filter(x=>x.key!==ansDrug.key)).slice(0,3)]).forEach(c=>{
+      const b=document.createElement("button");b.className="opt";b.textContent=c.emoji+" "+c.short;
+      b.onclick=()=>{if(locked)return;locked=true;
+        if(c.key===ansDrug.key){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 答對！${ansDrug.emoji}${ansDrug.short}（${ansDrug.rt.toFixed(1)} 分）。</span>`;}
+        else fb.innerHTML=`<span class="no">❌ 正解：${ansDrug.emoji}${ansDrug.short}（${ansDrug.rt.toFixed(1)} 分）。</span>`;
+        idx<order.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 總分 <b>${score}/5</b>！`;};
+      opts.appendChild(b);});}
+  next.onclick=()=>{idx++;load();};load();
+})();
+</script>
+</body>
+</html>
