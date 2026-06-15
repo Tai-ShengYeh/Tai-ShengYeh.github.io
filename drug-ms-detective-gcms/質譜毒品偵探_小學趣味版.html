@@ -358,12 +358,12 @@ function renderMolFit(m,box){
 }
 function pictureSVG(d){
   const maxmz=Math.max(...d.rich.map(p=>p[0])),maxX=Math.ceil(maxmz*1.07/10)*10;
-  const X0=34,X1=346,baseY=270,topY=180,xf=mz=>X0+mz/maxX*(X1-X0),hf=it=>it/100*(baseY-topY);
+  const X0=34,X1=346,baseY=268,topY=196,xf=mz=>X0+mz/maxX*(X1-X0),hf=it=>it/100*(baseY-topY);
   let bars="",labels="";
   d.rich.slice().sort((a,b)=>a[0]-b[0]).forEach(([mz,it])=>{
     const x=xf(mz),h=hf(it),isB=(mz===d.base);
     bars+=`<line x1="${x.toFixed(1)}" y1="${baseY}" x2="${x.toFixed(1)}" y2="${(baseY-h).toFixed(1)}" stroke="${isB?'#d00':'#e53935'}" stroke-width="${isB?2.8:1.7}"/>`;
-    if(isB) labels+=`<text x="${x.toFixed(1)}" y="${(baseY-h-5).toFixed(1)}" font-size="13" font-weight="900" fill="#d00" text-anchor="middle">${mz}</text>`;
+    if(isB) labels+=`<text x="${x.toFixed(1)}" y="${(baseY-h-7).toFixed(1)}" font-size="13" font-weight="900" fill="#d00" text-anchor="middle">${mz}</text>`;
     else if(it>=13) labels+=`<text x="${x.toFixed(1)}" y="${baseY+13}" font-size="10" fill="#1565c0" text-anchor="middle">${mz}</text>`;
   });
   let axis=`<line x1="${X0-4}" y1="${baseY}" x2="${X1+2}" y2="${baseY}" stroke="#555" stroke-width="1.4"/>`;
@@ -372,8 +372,8 @@ function pictureSVG(d){
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 300" width="100%">`+
     `<rect x="0" y="0" width="360" height="300" rx="14" fill="#ffffff"/>`+
     `<text x="180" y="25" font-size="16" font-weight="900" fill="#16263d" text-anchor="middle">${d.emoji} ${d.name}</text>`+
-    renderMolFit(d.mol,[18,40,342,158])+
-    `<text x="180" y="172" font-size="10.5" fill="#5a6a86" text-anchor="middle">↑ 化學結構　|　質譜指紋 ↓（橫軸 m/z）</text>`+
+    renderMolFit(d.mol,[18,34,342,150])+
+    `<text x="180" y="162" font-size="10.5" fill="#5a6a86" text-anchor="middle">↑ 化學結構　|　質譜指紋 ↓（橫軸 m/z）</text>`+
     axis+bars+labels+`</svg>`;
 }
 
