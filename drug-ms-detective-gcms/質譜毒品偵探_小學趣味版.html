@@ -165,6 +165,7 @@
   <a href="#g-puz" class="play">🧩 拼圖</a>
   <a href="#g-match" class="play">🎮 指紋配對</a>
   <a href="#g-race" class="play">🎮 賽跑偵探</a>
+  <a href="#g-know" class="play">🚨 識毒快問快答</a>
   <a href="#aids">🖨️ 教具</a>
 </nav>
 
@@ -269,18 +270,31 @@
   </div>
 </section>
 
+<!-- KNOW: real-world drug awareness quiz (喪屍煙彈 / 毒咖啡包) -->
+<section id="g-know">
+  <h2>🚨 識毒快問快答：毒品藏在哪裡？ 🧠</h2>
+  <p class="lead">壞人會把毒品<b>偷偷藏進電子菸、咖啡包</b>裡騙人吸食。看線索找出毒品，學會<b>保護自己</b>！</p>
+  <div class="game">
+    <div class="qcard" id="g3q">準備中…</div>
+    <div class="opts" id="g3opts"></div>
+    <div class="feedback" id="g3fb"></div>
+    <div>分數：<span class="score" id="g3score">0</span>　第 <span id="g3n">1</span> / 2 題</div>
+    <div style="margin-top:10px"><button class="btn" id="g3next" style="display:none">下一題 ▶</button></div>
+  </div>
+</section>
+
 <!-- AIDS -->
 <section id="aids">
   <h2>🖨️ 老師教具區 ✂️</h2>
   <p class="lead">按 Ctrl + P 列印，剪下來在課堂玩。</p>
   <h3>🪪 五張嫌犯資料卡（真實 GC-MS 數據）</h3>
   <table>
-    <tr><th>毒品</th><th>🚩 滯留時間</th><th>👑 基峰</th><th>🧩 主要碎片 m/z</th></tr>
-    <tr><td>🟥 甲基安非他命</td><td>8.7 分（最快）</td><td>58</td><td><span class="pill base">58</span><span class="pill">91</span><span class="pill">134</span></td></tr>
-    <tr><td>🟧 4-甲基甲基卡西酮</td><td>12.2 分</td><td>58</td><td><span class="pill base">58</span><span class="pill">65</span><span class="pill">119</span></td></tr>
-    <tr><td>🟨 愷他命 Ketamine</td><td>16.9 分</td><td>180</td><td><span class="pill base">180</span><span class="pill">182</span><span class="pill">209</span></td></tr>
-    <tr><td>🟩 依托咪酯 Etomidate</td><td>17.3 分</td><td>105</td><td><span class="pill base">105</span><span class="pill">77</span><span class="pill">244</span></td></tr>
-    <tr><td>🟦 海洛因 Heroin</td><td>23.8 分（最慢）</td><td>327</td><td><span class="pill base">327</span><span class="pill">369</span><span class="pill">268</span></td></tr>
+    <tr><th>毒品</th><th>🗣️ 俗稱</th><th>🚩 滯留時間</th><th>👑 基峰</th><th>🧩 主要碎片 m/z</th></tr>
+    <tr><td>🟥 甲基安非他命</td><td>安公子、冰塊、冰毒</td><td>8.7 分（最快）</td><td>58</td><td><span class="pill base">58</span><span class="pill">91</span><span class="pill">134</span></td></tr>
+    <tr><td>🟧 4-甲基甲基卡西酮</td><td>喵喵</td><td>12.2 分</td><td>58</td><td><span class="pill base">58</span><span class="pill">65</span><span class="pill">119</span></td></tr>
+    <tr><td>🟨 愷他命 Ketamine</td><td>K他命、K粉、K仔</td><td>16.9 分</td><td>180</td><td><span class="pill base">180</span><span class="pill">182</span><span class="pill">209</span></td></tr>
+    <tr><td>🟩 依托咪酯 Etomidate</td><td>喪屍煙彈</td><td>17.3 分</td><td>105</td><td><span class="pill base">105</span><span class="pill">77</span><span class="pill">244</span></td></tr>
+    <tr><td>🟦 海洛因 Heroin</td><td>4號、白粉、細仔</td><td>23.8 分（最慢）</td><td>327</td><td><span class="pill base">327</span><span class="pill">369</span><span class="pill">268</span></td></tr>
   </table>
 
   <h3>🎯 三句話總結</h3>
@@ -488,9 +502,15 @@ function specBars(d,neutral){
   pick.children[0].style.outline="3px solid #ffd43b";loadPuzzle();
 })();
 
-/* ===== GAME: fingerprint -> drug ===== */
+/* ===== GAME: fingerprint -> drug =====
+   第一題固定考「基峰獨特」的毒品（🟦海洛因 327 / 🟨愷他命 180 / 🟩依托咪酯 105），
+   避開基峰都是 58 的甲基安非他命與喵喵，免得學生第一題就混淆答錯。 */
 (function(){
-  let order=shuffle(DRUGS),idx=0,score=0,locked=false;
+  function buildOrder(){
+    const first=shuffle(DRUGS.filter(d=>["her","ket","eto"].includes(d.key)))[0];
+    return [first,...shuffle(DRUGS.filter(d=>d.key!==first.key))];
+  }
+  let order=buildOrder(),idx=0,score=0,locked=false;
   const q=document.getElementById("g1q"),fp=document.getElementById("g1fp"),opts=document.getElementById("g1opts"),
         fb=document.getElementById("g1fb"),sc=document.getElementById("g1score"),n=document.getElementById("g1n"),next=document.getElementById("g1next");
   function load(){locked=false;fb.textContent="";next.style.display="none";opts.innerHTML="";
@@ -526,6 +546,33 @@ function specBars(d,neutral){
         if(c.key===ansDrug.key){score++;sc.textContent=score;fb.innerHTML=`<span class="ok">✅ 答對！${ansDrug.emoji}${ansDrug.short}（${ansDrug.rt.toFixed(1)} 分）。</span>`;}
         else fb.innerHTML=`<span class="no">❌ 正解：${ansDrug.emoji}${ansDrug.short}（${ansDrug.rt.toFixed(1)} 分）。</span>`;
         idx<order.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 總分 <b>${score}/5</b>！`;};
+      opts.appendChild(b);});}
+  next.onclick=()=>{idx++;load();};load();
+})();
+
+/* ===== GAME: real-world drug awareness（喪屍煙彈 依托咪酯 / 毒咖啡包 喵喵）===== */
+(function(){
+  const KNOW=[
+    {key:"eto", icon:"🚬",
+     clue:`有一種毒品會被偷偷加進<b>電子菸的菸油</b>裡，吸了之後人會<b>恍惚、行為紊亂，還會像殭屍一樣全身發抖</b>（肌躍症），所以被叫做「<b>喪屍煙彈</b>」。猜猜它是哪一種毒品？`,
+     tell:`它原本是醫院用的<b>麻醉藥</b>，被壞人加進電子菸來濫用，吸了會像殭屍一樣發抖。<br>👉 <b>來路不明的電子菸，絕對不要碰！</b>`},
+    {key:"mmc", icon:"☕",
+     clue:`有一種毒品常被磨成粉，偷偷<b>加進「毒咖啡包」</b>裡，喝起來跟普通咖啡很像，俗稱「<b>喵喵</b>」，會讓人興奮、產生幻覺又非常容易上癮。猜猜它是哪一種毒品？`,
+     tell:`毒販會把它混進<b>咖啡包、奶茶包</b>，包裝看起來很普通，讓人不知不覺就中毒、上癮。<br>👉 <b>陌生人給的咖啡包、飲料，千萬不要喝！</b>`},
+  ];
+  let idx=0,score=0,locked=false;
+  const q=document.getElementById("g3q"),opts=document.getElementById("g3opts"),fb=document.getElementById("g3fb"),
+        sc=document.getElementById("g3score"),n=document.getElementById("g3n"),next=document.getElementById("g3next");
+  function load(){locked=false;fb.textContent="";next.style.display="none";opts.innerHTML="";
+    const item=KNOW[idx],ans=DRUGS.find(x=>x.key===item.key);n.textContent=idx+1;
+    q.innerHTML=`第 ${idx+1} 題 ${item.icon}：${item.clue}`;
+    shuffle([ans,...shuffle(DRUGS.filter(x=>x.key!==ans.key)).slice(0,3)]).forEach(c=>{
+      const b=document.createElement("button");b.className="opt";b.textContent=c.emoji+" "+c.short;
+      b.onclick=()=>{if(locked)return;locked=true;
+        if(c.key===ans.key){score++;sc.textContent=score;
+          fb.innerHTML=`<span class="ok">✅ 答對！這是 ${ans.emoji}${ans.name}。</span><br>${item.tell}`;}
+        else fb.innerHTML=`<span class="no">❌ 正解是 ${ans.emoji}${ans.name}。</span><br>${item.tell}`;
+        idx<KNOW.length-1?next.style.display="inline-block":fb.innerHTML+=`<br>🏁 總分 <b>${score}/${KNOW.length}</b>！認識毒品，才能遠離毒品 💪`;};
       opts.appendChild(b);});}
   next.onclick=()=>{idx++;load();};load();
 })();
