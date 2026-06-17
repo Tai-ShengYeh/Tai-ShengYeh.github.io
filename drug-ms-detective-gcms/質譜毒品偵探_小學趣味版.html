@@ -78,6 +78,11 @@
   .timeaxis span{position:absolute;transform:translateX(-50%);font-size:11px;color:#7f9bc0}
   .racebtns{text-align:center;margin-top:14px}
   .countdown{text-align:center;font-size:34px;font-weight:900;color:#ffd43b;min-height:0}
+  .dhead{color:#cfe0fb;font-size:13.5px;font-weight:700;text-align:center;margin:16px 0 6px}
+  .dhead b{color:#ffe066}
+  .chromrow{display:grid;grid-template-columns:120px 1fr;gap:8px;align-items:end}
+  .chromlabel{font-weight:800;font-size:13px;color:#9be7ad;text-align:right;padding:0 4px 8px 0;line-height:1.3}
+  .chromplot{background:#081320;border-radius:10px;overflow:hidden;box-shadow:inset 0 0 0 1px #2a456a}
 
   /* pictures (structure + spectrum) */
   .picgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:14px 0}
@@ -197,6 +202,11 @@
     <div class="countdown" id="countdown"></div>
     <div id="lanes"></div>
     <div class="timeaxis" id="timeaxis"></div>
+    <div class="dhead">📈 偵測器螢幕（層析圖）：每隻毒品<b>跑到終點</b>，就在它的<b>滯留時間位置</b>冒出 peak（位置與上方跑道對齊）！</div>
+    <div class="chromrow">
+      <div class="chromlabel">📈 層析圖<br>(偵測器)</div>
+      <div class="chromplot" id="chromaWrap"></div>
+    </div>
     <div class="racebtns">
       <button class="btn" id="raceStart">🏁 開始賽跑！</button>
       <button class="btn green" id="raceReset" style="display:none">🔄 再跑一次</button>
@@ -406,6 +416,26 @@ function pictureSVG(d){
   });
   for(let t=0;t<=MAXT;t+=5){const s=document.createElement("span");s.textContent=t+"分";s.style.left=(t/MAXT*92)+"%";axis.appendChild(s);}
 
+  /* ---- 偵測器層析圖：每隻毒品在自己的滯留時間位置長出一個 peak（不同 rt → peak 位置不同） ---- */
+  const chromaWrap=document.getElementById("chromaWrap");
+  const CW=1000,CH=176,baseY=CH-30,TFRAC=0.92;
+  const cx=t=>t/MAXT*TFRAC*CW;
+  const rtOrder={};[...DRUGS].sort((a,b)=>a.rt-b.rt).forEach((d,i)=>{rtOrder[d.key]=i;});
+  function gaussPath(c,sg,h){let s=`M${(c-3*sg).toFixed(1)} ${baseY}`;
+    for(let x=c-3*sg;x<=c+3*sg;x+=2){const y=baseY-h*Math.exp(-((x-c)*(x-c))/(2*sg*sg));s+=`L${x.toFixed(1)} ${y.toFixed(1)}`;}
+    return s+`L${(c+3*sg).toFixed(1)} ${baseY}Z`;}
+  function buildChroma(){
+    let ax=`<line x1="0" y1="${baseY}" x2="${CW}" y2="${baseY}" stroke="#3a5f93" stroke-width="1.5"/>`;
+    for(let t=0;t<=MAXT;t+=5){const x=cx(t);ax+=`<line x1="${x.toFixed(1)}" y1="${baseY}" x2="${x.toFixed(1)}" y2="${baseY+4}" stroke="#5b7aa6"/><text x="${x.toFixed(1)}" y="${baseY+18}" font-size="12" fill="#9fb7d8" text-anchor="middle">${t}分</text>`;}
+    let pk="";
+    DRUGS.forEach(d=>{const c=cx(d.rt),sg=10,h=100,ly=(baseY-h-8-(rtOrder[d.key]%2)*15);
+      pk+=`<path id="pk-${d.key}" d="${gaussPath(c,sg,h)}" fill="${d.color}" fill-opacity=".38" stroke="${d.color}" stroke-width="2" style="transform:scaleY(0);transform-box:fill-box;transform-origin:bottom;transition:transform .6s cubic-bezier(.2,.85,.3,1)"/><text id="lb-${d.key}" x="${c.toFixed(1)}" y="${ly.toFixed(1)}" font-size="12" font-weight="800" fill="${d.color}" text-anchor="middle" opacity="0" style="transition:opacity .4s .25s">${d.rt.toFixed(1)}分</text>`;});
+    chromaWrap.innerHTML=`<svg viewBox="0 0 ${CW} ${CH+6}" width="100%" style="display:block">${ax}${pk}</svg>`;
+  }
+  function growPeak(k){const p=document.getElementById("pk-"+k),l=document.getElementById("lb-"+k);if(p)p.style.transform="scaleY(1)";if(l)l.style.opacity="1";}
+  function resetPeaks(){DRUGS.forEach(d=>{const p=document.getElementById("pk-"+d.key),l=document.getElementById("lb-"+d.key);if(p)p.style.transform="scaleY(0)";if(l)l.style.opacity="0";});}
+  buildChroma();
+
   let finishes=0,order=[];
   function startRace(){
     startBtn.disabled=true;resetBtn.style.display="none";result.style.display="none";finishes=0;order=[];
@@ -419,7 +449,7 @@ function pictureSVG(d){
     const arrivedKeys={};
     function arrive(d,runner,rt){
       if(arrivedKeys[d.key])return;arrivedKeys[d.key]=true;
-      runner.classList.add("arrived");rt.textContent="🚩 "+d.rt.toFixed(1)+"分";rt.style.opacity=1;
+      runner.classList.add("arrived");rt.textContent="🚩 "+d.rt.toFixed(1)+"分";rt.style.opacity=1;growPeak(d.key);
       order.push(d);finishes++;
       if(finishes===DRUGS.length)done();
     }
@@ -444,7 +474,7 @@ function pictureSVG(d){
       "<br>👉 最輕巧的最快到、最大隻的最後到！";
   }
   function reset(){
-    finishes=0;order=[];result.style.display="none";cd.textContent="";
+    finishes=0;order=[];result.style.display="none";cd.textContent="";resetPeaks();
     lanesEl.querySelectorAll(".lane").forEach(lane=>{
       const runner=lane.querySelector(".runner");runner.style.transition="none";runner.style.left="0%";
       runner.classList.remove("arrived");
