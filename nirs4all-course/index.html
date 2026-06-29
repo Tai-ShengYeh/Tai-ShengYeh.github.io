@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nirs4all 教學課程 ｜ 近紅外光譜 × 機器學習</title>
+<meta name="description" content="改編自 nirs4all 官方範例的繁體中文互動教學課程：7 大模組、33+ 課，含可在 Google Colab 直接執行的 Jupyter Notebook，使用官方真實光譜資料集。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#FFFFFF;--paper2:#F5F2E9;--ink:#1A1A1A;--soft:#52493b;--teal:#0E7C7B;--cover:#119C9A;--coral:#E36414;--gold:#C8941F;--line:#E4DECC;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans TC',system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6;}
+  a{color:var(--teal);text-decoration:none;} a:hover{text-decoration:underline;}
+  h1,h2,h3{font-weight:900;line-height:1.2;}
+  .hero{background:var(--cover);color:#fff;text-align:center;padding:66px 22px 54px;}
+  .hero .crumb{font-size:13px;color:rgba(255,255,255,.85);margin-bottom:14px;font-weight:500;}
+  .hero .crumb a{color:#FFDE7A;}
+  .hero h1{font-size:clamp(28px,5vw,48px);letter-spacing:.02em;}
+  .hero .accent{color:#FFDE7A;}
+  .hero p{font-size:clamp(15px,2.2vw,19px);color:rgba(255,255,255,.92);font-weight:500;margin-top:14px;max-width:720px;margin-inline:auto;}
+  .hero .stats{display:flex;gap:30px;justify-content:center;flex-wrap:wrap;margin-top:26px;}
+  .hero .stats b{display:block;font-size:28px;font-weight:900;color:#FFDE7A;}
+  .hero .stats span{font-size:13px;color:rgba(255,255,255,.85);font-weight:500;}
+  main{max-width:1040px;margin:0 auto;padding:0 22px;}
+  section{padding:50px 0 8px;}
+  .kicker{color:var(--coral);font-weight:900;font-size:14px;letter-spacing:.14em;text-transform:uppercase;}
+  section h2{font-size:clamp(23px,3.5vw,32px);margin:6px 0 4px;}
+  section .lead{color:var(--soft);font-size:16px;margin-bottom:8px;}
+
+  /* 完整互動課程橫幅 */
+  .feature{background:var(--paper2);border:1px solid var(--line);border-radius:18px;padding:28px 30px;margin:24px 0;
+    display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+  .feature .ft-txt{flex:1;min-width:260px;}
+  .feature h3{font-size:22px;margin-bottom:6px;}
+  .feature p{color:var(--soft);font-size:15px;font-weight:500;}
+  .btn{display:inline-block;background:var(--coral);color:#fff;font-weight:900;padding:13px 26px;border-radius:999px;
+    font-size:15.5px;white-space:nowrap;}
+  .btn:hover{text-decoration:none;filter:brightness(1.05);}
+
+  /* notebook 卡片 */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;margin:22px 0;}
+  .card{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:20px 22px;display:flex;
+    flex-direction:column;transition:transform .15s ease,box-shadow .15s ease;}
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.08);}
+  .card .num{font-size:12px;font-weight:900;color:#fff;background:var(--teal);border-radius:999px;padding:3px 11px;
+    align-self:flex-start;margin-bottom:10px;}
+  .card h3{font-size:18.5px;margin-bottom:5px;}
+  .card p{color:var(--soft);font-size:14px;font-weight:500;flex:1;}
+  .card .links{margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .card .repo{font-size:12.5px;color:var(--soft);}
+  .colab-badge{height:24px;vertical-align:middle;}
+
+  .note{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;
+    padding:16px 20px;margin:18px 0;color:var(--soft);font-size:14.5px;}
+  .note b{color:var(--ink);}
+  .note code{background:var(--paper2);padding:1px 6px;border-radius:5px;font-size:13px;}
+  footer{background:var(--ink);color:#cfc8b6;text-align:center;padding:32px 22px;margin-top:54px;font-size:13.5px;}
+  footer b{color:var(--gold);} footer a{color:#9fd3d2;}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="crumb"><a href="https://tai-shengyeh.github.io/">← 食品科學教學課程</a></div>
+  <h1>nirs4all <span class="accent">教學課程</span></h1>
+  <p>近紅外光譜 × 機器學習 ｜ 改編自 <a href="https://github.com/GBeurier/nirs4all" style="color:#FFDE7A">nirs4all</a> 官方範例的繁體中文互動課程，使用官方真實光譜資料集，點 Colab 徽章即可線上執行。</p>
+  <div class="stats">
+    <div><b>7</b><span>學習模組</span></div>
+    <div><b>33+</b><span>實作課程</span></div>
+    <div><b>Colab</b><span>免安裝執行</span></div>
+  </div>
+</header>
+<main>
+
+  <section>
+    <span class="kicker">Read · 線上閱讀</span>
+    <h2>完整互動課程</h2>
+    <p class="lead">不必安裝任何東西，直接在瀏覽器閱讀。含側邊目錄、可折疊章節、程式碼高亮與學習進度追蹤。</p>
+    <div class="feature">
+      <div class="ft-txt">
+        <h3>nirs4all 互動課程（單頁 HTML）</h3>
+        <p>7 大模組、33+ 課的完整教材：入門 → 資料處理 → 前處理 → 模型 → 交叉驗證 → 部署 → 可解釋性。每課含學習目標、概念講解、程式碼與動手練習。</p>
+      </div>
+      <a class="btn" href="course.html">開啟互動課程 →</a>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">Run · Google Colab 實作</span>
+    <h2>七本可執行 Notebook</h2>
+    <p class="lead">每本對應一個模組，使用 nirs4all 官方 <code>sample_data</code> 真實光譜資料集。點「Open in Colab」→ 先執行第一格環境設定（約 1–2 分鐘）即可逐格執行。</p>
+    <div class="grid">
+
+      <div class="card"><span class="num">模組 1</span><h3>入門起步</h3>
+        <p>你的第一條 pipeline、回歸、分類、結果視覺化。</p>
+        <div class="links">
+          <a href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/01_getting_started.ipynb"><img class="colab-badge" src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+          <a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/01_getting_started.ipynb">GitHub ↗</a>
+        </div></div>
+
+      <div class="card"><span class="num">模組 2</span><h3>資料處理</h3>
+        <p>輸入格式、多資料集、波長重取樣、合成資料生成。</p>
+        <div class="links">
+          <a href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/02_data_handling.ipynb"><img class="colab-badge" src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+          <a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/02_data_handling.ipynb">GitHub ↗</a>
+        </div></div>
+
+      <div class="card"><span class="num">模組 3</span><h3>光譜前處理</h3>
+        <p>SNV/MSC/導數、特徵增強、樣本增強、訊號轉換、正交化、小波去噪。</p>
+        <div class="links">
+          <a href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/03_preprocessing.ipynb"><img class="colab-badge" src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+          <a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/03_preprocessing.ipynb">GitHub ↗</a>
+        </div></div>
+
+      <div class="card"><span class="num">模組 4</span><h3>模型訓練與比較</h3>
+        <p>多模型、Optuna 超參數調校、堆疊集成、PLS 變體、TabPFN、AOM。</p>
+        <div class="links">
+          <a href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/04_models.ipynb"><img class="colab-badge" src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+          <a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/04_models.ipynb">GitHub ↗</a>
+        </div></div>
+
+      <div class="card"><span class="num">模組 5</span><h3>交叉驗證與樣本管理</h3>
+        <p>CV 策略、分組切分防洩漏、離群過濾、重複量測聚合、標記與排除。</p>
+        <div class="links">
+          <a href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/05_cross_validation.ipynb"><img class="colab-badge" src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+          <a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/05_cross_validation.ipynb">GitHub ↗</a>
+        </div></div>
+
+      <div class="card"><span class="num">模組 6</span><h3>模型部署</h3>
+        <p>儲存/載入/預測、匯出 .n4a bundle、Session 工作區管理、sklearn 整合。</p>
+        <div class="links">
+          <a href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/06_deployment.ipynb"><img class="colab-badge" src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+          <a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/06_deployment.ipynb">GitHub ↗</a>
+        </div></div>
+
+      <div class="card"><span class="num">模組 7</span><h3>模型可解釋性</h3>
+        <p>SHAP 解釋預測、SHAP × sklearn、CARS/MC-UVE 波長特徵選擇。</p>
+        <div class="links">
+          <a href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/07_explainability.ipynb"><img class="colab-badge" src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+          <a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nirs4all-course/notebooks/07_explainability.ipynb">GitHub ↗</a>
+        </div></div>
+
+    </div>
+
+    <div class="note">
+      <b>版本說明：</b>本課程使用 nirs4all <b>0.9+ 的簡易 API</b>（<code>nirs4all.run()</code>），目前僅在 GitHub。Notebook 設定格會自動從 GitHub 安裝（需 Python ≥ 3.11；Colab 預設 3.12 ✅）。PyPI 的 <code>pip install nirs4all</code> 仍是舊版 0.4，沒有此 API。
+    </div>
+  </section>
+
+</main>
+<footer>
+  © Tai-Sheng Yeh（葉泰聖）· nirs4all 教學課程<br>
+  課程內容改編自 <a href="https://github.com/GBeurier/nirs4all">GBeurier/nirs4all</a>（CeCILL-2.1 授權）· 原作者 G. Beurier, D. Cornet, L. Rouan（CIRAD）·
+  <a href="https://github.com/Tai-ShengYeh">GitHub @Tai-ShengYeh</a>
+</footer>
+</body>
+</html>

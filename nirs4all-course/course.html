@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>nirs4all 互動教學課程 · 近紅外光譜機器學習</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+  :root{
+    --bg:#f6f7fb; --panel:#ffffff; --ink:#1f2733; --ink-soft:#56627a;
+    --line:#e6e9f0; --brand:#2f6f4f; --brand-soft:#e7f3ec; --brand-ink:#1f5638;
+    --accent:#c2632a; --code-bg:#282c34; --shadow:0 1px 3px rgba(20,30,50,.06),0 8px 24px rgba(20,30,50,.06);
+    --star:#e0a92b;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased}
+  a{color:var(--brand);text-decoration:none}
+  code,kbd{font-family:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace}
+
+  /* layout */
+  #layout{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+  /* sidebar */
+  #sidebar{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--panel);
+    border-right:1px solid var(--line);padding:0}
+  .brand{padding:22px 20px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:5}
+  .brand h1{font-size:18px;margin:0 0 4px;letter-spacing:.3px}
+  .brand .sub{font-size:12px;color:var(--ink-soft);margin:0}
+  .brand .ver{display:inline-block;margin-top:8px;font-size:11px;background:var(--brand-soft);color:var(--brand-ink);
+    padding:2px 8px;border-radius:99px}
+  .search{padding:12px 16px}
+  .search input{width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;outline:none}
+  .search input:focus{border-color:var(--brand)}
+  .progress-wrap{padding:0 16px 10px}
+  .progress-bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+  .progress-bar > i{display:block;height:100%;width:0;background:var(--brand);transition:width .3s}
+  .progress-label{font-size:11px;color:var(--ink-soft);margin-top:6px}
+  nav{padding:6px 10px 40px}
+  .nav-group{margin-bottom:4px}
+  .nav-group > .nav-head{display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;border-radius:8px;
+    font-weight:600;font-size:13.5px;color:var(--ink)}
+  .nav-group > .nav-head:hover{background:var(--bg)}
+  .nav-head .mod-num{font-size:11px;width:22px;height:22px;display:grid;place-items:center;background:var(--brand-soft);
+    color:var(--brand-ink);border-radius:6px;flex:none}
+  .nav-head .chev{margin-left:auto;transition:transform .2s;color:var(--ink-soft);font-size:11px}
+  .nav-group.collapsed .chev{transform:rotate(-90deg)}
+  .nav-items{overflow:hidden}
+  .nav-group.collapsed .nav-items{display:none}
+  .nav-items a{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 40px;font-size:12.5px;color:var(--ink-soft);
+    border-radius:7px}
+  .nav-items a:hover{background:var(--bg);color:var(--ink)}
+  .nav-items a.active{background:var(--brand-soft);color:var(--brand-ink);font-weight:600}
+  .nav-items a .dot{width:7px;height:7px;border-radius:99px;border:1.5px solid var(--line);flex:none}
+  .nav-items a.done .dot{background:var(--brand);border-color:var(--brand)}
+
+  /* main */
+  main{padding:0;max-width:none}
+  .wrap{max-width:920px;margin:0 auto;padding:40px 32px 120px}
+  .hero{background:linear-gradient(135deg,#2f6f4f,#3f8a64);color:#fff;border-radius:18px;padding:40px 36px;margin-bottom:34px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;
+    background:rgba(255,255,255,.08)}
+  .hero h2{margin:0 0 10px;font-size:30px;letter-spacing:.5px}
+  .hero p{margin:0;font-size:15px;opacity:.95;max-width:640px}
+  .hero .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .hero .chip{background:rgba(255,255,255,.16);padding:5px 12px;border-radius:99px;font-size:12.5px}
+
+  section.module{margin:0 0 18px;scroll-margin-top:18px}
+  .module-banner{display:flex;align-items:center;gap:14px;margin:42px 0 18px}
+  .module-banner .num{font-size:14px;font-weight:700;width:40px;height:40px;display:grid;place-items:center;
+    background:var(--brand);color:#fff;border-radius:11px;flex:none}
+  .module-banner h3{margin:0;font-size:22px}
+  .module-banner p{margin:2px 0 0;font-size:13px;color:var(--ink-soft)}
+
+  .lesson{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:16px;box-shadow:var(--shadow);
+    overflow:hidden;scroll-margin-top:18px}
+  .lesson-head{display:flex;align-items:flex-start;gap:14px;padding:18px 22px;cursor:pointer;user-select:none}
+  .lesson-head:hover{background:#fcfdfe}
+  .lesson-head .lid{font-size:12px;font-weight:700;color:var(--brand-ink);background:var(--brand-soft);padding:3px 9px;
+    border-radius:7px;flex:none;margin-top:3px}
+  .lesson-head .htext{flex:1;min-width:0}
+  .lesson-head h4{margin:0;font-size:17px}
+  .lesson-head .en{margin:2px 0 0;font-size:12px;color:var(--ink-soft);font-family:"JetBrains Mono",monospace}
+  .lesson-head .badges{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .stars{color:var(--star);font-size:12px;letter-spacing:1px}
+  .dur{font-size:11.5px;color:var(--ink-soft);background:var(--bg);padding:2px 8px;border-radius:99px}
+  .lesson-head .toggle{margin-left:auto;display:flex;align-items:center;gap:12px}
+  .chk{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;
+    font-size:13px;color:transparent;flex:none;transition:.15s}
+  .chk:hover{border-color:var(--brand)}
+  .lesson.done .chk{background:var(--brand);border-color:var(--brand);color:#fff}
+  .caret{color:var(--ink-soft);transition:transform .2s;font-size:13px}
+  .lesson.open .caret{transform:rotate(180deg)}
+  .lesson-body{display:none;padding:0 22px 22px;border-top:1px solid var(--line)}
+  .lesson.open .lesson-body{display:block}
+
+  .block-label{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--brand-ink);
+    text-transform:uppercase;letter-spacing:.5px;margin:20px 0 10px}
+  .block-label .ic{font-size:14px}
+  .objectives{list-style:none;padding:0;margin:0}
+  .objectives li{position:relative;padding:4px 0 4px 24px;font-size:14.5px}
+  .objectives li::before{content:"▸";position:absolute;left:4px;color:var(--brand);font-weight:700}
+  .concept{font-size:15px;color:var(--ink)}
+  .concept p{margin:8px 0}
+  .concept strong{color:var(--brand-ink)}
+  .concept .term{background:var(--brand-soft);color:var(--brand-ink);padding:0 5px;border-radius:4px;font-size:13.5px;
+    font-family:"JetBrains Mono",monospace}
+
+  .codecard{position:relative;margin:8px 0 4px}
+  .codecard pre{margin:0;border-radius:11px;overflow:auto}
+  .codecard pre code{padding:18px 18px;font-size:13px;line-height:1.65;display:block}
+  .copybtn{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.12);color:#cdd3df;border:none;
+    padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit}
+  .copybtn:hover{background:rgba(255,255,255,.22)}
+
+  .takeaways{background:#fbfaf6;border:1px solid #f0ead9;border-left:3px solid var(--star);border-radius:10px;
+    padding:14px 16px 14px 18px}
+  .takeaways ul{margin:6px 0 0;padding-left:20px}
+  .takeaways li{font-size:14px;margin:4px 0}
+  .exercise{background:#f3f8f5;border:1px solid #d9eadf;border-radius:10px;padding:14px 16px;font-size:14.5px}
+  .exercise b{color:var(--brand-ink)}
+
+  table.mini{width:100%;border-collapse:collapse;font-size:13.5px;margin:6px 0}
+  table.mini th,table.mini td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+  table.mini th{background:var(--bg);font-weight:600}
+  table.mini td code{font-size:12.5px;color:var(--accent)}
+
+  .footer{margin-top:50px;padding-top:24px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-soft)}
+  .hidden{display:none!important}
+  .topbtn{position:fixed;right:24px;bottom:24px;width:46px;height:46px;border-radius:50%;background:var(--brand);color:#fff;
+    border:none;font-size:18px;cursor:pointer;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.25s}
+  .topbtn.show{opacity:1;pointer-events:auto}
+  .menu-toggle{display:none}
+  @media(max-width:880px){
+    #layout{grid-template-columns:1fr}
+    #sidebar{position:fixed;left:0;top:0;width:280px;z-index:50;transform:translateX(-100%);transition:transform .25s}
+    #sidebar.open{transform:translateX(0)}
+    .menu-toggle{display:grid;place-items:center;position:fixed;left:14px;top:14px;z-index:60;width:42px;height:42px;
+      border-radius:10px;background:var(--brand);color:#fff;border:none;font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
+    .wrap{padding:64px 18px 100px}
+    .hero{padding:30px 22px}
+    .hero h2{font-size:23px}
+  }
+</style>
+</head>
+<body>
+<button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+<div id="layout">
+  <aside id="sidebar">
+    <div class="brand">
+      <h1>nirs4all 教學課程</h1>
+      <p class="sub">近紅外光譜 × 機器學習</p>
+      <span class="ver">User Path · 7 模組 · 33 課</span>
+    </div>
+    <div class="search"><input id="searchBox" type="text" placeholder="🔍 搜尋課程主題…"></div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><i id="progFill"></i></div>
+      <div class="progress-label"><span id="progText">0 / 33 完成</span> · <a href="#" onclick="resetProgress();return false;">重設</a></div>
+    </div>
+    <nav id="nav"></nav>
+  </aside>
+  <main>
+    <div class="wrap">
+      <div class="hero">
+        <h2>nirs4all 互動教學課程</h2>
+        <p>本課程改編自 <a href="https://github.com/GBeurier/nirs4all" style="color:#fff;text-decoration:underline">nirs4all</a> 官方 examples 的「使用者學習路徑（User Path）」，帶你從第一條 pipeline 一路走到模型部署與可解釋性分析。每課皆對應一個官方範例，含學習目標、概念講解、可複製程式碼、重點整理與動手練習。</p>
+        <div class="meta">
+          <span class="chip">📦 pip install nirs4all</span>
+          <span class="chip">🐍 Python 3.11+</span>
+          <span class="chip">🔬 PLS · CNN · SHAP</span>
+          <span class="chip">✅ 進度自動儲存</span>
+        </div>
+      </div>
+
+      <div id="intro"></div>
+      <div id="content"></div>
+
+      <div class="footer">
+        <p>課程內容改編自 nirs4all 官方範例（CeCILL-2.1 授權）。原始程式碼與資料：<a href="https://github.com/GBeurier/nirs4all/tree/main/examples">github.com/GBeurier/nirs4all/examples</a> ｜ 官方文件：<a href="https://nirs4all.readthedocs.io">nirs4all.readthedocs.io</a></p>
+        <p>本教材由 NIRS 學習者整理，作為自學與教學之用。</p>
+      </div>
+    </div>
+  </main>
+</div>
+<button class="topbtn" id="topBtn" title="回到頂端">↑</button>
+
+<script>
+/* ===================== 課程資料 ===================== */
+const INTRO = {
+  title:"課程導論：開始之前", id:"intro-sec",
+  html:`
+  <div class="module-banner"><div class="num">★</div><div><h3>課程導論</h3><p>近紅外光譜 + nirs4all 是什麼？如何安裝？pipeline 怎麼讀？</p></div></div>
+
+  <div class="lesson open" id="L-intro">
+    <div class="lesson-head" onclick="toggleLesson('L-intro')">
+      <span class="lid">00</span>
+      <div class="htext"><h4>什麼是 NIRS？什麼是 nirs4all？</h4><p class="en">background · installation · pipeline syntax</p></div>
+      <div class="toggle"><span class="caret">▾</span></div>
+    </div>
+    <div class="lesson-body">
+      <div class="block-label"><span class="ic">🌱</span>近紅外光譜（NIRS）速覽</div>
+      <div class="concept">
+        <p><strong>近紅外光譜（Near-Infrared Spectroscopy）</strong>利用樣品對 780–2500 nm 波段光的吸收，快速、非破壞地推估成分含量（如水分、蛋白質、油脂）。但原始光譜常被<strong>散射、基線漂移與雜訊</strong>污染，因此「前處理 + 機器學習回歸（常用 PLS）」成為標準流程。</p>
+        <p><strong>nirs4all</strong> 把「載入資料 → 前處理 → 訓練模型 → 評估 → 部署」整合成一套<span class="term">宣告式 pipeline</span>：你只要用一個 Python list 描述每個步驟，函式庫負責執行、比較與視覺化。它相容 scikit-learn、TensorFlow、PyTorch、JAX，並內建 30+ 光譜轉換與 15+ PLS 變體。</p>
+      </div>
+
+      <div class="block-label"><span class="ic">⚙️</span>安裝</div>
+      <div class="codecard"><pre><code class="language-bash"># 基本安裝（含 scikit-learn）
+pip install nirs4all
+
+# 加上深度學習後端（擇一或全部）
+pip install nirs4all[tensorflow]
+pip install nirs4all[torch]
+pip install nirs4all[all]
+
+# 驗證安裝
+nirs4all --test-install
+nirs4all --version</code></pre></div>
+
+      <div class="block-label"><span class="ic">🧩</span>Pipeline 的核心觀念</div>
+      <div class="concept">
+        <p>nirs4all 的 pipeline 是一個<strong>步驟清單（list）</strong>。清單裡可以放：</p>
+      </div>
+      <table class="mini">
+        <tr><th>寫法</th><th>意義</th></tr>
+        <tr><td><code>MinMaxScaler()</code></td><td>直接放 sklearn 轉換器 → 對特徵（光譜）做處理</td></tr>
+        <tr><td><code>{"y_processing": MinMaxScaler()}</code></td><td>用字典包起來 → 指定這是對「目標 y」做縮放</td></tr>
+        <tr><td><code>ShuffleSplit(...)</code></td><td>放交叉驗證切分器</td></tr>
+        <tr><td><code>{"model": PLSRegression(...)}</code></td><td>用 <code>"model"</code> 鍵宣告一個模型；可放多個來互相比較</td></tr>
+        <tr><td><code>{"feature_augmentation": [...]}</code></td><td>自動展開多種前處理組合</td></tr>
+        <tr><td><code>"chart_2d"</code> / <code>"fold_chart"</code></td><td>字串關鍵字 → 在該位置插入視覺化</td></tr>
+      </table>
+      <div class="concept"><p>整條 pipeline 用一行 <span class="term">nirs4all.run(pipeline, dataset, name)</span> 執行，回傳 <span class="term">RunResult</span> 物件，可讀 <code>.best_rmse</code>、<code>.best_r2</code>、<code>.top(n)</code> 等。掌握這個觀念，後面 33 課都是它的延伸。</p></div>
+
+      <div class="takeaways"><b>🔑 重點</b>
+        <ul>
+          <li>NIRS = 用光譜推估成分，但需前處理對抗散射與雜訊。</li>
+          <li>nirs4all pipeline = 一個 list；list 元素可為轉換器、字典指令或字串關鍵字。</li>
+          <li><code>nirs4all.run(...)</code> 一行訓練並比較所有設定，結果在 <code>RunResult</code>。</li>
+        </ul>
+      </div>
+    </div>
+  </div>`
+};
+
+const COURSE = [
+{
+  num:1, key:"01_getting_started", title:"入門起步", subtitle:"你的第一條 pipeline、回歸、分類與視覺化",
+  lessons:[
+    {
+      id:"U1-1", lid:"U01", title:"Hello World：你的第一條 pipeline", en:"U01_hello_world", stars:1, dur:"~1 分鐘",
+      objectives:["用 <code>nirs4all.run()</code> 訓練一條最小 pipeline","認識 pipeline 的 list 結構","從 <code>RunResult</code> 讀取結果"],
+      concept:`<p>最小可行的 pipeline 只需四步：<strong>特徵縮放 → 目標縮放 → 交叉驗證切分 → 模型</strong>。這就是一個完整、可訓練的 NIRS 回歸流程。</p><p>執行後得到 <span class="term">result</span>，用 <code>result.best_rmse</code>、<code>result.best_r2</code> 看最佳成績，用 <code>result.top(n=3)</code> 看前幾名模型。整個過程沒有任何樣板程式碼。</p>`,
+      code:`import nirs4all
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import ShuffleSplit
+from sklearn.cross_decomposition import PLSRegression
+
+result = nirs4all.run(
+    pipeline=[
+        MinMaxScaler(),                            # 特徵縮放到 [0,1]
+        {"y_processing": MinMaxScaler()},          # 目標縮放
+        ShuffleSplit(n_splits=3, test_size=0.25),  # 3 折交叉驗證
+        {"model": PLSRegression(n_components=10)}  # PLS 模型
+    ],
+    dataset="sample_data/regression",
+    name="HelloWorld",
+    verbose=1,
+)
+
+print(f"最佳 RMSE: {result.best_rmse:.4f}")
+print(f"最佳 R²:  {result.best_r2:.4f}")
+for i, p in enumerate(result.top(n=3, display_metrics=['rmse','r2']), 1):
+    print(f"{i}. {p['model_name']} — RMSE {p['rmse']:.4f}, R² {p['r2']:.4f}")`,
+      takeaways:["pipeline 是一個 list；用字典鍵 <code>y_processing</code>、<code>model</code> 標註步驟用途。","<code>nirs4all.run()</code> 一行完成訓練 + 交叉驗證 + 評分。","結果用 <code>result.best_*</code> 與 <code>result.top(n)</code> 取得。"],
+      exercise:"把 <code>n_components</code> 從 10 改成 5 與 20，比較 RMSE 變化，思考成分數對 PLS 的影響。"
+    },
+    {
+      id:"U1-2", lid:"U02", title:"基礎回歸：NIRS 前處理與模型比較", en:"U02_basic_regression", stars:2, dur:"~3 分鐘",
+      objectives:["套用 NIRS 專屬前處理（SNV、Detrend、導數、Gaussian）","用 <code>feature_augmentation</code> 自動探索前處理組合","用 <code>PredictionAnalyzer</code> 視覺化結果"],
+      concept:`<p>真實光譜需要前處理。本課引入 <span class="term">feature_augmentation</span>：給定一組前處理（如 SNV、一階導數、SG），讓 nirs4all 自動產生多種組合並各自建模比較，省去手動排列組合。</p><p>同時用 for 迴圈加入不同 <code>n_components</code> 的 PLS，最後用 <span class="term">PredictionAnalyzer</span> 畫出 top-k 比較圖、熱圖、蠟燭圖與直方圖。</p>`,
+      code:`import nirs4all
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import ShuffleSplit
+from sklearn.cross_decomposition import PLSRegression
+from nirs4all.operators.transforms import (
+    Detrend, FirstDerivative, Gaussian, SavitzkyGolay, Haar)
+from nirs4all.visualization.predictions import PredictionAnalyzer
+
+pipeline = [
+    MinMaxScaler(),
+    {"y_processing": MinMaxScaler()},
+    {"feature_augmentation": {                      # 自動展開前處理組合
+        "_or_": [Detrend, FirstDerivative, Gaussian, SavitzkyGolay, Haar],
+        "pick": 2,     # 每次挑 2 種串接
+        "count": 3,    # 產生 3 種組合
+    }},
+    "chart_2d",                                     # 插入光譜圖
+    ShuffleSplit(n_splits=3, test_size=0.25),
+]
+for n in [5, 10, 15]:
+    pipeline.append({"name": f"PLS-{n}", "model": PLSRegression(n_components=n)})
+
+result = nirs4all.run(pipeline=pipeline, dataset="sample_data/regression",
+                      name="BasicRegression", verbose=1)
+
+analyzer = PredictionAnalyzer(result.predictions)
+analyzer.plot_top_k(k=3, rank_metric='rmse')
+analyzer.plot_heatmap(x_var="model_name", y_var="preprocessings",
+                      rank_metric="rmse", display_metric="rmse")
+analyzer.plot_candlestick(variable="model_name")
+analyzer.plot_histogram()`,
+      takeaways:["散射校正（SNV/MSC）、基線校正（Detrend）、導數、平滑（SG/Gaussian）是 NIRS 四大前處理。","<code>feature_augmentation</code> 自動探索組合，免手動排列。","<code>PredictionAnalyzer</code> 提供 plot_top_k／heatmap／candlestick／histogram。"],
+      exercise:"把 <code>pick</code> 改為 <code>1</code>、<code>count</code> 改為 <code>5</code>，觀察哪一種單一前處理在此資料集表現最好。"
+    },
+    {
+      id:"U1-3", lid:"U03", title:"基礎分類：RF 與 XGBoost", en:"U03_basic_classification", stars:2, dur:"~2 分鐘",
+      objectives:["建立分類 pipeline","使用 RandomForest 與 XGBoost","用混淆矩陣與平衡準確率評估"],
+      concept:`<p>分類流程與回歸幾乎相同，差別在模型換成分類器、評估指標換成<span class="term">balanced_accuracy</span>（平衡準確率，處理類別不平衡）與 <span class="term">balanced_recall</span>。</p><p>本課示範同時放入 RandomForest 與（若有安裝）XGBoost，並用 <code>plot_confusion_matrix</code> 畫出前幾名模型的混淆矩陣。注意資料集改用 <code>sample_data/binary</code>。</p>`,
+      code:`import nirs4all
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import ShuffleSplit
+from nirs4all.operators.transforms import (
+    FirstDerivative, StandardNormalVariate, Haar, MultiplicativeScatterCorrection)
+from nirs4all.visualization.predictions import PredictionAnalyzer
+
+pipeline = [
+    "y_chart",                                      # 看目標類別分佈
+    {"feature_augmentation": [FirstDerivative, StandardNormalVariate,
+                              Haar, MultiplicativeScatterCorrection]},
+    StandardScaler(),
+    ShuffleSplit(n_splits=3, test_size=0.25),
+    "fold_chart",
+    {"model": RandomForestClassifier(n_estimators=50, max_depth=8,
+              random_state=42), "name": "RandomForest"},
+]
+
+result = nirs4all.run(pipeline=pipeline, dataset="sample_data/binary",
+                      name="BasicClassification", verbose=1, random_state=42)
+
+preds = result.predictions
+for i, p in enumerate(preds.top(5, rank_metric='balanced_accuracy',
+        display_metrics=['balanced_accuracy','balanced_recall']), 1):
+    print(f"{i}. {p['model_name']} — bAcc {p['balanced_accuracy']:.4f}")
+
+analyzer = PredictionAnalyzer(preds)
+analyzer.plot_confusion_matrix(k=4, rank_metric='balanced_accuracy')`,
+      takeaways:["分類與回歸 pipeline 結構一致，只換模型與指標。","類別不平衡時用 <code>balanced_accuracy</code> / <code>balanced_recall</code> 比單純 accuracy 更可靠。","<code>plot_confusion_matrix(k=4)</code> 一次比較前 4 名分類器。"],
+      exercise:"安裝 <code>xgboost</code> 後加入 <code>XGBClassifier</code>，比較它與 RandomForest 的平衡準確率。"
+    },
+    {
+      id:"U1-4", lid:"U04", title:"視覺化全覽：PredictionAnalyzer", en:"U04_visualization", stars:2, dur:"~3 分鐘",
+      objectives:["熟悉 PredictionAnalyzer 五種圖","理解 rank 與 display 的分離","認識 score_scope（refit 感知排序）"],
+      concept:`<p>本課是視覺化的完整導覽。最關鍵的觀念是 <strong>「排序」與「顯示」分離</strong>：</p><p><span class="term">rank_metric + rank_partition</span> 決定「誰是最佳模型」，<span class="term">display_metric + display_partition</span> 決定「畫面上顯示什麼數值」。例如可以「用驗證集 RMSE 排序，但顯示測試集 R²」。</p><p>另一個進階觀念是 <span class="term">score_scope</span>：當啟用 refit（用全部訓練資料重訓最佳模型）時，可選 <code>'all'</code>、<code>'refit'</code>、<code>'folds'</code>、<code>'flat'</code> 控制排名要不要納入重訓結果。</p>`,
+      code:`from nirs4all.visualization.predictions import PredictionAnalyzer
+analyzer = PredictionAnalyzer(result.predictions)
+
+# 1) Top-K 比較（預測 vs 實際散佈圖）
+analyzer.plot_top_k(k=3, rank_metric='rmse')
+
+# 2) 熱圖：用驗證集 RMSE 排序，但顯示測試集 R²
+analyzer.plot_heatmap(
+    x_var="model_name", y_var="preprocessings",
+    rank_metric='rmse', rank_partition='val',
+    display_metric='r2',  display_partition='test',
+    aggregation='best',          # 'best' | 'mean' | 'median'
+)
+
+# 3) 蠟燭圖：各模型表現分佈
+analyzer.plot_candlestick(variable="model_name", display_metric='rmse')
+
+# 4) 直方圖
+analyzer.plot_histogram(display_metric='r2')
+
+# 5) score_scope：只看交叉驗證、或只看重訓結果
+analyzer.plot_top_k(k=3, rank_metric='rmse', score_scope='folds')  # 只 CV
+analyzer.plot_heatmap(x_var="model_name", y_var="preprocessings",
+                      rank_metric="rmse", score_scope='refit')      # 只重訓`,
+      takeaways:["五種圖：top_k、heatmap、candlestick、histogram、confusion_matrix。","rank（排序依據）與 display（顯示數值）可各自指定不同 metric / partition。","<code>aggregation</code>：best / mean / median；<code>score_scope</code>：控制是否納入 refit 結果。"],
+      exercise:"用 <code>plot_heatmap</code> 比較 <code>x_var=\"model_name\"</code> 對 <code>y_var=\"dataset_name\"</code>，找出哪個模型跨資料集最穩定。"
+    },
+  ]
+},
+{
+  num:2, key:"02_data_handling", title:"資料處理", subtitle:"輸入格式、多資料集、多來源、波長與合成資料",
+  lessons:[
+    {
+      id:"U2-1", lid:"U01", title:"彈性輸入：各種資料格式", en:"U01_flexible_inputs", stars:1, dur:"~2 分鐘",
+      objectives:["用 numpy 陣列、字典、資料夾路徑等多種方式餵資料","指定 partition（訓練/測試切分）","認識 SpectroDataset 物件"],
+      concept:`<p>nirs4all 對輸入非常彈性。<code>dataset</code> 參數可接受：資料夾路徑字串、<code>(X, y)</code> tuple、字典設定、<code>DatasetConfigs</code> 或 <code>SpectroDataset</code> 物件。快速實驗時直接丟 numpy 最方便。</p><p><span class="term">partition_info</span> 控制哪些樣本當訓練：<code>{"train": 160}</code> 表前 160 筆為訓練、其餘為測試；也可用 slice 或明確索引清單。</p>`,
+      code:`import numpy as np, nirs4all
+from sklearn.cross_decomposition import PLSRegression
+
+X = np.random.rand(200, 100)   # 200 樣本 × 100 波長
+y = np.random.rand(200)
+
+# 方式 1：tuple (X, y, partition)
+result = nirs4all.run(
+    pipeline=[PLSRegression(n_components=5)],
+    dataset=(X, y, {"train": 160}),   # 前 160 訓練、其餘測試
+    name="ArrayInput",
+)
+
+# 方式 2：字典設定
+# dataset={"train_x": X_train, "train_y": y_train,
+#          "test_x": X_test,  "test_y": y_test}
+
+# 方式 3：資料夾路徑（自動偵測 Xcal/Ycal/Xval/Yval）
+# dataset="sample_data/regression"`,
+      takeaways:["<code>dataset</code> 接受路徑、tuple、字典、DatasetConfigs、SpectroDataset。","<code>{\"train\": 160}</code> / slice / 索引清單皆可指定切分。","不需手動包裝；舊程式碼向後相容。"],
+      exercise:"把 <code>{\"train\": 160}</code> 改成 <code>{\"train\": slice(0,150)}</code>，確認訓練/測試樣本數正確。"
+    },
+    {
+      id:"U2-2", lid:"U02", title:"多資料集：平行分析與比較", en:"U02_multi_datasets", stars:2, dur:"~3 分鐘",
+      objectives:["一次對多個資料集套用同一條 pipeline","讀取各資料集的個別結果","跨資料集視覺化比較"],
+      concept:`<p>把 <code>dataset</code> 傳成<strong>清單</strong>，同一條 pipeline 就會公平地套用到每個資料集，方便比較模型的<strong>泛化能力</strong>。</p><p>結果用 <code>result.per_dataset</code> 取得各資料集字典；用 <code>plot_heatmap(x_var="model_name", y_var="dataset_name")</code> 一眼看出哪個模型在哪個資料集表現好。</p>`,
+      code:`import nirs4all
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import ShuffleSplit
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.linear_model import ElasticNet
+from nirs4all.operators.transforms import (
+    MultiplicativeScatterCorrection, Gaussian, StandardNormalVariate, SavitzkyGolay, Haar)
+
+pipeline = [
+    MinMaxScaler(feature_range=(0.1, 0.8)),
+    {"feature_augmentation": [MultiplicativeScatterCorrection, Gaussian,
+                              StandardNormalVariate, SavitzkyGolay, Haar]},
+    ShuffleSplit(n_splits=3, random_state=42),
+    {"y_processing": MinMaxScaler()},
+    {"model": PLSRegression(n_components=5),  "name": "PLS-5"},
+    {"model": PLSRegression(n_components=10), "name": "PLS-10"},
+    {"model": ElasticNet(alpha=0.1),          "name": "ElasticNet"},
+]
+
+result = nirs4all.run(
+    pipeline=pipeline,
+    dataset=['sample_data/regression', 'sample_data/regression_2'],  # 清單！
+    name="MultiDataset", verbose=1)
+
+print(result.per_dataset.keys())   # 各資料集結果`,
+      takeaways:["<code>dataset=['p1','p2',...]</code> 即可平行比較。","<code>result.per_dataset</code> 取得各資料集成績。","heatmap 的 <code>y_var=\"dataset_name\"</code> 用於跨資料集比較。"],
+      exercise:"再加一個資料集到清單中，找出三個資料集都穩定的「最佛系」模型。"
+    },
+    {
+      id:"U2-3", lid:"U03", title:"多來源資料：NIR + 其他感測", en:"U03_multi_source", stars:3, dur:"~3 分鐘",
+      objectives:["載入多來源（多個 X 檔）資料","用 generator 語法做進階前處理探索","理解來源自動串接"],
+      concept:`<p>當一個樣本有多種量測（如 NIR 光譜 + 濕化學標記、或多台光譜儀），資料夾會有多個 X 檔。nirs4all 會<strong>自動載入並串接</strong>所有來源，模型看到的是合併後的特徵空間。</p><p>本課也展示更進階的 generator 語法：<code>pick</code>（挑幾種串接）、<code>then_pick</code>（串接後再挑幾種變體）、<code>count</code>（產生幾組）。</p>`,
+      code:`import nirs4all
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import ShuffleSplit
+from sklearn.cross_decomposition import PLSRegression
+from nirs4all.operators.transforms import (
+    StandardNormalVariate, SavitzkyGolay, Gaussian, Haar)
+
+pipeline = [
+    MinMaxScaler(),
+    {"y_processing": MinMaxScaler()},
+    {"feature_augmentation": {
+        "_or_": [StandardNormalVariate(), SavitzkyGolay(), Gaussian(), Haar()],
+        "pick": [2, 3],        # 挑 2 或 3 種前處理
+        "then_pick": [1, 3],   # 串接後再挑 1~3 種變體
+        "count": 2,            # 產生 2 組
+    }},
+    ShuffleSplit(n_splits=3, random_state=42),
+    "fold_chart",
+    MinMaxScaler(feature_range=(0.1, 0.8)),
+    {"model": PLSRegression(n_components=10), "name": "PLS-10"},
+]`,
+      takeaways:["多來源資料會自動載入並串接成一個特徵空間。","generator 的 <code>pick</code>／<code>then_pick</code>／<code>count</code> 控制組合數量。","進階：可用 source_branch 對不同來源做不同前處理（見開發者路徑）。"],
+      exercise:"思考：NIR + 濕化學資料合併後，PLS 成分數該調高或調低？動手試 5/10/20 比較。"
+    },
+    {
+      id:"U2-4", lid:"U04", title:"波長處理：重取樣與單位轉換", en:"U04_wavelength_handling", stars:2, dur:"~3 分鐘",
+      objectives:["用 Resampler 做波長內插與降採樣","聚焦特定光譜區段","設定波長單位（nm / cm⁻¹）"],
+      concept:`<p><span class="term">Resampler</span> 讓你把光譜重新取樣到指定的波長格點：可用於<strong>儀器標準化</strong>（對齊另一台儀器）、<strong>降維</strong>（取較少波長點）、或<strong>感興趣區段分析</strong>。</p><p>內插方法可選 linear / cubic / quadratic / nearest。資料的波長單位則在 <code>DatasetConfigs</code> 用 <code>header_unit</code> 指定。</p>`,
+      code:`import numpy as np
+from nirs4all.operators.transforms import Resampler
+from nirs4all.dataset import DatasetConfigs
+
+# 降採樣到 100 個點
+target_wl = np.linspace(1000, 2500, 100)
+Resampler(target_wavelengths=target_wl, method='cubic')
+
+# 聚焦特定區段（例如 9500→7000 cm⁻¹ 取 50 點）
+region_wl = np.linspace(9500, 7000, 50)
+Resampler(target_wavelengths=region_wl)
+
+# 指定波長單位
+DatasetConfigs("path/to/data", params={'header_unit': 'nm'})
+DatasetConfigs("path/to/data", params={'header_unit': 'cm-1'})`,
+      takeaways:["<code>Resampler(target_wavelengths=...)</code> 對齊/降採樣波長。","method：linear / cubic / quadratic / nearest。","用 <code>header_unit</code> 宣告 nm 或 cm⁻¹，避免單位混淆。"],
+      exercise:"把光譜降採樣到 50 點再訓練，比較與全波長的 RMSE 差異，評估降維代價。"
+    },
+    {
+      id:"U2-5", lid:"U05", title:"合成資料：快速產生測試資料集", en:"U05_synthetic_data", stars:2, dur:"~2 分鐘",
+      objectives:["用 <code>nirs4all.generate()</code> 產生合成光譜","用 regression / classification 便捷函式","設定複雜度與光譜成分"],
+      concept:`<p>還沒有真實資料？用 <span class="term">nirs4all.generate()</span> 產生具有已知地面真值的合成 NIRS 資料，適合單元測試、演算法基準測試與教學。</p><p>關鍵參數：<code>complexity</code>（simple / realistic / complex 控制雜訊程度）、<code>components</code>（water、protein、lipid、starch… 等預定義光譜成分）、<code>as_dataset</code>（回傳 SpectroDataset 或 (X,y)）。</p>`,
+      code:`import nirs4all
+
+# 通用產生器
+ds = nirs4all.generate(n_samples=500, complexity="realistic",
+                       components=["water", "protein"], random_state=42)
+
+# 回歸便捷函式
+X, y = nirs4all.generate.regression(n_samples=300, as_dataset=False)
+
+# 分類便捷函式（3 類）
+ds_cls = nirs4all.generate.classification(n_samples=300, n_classes=3)
+
+# 直接餵進 pipeline
+result = nirs4all.run(pipeline=[...], dataset=ds, name="Synthetic")`,
+      takeaways:["<code>generate()</code> 產生已知真值的合成光譜。","complexity：simple（測試）/ realistic（開發）/ complex（韌性測試）。","components 可指定 water、protein、lipid、starch、cellulose… 等。"],
+      exercise:"分別用 simple 與 complex 複雜度產生資料訓練同一模型，觀察 R² 落差。"
+    },
+    {
+      id:"U2-6", lid:"U06", title:"進階合成資料：Builder API", en:"U06_synthetic_advanced", stars:3, dur:"~5 分鐘",
+      objectives:["用 SyntheticDatasetBuilder 完整掌控資料生成","加入 metadata、多來源、批次效應","產生非線性目標做困難基準"],
+      concept:`<p><span class="term">SyntheticDatasetBuilder</span> 提供鏈式 API，可精細控制：特徵（波長範圍、成分）、目標（分佈、範圍）、metadata（分組、重複量測）、多來源、批次效應、切分等。</p><p>進階亮點是<strong>非線性目標</strong>：<code>with_nonlinear_targets</code>（多項式/協同/拮抗效應）、<code>with_target_complexity</code>（加入混淆因子）、<code>with_complex_target_landscape</code>（多子群），可打造接近真實的困難基準。也能用 <code>from_template</code> 比照真實資料的統計特性生成。</p>`,
+      code:`from nirs4all.data.synthetic import SyntheticDatasetBuilder
+import nirs4all
+
+ds = (SyntheticDatasetBuilder(n_samples=500, random_state=42, name="demo")
+      .with_features(wavelength_range=(1000, 2500), complexity="realistic",
+                     components=["water", "protein", "lipid"])
+      .with_targets(distribution="normal", range=(0, 100), component="protein")
+      .with_metadata(n_groups=10, n_repetitions=3)     # 供 GroupKFold / 重複量測
+      .with_batch_effects(enabled=True, n_batches=4)   # 模擬量測場次差異
+      .with_nonlinear_targets(interactions="synergistic",
+                              hidden_factors=2)          # 非線性 + 不可約誤差
+      .with_partitions(train_ratio=0.8, stratify=True)
+      .build())
+
+# 匯出成資料夾
+nirs4all.generate.to_folder("output/synth", n_samples=500, format="standard")
+
+# 比照真實資料生成
+# nirs4all.generate.from_template(X_real, n_samples=300)`,
+      takeaways:["Builder 用鏈式呼叫精細控制特徵/目標/metadata/來源/批次。","非線性目標方法可造出困難、貼近真實的基準資料。","<code>to_folder</code> / <code>to_csv</code> 匯出；<code>from_template</code> 比照真實資料生成。"],
+      exercise:"用 Builder 加 <code>with_batch_effects</code> 生成有批次效應的資料，作為後續遷移學習的練習素材。"
+    },
+  ]
+},
+{
+  num:3, key:"03_preprocessing", title:"光譜前處理", subtitle:"散射校正、特徵增強、樣本增強、訊號轉換、正交化、小波去噪",
+  lessons:[
+    {
+      id:"U3-1", lid:"U01", title:"前處理基礎：NIRS 專屬轉換", en:"U01_preprocessing_basics", stars:2, dur:"~3 分鐘",
+      objectives:["散射校正：SNV、MSC","基線校正：Detrend","導數與平滑：First/Second Derivative、Savitzky-Golay、Gaussian、Haar"],
+      concept:`<p>這是前處理的觀念地圖。NIRS 前處理大致分四類：</p>
+      <p><strong>散射校正</strong>對抗光程差與散射：<code>StandardNormalVariate</code>（SNV，逐樣本標準化）、<code>MultiplicativeScatterCorrection</code>（MSC，回歸式）。<br>
+      <strong>基線校正</strong>：<code>Detrend</code> 去除多項式漂移。<br>
+      <strong>導數</strong>凸顯吸收峰、移除基線：一階去常數基線、二階去線性基線、<code>SavitzkyGolay(deriv=1)</code> 為平滑導數。<br>
+      <strong>平滑</strong>降噪：<code>Gaussian</code>、<code>SavitzkyGolay(deriv=0)</code>。</p>`,
+      code:`from nirs4all.operators.transforms import (
+    StandardNormalVariate, MultiplicativeScatterCorrection, Detrend,
+    FirstDerivative, SecondDerivative, SavitzkyGolay, Gaussian, Haar)
+
+# 散射校正
+StandardNormalVariate()                    # SNV
+MultiplicativeScatterCorrection()          # MSC
+# 基線校正
+Detrend()
+# 導數
+FirstDerivative()                          # 去常數基線
+SecondDerivative()                         # 去線性基線
+SavitzkyGolay(window_length=11, polyorder=2, deriv=1)  # 平滑導數
+# 平滑
+Gaussian(sigma=2)
+
+# 常見組合
+pipeline = [StandardNormalVariate(), FirstDerivative(),  # 散射 + 基線
+            {"model": ...}]`,
+      takeaways:["四大類：散射校正、基線校正、導數、平滑。","SNV 逐樣本、MSC 以平均光譜為參考做回歸校正。","導數凸顯峰但放大雜訊 → 常與平滑（SG）併用。"],
+      exercise:"對同一資料分別只用 SNV、只用一階導數、SNV+一階導數，比較三者 RMSE。"
+    },
+    {
+      id:"U3-2", lid:"U02", title:"特徵增強：自動探索前處理", en:"U02_feature_augmentation", stars:3, dur:"~5 分鐘",
+      objectives:["用 <code>feature_augmentation</code> 產生前處理變體","理解三種模式：extend / add / replace","取出最佳前處理鏈"],
+      concept:`<p><span class="term">feature_augmentation</span> 是 nirs4all 的殺手級功能：自動建立前處理搜尋空間。三種 <code>action</code> 模式行為不同：</p>`,
+      table:`<table class="mini">
+        <tr><th>模式</th><th>行為</th><th>適用</th></tr>
+        <tr><td><code>extend</code></td><td>獨立新增選項（線性成長 N+M）</td><td>探索替代方案，不需串接</td></tr>
+        <tr><td><code>add</code></td><td>在既有基礎上串接，保留原始</td><td>消融研究、需保留基準</td></tr>
+        <tr><td><code>replace</code></td><td>串接後丟棄原始</td><td>多階段乾淨鏈</td></tr>
+      </table>`,
+      code:`import nirs4all
+from nirs4all.operators.transforms import StandardNormalVariate, FirstDerivative
+
+pipeline = [
+    {"feature_augmentation": [StandardNormalVariate, FirstDerivative],
+     "action": "extend"},
+    {"model": ...},
+]
+result = nirs4all.run(pipeline=pipeline, dataset="sample_data/regression")
+
+# 取出最佳前處理鏈
+best = result.best
+print(best.get('preprocessings'))      # 例如 "SNV|FirstDerivative"
+
+for p in result.top(n=5, display_metrics=['rmse','r2']):
+    print(f"{p['preprocessings']}: RMSE={p['rmse']:.4f}")`,
+      takeaways:["extend = 平行探索；add = 串接保留原始；replace = 串接丟棄原始。","最佳前處理鏈在 <code>result.best['preprocessings']</code>，格式如 \"SNV|FirstDerivative\"。","每筆預測有 train/val/test_score 與（指定 display_metrics 後的）rmse/r2。"],
+      exercise:"用 add 模式做消融研究：基準 vs 基準+SNV vs 基準+SNV+導數，看每步增益。"
+    },
+    {
+      id:"U3-3", lid:"U03", title:"樣本增強：資料擴增", en:"U03_sample_augmentation", stars:3, dur:"~4 分鐘",
+      objectives:["用 <code>sample_augmentation</code> 擴增訓練資料","使用內建光譜擴增器","用平衡擴增處理類別不平衡"],
+      concept:`<p><span class="term">sample_augmentation</span> 對訓練資料做擴增（加雜訊、基線漂移、波長平移等），增加多樣性、提升韌性。可設定每個原始樣本產生幾個增強樣本（<code>count</code>）。</p><p>進階：<code>balance="y"</code> 做平衡擴增，回歸時可用 <code>bins</code> 分箱。內建擴增器包含 GaussianAdditiveNoise、Rotate_Translate、WavelengthShift、MixupAugmenter 等。</p>`,
+      code:`from nirs4all.operators.augmentation import (
+    Rotate_Translate, GaussianAdditiveNoise)
+
+# 基本擴增
+{"sample_augmentation": {
+    "transformers": [Rotate_Translate, GaussianAdditiveNoise(sigma=0.01)],
+    "count": 2,               # 每個原始樣本產生 2 個
+    "selection": "random",
+    "random_state": 42,
+}}
+
+# 平衡擴增（回歸）
+{"sample_augmentation": {
+    "transformers": [Rotate_Translate],
+    "balance": "y",
+    "bins": 5,
+    "binning_strategy": "quantile",
+}}
+
+# 視覺化："augment_chart"（原始 vs 增強）、"augment_details_chart"`,
+      takeaways:["擴增只作用於訓練資料，增加多樣性與韌性。","<code>balance=\"y\"</code> 平衡少數類別/區間。","內建：GaussianAdditiveNoise、WavelengthShift、Mixup、ScatterSimulationMSC… 等。"],
+      exercise:"加入 <code>\"augment_chart\"</code> 視覺化增強後光譜，確認雜訊幅度合理（不破壞吸收峰）。"
+    },
+    {
+      id:"U3-4", lid:"U04", title:"訊號轉換：吸光度／反射率／Kubelka-Munk", en:"U04_signal_conversion", stars:3, dur:"~4 分鐘",
+      objectives:["區分吸光度、反射率、穿透率","用 ToAbsorbance / FromAbsorbance 轉換","套用 Kubelka-Munk 轉換"],
+      concept:`<p>不同儀器輸出不同訊號型態。建模前常需統一到吸光度尺度。<code>ToAbsorbance</code>（R→A）、<code>FromAbsorbance</code>（A→R），粉末/顆粒樣品常用 <span class="term">Kubelka-Munk</span> 轉換。</p><p>也有 PercentToFraction（0-100→0-1）與通用 <code>SignalTypeConverter</code>。所有轉換器皆相容 sklearn 的 TransformerMixin，可直接放進 pipeline。</p>`,
+      code:`from nirs4all.operators.transforms import (
+    ToAbsorbance, FromAbsorbance, KubelkaMunk,
+    PercentToFraction, SignalTypeConverter)
+from nirs4all.data.signal_type import detect_signal_type
+
+ToAbsorbance(source_type="reflectance")     # R → A
+FromAbsorbance(target_type="reflectance")   # A → R
+KubelkaMunk(source_type="reflectance")      # R → F(R)，適合粉末
+PercentToFraction()                         # 0–100 → 0–1
+SignalTypeConverter(source_type="reflectance%", target_type="absorbance")
+
+# 自動偵測訊號型態
+signal_type, confidence, reason = detect_signal_type(X)`,
+      takeaways:["建模前統一訊號尺度（多用吸光度）。","粉末/顆粒樣品適合 Kubelka-Munk。","<code>detect_signal_type</code> 可自動判斷型態，所有轉換器相容 sklearn。"],
+      exercise:"若你的資料是反射率%，串 <code>PercentToFraction()</code> + <code>ToAbsorbance()</code> 後再建模比較。"
+    },
+    {
+      id:"U3-5", lid:"U05", title:"正交化：OSC 與 EPO", en:"U05_orthogonalization", stars:3, dur:"~4 分鐘",
+      objectives:["用 OSC 去除與目標正交的變異","用 EPO 去除與外部參數相關的變異","提升模型可解釋性與表現"],
+      concept:`<p>進階前處理。<span class="term">OSC</span>（Orthogonal Signal Correction）移除光譜中<strong>與目標 Y 正交</strong>的變異——這些變異對預測無用卻佔據成分。<span class="term">EPO</span>（External Parameter Orthogonalization）移除<strong>與外部參數（溫度、批次）相關</strong>的變異。</p><p>兩者皆能讓模型聚焦在真正相關的光譜變異，提升可解釋性，有時也提升預測表現。常與 PLS 搭配。</p>`,
+      code:`from nirs4all.operators.transforms import OSC, EPO
+from sklearn.cross_decomposition import PLSRegression
+
+# OSC：去除 Y-正交變異
+pipeline = [
+    OSC(),
+    {"model": PLSRegression(n_components=10)},
+]
+
+# EPO：去除與外部參數（如溫度、批次）相關的變異
+pipeline = [
+    EPO(),
+    {"model": PLSRegression(n_components=10)},
+]`,
+      takeaways:["OSC 移除與目標正交的「無用」變異。","EPO 移除與溫度/批次等外部因子相關的變異。","兩者皆提升可解釋性，常作為遷移學習/儀器標準化的前處理。"],
+      exercise:"在有批次效應的合成資料（見 U2-6）上比較 有/無 EPO 的測試 RMSE。"
+    },
+    {
+      id:"U3-6", lid:"U06", title:"小波去噪：WaveletDenoise", en:"U06_wavelet_denoise", stars:3, dur:"~4 分鐘",
+      objectives:["用小波多階分解去噪","在頻域分離訊號與雜訊","保留光譜形狀同時降噪"],
+      concept:`<p><span class="term">WaveletDenoise</span> 用多階離散小波分解，對細節係數做門檻處理後重建，能在<strong>保留原始長度與光譜形狀</strong>的同時去除高頻雜訊，特別適合 PLS 等回歸前的清理。</p><p>關鍵參數：<code>wavelet</code>（db4、sym8、coif3、haar…）、<code>level</code>（分解階數，越高抓越低頻）、<code>threshold_mode</code>（soft 較平滑 / hard 保峰）、<code>noise_estimator</code>（median 穩健 / std）。</p>`,
+      code:`from nirs4all.operators.transforms import WaveletDenoise
+from sklearn.cross_decomposition import PLSRegression
+
+pipeline = [
+    WaveletDenoise(
+        wavelet='db4',
+        level=3,                 # 分解階數
+        threshold_mode='soft',   # 'soft' 平滑 / 'hard' 保峰
+        noise_estimator='median' # 'median' 穩健 / 'std'
+    ),
+    {"model": PLSRegression(n_components=10)},
+]`,
+      takeaways:["小波去噪在頻域分離訊號/雜訊，保留光譜長度與形狀。","wavelet 家族、level、threshold_mode 為主要調節點。","適合高頻儀器雜訊 + 基線漂移並存、且作為 PLS 前處理。"],
+      exercise:"比較 <code>threshold_mode='soft'</code> 與 <code>'hard'</code> 對尖銳吸收峰的保留程度。"
+    },
+  ]
+},
+];
+/* 後續模組（4-7）於下方注入 */
+</script>
+<script id="course-part2">
+COURSE.push(
+{
+  num:4, key:"04_models", title:"模型訓練與比較", subtitle:"多模型、超參數調校、堆疊集成、PLS 變體、TabPFN、AOM",
+  lessons:[
+    {
+      id:"U4-1", lid:"U01", title:"多模型比較", en:"U01_multi_model", stars:2, dur:"~4 分鐘",
+      objectives:["在一條 pipeline 放多個模型","用 <code>_or_</code> generator 語法","比較模型表現並挑選"],
+      concept:`<p>在 pipeline 裡放多個 <code>{"model": ...}</code>，nirs4all 會各自訓練並排名。也可用 <span class="term">_or_</span> generator 把多個模型寫在一起。NIRS 常用模型家族：線性（PLS、Ridge、Lasso、ElasticNet）、樹（RandomForest、GradientBoosting、ExtraTrees）、其他（SVR、KNN）。其中 <strong>PLS 最適合高度共線的光譜資料</strong>。</p>`,
+      code:`import nirs4all
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.linear_model import Ridge
+from sklearn.ensemble import RandomForestRegressor
+
+# 方式 1：分別列出
+pipeline = [
+    {"model": PLSRegression(n_components=10), "name": "PLS"},
+    {"model": Ridge(alpha=1.0),               "name": "Ridge"},
+    {"model": RandomForestRegressor(),        "name": "RF"},
+]
+
+# 方式 2：用 _or_ generator
+pipeline = [
+    {"_or_": [{"model": PLSRegression(n_components=10)},
+              {"model": Ridge(alpha=1.0)},
+              {"model": RandomForestRegressor()}]},
+]
+result = nirs4all.run(pipeline=pipeline, dataset="sample_data/regression")
+print(result.top(3), result.best_score, result.num_predictions)`,
+      takeaways:["放多個 <code>{\"model\":...}</code> 即自動比較。","<code>_or_</code> 把多模型寫成一組。","PLS 對共線光譜最佳；樹模型擅長非線性。"],
+      exercise:"加入 GradientBoostingRegressor，看樹模型能否在你的資料上贏過 PLS。"
+    },
+    {
+      id:"U4-2", lid:"U02", title:"超參數調校：Optuna 自動最佳化", en:"U02_hyperparameter_tuning", stars:3, dur:"~1 分鐘",
+      objectives:["用 <code>finetune_params</code> 自動調參","選搜尋法：grid / random / tpe / binary / auto","設定參數型別與範圍"],
+      concept:`<p>用 <span class="term">finetune_params</span> 內建 Optuna 自動最佳化。指定 <code>n_trials</code>、<code>sampler</code>（搜尋法）、<code>metric</code>（最佳化目標），以及 <code>model_params</code> 的搜尋空間。</p><p>搜尋法：<code>grid</code>（窮舉）、<code>random</code>（快速基準）、<code>tpe</code>（貝氏，中型空間高效）、<code>binary</code>（單峰整數如 PLS 成分數，快 2–3 倍）、<code>auto</code>（自動選）。參數型別：<code>('int',min,max)</code>、<code>('float',min,max)</code>、<code>('float_log',...)</code>（學習率/正則化）、<code>[v1,v2]</code>（類別）。</p>`,
+      code:`import nirs4all
+from sklearn.cross_decomposition import PLSRegression
+
+pipeline = [{
+    "model": PLSRegression(),
+    "finetune_params": {
+        "n_trials": 50,
+        "sampler": "tpe",         # grid/random/tpe/cmaes/binary/auto
+        "metric": "rmse",         # 自動推斷最佳化方向
+        "approach": "single",     # single/grouped/individual
+        "seed": 42,
+        "pruner": "median",
+        "model_params": {
+            "n_components": ('int', 1, 20),     # 整數範圍
+            "scale": [True, False],             # 類別
+        },
+    },
+}]
+result = nirs4all.run(pipeline=pipeline, dataset="sample_data/regression")`,
+      takeaways:["<code>finetune_params</code> 內建 Optuna 自動調參。","PLS 成分數這種單峰整數用 <code>binary</code> 搜尋最快。","學習率/正則化用 <code>float_log</code> 對數採樣。"],
+      exercise:"把 sampler 從 tpe 改成 binary 調 n_components，比較達到相同 RMSE 所需的 trial 數。"
+    },
+    {
+      id:"U4-3", lid:"U03", title:"堆疊集成：Stacking 與 Voting", en:"U03_stacking_ensembles", stars:3, dur:"~5 分鐘",
+      objectives:["用 StackingRegressor 學習式組合","用 VotingRegressor 平均式組合","設定 base estimators 與 meta-learner"],
+      concept:`<p>集成把多個模型組合以提升泛化。<span class="term">Stacking</span> 用一個 meta-learner（如 Ridge）學習如何組合各基模型的輸出；<span class="term">Voting</span> 則做（加權）平均。當你有多樣化模型（線性 + 樹）時最有效，但會犧牲可解釋性、且小資料集慎用。</p>`,
+      code:`from sklearn.ensemble import (StackingRegressor, VotingRegressor,
+    RandomForestRegressor, GradientBoostingRegressor)
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.linear_model import Ridge
+
+# Stacking：學習式組合
+stack = StackingRegressor(
+    estimators=[('pls', PLSRegression(n_components=10)),
+                ('rf',  RandomForestRegressor()),
+                ('gbr', GradientBoostingRegressor())],
+    final_estimator=Ridge(alpha=1.0), cv=3, passthrough=False)
+
+# Voting：（加權）平均
+vote = VotingRegressor(
+    estimators=[('pls', PLSRegression(10)), ('rf', RandomForestRegressor())],
+    weights=[0.6, 0.4])
+
+pipeline = [{"model": stack, "name": "Stacking"},
+            {"model": vote,  "name": "Voting"}]`,
+      takeaways:["Stacking 用 meta-learner 學習組合；Voting 做平均。","模型越多樣，集成增益越大。","代價：可解釋性下降、運算量增加、小資料集易過擬。"],
+      exercise:"比較 Stacking、Voting 與最佳單一模型的 RMSE，評估集成是否值得。"
+    },
+    {
+      id:"U4-4", lid:"U04", title:"PLS 變體：專門化的偏最小平方", en:"U04_pls_variants", stars:4, dur:"~6 分鐘",
+      objectives:["認識 PLSR、PLSDA、IKPLS、OPLS、SparsePLS","依情境挑選正確變體","用 JAX 後端加速"],
+      concept:`<p>PLS 家族針對不同情境有專門變體。下表為選擇指南：</p>`,
+      table:`<table class="mini">
+        <tr><th>變體</th><th>適用情境</th></tr>
+        <tr><td><code>PLSRegression</code></td><td>標準基準，最易理解</td></tr>
+        <tr><td><code>IKPLS</code></td><td>大資料、需速度（pip install ikpls）</td></tr>
+        <tr><td><code>OPLS</code></td><td>濾除 Y-正交變異</td></tr>
+        <tr><td><code>SparsePLS</code></td><td>變數選擇、可解釋性</td></tr>
+        <tr><td><code>IntervalPLS</code></td><td>波長區段選擇</td></tr>
+        <tr><td><code>RobustPLS</code></td><td>含離群值的資料</td></tr>
+        <tr><td><code>KernelPLS</code></td><td>非線性關係</td></tr>
+        <tr><td><code>PLSDA / OPLSDA</code></td><td>分類任務</td></tr>
+      </table>`,
+      code:`from nirs4all.operators.models import IKPLS, OPLS, SparsePLS, PLSDA
+
+# 大資料 + 速度（可選 JAX GPU 加速）
+IKPLS(n_components=10, backend='jax')
+
+# 變數選擇
+SparsePLS(n_components=10, alpha=0.1)
+
+# 濾除 Y-正交變異
+OPLS(n_components=10)
+
+# 分類
+PLSDA(n_components=10)`,
+      takeaways:["共通參數：n_components、backend（numpy/jax）。","SparsePLS / IntervalPLS 兼顧表現與可解釋性。","裝 JAX 後多數 PLS 變體可 GPU 加速。"],
+      exercise:"用 SparsePLS 找出被選中的波長，對照 U7-3 的特徵選擇結果是否一致。"
+    },
+    {
+      id:"U4-5", lid:"U05", title:"進階微調：複雜最佳化策略", en:"U05_advanced_finetuning", stars:4, dur:"~3 分鐘",
+      objectives:["多階段最佳化（探索→利用）","自訂 metric 與方向、force-params 種子","巢狀參數與深度學習 train_params 調校"],
+      concept:`<p>本課示範進階 HPO：多階段（先廣探索再精利用）、自訂指標與最佳化方向、<strong>force-params</strong>（把已知好設定當種子）、dict 格式參數規格（最彈性）、巢狀參數（TabPFN 式字典）、PyTorch 模型的 <code>train_params</code> 調校（epochs、lr…），以及堆疊集成用 MetaModel 的 <code>finetune_space</code>。</p>`,
+      code:`pipeline = [{
+    "model": PLSRegression(),
+    "finetune_params": {
+        "n_trials": 100,
+        "metric": "rmse", "direction": "minimize",
+        "model_params": {
+            # dict 格式最彈性
+            "n_components": {'type':'int','min':1,'max':30},
+            "tol": {'type':'float','min':1e-6,'max':1e-3,'log':True},
+        },
+        # 種子已知好設定，加速收斂
+        "force_params": [{"n_components": 12}],
+    },
+}]`,
+      takeaways:["多階段：先探索廣空間，再在好區域精調。","force_params 把領域知識當搜尋種子。","dict 格式參數支援 step、log 等進階選項。"],
+      exercise:"用 force_params 餵入你在 U4-2 找到的最佳 n_components，看是否更快收斂。"
+    },
+    {
+      id:"U4-6", lid:"U06", title:"TabPFN：免調參的表格基礎模型", en:"U06_tabpfn_nirs", stars:2, dur:"~3 分鐘",
+      objectives:["認識 TabPFNNIRSRegressor 的固定配方","知道何時用它 vs PLS/AOM/CNN","快速 fit/predict 並微調旋鈕"],
+      concept:`<p><span class="term">TabPFN</span> 是表格基礎模型。nirs4all 提供 <code>TabPFNNIRSRegressor</code>，採用<strong>固定前處理配方</strong>（無需逐資料集 HPO）：<code>SavitzkyGolay(11,2,1)</code> ▶ <code>OSC()</code> ▶ 置中 ▶ <code>TabPFNRegressor(n_estimators=16)</code>。</p><p>此配方取自 TabPFN 論文最常獲勝的前處理模式並實證驗證。在 57 個 NIRS 資料集上，中位測試 RMSE 僅比逐資料集 72 鏈 HPO 基準高約 2.5%，但每資料集只訓練一次。建議 n_train>200 時用 GPU。</p>`,
+      code:`# pip install tabpfn  （可選相依）
+from nirs4all.operators.models import TabPFNNIRSRegressor
+import nirs4all
+
+pipeline = [{"model": TabPFNNIRSRegressor(n_estimators=16), "name": "TabPFN"}]
+result = nirs4all.run(pipeline=pipeline, dataset="sample_data/regression")
+
+# 可調旋鈕：n_estimators、max_features 等`,
+      takeaways:["TabPFN = 免逐資料集 HPO 的固定配方，開箱即用。","配方：SG 一階導數 + OSC + 置中 + TabPFN。","適合快速基準；大樣本建議 GPU。"],
+      exercise:"在你的資料上比較 TabPFN 與最佳 PLS 的 RMSE 與訓練時間。"
+    },
+    {
+      id:"U4-7", lid:"U07", title:"AOM 全家桶：自動運算子選擇", en:"U07_aom_panoply", stars:5, dur:"~2–5 分鐘",
+      objectives:["AOM-PLS 運算子庫選擇","AOM-Ridge 全域選擇與 AutoSelector","AOMRidgeBlender 與 FastAOM"],
+      concept:`<p><span class="term">AOM</span>（Adaptive Operator-Mixture）家族會<strong>自動從運算子庫選出最佳前處理組合</strong>，省去手動前處理探索。注意這些模型需要與 pipeline 相同的使用者切分（<code>train_params=AOM_SPLIT_REQUIRED</code>）。</p><p>成員：<code>AOMPLSRegressor</code>（運算子庫選擇）、<code>AOMRidgeRegressor</code>（全域選擇）、<code>AOMRidgeAutoSelector</code>（候選間自動選）、<code>AOMRidgeBlender</code>（最強實證配方）、<code>FastAOMPLSRidge</code>（更快的篩選式鏈校準）。</p>`,
+      code:`from nirs4all.operators.models import (AOMPLSRegressor, AOMRidgeRegressor,
+    AOMRidgeBlender)
+from nirs4all.operators.transforms import StandardNormalVariate
+from sklearn.preprocessing import MinMaxScaler
+
+AOM_SPLIT_REQUIRED = {"requires_user_split": True}
+
+pipeline = [
+    MinMaxScaler(), {"y_processing": MinMaxScaler()},
+    StandardNormalVariate(),
+    user_split,                                   # 使用者切分
+    {"model": AOMPLSRegressor(n_components="auto", max_components=5,
+        operator_bank="compact", criterion="cv", cv=4, random_state=42),
+     "name": "AOMPLS", "train_params": AOM_SPLIT_REQUIRED},
+    {"model": AOMRidgeBlender(candidates=QUICK_AOM_RIDGE_CANDIDATES,
+        outer_cv=4, inner_cv=4, regularizer=0.01, random_state=42),
+     "name": "AOMRidge-blender", "train_params": AOM_SPLIT_REQUIRED},
+]`,
+      takeaways:["AOM 自動從運算子庫挑前處理組合。","需與 pipeline 共用使用者切分（AOM_SPLIT_REQUIRED）。","AOMRidgeBlender 為最強實證配方；FastAOM 為加速版。"],
+      exercise:"進階：用 AOMRidgeAutoSelector 與你手動找到的最佳前處理鏈比較表現。"
+    },
+  ]
+},
+{
+  num:5, key:"05_cross_validation", title:"交叉驗證與樣本管理", subtitle:"CV 策略、分組切分、離群過濾、聚合、標記、排除",
+  lessons:[
+    {
+      id:"U5-1", lid:"U01", title:"交叉驗證策略：選對 CV 方法", en:"U01_cv_strategies", stars:2, dur:"~4 分鐘",
+      objectives:["標準 CV：KFold、ShuffleSplit、RepeatedKFold","分類用分層 CV","時序資料用 TimeSeriesSplit"],
+      concept:`<p>選對 CV 才有可靠評估。下表為選擇指南：</p>`,
+      table:`<table class="mini">
+        <tr><th>策略</th><th>適用</th></tr>
+        <tr><td><code>KFold</code></td><td>標準回歸、大資料</td></tr>
+        <tr><td><code>ShuffleSplit</code></td><td>需彈性測試比例、多次重複</td></tr>
+        <tr><td><code>RepeatedKFold</code></td><td>小資料、需穩健估計</td></tr>
+        <tr><td><code>StratifiedKFold</code></td><td>分類、類別不平衡</td></tr>
+        <tr><td><code>TimeSeriesSplit</code></td><td>時序/序列資料</td></tr>
+        <tr><td><code>LeaveOneOut</code></td><td>極小資料集</td></tr>
+      </table>`,
+      code:`from sklearn.model_selection import (KFold, ShuffleSplit,
+    RepeatedKFold, StratifiedKFold)
+
+KFold(n_splits=5, shuffle=True, random_state=42)
+ShuffleSplit(n_splits=5, test_size=0.2, random_state=42)
+RepeatedKFold(n_splits=5, n_repeats=3, random_state=42)
+StratifiedKFold(n_splits=5)        # 分類
+
+# 直接放進 pipeline
+pipeline = [KFold(n_splits=5), {"model": ...}]`,
+      takeaways:["中型資料 5–10 折；分類用分層 CV。","需指定測試比例用 ShuffleSplit；小資料用 RepeatedKFold。","折數越多估計越穩但越慢。"],
+      exercise:"在小資料上比較 KFold(5) 與 RepeatedKFold(5×3) 的 RMSE 標準差。"
+    },
+    {
+      id:"U5-2", lid:"U02", title:"分組切分：避免資料洩漏", en:"U02_group_splitting", stars:3, dur:"~4 分鐘",
+      objectives:["理解為何分組切分重要","用 GroupKFold / StratifiedGroupKFold","透過 repetition 自動分組"],
+      concept:`<p>當同一樣本有多筆光譜（技術重複），若它們被分到不同折就會<strong>資料洩漏</strong>、高估表現。解法是按樣本分組。</p><p>nirs4all 推薦做法：在 <code>DatasetConfigs</code> 設 <span class="term">repetition="Sample_ID"</span>，之後<strong>任何</strong>切分器都會自動尊重分組。也可用原生 GroupKFold 搭配 <code>"group"</code> 參數。</p>`,
+      code:`from nirs4all.dataset import DatasetConfigs
+from sklearn.model_selection import KFold, GroupKFold
+
+# 推薦：設定 repetition，所有切分器自動分組
+ds = DatasetConfigs("path", repetition="Sample_ID")
+pipeline = [KFold(n_splits=3), {"model": ...}]   # 自動按 Sample_ID 分組
+
+# 原生群組切分器
+pipeline = [{"split": GroupKFold(n_splits=3), "group": "Sample_ID"},
+            {"model": ...}]
+
+# 額外分組（與 repetition 結合）
+pipeline = [{"split": KFold(n_splits=3), "group_by": ["Year", "Location"]}]`,
+      takeaways:["重複量測未分組 → 資料洩漏、虛高分數。","設 <code>repetition=\"Sample_ID\"</code> 後任何切分器自動分組。","可用 group_by 加額外分組維度，或 ignore_repetition 退出。"],
+      exercise:"對含重複量測的資料，比較「有分組」與「無分組」的測試 R²，量化洩漏幅度。"
+    },
+    {
+      id:"U5-3", lid:"U03", title:"樣本排除：離群偵測與品管", en:"U03_sample_filtering", stars:3, dur:"~5 分鐘",
+      objectives:["Y 基離群過濾（IQR、Z-score、MAD）","X 基離群過濾（PCA、Mahalanobis）","用 <code>exclude</code> 關鍵字整合進 pipeline"],
+      concept:`<p>髒資料拖累模型。用 <span class="term">exclude</span> 關鍵字從訓練集移除離群/低品質樣本。Y 基用 <code>YOutlierFilter</code>（iqr / zscore / mad / percentile）；X 基可用 PCA、Mahalanobis 距離。</p><p>多個過濾器可用 <code>mode="any"</code>（任一觸發即排除）。若只想標記不移除，改用 <code>{"tag": Filter()}</code>（見下一課）。</p>`,
+      code:`from nirs4all.operators.filters import YOutlierFilter, CompositeFilter
+
+# 單一過濾器
+pipeline = [{"exclude": YOutlierFilter(method="iqr", threshold=1.5)},
+            {"model": ...}]
+
+# 多過濾器（任一觸發即排除）
+pipeline = [{"exclude": [YOutlierFilter(method="zscore", threshold=3.0),
+                         YOutlierFilter(method="mad", threshold=3.5)],
+             "mode": "any"}]
+
+# 視覺化
+{"exclusion_chart": {"color_by": "status"}}`,
+      takeaways:["<code>exclude</code> 從訓練移除樣本（預測時仍會預測全部）。","Y 基：iqr / zscore / mad / percentile；X 基：PCA / Mahalanobis。","保守門檻起步，並比較 有/無 排除的表現。"],
+      exercise:"用 IQR(1.5) 排除離群後比較 RMSE，再放寬到 3.0 觀察過度排除的風險。"
+    },
+    {
+      id:"U5-4", lid:"U04", title:"重複量測聚合", en:"U04_aggregation", stars:3, dur:"~4 分鐘",
+      objectives:["設定 repetition 欄位","區分原始 vs 聚合指標","每圖覆寫聚合方式"],
+      concept:`<p>當多筆光譜代表同一樣本時，可<strong>聚合預測</strong>（平均）以降噪、得到每樣本一個預測。在 <code>DatasetConfigs</code> 設 <code>repetition</code> 後，結果會同時報告原始指標與聚合指標（標 *）。</p><p>視覺化可每圖覆寫：<code>plot_histogram(aggregate='')</code> 關閉、<code>aggregate='sample_id'</code> 強制。<code>top(5, by_repetition=True)</code> 用聚合排名。</p>`,
+      code:`from nirs4all.dataset import DatasetConfigs
+import nirs4all
+
+ds = DatasetConfigs("path/to/data", repetition="sample_id")
+result = nirs4all.run(pipeline=[...], dataset=ds)
+
+preds = result.predictions
+preds.top(5, by_repetition=True)          # 用聚合排名
+preds.top(5, by_repetition='lot_id')      # 自訂聚合欄位
+
+from nirs4all.visualization.predictions import PredictionAnalyzer
+az = PredictionAnalyzer(preds)
+az.plot_histogram(aggregate='sample_id')  # 強制聚合`,
+      takeaways:["聚合 = 每樣本平均預測，降噪且實用。","結果同時呈現原始與聚合（*）指標。","top(by_repetition=True) 依聚合排名；圖可逐一覆寫。"],
+      exercise:"比較原始與聚合後的測試 RMSE，量化重複量測平均帶來的降噪效益。"
+    },
+    {
+      id:"U5-5", lid:"U05", title:"標記分析：標記但不移除", en:"U05_tagging_analysis", stars:3, dur:"~4 分鐘",
+      objectives:["用 <code>tag</code> 標記樣本","區分 tag 與 exclude","用標記做分層分析"],
+      concept:`<p><span class="term">tag</span> 只<strong>標記</strong>樣本而不移除——樣本仍用於訓練。適合做離群影響分析、分層表現報告、樣本分類與品管文件。可同時套多個標記做多維分析。</p><p>對比：<code>tag</code> = 只標記；<code>exclude</code> = 標記並從訓練移除。</p>`,
+      code:`from nirs4all.operators.filters import YOutlierFilter
+
+# 標記（樣本仍參與訓練）
+pipeline = [{"tag": YOutlierFilter(method="iqr", threshold=1.5)},
+            {"model": ...}]
+
+# 自訂標記名稱
+pipeline = [{"tag": YOutlierFilter(method="iqr",
+              threshold=1.5)},  # 可加 tag_name 參數
+            {"model": ...}]
+
+# 對比：exclude 會移除、tag 不會`,
+      takeaways:["tag 標記但保留樣本；exclude 標記並移除。","可套多個標記做多維分析。","自訂 tag_name 提升分析可讀性。"],
+      exercise:"先 tag 離群樣本訓練，再 exclude 同樣本訓練，比較兩者差異以判斷是否該移除。"
+    },
+    {
+      id:"U5-6", lid:"U06", title:"排除策略比較", en:"U06_exclusion_strategies", stars:4, dur:"~5 分鐘",
+      objectives:["單一 vs 多重過濾排除","排除模式：any vs all","結合排除與標記的最佳實務"],
+      concept:`<p>本課系統比較不同排除策略：單一過濾器、多過濾器（<code>mode="any"</code> 任一觸發 / <code>"all"</code> 全部觸發才排除）、Y 基 vs X 基排除，以及排除與標記的組合運用。</p><p>重點：被排除樣本不參與訓練，但仍會被建立標記供分析；且排除<strong>不影響預測</strong>（預測時所有樣本都會被預測）。</p>`,
+      code:`from nirs4all.operators.filters import YOutlierFilter
+
+# 單一過濾
+{"exclude": YOutlierFilter(method="iqr", threshold=1.5)}
+
+# 多過濾 — any：任一觸發即排除（較積極）
+{"exclude": [YOutlierFilter(method="iqr"),
+             YOutlierFilter(method="zscore")], "mode": "any"}
+
+# 多過濾 — all：全部觸發才排除（較保守）
+{"exclude": [F1(), F2()], "mode": "all"}`,
+      takeaways:["mode=any 較積極清理；all 較保守。","排除不影響預測階段（仍預測全部樣本）。","排除樣本仍建立標記，可回頭分析。"],
+      exercise:"對同一資料分別用 any 與 all 模式，比較被排除樣本數與最終 RMSE。"
+    },
+  ]
+},
+{
+  num:6, key:"06_deployment", title:"模型部署", subtitle:"儲存/載入/預測、匯出 .n4a、工作區管理、sklearn 整合",
+  lessons:[
+    {
+      id:"U6-1", lid:"U01", title:"儲存、載入與預測", en:"U01_save_load_predict", stars:2, dur:"~4 分鐘",
+      objectives:["訓練時自動儲存模型","用預測項目或 model ID 做預測","驗證預測一致性"],
+      concept:`<p>用 <code>save_artifacts=True</code> 訓練後，模型（含前處理鏈）會存到 <code>workspace/runs/</code>。要對新資料預測有兩種方式：傳入<strong>預測項目</strong>或傳入 <strong>model ID</strong>。</p><p>新資料可給檔案路徑或 numpy 陣列。<code>all_predictions=True</code> 可取得完整 metadata。</p>`,
+      code:`from nirs4all.pipeline import PipelineRunner
+from nirs4all.dataset import DatasetConfigs
+
+runner = PipelineRunner(save_artifacts=True)
+predictions, _ = runner.run(pipeline_config, dataset_config)
+
+best = predictions.top(1)[0]
+model_id = best['id']
+
+# 方式 A：用預測項目
+predictor = PipelineRunner()
+new_preds, _ = predictor.predict(best, DatasetConfigs({'X_test': X_new}))
+
+# 方式 B：用 model ID
+new_preds, _ = predictor.predict(model_id, DatasetConfigs({'X_test': X_new}))`,
+      takeaways:["<code>save_artifacts=True</code> 自動存模型+前處理到 workspace/runs/。","可用預測項目或 model ID 預測。","新資料接受檔案路徑或 numpy 陣列。"],
+      exercise:"訓練後重新載入模型，對同一測試集預測，確認結果與訓練時一致。"
+    },
+    {
+      id:"U6-2", lid:"U02", title:"匯出 Bundle：可攜式部署", en:"U02_export_bundle", stars:2, dur:"~5 分鐘",
+      objectives:["匯出 <code>.n4a</code> bundle","匯出可攜 Python 腳本 <code>.n4a.py</code>","載入 bundle 並預測、檢視 metadata"],
+      concept:`<p>把訓練好的模型打包成可攜檔，方便部署、分享與封存。<span class="term">.n4a</span> 格式支援所有模型型態但需 nirs4all；<span class="term">.n4a.py</span> 為僅 sklearn 的獨立腳本（只需 numpy + joblib）。</p>`,
+      code:`from nirs4all.pipeline import PipelineRunner
+from nirs4all.pipeline.bundle import BundleLoader
+
+runner = PipelineRunner(save_artifacts=True)
+predictions, _ = runner.run(config, dataset)
+best = predictions.top(1)[0]
+
+# 匯出 .n4a bundle
+bundle = runner.export(source=best, output_path="model.n4a", format="n4a")
+
+# 匯出可攜腳本（僅 sklearn）
+runner.export(source=best, output_path="model.n4a.py", format="n4a.py")
+
+# 載入並預測
+predictor = PipelineRunner()
+preds, _ = predictor.predict(str(bundle), new_dataset)
+
+# 檢視 metadata
+print(BundleLoader(bundle).metadata)`,
+      takeaways:[".n4a：全模型型態，需 nirs4all。",".n4a.py：僅 sklearn、獨立可攜（numpy+joblib）。","BundleLoader 可檢視 bundle metadata。"],
+      exercise:"把最佳模型匯出為 .n4a.py，在乾淨環境（只裝 numpy+joblib）載入預測，驗證可攜性。"
+    },
+    {
+      id:"U6-3", lid:"U03", title:"工作區管理：Session 與組織", en:"U03_workspace_management", stars:2, dur:"~5 分鐘",
+      objectives:["用 session context manager 管理多次執行","認識工作區結構","SQLite 預測儲存與模板庫"],
+      concept:`<p>用 <span class="term">nirs4all.session()</span> context manager 共享設定並組織多次 run。可設 <code>workspace_path</code> 自訂路徑、收集所有結果挑最佳。每個 run 也能覆寫 verbose 等設定。</p>`,
+      code:`import nirs4all
+
+with nirs4all.session(verbose=1, save_artifacts=True,
+                      workspace_path="custom/path") as s:
+    r1 = nirs4all.run(pipeline=[...], dataset="d1", session=s)
+    r2 = nirs4all.run(pipeline=[...], dataset="d2", session=s)
+
+# 收集並挑最佳
+all_results = []
+with nirs4all.session() as s:
+    for cfg in configs:
+        all_results.append(nirs4all.run(pipeline=cfg, dataset="d", session=s))
+best = min(all_results, key=lambda x: x.best_rmse)`,
+      table:`<table class="mini">
+        <tr><th>工作區結構</th><th>內容</th></tr>
+        <tr><td><code>store.sqlite</code></td><td>所有結構化資料（runs、predictions）</td></tr>
+        <tr><td><code>artifacts/</code></td><td>內容定址的二進位產物</td></tr>
+        <tr><td><code>exports/</code></td><td>匯出的最佳結果（.n4a）</td></tr>
+        <tr><td><code>library/</code></td><td>儲存的 pipeline 模板（.json）</td></tr>
+      </table>`,
+      takeaways:["session 共享設定、組織多次 run。","工作區：store.sqlite + artifacts/ + exports/ + library/。","可收集所有結果再挑最佳。"],
+      exercise:"用一個 session 跑三個資料集，最後用 min(...) 找出全域最佳 RMSE 的 run。"
+    },
+    {
+      id:"U6-4", lid:"U04", title:"sklearn 整合：NIRSPipeline 包裝器", en:"U04_sklearn_integration", stars:2, dur:"~5 分鐘",
+      objectives:["從訓練結果建立 NIRSPipeline","用 sklearn 式 predict() / score()","從 bundle 載入部署"],
+      concept:`<p><span class="term">NIRSPipeline</span> 把訓練好的 nirs4all 模型包裝成 sklearn 相容物件，於是能用 <code>predict()</code>、<code>score()</code>、<code>transform()</code>，並接上 <code>cross_val_score</code>、<code>GridSearchCV</code>、SHAP 等標準工具。可從 result 或 bundle 建立。</p>`,
+      code:`import nirs4all
+from nirs4all.sklearn import NIRSPipeline
+
+result = nirs4all.run(pipeline=[...], dataset="sample_data/regression")
+
+# 包裝成 sklearn 相容
+pipe = NIRSPipeline.from_result(result)
+y_pred = pipe.predict(X_test)
+r2     = pipe.score(X_test, y_test)
+X_prep = pipe.transform(X_raw)        # 只做前處理
+
+# 從 bundle 載入（生產環境）
+pipe = NIRSPipeline.from_bundle("model.n4a")
+
+# 取得底層 sklearn 模型
+model = pipe.model_`,
+      takeaways:["NIRSPipeline 提供 predict / score / transform。","可從 result 或 bundle 建立。","相容 cross_val_score、GridSearchCV、SHAP。"],
+      exercise:"把 NIRSPipeline 餵進 sklearn 的 cross_val_score，得到跨折 R² 分佈。"
+    },
+  ]
+},
+{
+  num:7, key:"07_explainability", title:"模型可解釋性", subtitle:"SHAP 基礎、SHAP × sklearn、特徵（波長）選擇",
+  lessons:[
+    {
+      id:"U7-1", lid:"U01", title:"SHAP 基礎：解釋模型預測", en:"U01_shap_basics", stars:2, dur:"~5 分鐘",
+      objectives:["理解為何用 SHAP 解釋 NIRS 模型","用 <code>runner.explain()</code> 跑 SHAP","光譜圖、瀑布圖、蜂群圖"],
+      concept:`<p><span class="term">SHAP</span>（SHapley Additive exPlanations）量化每個波長對預測的貢獻。對 NIRS 尤其有用：<strong>光譜圖</strong>顯示重要波長區段、<strong>瀑布圖</strong>解釋單一預測、<strong>蜂群圖</strong>揭示特徵模式。高維光譜可用<strong>分箱</strong>讓結果更易讀。</p><p>用 <code>runner.explain(best, dataset, shap_params=...)</code> 執行。需 <code>pip install shap</code>。</p>`,
+      code:`from nirs4all.pipeline import PipelineRunner
+
+runner = PipelineRunner(save_artifacts=True)
+predictions, _ = runner.run(pipeline_config, dataset_config)
+best = predictions.top(1)[0]
+
+shap_params = {
+    'n_samples': 100,
+    'explainer_type': 'auto',
+    'visualizations': ['spectral', 'waterfall', 'beeswarm'],
+    'bin_size':   {'spectral': 10, 'waterfall': 20},   # 高維分箱
+    'bin_stride': {'spectral': 5,  'waterfall': 10},
+}
+shap_results, out_dir = runner.explain(best, dataset_config,
+                                       shap_params=shap_params)`,
+      takeaways:["SHAP 量化各波長對預測的貢獻。","光譜圖找重要區段、瀑布圖解釋單筆、蜂群圖看模式。","分箱讓高維光譜的解釋更可讀。"],
+      exercise:"跑光譜 SHAP，找出貢獻最大的波長區段，對照已知的化學吸收帶（如水分 1450/1940 nm）。"
+    },
+    {
+      id:"U7-2", lid:"U02", title:"SHAP × sklearn 包裝器", en:"U02_shap_sklearn", stars:3, dur:"~5 分鐘",
+      objectives:["用 NIRSPipeline 接 SHAP","選對 explainer（Kernel/Tree/Linear）","抽取特徵重要性"],
+      concept:`<p>用 <code>NIRSPipeline</code> 包裝後可直接接 SHAP 各式 explainer。<strong>KernelExplainer</strong> 適用任何模型（最慢）、<strong>TreeExplainer</strong> 適樹模型（快 10–100 倍）、<strong>LinearExplainer</strong> 適線性、<strong>DeepExplainer</strong> 適神經網路。用 <code>shap.kmeans()</code> 做高效背景集。</p>`,
+      code:`import shap, numpy as np, nirs4all
+from nirs4all.sklearn import NIRSPipeline
+
+result = nirs4all.run(pipeline=[...], dataset="sample_data/regression")
+pipe = NIRSPipeline.from_result(result)
+
+# KernelExplainer（任何模型）
+background = shap.kmeans(X, 10)
+explainer = shap.KernelExplainer(pipe.predict, background)
+shap_values = explainer.shap_values(X_test)
+
+# TreeExplainer（樹模型，需先前處理）
+model = pipe.model_
+X_prep = pipe.transform(X)
+tree_vals = shap.TreeExplainer(model).shap_values(X_prep)
+
+# 特徵重要性 Top-10
+importance = np.mean(np.abs(shap_values), axis=0)
+top = np.argsort(importance)[-10:][::-1]`,
+      takeaways:["TreeExplainer 比 KernelExplainer 快 10–100 倍。","TreeExplainer 前要先 <code>pipe.transform(X)</code>。","<code>shap.kmeans()</code> 提供高效背景集。"],
+      exercise:"對樹模型用 TreeExplainer 抽 Top-10 波長，與 U7-1 的光譜 SHAP 比較一致性。"
+    },
+    {
+      id:"U7-3", lid:"U03", title:"特徵選擇：CARS 與 MC-UVE", en:"U03_feature_selection", stars:3, dur:"~5 分鐘",
+      objectives:["用 CARS 競爭式自適應重取樣選波長","用 MC-UVE 蒙地卡羅消除無資訊變數","整合進 pipeline 並視覺化"],
+      concept:`<p>並非所有波長都有用。<span class="term">CARS</span>（Competitive Adaptive Reweighted Sampling）與 <span class="term">MC-UVE</span>（Monte-Carlo Uninformative Variable Elimination）能挑出最具資訊的波長，提升模型精簡度與可解釋性。CARS 可直接放進 pipeline，後接 PLS。</p>`,
+      code:`import nirs4all
+from nirs4all.operators.selection import CARS
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.model_selection import ShuffleSplit
+from sklearn.preprocessing import MinMaxScaler
+from nirs4all.operators.transforms import FirstDerivative, StandardNormalVariate
+
+pipeline = [
+    {"y_processing": MinMaxScaler()},
+    {"feature_augmentation": [FirstDerivative, StandardNormalVariate]},
+    CARS(n_components=10, n_sampling_runs=10,
+         n_variables_ratio_end=0.2, cv_folds=5, random_state=42),
+    MinMaxScaler(),
+    "chart_2d",                                   # 看選後光譜
+    ShuffleSplit(n_splits=3, test_size=0.25, random_state=42),
+    PLSRegression(n_components=10),
+]
+result = nirs4all.run(pipeline=pipeline, dataset="sample_data/regression")`,
+      takeaways:["CARS / MC-UVE 挑出資訊波長，精簡模型。","CARS 關鍵參數：n_sampling_runs、n_variables_ratio_end。","選後用 chart_2d 視覺化保留的波長區段。"],
+      exercise:"比較全波長 PLS 與 CARS 選擇後 PLS 的 RMSE 與所用波長數，評估精簡效益。"
+    },
+  ]
+}
+);
+</script>
+<script id="render-engine">
+/* ===================== 渲染引擎 ===================== */
+function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function lessonHTML(l){
+  const obj = (l.objectives||[]).map(o=>`<li>${o}</li>`).join('');
+  const take = (l.takeaways||[]).map(t=>`<li>${t}</li>`).join('');
+  return `<div class="lesson" id="L-${l.id}" data-search="${(l.title+' '+l.en+' '+(l.objectives||[]).join(' ')).toLowerCase()}">
+    <div class="lesson-head" onclick="toggleLesson('L-${l.id}')">
+      <span class="lid">${l.lid}</span>
+      <div class="htext">
+        <h4>${l.title}</h4>
+        <p class="en">${l.en}.py</p>
+        <div class="badges"><span class="stars">${stars(l.stars)}</span><span class="dur">⏱ ${l.dur}</span></div>
+      </div>
+      <div class="toggle">
+        <div class="chk" title="標記完成" onclick="event.stopPropagation();toggleDone('${l.id}')">✓</div>
+        <span class="caret">▾</span>
+      </div>
+    </div>
+    <div class="lesson-body">
+      <div class="block-label"><span class="ic">🎯</span>學習目標</div>
+      <ul class="objectives">${obj}</ul>
+      <div class="block-label"><span class="ic">💡</span>概念講解</div>
+      <div class="concept">${l.concept}${l.table||''}</div>
+      <div class="block-label"><span class="ic">💻</span>程式碼</div>
+      <div class="codecard">
+        <button class="copybtn" onclick="copyCode(this)">複製</button>
+        <pre><code class="language-python">${esc(l.code)}</code></pre>
+      </div>
+      <div class="block-label"><span class="ic">🔑</span>重點整理</div>
+      <div class="takeaways"><ul>${take}</ul></div>
+      <div class="block-label"><span class="ic">✍️</span>動手練習</div>
+      <div class="exercise"><b>試試看：</b>${l.exercise}</div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  // intro
+  document.getElementById('intro').innerHTML = INTRO.html;
+  // modules
+  let html='', nav='';
+  COURSE.forEach(m=>{
+    html += `<section class="module" id="mod-${m.num}">
+      <div class="module-banner"><div class="num">${m.num}</div>
+        <div><h3>${m.title}</h3><p>${m.subtitle}</p></div></div>
+      ${m.lessons.map(lessonHTML).join('')}</section>`;
+    nav += `<div class="nav-group" id="ng-${m.num}">
+      <div class="nav-head" onclick="document.getElementById('ng-${m.num}').classList.toggle('collapsed')">
+        <span class="mod-num">${m.num}</span><span>${m.title}</span><span class="chev">▾</span></div>
+      <div class="nav-items">
+        ${m.lessons.map(l=>`<a href="#L-${l.id}" data-lesson="${l.id}" onclick="closeMobile()"><span class="dot"></span>${l.lid} ${l.title}</a>`).join('')}
+      </div></div>`;
+  });
+  document.getElementById('content').innerHTML = html;
+  document.getElementById('nav').innerHTML = nav;
+  hljs.highlightAll();
+  loadProgress();
+  setupScrollSpy();
+}
+
+/* ===================== 互動功能 ===================== */
+function toggleLesson(id){document.getElementById(id).classList.toggle('open');
+  const a=document.querySelector(`a[data-lesson="${id.slice(2)}"]`);}
+function copyCode(btn){
+  const code=btn.parentElement.querySelector('code').innerText;
+  navigator.clipboard.writeText(code).then(()=>{btn.textContent='已複製 ✓';setTimeout(()=>btn.textContent='複製',1500);});
+}
+/* 進度（localStorage） */
+const KEY='nirs4all_course_progress';
+function getDone(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
+function setDone(d){localStorage.setItem(KEY,JSON.stringify(d));}
+function allLessonIds(){let ids=[];COURSE.forEach(m=>m.lessons.forEach(l=>ids.push(l.id)));return ids;}
+function toggleDone(id){const d=getDone();d[id]=!d[id];setDone(d);applyProgress();}
+function applyProgress(){
+  const d=getDone();const ids=allLessonIds();let n=0;
+  ids.forEach(id=>{const el=document.getElementById('L-'+id);const a=document.querySelector(`a[data-lesson="${id}"]`);
+    if(d[id]){n++;el&&el.classList.add('done');a&&a.classList.add('done');}
+    else{el&&el.classList.remove('done');a&&a.classList.remove('done');}});
+  const pct=Math.round(n/ids.length*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progText').textContent=`${n} / ${ids.length} 完成`;
+}
+function loadProgress(){applyProgress();}
+function resetProgress(){if(confirm('確定要清除所有學習進度嗎？')){setDone({});applyProgress();}}
+/* 搜尋 */
+document.addEventListener('input',e=>{
+  if(e.target.id!=='searchBox')return;
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('.lesson').forEach(el=>{
+    if(el.id==='L-intro')return;
+    const hit=!q||(el.dataset.search||'').includes(q);
+    el.classList.toggle('hidden',!hit);
+    if(q&&hit)el.classList.add('open');
+  });
+  document.querySelectorAll('section.module').forEach(sec=>{
+    const any=[...sec.querySelectorAll('.lesson')].some(l=>!l.classList.contains('hidden'));
+    sec.classList.toggle('hidden',!any);
+  });
+});
+/* scrollspy */
+function setupScrollSpy(){
+  const links=[...document.querySelectorAll('.nav-items a')];
+  const map={};links.forEach(a=>map[a.getAttribute('href').slice(1)]=a);
+  const obs=new IntersectionObserver(es=>{
+    es.forEach(en=>{if(en.isIntersecting){
+      links.forEach(a=>a.classList.remove('active'));
+      const a=map['L-'+en.target.id.slice(2)];a&&a.classList.add('active');
+    }});
+  },{rootMargin:'-10% 0px -80% 0px'});
+  document.querySelectorAll('.lesson').forEach(l=>l.id!=='L-intro'&&obs.observe(l));
+}
+function closeMobile(){if(window.innerWidth<=880)document.getElementById('sidebar').classList.remove('open');}
+/* back to top */
+const topBtn=document.getElementById('topBtn');
+topBtn.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+window.addEventListener('scroll',()=>topBtn.classList.toggle('show',window.scrollY>600));
+
+render();
+</script>
+</body>
+</html>
+                          
