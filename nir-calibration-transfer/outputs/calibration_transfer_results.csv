@@ -1,5 +1,0 @@
-method,needs_paired_spectra,needs_y_for_standards,RMSEP_protein,R2_test
-No transfer: m5 model -> mp5 spectra,No,No,0.6513848752869137,-0.6148049606847157
-SBC: slope/bias on standard predictions,Yes,Yes,0.20976407155574325,0.8325415980018351
-DS: direct standardization spectra,Yes,No,0.36971597215122726,0.4797870487232758
-PDS: piecewise direct standardization spectra,Yes,No,0.34918200519283105,0.5359674523176754
