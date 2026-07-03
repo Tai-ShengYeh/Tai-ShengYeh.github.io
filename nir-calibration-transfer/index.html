@@ -3,35 +3,304 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NIR Calibration Transfer 教學：Corn 三儀器資料集</title>
+<meta name="description" content="用公開 corn NIR 三儀器資料集，三層鷹架學習 NIR 模型校正轉移（calibration transfer）：SBC、DS、PDS，含互動圖表、自我檢測與 Colab 一鍵執行。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Segoe UI",sans-serif;line-height:1.65;margin:0;background:#f7fbff;color:#172033}.wrap{max-width:1080px;margin:auto;padding:32px}h1,h2,h3{color:#0b5c9e}.card{background:white;border:1px solid #d7e9fb;border-radius:16px;padding:22px;margin:18px 0;box-shadow:0 4px 16px #0b5c9e14}code,pre{background:#eef6ff;border-radius:8px;padding:2px 6px}pre{overflow:auto;padding:14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}.tag{display:inline-block;background:#dff0ff;color:#084f86;border-radius:999px;padding:4px 10px;margin:2px}table{border-collapse:collapse;width:100%;background:white}td,th{border:1px solid #cfe3f7;padding:8px;text-align:left}th{background:#eaf5ff}.warn{border-left:5px solid #f0a000}.ok{border-left:5px solid #20a060}a{color:#075fae}img{max-width:100%;border-radius:10px;border:1px solid #d7e9fb}</style>
-</head><body><main class="wrap">
-<h1>NIR Calibration Transfer 教學：Corn 三儀器資料集</h1>
-<p><span class="tag">Python Jupyter</span><span class="tag">Google Colab</span><span class="tag">Orange Data Mining</span><span class="tag">PLS / DS / PDS / SBC</span></p>
-<div class="card ok"><h2>教學定位</h2><p>這份教材用公開的 Eigenvector Research corn NIR dataset 示範 calibration transfer：同一批 80 個玉米樣品在三台 NIR 儀器 m5、mp5、mp6 上量測，波長 1100–2498 nm，每 2 nm 一點，共 700 channels，並提供 moisture、oil、protein、starch 參考值。</p><p>學生會先建立 <b>master instrument</b>（m5）的 PLS protein 模型，再直接套用到 <b>slave instrument</b>（mp5），觀察誤差惡化，接著用 SBC、DS、PDS 比較轉移效果。</p></div>
-<div class="card"><h2>為什麼這個 dataset 適合 calibration transfer？</h2><table><tr><th>條件</th><th>此資料集狀態</th><th>教學意義</th></tr><tr><td>同一樣品跨儀器量測</td><td>80 samples × m5/mp5/mp6</td><td>可建立 paired spectra，適合 DS/PDS</td></tr><tr><td>有化學參考值</td><td>Moisture、Oil、Protein、Starch</td><td>可做定量模型與 RMSEP 評估</td></tr><tr><td>波長軸一致</td><td>1100–2498 nm, 2 nm interval</td><td>降低前處理難度，適合入門課</td></tr><tr><td>公開可下載</td><td>Eigenvector Research data sets</td><td>學生可重現，不需私有儀器資料</td></tr></table></div>
-<div class="card"><h2>檔案與使用路線</h2><div class="grid"><div><h3>Python Jupyter</h3><p>開啟 <code>notebooks/nir_calibration_transfer_corn_jupyter.ipynb</code>。適合本機 Anaconda/JupyterLab。</p></div><div><h3>Google Colab</h3><p>上傳 <code>notebooks/nir_calibration_transfer_corn_colab.ipynb</code> 到 Colab。資料會自動下載。</p></div><div><h3>Orange Data Mining</h3><p>用 Orange 的 File widget 載入 <code>orange/corn_nir_for_orange.csv</code>，做 PCA、欄位角色設定與儀器差異視覺化。</p></div></div></div>
+:root{--paper:#f7fbff;--card:#fff;--ink:#172033;--soft:#4a5b70;--blue:#0b5c9e;--teal:#119C9A;--coral:#E36414;--gold:#C8941F;--line:#d7e9fb;--ok:#20a060;--warn:#f0a000;}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;line-height:1.65;background:var(--paper);color:var(--ink);}
+a{color:var(--blue);text-decoration:none;} a:hover{text-decoration:underline;}
+.hero{background:linear-gradient(135deg,#119C9A,#0b5c9e);color:#fff;padding:52px 22px 44px;text-align:center;}
+.hero h1{font-size:clamp(24px,4.5vw,40px);font-weight:900;}
+.hero p{max-width:760px;margin:14px auto 0;color:rgba(255,255,255,.92);font-size:clamp(14px,2vw,17px);}
+.tags{margin-top:18px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.tags span{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700;}
+.wrap{max-width:1000px;margin:auto;padding:26px 20px 60px;}
+.lvl{display:inline-block;font-weight:900;font-size:12px;letter-spacing:.12em;padding:4px 12px;border-radius:999px;color:#fff;margin:30px 0 6px;}
+.lvl.beg{background:var(--teal);} .lvl.mid{background:var(--coral);} .lvl.adv{background:var(--gold);}
+h2{font-size:clamp(20px,3vw,27px);color:var(--blue);margin:2px 0 4px;}
+h3{font-size:18px;color:var(--blue);margin:2px 0 6px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:14px 0;box-shadow:0 4px 16px #0b5c9e12;}
+.card.ok{border-left:5px solid var(--ok);}
+.card.warn{border-left:5px solid var(--warn);}
+figure{margin:12px 0;}
+figure img{width:100%;border:1px solid var(--line);border-radius:12px;background:#fff;}
+figcaption{font-size:13.5px;color:var(--soft);margin-top:7px;text-align:center;}
+table{border-collapse:collapse;width:100%;background:#fff;font-size:14px;margin-top:8px;}
+td,th{border:1px solid var(--line);padding:8px 10px;text-align:left;}
+th{background:#eaf5ff;color:var(--blue);}
+code,pre{background:#eef6ff;border-radius:7px;padding:2px 6px;font-size:13.5px;}
+pre{padding:12px;overflow:auto;}
+.btn{display:inline-block;font-weight:700;border-radius:10px;padding:9px 16px;margin:6px 8px 0 0;}
+.btn.colab{background:#F9AB00;color:#111;}
+.btn.gh{background:#24292f;color:#fff;}
+.btn.zip{background:var(--blue);color:#fff;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;}
+.mini{background:#f2f9ff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+.mini b{color:var(--blue);}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;}
+.chip{border:1px solid var(--line);background:#eaf5ff;color:var(--blue);border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer;font-size:14px;}
+.chip.active{background:var(--blue);color:#fff;}
+details{background:#f2f9ff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0;}
+summary{font-weight:700;color:var(--blue);cursor:pointer;}
+details p,details ul{margin-top:8px;}
+.quiz .q{font-weight:700;margin:14px 0 8px;}
+.quiz button{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--line);border-radius:9px;padding:9px 12px;margin:5px 0;cursor:pointer;font-size:14.5px;font-family:inherit;transition:.12s;}
+.quiz button:hover{border-color:var(--blue);}
+.quiz button.correct{background:#e3f7ec;border-color:var(--ok);}
+.quiz button.wrong{background:#fdece0;border-color:var(--coral);}
+.quiz .fb{font-size:13.5px;color:var(--soft);margin:4px 0 0;min-height:1px;}
+.score{font-weight:900;color:var(--blue);margin-top:12px;}
+.legend{font-size:13px;color:var(--soft);}
+.toc{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;justify-content:center;}
+.toc a{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:8px;padding:6px 12px;color:#fff;font-size:13.5px;font-weight:700;}
+footer{background:#172033;color:#cfe0f2;text-align:center;padding:28px 20px;font-size:13px;}
+footer a{color:#9fd3d2;}
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>NIR 模型校正轉移 · Calibration Transfer</h1>
+  <p>同一批玉米、三台近紅外儀器：學會為什麼校正模型不能無痛跨儀器使用，以及 SBC / DS / PDS 三種修正法。三層鷹架 · 互動圖表 · 自我檢測 · Colab 一鍵執行。</p>
+  <div class="tags"><span>Python Jupyter</span><span>Google Colab</span><span>Orange Data Mining</span><span>PLS · SBC · DS · PDS</span></div>
+  <nav class="toc">
+    <a href="#beg">① 入門：儀器差異</a>
+    <a href="#mid">② 中階：三種轉移法</a>
+    <a href="#adv">③ 進階：陷阱與敏感度</a>
+    <a href="#quiz">自我檢測</a>
+    <a href="#run">動手做</a>
+  </nav>
+</header>
+<main class="wrap">
 
-<div class="card"><h2>下載與執行</h2>
-<ul>
-<li><a href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/releases/download/nir-calibration-transfer-v1/nir_calibration_transfer_teaching_package.zip">下載完整教材包 ZIP</a>（Jupyter、Colab、Orange CSV、Python script、figures）</li>
-<li><a href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/releases/tag/nir-calibration-transfer-v1">GitHub Release 頁面</a></li>
-</ul>
-<p>Python notebook/script 會自動從 Eigenvector Research 下載 corn NIR dataset；線上頁面保留為輕量 HTML，避免 GitHub Pages 部署失敗。</p>
-</div>
-<div class="card"><h2>Python 核心流程</h2><ol><li>下載 <code>corn.mat</code> 並解析 m5/mp5/mp6 spectra。</li><li>Savitzky–Golay smoothing + SNV 作為基礎前處理。</li><li>用 m5 前 50 個樣品建立 PLS protein 模型。</li><li>用 10 個 paired standards 學習 slave→master 的轉換。</li><li>用 mp5 後 20 個樣品作 independent slave test。</li><li>比較 no transfer、SBC、DS、PDS 的 RMSEP 與 R²。</li></ol><pre>python analysis_script.py</pre></div>
-<div class="card warn"><h2>教學注意事項</h2><ul><li>這是 calibration transfer 教學，不是追求最佳 corn protein 模型。</li><li>SBC 需要 standard samples 的 reference y；DS/PDS 通常只需要 paired spectra。</li><li>PDS 對 transfer standards 的數量、代表性、window size 很敏感；標準樣品太少可能過度配適。</li><li>不要把同一 sample 的不同 instrument spectra 當成獨立樣品隨機切分，否則會混淆 transfer 問題。</li></ul></div>
-<div class="card"><h2>Orange Data Mining 課堂活動</h2><ol><li>安裝 Orange 與（可選）Orange Spectroscopy add-on。</li><li>File → 載入 <code>corn_nir_for_orange.csv</code>。</li><li>Select Columns：<code>wl_*</code> 為 features，<code>Protein</code> 為 target，<code>sample_id</code> 與 <code>instrument</code> 為 meta。</li><li>PCA：用 instrument 上色，觀察三台儀器造成的光譜分布差異。</li><li>用 Select Rows 分出 m5 與 mp5，比較模型跨儀器預測落差。</li><li>把 Python 產生的轉移後 spectra 匯回 Orange，可視覺化 PDS 前後變化。</li></ol></div>
+  <div class="card ok">
+    <h2>這份教材要解決的問題</h2>
+    <p>你在 A 儀器辛苦建好的 NIR 定量模型，換到 B 儀器就失準。<b>Calibration transfer（校正轉移）</b>就是用少量樣品，把模型「搬」到新儀器而不必整套重建。我們用公開的 Eigenvector corn 資料集：80 個玉米樣品在 <b>m5 / mp5 / mp6</b> 三台儀器量測，1100–2498 nm、共 700 個波長，附 moisture / oil / protein / starch 參考值。</p>
+  </div>
 
-<div class="card"><h2>已驗證的示範執行結果（Protein, m5 → mp5）</h2>
-<p>我已在本機執行 <code>analysis_script.py</code>；此表是實際輸出，供學生確認 notebook 跑出的結果是否接近。</p>
-<table><tr><th>方法</th><th>需要 paired spectra</th><th>需要 standards 的 y</th><th>RMSEP protein</th><th>R² test</th></tr><tr><td>No transfer: m5 model -> mp5 spectra</td><td>No</td><td>No</td><td>0.651</td><td>-0.615</td></tr>
-<tr><td>SBC: slope/bias on standard predictions</td><td>Yes</td><td>Yes</td><td>0.210</td><td>0.833</td></tr>
-<tr><td>DS: direct standardization spectra</td><td>Yes</td><td>No</td><td>0.370</td><td>0.480</td></tr>
-<tr><td>PDS: piecewise direct standardization spectra</td><td>Yes</td><td>No</td><td>0.349</td><td>0.536</td></tr></table>
-<p>圖檔會由 Python script 輸出至 <code>outputs/</code>；下表為已驗證的示範結果。</p></div>
-</div>
+  <!-- ================= LEVEL 1 ================= -->
+  <span class="lvl beg" id="beg">① 入門 · 建立直覺</span>
+  <div class="card">
+    <h2>先看見「儀器差異」長什麼樣子</h2>
+    <p>同一批樣品、相同化學成分，只是換了儀器，光譜就不一樣。下圖三種顏色是三台儀器量到的原始光譜——形狀相似但有系統性偏移。</p>
+    <figure><img src="web_assets/fig1_raw.png" alt="三台儀器原始光譜">
+      <figcaption>圖 1｜同一批玉米在 m5 / mp5 / mp6 上的原始吸收光譜：整體相似，但有儀器造成的偏移。</figcaption></figure>
+    <p>把 m5 減去 mp5，可以看到差異<b>不是一條水平線</b>，而是隨波長變化——這正是為什麼「減一個常數」修不好，需要更聰明的方法。</p>
+    <figure><img src="web_assets/fig2_diff.png" alt="m5 減 mp5 差異光譜">
+      <figcaption>圖 2｜m5 − mp5 差異光譜（平均 ± 1 標準差）：差異與波長相依，且在含水/含油吸收帶特別大。</figcaption></figure>
+  </div>
 
-<div class="card"><h2>建議評量問題</h2><ul><li>何謂 master/slave instrument？</li><li>為什麼 calibration model 不能無痛跨儀器使用？</li><li>DS 與 PDS 的差別是 global mapping 還是 local wavelength-window mapping？</li><li>如果新儀器沒有任何 paired standard，可以採用哪些替代策略？</li></ul></div>
-<div class="card"><h2>資料來源</h2><p>Eigenvector Research, “NIR of Corn Samples for Standardization Benchmarking”: <a href="https://eigenvector.com/resources/data-sets/">https://eigenvector.com/resources/data-sets/</a></p><p>背景閱讀：Zhao et al., Molecules 2019, PLS Subspace-Based Calibration Transfer for Near-Infrared Spectroscopy Quantitative Analysis, DOI: 10.3390/molecules24071289.</p></div>
-</main></body></html>
+  <div class="card">
+    <h2>差異有多大？大到蓋過化學訊號</h2>
+    <p>把三台儀器全部光譜做 PCA。若儀器沒差異，點應該按「化學成分」散開；但實際上，它們<b>先按儀器分成上下兩群</b>。這就是跨儀器直接套模型會壞掉的根本原因。</p>
+    <figure><img src="web_assets/fig3_pca.png" alt="PCA 依儀器上色">
+      <figcaption>圖 3｜PCA scores 以儀器上色：m5 明顯自成一群，儀器差異主宰了主要變異。</figcaption></figure>
+    <div class="grid">
+      <div class="mini"><b>Master 主儀器</b><br>建立原始校正模型的儀器（這裡是 m5）。</div>
+      <div class="mini"><b>Slave 從儀器</b><br>想沿用模型的目標儀器（這裡是 mp5）。</div>
+      <div class="mini"><b>Transfer standard</b><br>同時在兩台儀器量測的少量共同樣品，用來學轉換關係。</div>
+    </div>
+  </div>
+
+  <!-- ================= LEVEL 2 ================= -->
+  <span class="lvl mid" id="mid">② 中階 · 三種轉移法</span>
+  <div class="card">
+    <h2>先示範「不做轉移」會多慘</h2>
+    <p>用 m5 前 50 個樣品建 PLS protein 模型，直接拿去預測 mp5 的樣品：RMSEP 高、R² 甚至為負（比直接猜平均值還差）。接著比較三種修正法。</p>
+    <table>
+      <tr><th>方法</th><th>概念</th><th>需要 paired 光譜</th><th>需要標準品的 y 值</th></tr>
+      <tr><td><b>SBC</b> 斜率偏移校正</td><td>只校正「預測值」：predicted → 線性校正</td><td>是</td><td>是</td></tr>
+      <tr><td><b>DS</b> 直接標準化</td><td>用<b>全域</b>線性映射把 slave 光譜變得像 master</td><td>是</td><td>否</td></tr>
+      <tr><td><b>PDS</b> 分段直接標準化</td><td>每個波長用<b>鄰近視窗</b>局部映射，較有彈性</td><td>是</td><td>否</td></tr>
+    </table>
+    <figure style="margin-top:16px"><img src="web_assets/fig6_pds.png" alt="PDS 視窗示意">
+      <figcaption>圖 4｜DS vs PDS：DS 用一個全域轉換矩陣；PDS 對每個波長點只用鄰近 j±k 視窗做局部對應。</figcaption></figure>
+  </div>
+
+  <div class="card">
+    <h2>結果：轉移前後的預測落差</h2>
+    <div class="grid">
+      <figure><img src="web_assets/fig4_pred.png" alt="預測散佈圖">
+        <figcaption>圖 5｜mp5 測試集預測 vs 參考值。越貼近虛線越準。</figcaption></figure>
+      <figure><img src="web_assets/fig5_rmsep.png" alt="RMSEP 長條圖">
+        <figcaption>圖 6｜四種方法 RMSEP。No transfer 最差，轉移後大幅下降。</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>互動：換一個成分看結論是否一致</h2>
+    <p class="legend">點下方按鈕切換目標成分，觀察哪個方法勝出——你會發現「最佳方法會隨成分而變」，沒有萬用解。</p>
+    <div class="chips" id="chips"></div>
+    <table id="restab">
+      <tr><th>方法</th><th>RMSEP（越低越好）</th><th>R²（越高越好）</th><th>需 paired</th><th>需 y</th></tr>
+    </table>
+    <p class="legend" id="resnote"></p>
+  </div>
+
+  <!-- ================= LEVEL 3 ================= -->
+  <span class="lvl adv" id="adv">③ 進階 · 陷阱與敏感度</span>
+  <div class="card warn">
+    <h2>最容易犯的錯</h2>
+    <table>
+      <tr><th>錯誤做法</th><th>後果</th><th>正確做法</th></tr>
+      <tr><td>把同一樣品的不同儀器光譜當獨立樣本隨機切分</td><td>資料洩漏，準確率虛高</td><td>依 <code>sample_id</code> 分組切分</td></tr>
+      <tr><td>transfer standards 選太少或分布太窄</td><td>PDS 過度配適，泛化差</td><td>選涵蓋濃度範圍的代表性標準品</td></tr>
+      <tr><td>只用「測量時間」推論標籤/分組</td><td>混淆變異來源</td><td>用真正的樣品與成分中繼資料</td></tr>
+      <tr><td>假設差異是常數，直接減偏移</td><td>修不掉波長相依差異（見圖 2）</td><td>用 DS/PDS 學波長相依映射</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>延伸思考（點開看解答）</h2>
+    <details><summary>沒有任何 paired standard 時怎麼辦？</summary>
+      <p>可考慮<b>無標準品法</b>：如 CTAI（affine invariance）、以預處理消除儀器差異（SNV、OSC、FIR），或 domain adaptation / 遷移學習。代價是通常較不穩定，需更謹慎驗證。</p></details>
+    <details><summary>PDS 的 window size 該怎麼選？</summary>
+      <p>視窗太小→無法涵蓋波長偏移；太大→退化成全域 DS 並易過擬合。實務上用交叉驗證掃描半視窗寬度 k，挑 RMSEP 最低且穩定者。</p></details>
+    <details><summary>為什麼 SBC 的 R² 有時最高，卻不一定是最佳選擇？</summary>
+      <p>SBC 需要標準品的<b>參考 y 值</b>（較貴、較難取得），且只校正輸出、不修光譜本身。當你拿不到標準品 y、或想讓轉移後光譜可再做別的分析時，DS/PDS 更實用。</p></details>
+  </div>
+
+  <!-- ================= QUIZ ================= -->
+  <span class="lvl beg" id="quiz" style="background:var(--blue)">✓ 自我檢測</span>
+  <div class="card quiz" id="quiz-box">
+    <h2>5 題快速檢測</h2>
+    <p class="legend">點選你的答案，立即看回饋。</p>
+    <div id="quiz-body"></div>
+    <div class="score" id="score"></div>
+  </div>
+
+  <!-- ================= RUN ================= -->
+  <span class="lvl mid" id="run" style="background:var(--teal)">▶ 動手做</span>
+  <div class="card">
+    <h2>三條學習路線</h2>
+    <div class="grid">
+      <div class="mini"><b>Python Jupyter</b><br>本機 Anaconda / JupyterLab，開 <code>notebooks/…_jupyter.ipynb</code>。</div>
+      <div class="mini"><b>Google Colab</b><br>免安裝，一鍵開啟，資料自動下載。</div>
+      <div class="mini"><b>Orange Data Mining</b><br>不寫程式，用 widget 拖拉做 PCA 與儀器差異視覺化。</div>
+    </div>
+    <p style="margin-top:14px">
+      <a class="btn colab" href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/nir-calibration-transfer/notebooks/nir_calibration_transfer_corn_colab.ipynb">▶ Open in Colab</a>
+      <a class="btn gh" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/tree/main/nir-calibration-transfer">GitHub 原始碼</a>
+      <a class="btn zip" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/releases/download/nir-calibration-transfer-v1/nir_calibration_transfer_teaching_package.zip">下載完整教材包 ZIP</a>
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Python 核心流程</h2>
+    <ol>
+      <li>下載 <code>corn.mat</code>，解析 m5/mp5/mp6 光譜。</li>
+      <li>Savitzky–Golay 平滑 + SNV 作為基礎前處理。</li>
+      <li>用 m5 前 50 個樣品建 PLS protein 模型。</li>
+      <li>用 10 個 paired standards 學 slave→master 轉換。</li>
+      <li>用 mp5 後 20 個樣品做獨立測試。</li>
+      <li>比較 no transfer、SBC、DS、PDS 的 RMSEP 與 R²。</li>
+    </ol>
+    <pre>python analysis_script.py</pre>
+  </div>
+
+  <div class="card">
+    <h2>Orange Data Mining 課堂活動</h2>
+    <ol>
+      <li>安裝 Orange 與（可選）Orange Spectroscopy add-on。</li>
+      <li>File → 載入 <code>corn_nir_for_orange.csv</code>。</li>
+      <li>Select Columns：<code>wl_*</code> 為 features，<code>Protein</code> 為 target，<code>sample_id</code>、<code>instrument</code> 為 meta。</li>
+      <li>PCA → 用 instrument 上色，重現圖 3 的儀器分群。</li>
+      <li>Select Rows 分出 m5 / mp5，比較跨儀器預測落差。</li>
+      <li>把 Python 轉移後的光譜匯回 Orange，視覺化 PDS 前後變化。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>術語速查</h2>
+    <div class="grid">
+      <div class="mini"><b>RMSEP</b><br>預測均方根誤差，越低越準。</div>
+      <div class="mini"><b>PLS</b><br>偏最小平方回歸，NIR 定量主力。</div>
+      <div class="mini"><b>SNV</b><br>標準正態變量，消散射造成的乘性/加性效應。</div>
+      <div class="mini"><b>Savitzky–Golay</b><br>多項式平滑/微分，降噪並凸顯特徵。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>資料來源</h2>
+    <p>Eigenvector Research, “NIR of Corn Samples for Standardization Benchmarking”：<a href="https://eigenvector.com/resources/data-sets/">eigenvector.com/resources/data-sets</a></p>
+    <p class="legend">背景閱讀：Zhao et al., <i>Molecules</i> 2019, PLS Subspace-Based Calibration Transfer for NIR Quantitative Analysis, DOI: 10.3390/molecules24071289。</p>
+  </div>
+
+</main>
+<footer>
+  © Tai-Sheng Yeh（葉泰聖）· NIR Calibration Transfer 教學 ·
+  <a href="https://tai-shengyeh.github.io/">回教學課程入口</a>
+</footer>
+
+<script>
+const RESULTS = {"Moisture": {"No transfer": [2.265, -25.102], "SBC": [0.523, -0.391], "DS": [0.455, -0.054], "PDS": [0.377, 0.277]}, "Oil": {"No transfer": [0.113, 0.669], "SBC": [0.14, 0.494], "DS": [0.175, 0.201], "PDS": [0.216, -0.212]}, "Protein": {"No transfer": [0.651, -0.615], "SBC": [0.21, 0.833], "DS": [0.37, 0.48], "PDS": [0.349, 0.536]}, "Starch": {"No transfer": [1.616, -3.258], "SBC": [0.534, 0.535], "DS": [0.759, 0.059], "PDS": [0.764, 0.048]}};
+const META = {
+  "No transfer":["否","否"], "SBC":["是","是"], "DS":["是","否"], "PDS":["是","否"]
+};
+const UNITS = {Moisture:"%",Oil:"%",Protein:"%",Starch:"%"};
+const order = ["No transfer","SBC","DS","PDS"];
+const chips = document.getElementById('chips');
+const tab = document.getElementById('restab');
+const note = document.getElementById('resnote');
+function render(resp){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.dataset.r===resp));
+  tab.querySelectorAll('tr.d').forEach(r=>r.remove());
+  const data = RESULTS[resp];
+  let best=null,bestv=Infinity;
+  order.forEach(m=>{ if(data[m][0]<bestv){bestv=data[m][0];best=m;} });
+  order.forEach(m=>{
+    const [rm,r2]=data[m];
+    const tr=document.createElement('tr'); tr.className='d';
+    if(m===best) tr.style.background='#e3f7ec';
+    tr.innerHTML=`<td>${m}${m===best?' 🏆':''}</td><td>${rm}</td><td>${r2}</td><td>${META[m][0]}</td><td>${META[m][1]}</td>`;
+    tab.appendChild(tr);
+  });
+  note.textContent = `目標成分：${resp}（單位 ${UNITS[resp]}）。此成分下 RMSEP 最低的是 ${best}。試著切換不同成分，最佳方法會改變——這說明轉移方法要依任務挑選。`;
+}
+Object.keys(RESULTS).forEach((r,i)=>{
+  const b=document.createElement('button'); b.className='chip'+(i===0?' active':''); b.dataset.r=r; b.textContent=r;
+  b.onclick=()=>render(r); chips.appendChild(b);
+});
+render('Protein');
+
+const QUIZ = [
+  {q:"為什麼在 m5 建好的 PLS 模型直接拿去預測 mp5 會失準？",
+   opts:["因為玉米樣品的化學成分改變了","因為儀器間有系統性、隨波長變化的光譜差異","因為波長軸不一致無法對齊","因為 PLS 不能用在 NIR"],
+   a:1,fb:"同一批樣品成分沒變、波長軸一致；問題出在儀器造成的光譜差異（見圖 1–3）。"},
+  {q:"下列哪一項是 DS 與 PDS 的核心差別？",
+   opts:["DS 需要 y、PDS 不需要","DS 是全域線性映射、PDS 是逐波長的局部視窗映射","DS 只能用於 protein","PDS 不需要 paired 光譜"],
+   a:1,fb:"DS 用單一全域轉換；PDS 對每個波長點用鄰近視窗做局部映射（見圖 4）。"},
+  {q:"哪一種方法需要標準品的『參考 y 值』？",
+   opts:["DS","PDS","SBC","以上皆需要"],
+   a:2,fb:"SBC 校正的是預測值，需要標準品的參考 y；DS/PDS 通常只需 paired 光譜。"},
+  {q:"把同一樣品在不同儀器的光譜當獨立樣本隨機切分，會發生什麼？",
+   opts:["沒有影響","造成資料洩漏、準確率虛高","模型無法收斂","一定會過度平滑"],
+   a:1,fb:"這是典型資料洩漏，應依 sample_id 分組切分。"},
+  {q:"若新儀器完全沒有 paired standard，較合適的方向是？",
+   opts:["放棄，一定要重新採樣","用無標準品法，如 CTAI 或以預處理消除差異","把 window size 設到最大","直接沿用舊模型即可"],
+   a:1,fb:"無 paired standard 時可走無標準品轉移（affine invariance、預處理、domain adaptation），但需更嚴謹驗證。"}
+];
+const body=document.getElementById('quiz-body'); let answered=0,correct=0;
+QUIZ.forEach((item,qi)=>{
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`<div class="q">${qi+1}. ${item.q}</div>`;
+  const fb=document.createElement('p'); fb.className='fb';
+  item.opts.forEach((opt,oi)=>{
+    const btn=document.createElement('button'); btn.textContent=opt;
+    btn.onclick=()=>{
+      if(wrap.dataset.done) return; wrap.dataset.done=1; answered++;
+      if(oi===item.a){btn.classList.add('correct');correct++;}
+      else{btn.classList.add('wrong'); wrap.querySelectorAll('button')[item.a].classList.add('correct');}
+      fb.textContent=(oi===item.a?"✔ 正確。":"✘ 正解已標綠。")+item.fb;
+      document.getElementById('score').textContent=`已作答 ${answered}/${QUIZ.length}，答對 ${correct} 題。`;
+    };
+    wrap.appendChild(btn);
+  });
+  wrap.appendChild(fb); body.appendChild(wrap);
+});
+</script>
+</body>
+</html>
