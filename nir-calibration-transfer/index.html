@@ -12,7 +12,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Segoe UI",sans
 <div class="card"><h2>為什麼這個 dataset 適合 calibration transfer？</h2><table><tr><th>條件</th><th>此資料集狀態</th><th>教學意義</th></tr><tr><td>同一樣品跨儀器量測</td><td>80 samples × m5/mp5/mp6</td><td>可建立 paired spectra，適合 DS/PDS</td></tr><tr><td>有化學參考值</td><td>Moisture、Oil、Protein、Starch</td><td>可做定量模型與 RMSEP 評估</td></tr><tr><td>波長軸一致</td><td>1100–2498 nm, 2 nm interval</td><td>降低前處理難度，適合入門課</td></tr><tr><td>公開可下載</td><td>Eigenvector Research data sets</td><td>學生可重現，不需私有儀器資料</td></tr></table></div>
 <div class="card"><h2>檔案與使用路線</h2><div class="grid"><div><h3>Python Jupyter</h3><p>開啟 <code>notebooks/nir_calibration_transfer_corn_jupyter.ipynb</code>。適合本機 Anaconda/JupyterLab。</p></div><div><h3>Google Colab</h3><p>上傳 <code>notebooks/nir_calibration_transfer_corn_colab.ipynb</code> 到 Colab。資料會自動下載。</p></div><div><h3>Orange Data Mining</h3><p>用 Orange 的 File widget 載入 <code>orange/corn_nir_for_orange.csv</code>，做 PCA、欄位角色設定與儀器差異視覺化。</p></div></div></div>
 
-<div class="card"><h2>下載與執行</h2><p>本頁先部署為線上教材版。Notebook、Orange CSV 與 Python script 可由課堂講義包或後續 GitHub release 下載；Python script 會自動從 Eigenvector Research 下載 corn NIR dataset。</p></div>
+<div class="card"><h2>下載與執行</h2>
+<ul>
+<li><a href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/releases/download/nir-calibration-transfer-v1/nir_calibration_transfer_teaching_package.zip">下載完整教材包 ZIP</a>（Jupyter、Colab、Orange CSV、Python script、figures）</li>
+<li><a href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/releases/tag/nir-calibration-transfer-v1">GitHub Release 頁面</a></li>
+</ul>
+<p>Python notebook/script 會自動從 Eigenvector Research 下載 corn NIR dataset；線上頁面保留為輕量 HTML，避免 GitHub Pages 部署失敗。</p>
+</div>
 <div class="card"><h2>Python 核心流程</h2><ol><li>下載 <code>corn.mat</code> 並解析 m5/mp5/mp6 spectra。</li><li>Savitzky–Golay smoothing + SNV 作為基礎前處理。</li><li>用 m5 前 50 個樣品建立 PLS protein 模型。</li><li>用 10 個 paired standards 學習 slave→master 的轉換。</li><li>用 mp5 後 20 個樣品作 independent slave test。</li><li>比較 no transfer、SBC、DS、PDS 的 RMSEP 與 R²。</li></ol><pre>python analysis_script.py</pre></div>
 <div class="card warn"><h2>教學注意事項</h2><ul><li>這是 calibration transfer 教學，不是追求最佳 corn protein 模型。</li><li>SBC 需要 standard samples 的 reference y；DS/PDS 通常只需要 paired spectra。</li><li>PDS 對 transfer standards 的數量、代表性、window size 很敏感；標準樣品太少可能過度配適。</li><li>不要把同一 sample 的不同 instrument spectra 當成獨立樣品隨機切分，否則會混淆 transfer 問題。</li></ul></div>
 <div class="card"><h2>Orange Data Mining 課堂活動</h2><ol><li>安裝 Orange 與（可選）Orange Spectroscopy add-on。</li><li>File → 載入 <code>corn_nir_for_orange.csv</code>。</li><li>Select Columns：<code>wl_*</code> 為 features，<code>Protein</code> 為 target，<code>sample_id</code> 與 <code>instrument</code> 為 meta。</li><li>PCA：用 instrument 上色，觀察三台儀器造成的光譜分布差異。</li><li>用 Select Rows 分出 m5 與 mp5，比較模型跨儀器預測落差。</li><li>把 Python 產生的轉移後 spectra 匯回 Orange，可視覺化 PDS 前後變化。</li></ol></div>
