@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="食用油脂肪酸 P/M/S 組成、橄欖油摻假比例模擬與互動測驗教材">
+  <title>油裡的數字會說話｜食用油脂肪酸與摻假判讀</title>
+  <style>
+    :root {
+      --ink:#0b2341; --muted:#5d6b7c; --line:#d8dee6; --grid:#eaf0f6;
+      --olive:#617b16; --olive-dark:#445b0d; --canola:#e5b510; --soy:#bd7411;
+      --coral:#e95e4d; --coral-pale:#fff2ef; --green-pale:#f2f6e8;
+      --yellow-pale:#fff8dc; --soy-pale:#fff4e6; --white:#fff;
+      --p:#637c20; --m:#e5b510; --s:#e95e4d;
+      --shadow:0 16px 40px rgba(11,35,65,.09);
+      --radius:18px; --max:1180px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:"Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:var(--white);line-height:1.65}
+    button,input{font:inherit}
+    button{min-height:44px}
+    a{color:var(--olive-dark)}
+    :focus-visible{outline:3px solid rgba(229,181,16,.65);outline-offset:3px}
+    .skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:#fff;padding:8px 14px;z-index:100}
+    .skip:focus{left:8px}
+    .nav{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(12px)}
+    .nav-inner{max-width:var(--max);margin:auto;min-height:68px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.04em}
+    .brand-mark{width:34px;height:34px;border:2px solid var(--ink);border-radius:50% 50% 45% 55%;display:grid;place-items:center;color:var(--olive);font-size:19px}
+    .nav-links{display:flex;gap:28px;align-items:center}
+    .nav-links a{text-decoration:none;color:var(--ink);font-weight:700;padding:20px 0;border-bottom:3px solid transparent}
+    .nav-links a:hover{border-color:var(--olive)}
+    .menu-btn{display:none;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;color:var(--ink)}
+    .container{max-width:var(--max);margin:auto;padding:0 24px}
+    .hero{min-height:680px;display:grid;grid-template-columns:.88fr 1.2fr;align-items:center;gap:30px;padding:70px 0 42px;border-bottom:1px solid var(--line)}
+    h1{font-size:clamp(2.8rem,5vw,4.1rem);line-height:1.06;letter-spacing:-.04em;margin:0 0 24px;max-width:11ch}
+    .hero p{font-size:clamp(1.15rem,2vw,1.55rem);font-weight:700;margin:0 0 34px;max-width:24ch}
+    .primary{border:0;border-radius:12px;background:var(--olive);color:#fff;padding:13px 22px;font-weight:900;box-shadow:0 8px 18px rgba(68,91,13,.2);cursor:pointer}
+    .primary:hover{background:var(--olive-dark);transform:translateY(-1px)}
+    .hero-visual{position:relative;min-height:520px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .hero-visual::before{content:"";position:absolute;inset:6% 0 4% 10%;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(to right,transparent,#000 18%,#000 88%,transparent)}
+    .hero-visual img{position:relative;width:100%;height:auto;display:block;object-fit:contain;mix-blend-mode:multiply}
+    .evidence-note{position:absolute;right:0;bottom:20px;background:#fff;border:1px solid var(--coral);border-radius:12px;padding:12px 15px;max-width:270px;font-size:.88rem;font-weight:800;color:#8f3027;box-shadow:var(--shadow)}
+    .section{padding:90px 0}
+    .section.alt{background:#f8fafc;border-block:1px solid var(--line)}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:36px}
+    h2{font-size:clamp(2rem,4vw,3.2rem);line-height:1.16;margin:0 0 10px;letter-spacing:-.025em}
+    .section-head p{margin:0;color:var(--muted);max-width:620px}
+    .pms-strip{display:grid;grid-template-columns:repeat(3,1fr);border-block:1px solid var(--line);margin:30px 0 60px}
+    .pms-item{padding:30px 26px;display:grid;grid-template-columns:58px 1fr;gap:16px;align-items:start}
+    .pms-item+.pms-item{border-left:1px solid var(--line)}
+    .letter{width:58px;height:58px;border:2px solid currentColor;border-radius:50%;display:grid;place-items:center;font-size:1.7rem;font-weight:900}
+    .pms-item h3{margin:2px 0 4px;font-size:1.15rem}.pms-item p{margin:0;color:var(--muted);font-size:.93rem}
+    .p-color{color:var(--p)}.m-color{color:#bd8c00}.s-color{color:var(--s)}
+    .oil-table{width:100%;border-collapse:collapse;border-top:2px solid var(--ink);font-variant-numeric:tabular-nums}
+    .oil-table th,.oil-table td{padding:16px 14px;border-bottom:1px solid var(--line);text-align:left}
+    .oil-table th{font-size:.85rem;color:var(--muted);letter-spacing:.03em}
+    .oil-name{font-weight:900;white-space:nowrap}.oil-note{color:var(--muted);font-size:.88rem}
+    .stack{height:22px;display:flex;min-width:300px;border-radius:5px;overflow:hidden;background:#eef1f4}
+    .stack span{height:100%}.seg-p{background:var(--p)}.seg-m{background:var(--m)}.seg-s{background:var(--s)}
+    .legend{display:flex;gap:20px;flex-wrap:wrap;font-size:.86rem;margin:12px 0 0;color:var(--muted)}
+    .legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px}
+    .lab{border:2px solid var(--ink);border-radius:22px;padding:28px;box-shadow:var(--shadow);background:#fff;position:relative}
+    .lab::before,.lab::after{content:"";position:absolute;width:70px;height:10px;border-top:2px solid var(--ink);top:12px}.lab::before{left:24px}.lab::after{right:24px}
+    .lab-top{display:grid;grid-template-columns:1fr 1fr;gap:22px;padding-bottom:26px;border-bottom:1px solid var(--line)}
+    .control-label{font-size:.88rem;color:var(--muted);font-weight:800;display:block;margin-bottom:8px}
+    .switches,.presets{display:flex;gap:10px;flex-wrap:wrap}
+    .choice{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:10px 16px;color:var(--ink);font-weight:800;cursor:pointer}
+    .choice.active{background:var(--olive);border-color:var(--olive);color:#fff}
+    .choice.soy.active{background:var(--soy);border-color:var(--soy)}
+    .preset{border:1px solid var(--olive);color:var(--olive-dark);background:var(--green-pale);border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer}
+    .preset.soy{border-color:var(--soy);color:#784400;background:var(--soy-pale)}
+    .mix-controls{display:grid;grid-template-columns:220px 1fr;gap:28px;align-items:center;padding:30px 0}
+    .big-number{font-size:3.1rem;line-height:1;font-weight:900;color:var(--olive);font-variant-numeric:tabular-nums}
+    .big-number small{font-size:1.2rem}.ratio-small{color:var(--muted);font-weight:700;margin-top:9px}
+    input[type=range]{width:100%;accent-color:var(--olive);cursor:pointer}
+    .range-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;margin-top:6px}
+    .liters{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}
+    .liters label{font-size:.82rem;color:var(--muted);font-weight:800}.liters input{width:110px;display:block;border:1px solid var(--line);border-radius:8px;padding:9px;margin-top:4px;color:var(--ink)}
+    .results{display:grid;grid-template-columns:1.15fr .85fr;gap:28px;border-top:1px solid var(--line);padding-top:28px}
+    .bar-row{display:grid;grid-template-columns:42px 1fr 74px;gap:12px;align-items:center;margin:17px 0}
+    .bar-row b{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff}
+    .meter{height:30px;background:#edf1f4;border-radius:5px;overflow:hidden}.meter span{height:100%;display:block;transition:width .35s ease}
+    .bar-value{text-align:right;font-weight:900;font-variant-numeric:tabular-nums}
+    .verdict{border-left:2px solid var(--ink);padding-left:28px;display:flex;flex-direction:column;justify-content:center}
+    .standards{display:grid;grid-template-columns:1fr auto;gap:8px 20px;padding:10px 0;border-bottom:1px solid var(--line)}
+    .standards strong{font-variant-numeric:tabular-nums;font-size:1.2rem}
+    .result-box{margin-top:18px;border:1.5px solid var(--coral);background:var(--coral-pale);border-radius:14px;padding:18px;color:#992f25}
+    .result-ratio{font-size:clamp(1.8rem,4vw,3rem);font-weight:900;line-height:1.25;font-variant-numeric:tabular-nums}
+    .formula{margin-top:22px;padding:16px 18px;background:#f5f7fa;border-left:4px solid var(--ink);font-family:Consolas,"Microsoft JhengHei",sans-serif;font-size:.9rem}
+    .case-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+    .case-block{padding:30px 0;border-top:2px solid var(--ink)}
+    .case-block h3{font-size:1.45rem;margin:0 0 12px}.case-block p{color:var(--muted)}
+    .case-block strong{color:var(--ink)}
+    .callout{border:1px solid var(--coral);background:var(--coral-pale);border-radius:12px;padding:18px;margin-top:20px;color:#882b22}
+    .quiz-shell{display:grid;grid-template-columns:1fr 260px;gap:28px}
+    .quiz-main,.score-rail{border:1px solid var(--line);border-radius:16px;padding:28px;background:#fff}
+    .quiz-progress{height:7px;background:#edf0f3;border-radius:20px;overflow:hidden;margin:10px 0 30px}.quiz-progress span{display:block;height:100%;background:var(--olive);transition:width .3s}
+    .question{font-size:1.45rem;line-height:1.55;font-weight:900;margin:0 0 24px}
+    .options{display:grid;gap:12px}.option{width:100%;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:14px 16px;color:var(--ink);cursor:pointer;font-weight:700}
+    .option:hover:not(:disabled){border-color:var(--olive);background:var(--green-pale)}
+    .option.correct{border-color:var(--olive);background:var(--green-pale);color:var(--olive-dark)}
+    .option.wrong{border-color:var(--coral);background:var(--coral-pale);color:#8e2b23}
+    .option:disabled{cursor:default}
+    .feedback{display:none;margin-top:20px;border-radius:12px;padding:18px}.feedback.show{display:block}.feedback.ok{background:var(--green-pale);border:1px solid var(--olive)}.feedback.fail{background:var(--coral-pale);border:1px solid var(--coral)}
+    .feedback strong{display:block;margin-bottom:5px}.next{margin-top:18px;float:right}
+    .score-rail h3{margin:0 0 18px}.score-big{font-size:3rem;font-weight:900;color:var(--olive);font-variant-numeric:tabular-nums}.dots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:24px 0}.dot{aspect-ratio:1;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-weight:900;color:var(--muted)}.dot.current{border-color:var(--olive);color:var(--olive)}.dot.done{background:var(--olive);color:#fff;border-color:var(--olive)}
+    .completion{text-align:center;padding:20px 0}.completion h3{font-size:1.8rem}.completion .score-big{font-size:4.5rem}.completion p{color:var(--muted)}
+    .source-box{margin-top:34px;border-top:1px solid var(--line);padding-top:22px;color:var(--muted);font-size:.88rem}
+    .share{display:flex;gap:18px;align-items:center;margin-top:24px;padding:16px;background:#f6f8fa;border-radius:12px}.share img{width:96px;height:96px;background:#fff;border:1px solid var(--line)}.share p{margin:0;font-size:.82rem}
+    footer{background:var(--ink);color:#dce5ef;padding:36px 0;font-size:.86rem}footer a{color:#fff}
+    @media(max-width:850px){.nav-links{display:none;position:absolute;top:68px;left:0;right:0;background:#fff;padding:14px 24px;border-bottom:1px solid var(--line);flex-direction:column;align-items:flex-start;gap:0}.nav-links.open{display:flex}.nav-links a{padding:10px 0}.menu-btn{display:block}.hero{grid-template-columns:1fr;min-height:auto;padding-top:58px}.hero-visual{min-height:360px}.section{padding:70px 0}.pms-strip,.lab-top,.results,.case-grid,.quiz-shell{grid-template-columns:1fr}.pms-item+.pms-item{border-left:0;border-top:1px solid var(--line)}.mix-controls{grid-template-columns:1fr}.verdict{border-left:0;border-top:2px solid var(--ink);padding:22px 0 0}.score-rail{order:-1}.oil-table{display:block;overflow-x:auto}.section-head{display:block}.section-head p{margin-top:10px}}
+    @media(max-width:560px){.container,.nav-inner{padding-inline:17px}h1{font-size:2.75rem}.hero{padding-top:42px}.hero-visual{min-height:280px;display:flex;flex-direction:column;align-items:stretch}.evidence-note{position:relative;right:auto;bottom:auto;margin:0;width:100%;max-width:none}.section{padding:56px 0}.lab{padding:20px 15px}.pms-item{grid-template-columns:48px 1fr;padding:22px 10px}.letter{width:46px;height:46px}.bar-row{grid-template-columns:36px 1fr 62px}.stack{min-width:260px}.quiz-main,.score-rail{padding:20px 16px}.question{font-size:1.2rem}.share{align-items:flex-start}.liters input{width:100px}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+    @media print{.nav,.primary,.share,.menu-btn{display:none!important}.hero{min-height:auto}.section{padding:35px 0}.lab,.quiz-main,.score-rail{box-shadow:none}.hero-visual{min-height:300px}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要內容</a>
+  <nav class="nav" aria-label="課程導覽">
+    <div class="nav-inner">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">滴</span><span>食品分析實驗室</span></div>
+      <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">選單</button>
+      <div class="nav-links" id="navLinks">
+        <a href="#concept">概念</a><a href="#profile">油品圖譜</a><a href="#simulator">混油模擬</a><a href="#quiz">學習測驗</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div class="container">
+      <section class="hero" aria-labelledby="heroTitle">
+        <div>
+          <h1 id="heroTitle">油裡的數字會說話</h1>
+          <p>用脂肪酸組成拆穿橄欖油摻假</p>
+          <button class="primary" onclick="document.querySelector('#concept').scrollIntoView()">開始判讀　→</button>
+        </div>
+        <div class="hero-visual">
+          <img src="hero-oil-lab.png" alt="橄欖枝、芥花、大豆與裝有食用油的實驗室燒瓶">
+          <div class="evidence-note">標籤可以被修改；樣品的脂肪酸組成不會因此改變。</div>
+        </div>
+      </section>
+    </div>
+
+    <section class="section" id="concept">
+      <div class="container">
+        <div class="section-head"><div><h2>先認識 P／M／S</h2><p>把總脂肪中的三類脂肪酸放在同一尺度比較，便能看見不同油品的「組成指紋」。</p></div></div>
+        <div class="pms-strip">
+          <article class="pms-item p-color"><span class="letter">P</span><div><h3>多元不飽和脂肪酸</h3><p>Polyunsaturated fatty acids；含兩個以上雙鍵。大豆油、一般葵花油含量較高。</p></div></article>
+          <article class="pms-item m-color"><span class="letter">M</span><div><h3>單元不飽和脂肪酸</h3><p>Monounsaturated fatty acids；含一個雙鍵。橄欖油以油酸為主，因此 M 特別高。</p></div></article>
+          <article class="pms-item s-color"><span class="letter">S</span><div><h3>飽和脂肪酸</h3><p>Saturated fatty acids；不含碳碳雙鍵。椰子油的 S 明顯高於多數液態植物油。</p></div></article>
+        </div>
+        <div class="case-grid">
+          <div class="case-block"><h3>如何讀 P：M：S？</h3><p>先把三個含量同除以 P。例如橄欖油為 9.4：74.3：16.3，同除以 9.4 後得到 <strong>1：7.90：1.73</strong>。</p></div>
+          <div class="case-block"><h3>為什麼能判讀油種？</h3><p>不同原料的脂肪酸生合成特性不同，因此 P、M、S 分布不同。但天然批次仍有變異，正式鑑別不能只靠單一比值。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="profile">
+      <div class="container">
+        <div class="section-head"><div><h2>常見食用油脂肪酸圖譜</h2><p>下列為每 100 g 油脂中的相對含量（g）。橫條以同一色碼呈現 P、M、S。</p></div></div>
+        <div style="overflow-x:auto">
+          <table class="oil-table">
+            <thead><tr><th>油品</th><th>P</th><th>M</th><th>S</th><th>組成視覺</th><th>判讀重點</th></tr></thead>
+            <tbody id="oilRows"></tbody>
+          </table>
+        </div>
+        <div class="legend"><span><i style="background:var(--p)"></i>P 多元不飽和</span><span><i style="background:var(--m)"></i>M 單元不飽和</span><span><i style="background:var(--s)"></i>S 飽和</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="simulator">
+      <div class="container">
+        <div class="section-head"><div><h2>混油模擬實驗台</h2><p>選擇摻混油、改變橄欖油比例，立即比較混合物的 P／M／S 與純橄欖油標準。</p></div></div>
+        <div class="lab">
+          <div class="lab-top">
+            <div><span class="control-label">選擇摻混油</span><div class="switches"><button class="choice active" data-oil="canola">芥花油</button><button class="choice soy" data-oil="soybean">大豆油</button></div></div>
+            <div><span class="control-label">快速案例</span><div class="presets"><button class="preset" onclick="setPreset('canola',20,580)">芥花油：20＋580 L</button><button class="preset soy" onclick="setPreset('soybean',20,580)">大豆油：20＋580 L</button></div></div>
+          </div>
+          <div class="mix-controls">
+            <div><span class="control-label">橄欖油比例</span><div class="big-number"><span id="olivePct">3.33</span><small>%</small></div><div class="ratio-small" id="mixText">橄欖油：芥花油 = 1：29</div></div>
+            <div>
+              <label class="control-label" for="oliveRange">向右增加橄欖油比例</label>
+              <input id="oliveRange" type="range" min="0" max="100" step="0.01" value="3.33" aria-describedby="mixText">
+              <div class="range-labels"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+              <div class="liters"><label>橄欖油（L）<input id="oliveLiters" type="number" min="0" step="1" value="20"></label><label><span id="otherLabel">芥花油</span>（L）<input id="otherLiters" type="number" min="0" step="1" value="580"></label></div>
+            </div>
+          </div>
+          <div class="results">
+            <div>
+              <h3>脂肪酸組成結果（%）</h3>
+              <div class="bar-row"><b style="background:var(--p)">P</b><div class="meter"><span id="pBar" style="background:var(--p)"></span></div><div class="bar-value" id="pVal"></div></div>
+              <div class="bar-row"><b style="background:var(--m)">M</b><div class="meter"><span id="mBar" style="background:var(--m)"></span></div><div class="bar-value" id="mVal"></div></div>
+              <div class="bar-row"><b style="background:var(--s)">S</b><div class="meter"><span id="sBar" style="background:var(--s)"></span></div><div class="bar-value" id="sVal"></div></div>
+              <div class="formula" id="formula"></div>
+            </div>
+            <aside class="verdict" aria-live="polite">
+              <h3>標準與結果比對</h3>
+              <div class="standards"><span>純橄欖油標準</span><strong>1：7.90：1.73</strong><span>報導中的包裝標示</span><strong>1：7.21：1.77</strong></div>
+              <div class="result-box"><div>本次模擬結果（P：M：S）</div><div class="result-ratio" id="ratioResult"></div><strong id="interpretation"></strong></div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="case">
+      <div class="container">
+        <div class="section-head"><div><h2>把新聞敘述拆成兩個問題</h2><p>「檢方查得的製程比例」與「由脂肪酸組成反推比例」是不同證據，不能混為一談。</p></div></div>
+        <div class="case-grid">
+          <article class="case-block"><h3>20 L＋580 L 的比例算對了嗎？</h3><p><strong>算術正確：</strong>20 ÷ 600＝3.33%，代表橄欖油只占 3.33%。新聞中的 20：580 可來自調查紀錄、進貨或人員供述。</p><div class="callout">若摻混的是芥花油，實際推估為 <strong>1：1.56：0.28</strong>，幾乎就是芥花油圖譜。</div></article>
+          <article class="case-block"><h3>改標示能躲過化學分析嗎？</h3><p><strong>不能。</strong>把包裝上的 P／M／S 寫成 1：7.21：1.77，不會改變瓶中油的脂肪酸組成。真正的樣品分析仍會反映大量芥花油或大豆油。</p><div class="callout">教學提醒：P／M／S 是初步判讀工具；正式真偽鑑別須結合脂肪酸個別組成、固醇、三酸甘油酯或其他驗證方法。</div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="quiz">
+      <div class="container">
+        <div class="section-head"><div><h2>學習測驗</h2><p>共 8 題。作答後立即顯示正確答案與原因，完成後可重新挑戰。</p></div></div>
+        <div class="quiz-shell" id="quizShell">
+          <div class="quiz-main">
+            <div id="quizGame">
+              <strong id="qCount">第 1／8 題</strong><div class="quiz-progress"><span id="qProgress"></span></div>
+              <p class="question" id="question"></p><div class="options" id="options"></div>
+              <div class="feedback" id="feedback" aria-live="polite"></div>
+              <button class="primary next" id="nextBtn" hidden>下一題　→</button><div style="clear:both"></div>
+            </div>
+            <div class="completion" id="completion" hidden><h3>你的分析判讀力</h3><div class="score-big"><span id="finalScore">0</span><small>／100</small></div><p id="finalMessage"></p><button class="primary" id="restartBtn">重新挑戰</button></div>
+          </div>
+          <aside class="score-rail"><h3>作答進度</h3><div class="score-big"><span id="scoreNow">0</span><small>／8</small></div><div class="dots" id="dots"></div><p id="scoreHint">先判讀，再選答案。</p></aside>
+        </div>
+        <div class="source-box">
+          <strong>資料來源與使用界線</strong><br>
+          脂肪酸數值取自衛生福利部食品藥物管理署「台灣食品營養成分資料庫 2018 版」，整理於《國人膳食營養素參考攝取量》第八版。混合計算假設兩種油密度近似、以比例線性加權，僅供課堂理解；實際檢驗應以實驗室方法與批次實測為準。<br>
+          <a href="https://health99.hpa.gov.tw/storage/pdf/materials/22384.pdf" target="_blank" rel="noopener">開啟官方資料</a>　·　<a href="https://www.fda.gov.tw/tc/includes/GetFile.ashx?id=f637588531216208705&type=1" target="_blank" rel="noopener">TFDA 常見油品脂肪酸資料</a>
+          <div class="share"><img id="qrImage" alt="目前教材網址 QR Code"><p id="qrHelp">若以本機伺服器或網站開啟，可掃描 QR Code 分享給學生；直接以檔案開啟時，請先部署或在同一 Wi-Fi 使用本機伺服器。</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="container">食品分析課程互動教材｜P／M／S 只能作為判讀線索，不能取代法定檢驗與完整證據鏈。</div></footer>
+
+  <script>
+    const oils = [
+      {id:'olive',name:'橄欖油',p:9.4,m:74.3,s:16.3,note:'M 高；P:M:S＝1:7.90:1.73'},
+      {id:'canola',name:'芥花油',p:36.0,m:54.1,s:9.7,note:'M 為主，但 P 明顯高於橄欖油'},
+      {id:'soybean',name:'大豆油',p:59.9,m:23.7,s:16.1,note:'P 高；與橄欖油差異大'},
+      {id:'sunflower',name:'葵花油',p:61.9,m:26.5,s:11.6,note:'一般型以 P 為主'},
+      {id:'sesame',name:'黑芝麻油',p:43.2,m:40.0,s:16.5,note:'P 與 M 接近'},
+      {id:'coconut',name:'椰子油',p:1.7,m:8.0,s:90.1,note:'S 極高，常溫物性也不同'}
+    ];
+    const byId = Object.fromEntries(oils.map(o=>[o.id,o]));
+    const tbody = document.getElementById('oilRows');
+    oils.forEach(o=>{
+      const total=o.p+o.m+o.s;
+      tbody.insertAdjacentHTML('beforeend',`<tr><td class="oil-name">${o.name}</td><td>${o.p.toFixed(1)}</td><td>${o.m.toFixed(1)}</td><td>${o.s.toFixed(1)}</td><td><div class="stack" aria-label="${o.name} P ${o.p}、M ${o.m}、S ${o.s}"><span class="seg-p" style="width:${o.p/total*100}%"></span><span class="seg-m" style="width:${o.m/total*100}%"></span><span class="seg-s" style="width:${o.s/total*100}%"></span></div></td><td class="oil-note">${o.note}</td></tr>`);
+    });
+
+    let adulterant='canola';
+    const range=document.getElementById('oliveRange');
+    const oliveL=document.getElementById('oliveLiters');
+    const otherL=document.getElementById('otherLiters');
+    document.querySelectorAll('.choice').forEach(btn=>btn.addEventListener('click',()=>{
+      adulterant=btn.dataset.oil;
+      document.querySelectorAll('.choice').forEach(b=>b.classList.toggle('active',b===btn));
+      document.getElementById('otherLabel').textContent=byId[adulterant].name;
+      updateMix();
+    }));
+    range.addEventListener('input',()=>{
+      const total=(Number(oliveL.value)||0)+(Number(otherL.value)||0)||600;
+      const frac=Number(range.value)/100;
+      oliveL.value=(total*frac).toFixed(1);otherL.value=(total*(1-frac)).toFixed(1);updateMix();
+    });
+    [oliveL,otherL].forEach(el=>el.addEventListener('input',()=>{
+      const a=Math.max(0,Number(oliveL.value)||0),b=Math.max(0,Number(otherL.value)||0),total=a+b;
+      range.value=total?a/total*100:0;updateMix();
+    }));
+    function setPreset(o,a,b){
+      adulterant=o;oliveL.value=a;otherL.value=b;range.value=a/(a+b)*100;
+      document.querySelectorAll('.choice').forEach(btn=>btn.classList.toggle('active',btn.dataset.oil===o));
+      document.getElementById('otherLabel').textContent=byId[o].name;updateMix();
+    }
+    function updateMix(){
+      const x=Number(range.value)/100,o=byId.olive,a=byId[adulterant];
+      const p=x*o.p+(1-x)*a.p,m=x*o.m+(1-x)*a.m,s=x*o.s+(1-x)*a.s;
+      const mp=m/p,sp=s/p,pct=x*100,otherName=a.name;
+      document.getElementById('olivePct').textContent=pct.toFixed(2);
+      document.getElementById('mixText').textContent=pct===0?`全為${otherName}`:pct===100?'全為橄欖油':`橄欖油：${otherName} ≈ 1：${((1-x)/x).toFixed(2)}`;
+      [['p',p],['m',m],['s',s]].forEach(([k,v])=>{document.getElementById(k+'Bar').style.width=Math.min(100,v)+'%';document.getElementById(k+'Val').textContent=v.toFixed(2)});
+      document.getElementById('ratioResult').textContent=`1：${mp.toFixed(2)}：${sp.toFixed(2)}`;
+      let msg=pct<10?`解讀：這桶油的脂肪酸圖譜幾乎就是${otherName}`:pct>95?'解讀：組成已接近純橄欖油':'解讀：呈現兩種油的混合圖譜';
+      document.getElementById('interpretation').textContent=msg;
+      document.getElementById('formula').innerHTML=`以 P 為例：${pct.toFixed(2)}% × 9.4 ＋ ${(100-pct).toFixed(2)}% × ${a.p.toFixed(1)} ＝ <strong>${p.toFixed(2)}</strong>`;
+    }
+    updateMix();
+
+    const quiz=[
+      {q:'P／M／S 依序代表哪三類脂肪酸？',opts:['多元不飽和、單元不飽和、飽和','蛋白質、礦物質、糖','棕櫚酸、肉豆蔻酸、硬脂酸','過氧化價、酸價、皂化價'],a:0,e:'P、M、S 分別是 polyunsaturated、monounsaturated、saturated fatty acids。'},
+      {q:'官方資料中的橄欖油 9.4：74.3：16.3，正規化為 P＝1 後最接近何者？',opts:['1：1.50：0.27','1：7.90：1.73','1：0.40：0.27','1：4.00：1.53'],a:1,e:'三項同除以 9.4，即得到約 1：7.90：1.73。'},
+      {q:'20 L 橄欖油加入 580 L 其他油，橄欖油占總量多少？',opts:['29.0%','20.0%','3.33%','96.67%'],a:2,e:'總量是 600 L；20 ÷ 600 × 100%＝3.33%。'},
+      {q:'20 L 橄欖油＋580 L 芥花油，推估 P：M：S 最接近何者？',opts:['1：7.21：1.77','1：7.90：1.73','1：1.56：0.28','1：0.44：0.28'],a:2,e:'混合後 P≈35.11、M≈54.77、S≈9.92，正規化為 1：1.56：0.28。'},
+      {q:'把包裝營養標示改成純橄欖油的 P／M／S，對實驗室測得的樣品組成有何影響？',opts:['樣品會自動變成相同比例','只會改變標示，不會改變樣品化學組成','只改變 P，不改變 M 與 S','可保證通過所有真偽檢驗'],a:1,e:'標籤是文字資訊；化學分析反映瓶中樣品，兩者不能混為一談。'},
+      {q:'20 L 橄欖油＋580 L 大豆油，推估 P：M：S 最接近何者？',opts:['1：0.44：0.28','1：1.56：0.28','1：7.90：1.73','1：5.40：1.61'],a:0,e:'混合後 P≈58.22、M≈25.39、S≈16.11，正規化約 1：0.44：0.28。'},
+      {q:'表中哪一種油的飽和脂肪酸 S 含量最高？',opts:['橄欖油','芥花油','大豆油','椰子油'],a:3,e:'椰子油的 S 約為 90.1%，明顯高於其他列示油品。'},
+      {q:'若只用 M／P＝7.21 反推橄欖油＋芥花油的混合比例，約需多少橄欖油？',opts:['3.3%','20%','50%','96.9%'],a:3,e:'解線性混合方程約得 96.9% 橄欖油，幾乎與「3.3% 橄欖油」完全相反。'}
+    ];
+    let qi=0,score=0,answered=false;
+    const qEl=document.getElementById('question'),optsEl=document.getElementById('options'),fb=document.getElementById('feedback'),next=document.getElementById('nextBtn');
+    function initDots(){document.getElementById('dots').innerHTML=quiz.map((_,i)=>`<span class="dot" id="dot${i}">${i+1}</span>`).join('')}
+    function showQ(){
+      answered=false;fb.className='feedback';fb.innerHTML='';next.hidden=true;
+      document.getElementById('qCount').textContent=`第 ${qi+1}／${quiz.length} 題`;document.getElementById('qProgress').style.width=`${(qi+1)/quiz.length*100}%`;
+      qEl.textContent=quiz[qi].q;optsEl.innerHTML='';
+      quiz[qi].opts.forEach((o,i)=>{const b=document.createElement('button');b.className='option';b.textContent=`${String.fromCharCode(65+i)}. ${o}`;b.onclick=()=>answerQ(i);optsEl.appendChild(b)});
+      document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('current',i===qi));
+    }
+    function answerQ(i){
+      if(answered)return;answered=true;const q=quiz[qi],buttons=[...optsEl.children],ok=i===q.a;
+      buttons.forEach((b,j)=>{b.disabled=true;if(j===q.a)b.classList.add('correct')});if(!ok)buttons[i].classList.add('wrong');
+      if(ok)score++;
+      fb.className=`feedback show ${ok?'ok':'fail'}`;fb.innerHTML=`<strong>${ok?'答對了！':'再檢查一次。正確答案是 '+String.fromCharCode(65+q.a)+'。'}</strong>${q.e}`;
+      document.getElementById('dot'+qi).classList.add('done');document.getElementById('scoreNow').textContent=score;document.getElementById('scoreHint').textContent=ok?'判讀正確，繼續保持。':'閱讀解析後再前進。';next.hidden=false;next.focus();
+    }
+    next.onclick=()=>{qi++;if(qi<quiz.length)showQ();else finishQuiz()};
+    function finishQuiz(){
+      document.getElementById('quizGame').hidden=true;document.getElementById('completion').hidden=false;const pct=Math.round(score/quiz.length*100);document.getElementById('finalScore').textContent=pct;
+      document.getElementById('finalMessage').textContent=pct>=88?'表現優秀！你已能把標示、配方與實測組成分開判讀。':pct>=63?'基礎已建立；建議再操作一次混油模擬後挑戰。':'回到油品圖譜與模擬器，重新觀察 P／M／S 的變化。';
+    }
+    document.getElementById('restartBtn').onclick=()=>{qi=0;score=0;document.getElementById('scoreNow').textContent=0;document.getElementById('quizGame').hidden=false;document.getElementById('completion').hidden=true;initDots();showQ()};
+    initDots();showQ();
+
+    const menuBtn=document.getElementById('menuBtn'),navLinks=document.getElementById('navLinks');menuBtn.onclick=()=>{const open=navLinks.classList.toggle('open');menuBtn.setAttribute('aria-expanded',open)};navLinks.querySelectorAll('a').forEach(a=>a.onclick=()=>{navLinks.classList.remove('open');menuBtn.setAttribute('aria-expanded','false')});
+    const qr=document.getElementById('qrImage');const shareUrl=location.href.split('#')[0];qr.src=`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(shareUrl)}`;
+    if(location.protocol==='file:')qr.alt='部署或用本機伺服器開啟後產生可分享的教材 QR Code';
+  </script>
+</body>
+</html>
