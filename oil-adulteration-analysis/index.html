@@ -44,6 +44,24 @@
     .evidence-note{position:absolute;right:0;bottom:20px;background:#fff;border:1px solid var(--coral);border-radius:12px;padding:12px 15px;max-width:270px;font-size:.88rem;font-weight:800;color:#8f3027;box-shadow:var(--shadow)}
     .section{padding:90px 0}
     .section.alt{background:#f8fafc;border-block:1px solid var(--line)}
+    .news-brief{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:52px;border-top:3px solid var(--ink);border-bottom:1px solid var(--line);padding:38px 0 42px}
+    .news-meta{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:.84rem;font-weight:800;letter-spacing:.04em;margin-bottom:18px}
+    .news-meta span{border-left:1px solid var(--line);padding-left:12px}
+    .news-kicker{color:var(--coral);font-weight:900;letter-spacing:.08em;margin:0 0 8px}
+    .news-brief h2{max-width:17ch}
+    .news-summary{font-size:1.08rem;line-height:1.85;color:var(--muted);margin:18px 0}
+    .news-link{display:inline-flex;align-items:center;gap:7px;font-weight:900;text-underline-offset:4px}
+    .news-facts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+    .news-fact{background:#fff;padding:22px 20px;min-height:132px}
+    .news-fact small{display:block;color:var(--muted);font-weight:800;margin-bottom:8px}
+    .news-fact strong{display:block;font-size:clamp(1.25rem,2.4vw,1.75rem);line-height:1.25;color:var(--ink);font-variant-numeric:tabular-nums}
+    .news-question{grid-column:1/-1;background:var(--ink);color:#fff;padding:24px 22px}
+    .news-question p{font-size:1.12rem;line-height:1.6;font-weight:900;margin:0 0 16px}
+    .prediction-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .predict-btn{border:1px solid rgba(255,255,255,.52);background:transparent;color:#fff;border-radius:10px;padding:10px 18px;font-weight:900;cursor:pointer}
+    .predict-btn:hover,.predict-btn.selected{background:#fff;color:var(--ink)}
+    .predict-feedback{display:none;margin:16px 0 0;padding:14px 16px;border-left:4px solid var(--coral);background:#fff;color:var(--ink);line-height:1.6}
+    .predict-feedback.show{display:block}
     .section-head{display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:36px}
     h2{font-size:clamp(2rem,4vw,3.2rem);line-height:1.16;margin:0 0 10px;letter-spacing:-.025em}
     .section-head p{margin:0;color:var(--muted);max-width:620px}
@@ -110,8 +128,8 @@
     .source-box{margin-top:34px;border-top:1px solid var(--line);padding-top:22px;color:var(--muted);font-size:.88rem}
     .share{display:flex;gap:18px;align-items:center;margin-top:24px;padding:16px;background:#f6f8fa;border-radius:12px}.share img{width:96px;height:96px;background:#fff;border:1px solid var(--line)}.share p{margin:0;font-size:.82rem}
     footer{background:var(--ink);color:#dce5ef;padding:36px 0;font-size:.86rem}footer a{color:#fff}
-    @media(max-width:850px){.nav-links{display:none;position:absolute;top:68px;left:0;right:0;background:#fff;padding:14px 24px;border-bottom:1px solid var(--line);flex-direction:column;align-items:flex-start;gap:0}.nav-links.open{display:flex}.nav-links a{padding:10px 0}.menu-btn{display:block}.hero{grid-template-columns:1fr;min-height:auto;padding-top:58px}.hero-visual{min-height:360px}.section{padding:70px 0}.pms-strip,.lab-top,.results,.case-grid,.quiz-shell{grid-template-columns:1fr}.pms-item+.pms-item{border-left:0;border-top:1px solid var(--line)}.mix-controls{grid-template-columns:1fr}.verdict{border-left:0;border-top:2px solid var(--ink);padding:22px 0 0}.score-rail{order:-1}.oil-table{display:block;overflow-x:auto}.section-head{display:block}.section-head p{margin-top:10px}}
-    @media(max-width:560px){.container,.nav-inner{padding-inline:17px}h1{font-size:2.75rem}.hero{padding-top:42px}.hero-visual{min-height:280px;display:flex;flex-direction:column;align-items:stretch}.evidence-note{position:relative;right:auto;bottom:auto;margin:0;width:100%;max-width:none}.section{padding:56px 0}.lab{padding:20px 15px}.pms-item{grid-template-columns:48px 1fr;padding:22px 10px}.letter{width:46px;height:46px}.bar-row{grid-template-columns:36px 1fr 62px}.stack{min-width:260px}.quiz-main,.score-rail{padding:20px 16px}.question{font-size:1.2rem}.share{align-items:flex-start}.liters input{width:100px}}
+    @media(max-width:850px){.nav-links{display:none;position:absolute;top:68px;left:0;right:0;background:#fff;padding:14px 24px;border-bottom:1px solid var(--line);flex-direction:column;align-items:flex-start;gap:0}.nav-links.open{display:flex}.nav-links a{padding:10px 0}.menu-btn{display:block}.hero{grid-template-columns:1fr;min-height:auto;padding-top:58px}.hero-visual{min-height:360px}.section{padding:70px 0}.news-brief,.pms-strip,.lab-top,.results,.case-grid,.quiz-shell{grid-template-columns:1fr}.pms-item+.pms-item{border-left:0;border-top:1px solid var(--line)}.mix-controls{grid-template-columns:1fr}.verdict{border-left:0;border-top:2px solid var(--ink);padding:22px 0 0}.score-rail{order:-1}.oil-table{display:block;overflow-x:auto}.section-head{display:block}.section-head p{margin-top:10px}}
+    @media(max-width:560px){.container,.nav-inner{padding-inline:17px}h1{font-size:2.75rem}.hero{padding-top:42px}.hero-visual{min-height:280px;display:flex;flex-direction:column;align-items:stretch}.evidence-note{position:relative;right:auto;bottom:auto;margin:0;width:100%;max-width:none}.section{padding:56px 0}.news-facts{grid-template-columns:1fr}.news-question{grid-column:1}.news-fact{min-height:auto}.lab{padding:20px 15px}.pms-item{grid-template-columns:48px 1fr;padding:22px 10px}.letter{width:46px;height:46px}.bar-row{grid-template-columns:36px 1fr 62px}.stack{min-width:260px}.quiz-main,.score-rail{padding:20px 16px}.question{font-size:1.2rem}.share{align-items:flex-start}.liters input{width:100px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
     @media print{.nav,.primary,.share,.menu-btn{display:none!important}.hero{min-height:auto}.section{padding:35px 0}.lab,.quiz-main,.score-rail{box-shadow:none}.hero-visual{min-height:300px}}
   </style>
@@ -123,7 +141,7 @@
       <div class="brand"><span class="brand-mark" aria-hidden="true">滴</span><span>食品分析實驗室</span></div>
       <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">選單</button>
       <div class="nav-links" id="navLinks">
-        <a href="#concept">概念</a><a href="#profile">油品圖譜</a><a href="#simulator">混油模擬</a><a href="#quiz">學習測驗</a>
+        <a href="#news-intro">新聞引言</a><a href="#concept">概念</a><a href="#profile">油品圖譜</a><a href="#simulator">混油模擬</a><a href="#quiz">學習測驗</a>
       </div>
     </div>
   </nav>
@@ -133,8 +151,8 @@
       <section class="hero" aria-labelledby="heroTitle">
         <div>
           <h1 id="heroTitle">油裡的數字會說話</h1>
-          <p>用脂肪酸組成拆穿橄欖油摻假</p>
-          <button class="primary" onclick="document.querySelector('#concept').scrollIntoView()">開始判讀　→</button>
+          <p>從一則橄欖油摻假新聞，練習用脂肪酸數字查核真相</p>
+          <button class="primary" onclick="document.querySelector('#news-intro').scrollIntoView()">從新聞開始　→</button>
         </div>
         <div class="hero-visual">
           <img src="hero-oil-lab.png" alt="橄欖枝、芥花、大豆與裝有食用油的實驗室燒瓶">
@@ -142,6 +160,34 @@
         </div>
       </section>
     </div>
+
+    <section class="section alt" id="news-intro" aria-labelledby="newsTitle">
+      <div class="container">
+        <div class="news-brief">
+          <article>
+            <div class="news-meta">課堂新聞事件<span>2026 年 7 月報導</span></div>
+            <p class="news-kicker">CASE 01｜蒙特樂橄欖油事件</p>
+            <h2 id="newsTitle">標籤上的數字，和瓶子裡的油是同一件事嗎？</h2>
+            <p class="news-summary">新聞報導與起訴內容指出，涉案廠商被指以低價油混充高價橄欖油，並調整包裝上的營養標示，使 P／M／S 看起來接近純橄欖油。這堂課不判定法律責任，而是查核報導中的配方與脂肪酸數字在化學上是否相容。</p>
+            <a class="news-link" href="https://www.msn.com/zh-tw/news/national/%E7%94%A8%E4%BD%8E%E5%83%B9%E6%B2%B9%E6%B7%B7%E5%85%85%E9%AB%98%E5%83%B9%E6%B2%B9-%E8%92%99%E7%89%B9%E6%A8%82%E6%A9%84%E6%AC%96%E6%B2%B9%E4%BA%8B%E4%BB%B6-%E4%BA%8C%E5%BB%A0%E5%95%86%E9%81%AD%E8%B5%B7%E8%A8%B4%E6%B1%82%E5%88%915%E5%B9%B4/ar-AA27SdzX" target="_blank" rel="noopener">閱讀 MSN 原始報導 <span aria-hidden="true">↗</span></a>
+          </article>
+          <aside class="news-facts" aria-label="新聞中的關鍵數字">
+            <div class="news-fact"><small>報導所述摻配方式</small><strong>20 L 橄欖油<br>＋ 580 L 芥花油</strong></div>
+            <div class="news-fact"><small>橄欖油實際占比</small><strong>3.33%</strong></div>
+            <div class="news-fact"><small>報導中的包裝標示</small><strong>1：7.21：1.77</strong></div>
+            <div class="news-fact"><small>純橄欖油參考值</small><strong>1：7.90：1.73</strong></div>
+            <div class="news-question">
+              <p>先別計算：只有 3.33% 橄欖油的混合物，實測 P／M／S 可能如此接近純橄欖油嗎？</p>
+              <div class="prediction-actions" aria-label="課前預測">
+                <button class="predict-btn" type="button" data-prediction="possible">可能</button>
+                <button class="predict-btn" type="button" data-prediction="impossible">不可能</button>
+              </div>
+              <div class="predict-feedback" id="predictionFeedback" aria-live="polite"></div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
 
     <section class="section" id="concept">
       <div class="container">
@@ -244,6 +290,16 @@
   <footer><div class="container">食品分析課程互動教材｜P／M／S 只能作為判讀線索，不能取代法定檢驗與完整證據鏈。</div></footer>
 
   <script>
+    const predictionFeedback=document.getElementById('predictionFeedback');
+    document.querySelectorAll('.predict-btn').forEach(btn=>btn.addEventListener('click',()=>{
+      const correct=btn.dataset.prediction==='impossible';
+      document.querySelectorAll('.predict-btn').forEach(b=>b.classList.toggle('selected',b===btn));
+      predictionFeedback.className='predict-feedback show';
+      predictionFeedback.innerHTML=correct
+        ? '<strong>判斷正確。</strong>依 20＋580 L 線性加權，推估約為 <strong>1：1.56：0.28</strong>，遠離純橄欖油；接著學會怎麼算。'
+        : '<strong>再想一步。</strong>橄欖油只占 3.33%，混合物應主要呈現芥花油圖譜；推估約為 <strong>1：1.56：0.28</strong>。';
+    }));
+
     const oils = [
       {id:'olive',name:'橄欖油',p:9.4,m:74.3,s:16.3,note:'M 高；P:M:S＝1:7.90:1.73'},
       {id:'canola',name:'芥花油',p:36.0,m:54.1,s:9.7,note:'M 為主，但 P 明顯高於橄欖油'},
