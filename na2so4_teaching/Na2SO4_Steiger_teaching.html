@@ -931,4 +931,51 @@ The phase diagram Na₂SO₄–H₂O and the generation of stress.
 <a href="https://doi.org/10.1016/j.gca.2008.05.053">doi:10.1016/j.gca.2008.05.053</a><br>
 Menéndez, B. (2018). Estimation of salt mixture damage on built cultural heritage from environmental conditions. <i>Geosciences</i>, 8(11), 401.</p>
 
+
+<button id="viewToggle" title="切換檢視模式">📱 手機版</button>
+<style>
+#viewToggle{position:fixed;top:12px;right:12px;z-index:999;padding:8px 14px;
+  border-radius:20px;border:1px solid #1a4a7a;background:#fff;color:#1a4a7a;
+  font-weight:bold;font-size:14px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+body.mobile{font-size:19px;padding:12px;line-height:2}
+body.mobile h1{font-size:1.5em}
+body.mobile h2{font-size:1.3em}
+.scrollhint{display:none;font-size:.8em;color:#888;text-align:center;margin-bottom:2px}
+body.mobile .scrollhint{display:block}
+body.mobile .diagram{overflow-x:auto;-webkit-overflow-scrolling:touch}
+body.mobile .diagram svg{min-width:760px}
+body.mobile .imgscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+body.mobile .imgscroll img{min-width:760px;max-width:none}
+body.mobile .widget{overflow-x:auto;-webkit-overflow-scrolling:touch}
+body.mobile .widget canvas{min-width:760px}
+body.mobile table{display:block;overflow-x:auto;white-space:nowrap}
+body.mobile pre{font-size:.75em}
+</style>
+<script>
+(function(){
+  // 圖片包進可橫向捲動的容器
+  document.querySelectorAll('figure img, body > img, p > img').forEach(function(img){
+    if(img.closest('.imgscroll'))return;
+    var d=document.createElement('div'); d.className='imgscroll';
+    img.parentNode.insertBefore(d,img); d.appendChild(img);
+  });
+  // 每張圖前加滑動提示
+  document.querySelectorAll('figure, .widget').forEach(function(f){
+    var h=document.createElement('div'); h.className='scrollhint';
+    h.textContent='↔ 手機版可左右滑動看完整圖'; f.insertBefore(h,f.firstChild);
+  });
+  var btn=document.getElementById('viewToggle');
+  function setMode(m){
+    document.body.classList.toggle('mobile', m==='mobile');
+    btn.textContent = m==='mobile' ? '🖥 電腦版' : '📱 手機版';
+    try{localStorage.setItem('na2so4ViewMode', m);}catch(e){}
+  }
+  btn.addEventListener('click', function(){
+    setMode(document.body.classList.contains('mobile') ? 'desktop' : 'mobile');
+  });
+  var saved=null; try{saved=localStorage.getItem('na2so4ViewMode');}catch(e){}
+  setMode(saved || (window.innerWidth < 768 ? 'mobile' : 'desktop'));
+})();
+</script>
+
 </body></html>
