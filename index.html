@@ -1,6 +1,224 @@
-<div class="card"><span class="tag coral">Raman · 色料鑑定</span><h3>拉曼 × 藍色料鑑定</h3>
-  <p>四種藍色料(酞菁 CuPc、亮藍 FCF、靛藍、鈷藍)的拉曼指紋比對:判讀邏輯(分子 vs 晶型)、前處理實驗(校正／基線／雜訊)、混合物遮蔽、真偽鑑定;Python／R／Orange 三工具。8 個可獨立點入的互動單元,純前端可離線。</p>
-  <div class="links"><a class="go" href="https://tai-shengyeh.github.io/raman-pigment-id/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/tree/main/raman-pigment-id">GitHub</a></div></div>
-</div>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tai-Sheng Yeh ｜ 食品科學教學課程</title>
+<meta name="description" content="葉泰聖的食品科學互動教學課程：光譜 × 食品分析化學計量學、食品安全檢測、食品營養華語閱讀。互動教材、教學影片、可重現工作流。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#FFFFFF;--paper2:#F5F2E9;--ink:#1A1A1A;--soft:#52493b;--teal:#0E7C7B;--cover:#119C9A;--coral:#E36414;--gold:#C8941F;--line:#E4DECC;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Noto Sans TC',system-ui,sans-serif;color:var(--ink);background:var(--paper);line-height:1.6;}
+  a{color:var(--teal);text-decoration:none;} a:hover{text-decoration:underline;}
+  h1,h2,h3{font-weight:900;line-height:1.2;}
+  .hero{background:var(--cover);color:#fff;text-align:center;padding:72px 22px 60px;}
+  .hero h1{font-size:clamp(30px,5vw,52px);letter-spacing:.02em;}
+  .hero .accent{color:#FFDE7A;}
+  .hero p{font-size:clamp(15px,2.2vw,20px);color:rgba(255,255,255,.9);font-weight:500;margin-top:14px;max-width:720px;margin-inline:auto;}
+  .hero .stats{display:flex;gap:30px;justify-content:center;flex-wrap:wrap;margin-top:26px;}
+  .hero .stats b{display:block;font-size:30px;font-weight:900;color:#FFDE7A;}
+  .hero .stats span{font-size:13px;color:rgba(255,255,255,.85);font-weight:500;}
+  main{max-width:1080px;margin:0 auto;padding:0 22px;}
+  section{padding:54px 0 8px;}
+  .kicker{color:var(--coral);font-weight:900;font-size:14px;letter-spacing:.14em;text-transform:uppercase;}
+  section h2{font-size:clamp(24px,3.5vw,34px);margin:6px 0 4px;}
+  section .lead{color:var(--soft);font-size:16px;margin-bottom:8px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin:24px 0;}
+  .card{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;display:flex;flex-direction:column;transition:transform .15s ease,box-shadow .15s ease;}
+  .card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.08);}
+  .card .tag{font-size:12px;font-weight:900;color:#fff;background:var(--teal);border-radius:999px;padding:3px 11px;align-self:flex-start;margin-bottom:10px;}
+  .card .tag.coral{background:var(--coral);} .card .tag.gold{background:var(--gold);}
+  .card h3{font-size:21px;margin-bottom:6px;}
+  .card p{color:var(--soft);font-size:14.5px;font-weight:500;flex:1;}
+  .card .links{margin-top:14px;display:flex;gap:14px;align-items:center;}
+  .card .go{font-weight:900;color:var(--coral);}
+  .card .repo{font-size:13px;color:var(--soft);}
+  footer{background:var(--ink);color:#cfc8b6;text-align:center;padding:34px 22px;margin-top:56px;font-size:13.5px;}
+  footer b{color:var(--gold);} footer a{color:#9fd3d2;}
+  @media(max-width:560px){.hero .stats{gap:18px;}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>食品科學<span class="accent">教學課程</span></h1>
+  <p>葉泰聖（Tai-Sheng Yeh）｜ 互動教材 · 教學影片 · Python + Orange 可重現工作流</p>
+  <div class="stats">
+    <div><b>37</b><span>線上課程</span></div>
+    <div><b>17</b><span>光譜/感測化學計量學</span></div>
+    <div><b>40+</b><span>教學影片</span></div>
+  </div>
+</header>
+<main>
+
+  <section>
+    <span class="kicker">Spectroscopy × Chemometrics</span>
+    <h2>光譜 × 食品分析（化學計量學）</h2>
+    <p class="lead">多種光譜與感測技術配 PCA / PLS / PLS-DA，三層教學：看影片建直覺 → 讀 Python 學算法 → 用 Orange 親手做。</p>
+    <div class="grid">
+      <div class="card"><span class="tag coral">桌面工具</span><h3>SpectraView · 光譜前處理工具</h3>
+        <p>開源桌面程式（Python）：載入 FTIR/Raman/NIR/XRF，做基線(airPLS)/SNV/微分等前處理、尋峰與峰形擬合、XRF 元素鑑定、混合物 NNLS、光譜庫比對，再匯出 X-matrix 餵 PCA / PLS。貫穿下列所有技術的「前處理那一哩路」，<b>頁面附互動光譜庫比對 demo</b>。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/spectraview/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/spectraview">GitHub</a></div></div>
+      <div class="card"><span class="tag">E-nose</span><h3>電子鼻 × 食品品質</h3>
+        <p>電子鼻感測器陣列食品分析：入門 PCA + 分類模型判斷新鮮度；中階 PLS / SVR / Random Forest regression 預測 TVC；進階 time-series feature engineering 從原始曲線萃取 max、AUC、slope。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/enose-food-analysis/">入門課 →</a><a class="repo" href="https://tai-shengyeh.github.io/enose-food-analysis/regression.html">中階 regression ↗</a><a class="repo" href="https://tai-shengyeh.github.io/enose-food-analysis/time-series.html">進階 time-series ↗</a></div></div>
+      <div class="card"><span class="tag">NIR</span><h3>近紅外光譜</h3>
+        <p>PCA 探索 + PLS 定量，Tecator 肉品資料；預測脂肪含量。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/chemometrics-teaching/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/chemometrics-teaching">GitHub</a></div></div>
+      <div class="card"><span class="tag gold">LC-MS/MS · 確效</span><h3>LC-MS/MS 方法確效 × 量測不確定度</h3>
+        <p>檢量線迴歸、LOD/LOQ、ISO GUM 量測不確定度、歐盟 CCα/CCβ（決定極限／偵測能力）；含 OLS/WLS 加權迴歸互動計算器、Van Loco 加權迭代 CCα/CCβ 完整算例與 17 題測驗。依 Evard 2016、Van Loco 2007、Brüggemann 2010。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/chemometrics-teaching/lcmsms-validation.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/chemometrics-teaching">GitHub</a></div></div>
+
+      <div class="card"><span class="tag">NIR · Calibration Transfer</span><h3>近紅外光譜 · 模型校正轉移</h3>
+        <p>公開 corn NIR 三儀器資料集（m5/mp5/mp6）：建立 master instrument PLS protein 模型，觀察跨儀器預測偏差，並比較 SBC、DS、PDS calibration transfer；含 Python Jupyter、Google Colab 與 Orange Data Mining 教學流程。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/nir-calibration-transfer/">課程頁 →</a><a class="repo" href="https://eigenvector.com/resources/data-sets/">Eigenvector Data</a></div></div>
+      <div class="card"><span class="tag">NIR</span><h3>近紅外光譜 · 雞蛋新鮮度</h3>
+        <p>PCA 探索 + PLS 定量，660 筆低成本手持 NIR 光譜（740–1070 nm）預測雞蛋室溫儲存天數（R²≈0.82）；含 SNV／Savitzky–Golay 前處理、一倍標準誤選潛在變數、GroupKFold 防資料洩漏，Python(Colab) + Orange 雙路線。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/nir-egg-freshness/">課程頁 →</a><a class="repo" href="https://data.mendeley.com/datasets/6hn67h2trb/2">Mendeley Data</a></div></div>
+      <div class="card"><span class="tag">NIR · ML</span><h3>nirs4all · 近紅外光譜機器學習課程</h3>
+        <p>改編自 nirs4all 官方範例的繁中互動課程：7 大模組、33+ 課，從第一條 pipeline 到前處理、PLS 變體、交叉驗證、部署與 SHAP 可解釋性。含單頁互動教材＋7 本可在 Google Colab 直接執行的 Notebook（使用官方真實光譜資料集）。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/nirs4all-course/">課程頁 →</a><a class="repo" href="https://github.com/GBeurier/nirs4all">nirs4all GitHub</a></div></div>
+      <div class="card"><span class="tag">MS</span><h3>質譜</h3>
+        <p>PCA 探索 + PLS-DA 鑑別，白酒 GC-MS 代謝體；分辨葡萄品種。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/ms-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/ms-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">Raman</span><h3>拉曼光譜</h3>
+        <p>拉曼光譜在食品分析的應用；互動投影片＋形成性評量小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/raman-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/raman-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">Raman · 色料鑑定</span><h3>拉曼 × 藍色料鑑定</h3>
+        <p>四種藍色料（酞菁 CuPc、亮藍 FCF、靛藍、鈷藍）的拉曼指紋比對：判讀邏輯（分子 vs 晶型）、前處理實驗（校正／基線／雜訊）、混合物遮蔽、真偽鑑定；Python／R／Orange 三工具。8 個可獨立點入的互動單元，純前端可離線。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/raman-pigment-id/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/tree/main/raman-pigment-id">GitHub</a></div></div>
+      <div class="card"><span class="tag">Hyperspectral</span><h3>高光譜影像</h3>
+        <p>高光譜資料分析；Python + Orange + SpectroFood，中英投影片與可重現工作流。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/hyperspectral-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/hyperspectral-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">NMR</span><h3>核磁共振光譜</h3>
+        <p>PCA 探索 + PLS 回歸，40 支葡萄酒 ¹H-NMR；定量蘋果酸。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/nmr-food-analysis/teaching.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/nmr-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">Fluorescence</span><h3>螢光光譜 EEM</h3>
+        <p>PCA 老化軌跡 + 監督分類，橄欖油加速老化；鑑別新鮮度。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/olive-oil-eem/teaching.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/olive-oil-eem">GitHub</a></div></div>
+      <div class="card"><span class="tag">FTIR</span><h3>紅外光譜</h3>
+        <p>PCA 探索 + PLS-DA 鑑別，即溶咖啡 Arabica vs Robusta；搭配咖啡 PGMM 集群 R 分析報告。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/ftir-food-analysis/teaching.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/ftir-food-analysis">GitHub</a><a class="repo" href="https://tai-shengyeh.github.io/coffee_pgmm_R_code/coffee_pgmm.html">R 報告 ↗</a></div></div>
+      <div class="card"><span class="tag">2D-COS</span><h3>FTIR × 2T2D-COS · 食品光譜影像</h3>
+        <p>使用 Mendeley Food FTIR spectra，從即溶咖啡 Arabica vs Robusta 開始，學習一維 FTIR 光譜、PCA / SVM baseline、two-trace 2D correlation maps 與 Orange 工作流。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/ftir-2t2d-food-analysis/">課程頁 →</a><a class="repo" href="https://data.mendeley.com/datasets/frrv2yd9rg/1">Mendeley Data</a></div></div>
+      <div class="card"><span class="tag">2D-COS</span><h3>DUVRR × 2T2D-COS · mRNA-LNP 包覆</h3>
+        <p>原始論文導讀（Anal. Chem. 2026）：深紫外共振拉曼觀測 mRNA 疫苗的脂質奈米顆粒包覆，PCA → 2D-COS → 2T2D-COS 把重疊峰變成 1322 cm⁻¹ 量化 marker；含預備知識、名詞速查與自我檢測，與上方食品 FTIR × 2T2D-COS 互為方法對照。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/mrna-lnp-duvrr-2t2dcos/">課程頁 →</a><a class="repo" href="https://doi.org/10.1021/acs.analchem.5c04246">原始論文 ↗</a></div></div>
+      <div class="card"><span class="tag">Benchtop NMR</span><h3>桌上型 NMR · 咖啡真偽</h3>
+        <p>PCA 探索 + PLS 定量 + PLS-DA 分類，60 支咖啡 16-OMC 摻假標記；搭配 FTIR 與 coffee 化學成分。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/benchtop-nmr-coffee/teaching.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/benchtop-nmr-coffee">GitHub</a></div></div>
+      <div class="card"><span class="tag">GC</span><h3>氣相層析 · 咖啡品種</h3>
+        <p>PCA 探索 + PLS-DA 鑑別，14 支咖啡 Arabica vs Robusta；GC 層析指紋，留一驗證 92.9%。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/coffee-gc-analysis/teaching.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/coffee-gc-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">XRF</span><h3>X 射線螢光</h3>
+        <p>PCA 探索 + PLS-DA 分類，元素指紋；以開放蜂蜜元素表（CC0）即時實算真假與摻假鑑別。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/xrf-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/xrf-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">LIBS</span><h3>雷射誘導擊穿光譜</h3>
+        <p>PCA 探索 + PLS 定量 + PLS-DA 分類，原子發射光譜；咖啡品種過擬合教訓、蜂蜜摻假定量。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/libs-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/libs-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">ML</span><h3>五種機器學習分類法 · 茶葉產地</h3>
+        <p>LDA／Ridge／RF／Boosting／SVM 以 14 元素指紋判別產地；Python(scikit-learn) × Orange 雙路線，真實留一法 LOO-CV、反直覺結果（小資料線性模型勝集成樹），深色主題、手機友善。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/ml_five_models_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">Food Analysis · Nielsen 6/e</span>
+    <h2>食品分析（Nielsen）</h2>
+    <p class="lead">Nielsen《食品分析》經典方法＋食藥署公告檢驗方法的中文互動教材，每份 SOIL 三段式投影片＋形成性評量小遊戲。</p>
+    <div class="grid">
+      <div class="card"><span class="tag">Nielsen 6/e</span><h3>食品分析 · 教學入口</h3>
+        <p>15 章 Nielsen 互動投影片(原子光譜、NMR、質譜、層析、HPLC、GC、水分、灰分、油脂、蛋白質、醣類、維他命、礦物質、pH/酸度、油脂特性)＋8 項食藥署公告檢驗方法(甜味劑、二氧化硫[滴定/GC-MS]、硼酸、四環素、二硫代胺基甲酸鹽、農藥多重殘留、茶葉多重元素)＋機器學習×化學計量學延伸(5 分類器 Python×Orange、手機友善)，共 24 份 deck（約 619 頁 · 約 139 個小遊戲與互動），單一 HTML 可離線。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">油脂真偽 · P/M/S</span><h3>橄欖油摻假判讀實驗室</h3>
+        <p>以台灣食品營養成分資料庫的脂肪酸組成，認識橄欖油、芥花油、大豆油等食用油圖譜；可動態模擬 20 L 橄欖油混入 580 L 芥花油或大豆油，練習區分包裝標示與實際化學組成，並以 8 題形成性評量驗收。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/oil-adulteration-analysis/">開始實驗 →</a></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">Food Chemistry · Fennema 5/e</span>
+    <h2>食品化學</h2>
+    <p class="lead">以 Fennema 5/e 為本的中文食品化學教學：互動簡報、3D 模型與課堂即時小遊戲。</p>
+    <div class="grid">
+      <div class="card"><span class="tag">教學站</span><h3>食品化學 · 教學入口</h3>
+        <p>Fennema 5/e 中文教學版，9 章完整教材：導論、水分與冰、碳水化合物、脂質、蛋白質、酵素、分散系統、維生素、礦物質。每章互動簡報＋課堂小遊戲，課堂即時收題。</p>
+        <div class="links"><a class="go" href="https://food-chemistry-tw.web.app">教學站 →</a></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">Food Safety · Detection</span>
+    <h2>食品安全 · 檢測</h2>
+    <div class="grid">
+      <div class="card"><span class="tag coral">GC-MS/LC-MS · 4 模組</span><h3>質譜定性・定量・品管（驗毒）</h3>
+        <p>用 5 種毒品的 GC-MS／LC-MS 訊號學質譜定性確認、定量與數據品管：偵探入門、兒童遊戲版、GC-MS／LC-MS 進階共四個互動模組；含離子比、確認點數、校正曲線、基質效應互動實驗室與多款小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/drug-ms-detective-gcms/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/tree/main/drug-ms-detective-gcms">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">3 小時</span><h3>食品中微塑膠檢測</h3>
+        <p>NIR、FTIR、Raman、Py-GC-MS、LC-MS 多技術整合的互動教材。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/microplastic-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/microplastic-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">高中 · 60 分</span><h3>微塑膠 × 食品安全</h3>
+        <p>高中彈性課程，22 頁 60 分鐘互動教學投影片。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/microplastic-teaching/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/microplastic-teaching">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">公告方法</span><h3>多重殘留農藥檢驗</h3>
+        <p>衛福部公告法 MOHWP0055.05（410 項農藥）：QuEChERS 前處理＋LC-MS/MS 與 GC-MS/MS；17 頁互動投影片＋淨化劑配對與觀念測驗小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/pesticide-residue-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/pesticide-residue-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">LC-MS/MS · 13 項</span><h3>食品中甜味劑</h3>
+        <p>食藥署公告法 MOHWA0030：LC-MS/MS 一次驗 13 種甜味劑（含禁用甘精）；21 頁互動投影片＋6 個嵌入式小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/tfda_sweeteners_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">通氣蒸餾滴定</span><h3>食品中二氧化硫</h3>
+        <p>食藥署公告法 MOHWA0013：通氣蒸餾＋鹼滴定（Monier-Williams）定量亞硫酸鹽；21 頁互動投影片＋6 個嵌入式小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/tfda_so2_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">頂空 GC-MS</span><h3>二氧化硫 · GC-MS 確認法</h3>
+        <p>食藥署 TFDAA0063：頂空進樣 GC-MS／SIM、2-氯甲苯內標；當食品基質干擾滴定法時的專一確認法。22 頁互動投影片＋6 個嵌入式小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/tfda_so2_gcms_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">分光光度</span><h3>食品中硼酸</h3>
+        <p>食藥署建議法 TFDAA0086：薑黃素呈色 550 nm 分光光度，揪出違法硼砂；20 頁互動投影片＋6 個嵌入式小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/tfda_boric_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">LC-MS/MS · 獸藥</span><h3>四環素殘留檢驗</h3>
+        <p>食藥署公告法 MOHWV0036：LC-MS/MS 驗 7 種四環黴素動物用藥殘留（EDTA 螯合萃取）；21 頁互動投影片＋6 個嵌入式小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/tfda_tetracycline_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">頂空 GC-FPD</span><h3>二硫代胺基甲酸鹽殺菌劑</h3>
+        <p>食藥署 MOHWP0054：各種二硫代胺基甲酸鹽裂解成共同產物 CS₂，以頂空 GC-FPD 硫選擇偵測；含十字花科假陽性的清洗試驗確認。20 頁互動投影片＋6 個嵌入式小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/tfda_dithiocarbamate_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">QuEChERS · 32 項</span><h3>農藥多重殘留分析(六)</h3>
+        <p>食藥署 TFDAP0007：QuEChERS 前處理＋LC-MS/MS，一次驗 32 項極性／酸性農藥；依基質選三類 dSPE 淨化(PSA/C18/GCB)。20 頁互動投影片＋6 個嵌入式小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/tfda_pesticide6_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">ICP-MS · 14 元素</span><h3>茶葉中多重元素 · 產地鑑別</h3>
+        <p>食藥署 TFDAF0032：ICP-MS 量 14 元素指紋＋PCA／LDA 判別台灣茶 vs 境外茶；23 頁互動投影片＋真實 PCA/LDA 互動切換，附紅茶產地開放資料集。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/tea_multielement_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">Food &amp; Nutrition · CSL (A2–B1)</span>
+    <h2>食品營養 · 華語閱讀</h2>
+    <p class="lead">A2–B1 華語學習者的食品營養文獻閱讀與寫作，含互動工具、小遊戲與課堂活動。</p>
+    <div class="grid">
+      <div class="card"><span class="tag gold">A2–B1</span><h3>食品營養華語文獻閱讀</h3>
+        <p>互動 HTML 教學工具、課堂活動與班級報告。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-nutrition-chinese-teaching/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-nutrition-chinese-teaching">GitHub</a></div></div>
+      <div class="card"><span class="tag gold">A2–B1</span><h3>無可可巧克力</h3>
+        <p>華語文獻閱讀與寫作、小遊戲與課堂投票。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/cocoa-free-chocolate-lesson/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/cocoa-free-chocolate-lesson">GitHub</a></div></div>
+      <div class="card"><span class="tag gold">A2–B1</span><h3>GLP-1 食品營養華語</h3>
+        <p>GLP-1 主題的華語課堂互動小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/glp1-chinese-class/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/glp1-chinese-class">GitHub</a></div></div>
+      <div class="card"><span class="tag gold">A2–B1</span><h3>人造鰻魚飯 × 培植肉</h3>
+        <p>培植肉拯救瀕危鰻魚；13 頁互動簡報＋4 個形成性評量小遊戲。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/cultivated-eel-lesson/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/cultivated-eel-lesson">GitHub</a></div></div>
+    </div>
+  </section>
+
+</main>
+<footer>
+  © Tai-Sheng Yeh（葉泰聖）· 食品科學教學課程入口<br>
+  教材以 Python（scikit-learn）、Orange Data Mining 與 <b>claude-code-video-kit</b> 製作 ·
+  <a href="https://github.com/Tai-ShengYeh">GitHub @Tai-ShengYeh</a>
+</footer>
 </body>
 </html>
