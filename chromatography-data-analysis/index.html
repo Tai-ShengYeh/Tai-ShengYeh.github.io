@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="互動式層析數據分析教材：基線校正、峰偵測、積分、解卷積、定量，以及 MOCCA2、hplc-py、chromatoPy 工具選擇。">
+  <title>層析數據分析實驗室</title>
+  <style>
+    :root {
+      --ink: #092b54;
+      --ink-2: #274461;
+      --muted: #61768a;
+      --line: #d7e0e8;
+      --line-2: #e8eef3;
+      --paper: #ffffff;
+      --wash: #f5f8fa;
+      --teal: #008f87;
+      --teal-dark: #00736d;
+      --teal-pale: #d8f1ef;
+      --amber: #d87900;
+      --amber-pale: #fff2dc;
+      --red: #b54848;
+      --green: #247a52;
+      --shadow: 0 14px 38px rgba(9, 43, 84, .08);
+      --radius: 16px;
+      --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: var(--sans);
+      line-height: 1.65;
+      text-rendering: optimizeLegibility;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: var(--teal-dark); text-underline-offset: 3px; }
+    :focus-visible { outline: 3px solid rgba(0,143,135,.28); outline-offset: 3px; }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: minmax(250px, 1fr) auto;
+      align-items: center;
+      min-height: 86px;
+      padding: 10px clamp(20px, 4vw, 64px);
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-mark {
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      color: white;
+      border-radius: 12px 12px 12px 3px;
+      background: var(--ink);
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .brand h1 { margin: 0; font-size: clamp(20px, 2.1vw, 30px); line-height: 1.15; }
+    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+    .top-nav { display: flex; gap: 6px; }
+    .nav-btn {
+      position: relative;
+      border: 0;
+      padding: 14px 17px;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .nav-btn::after {
+      content: "";
+      position: absolute;
+      right: 14px;
+      bottom: 5px;
+      left: 14px;
+      height: 3px;
+      border-radius: 2px;
+      background: transparent;
+    }
+    .nav-btn[aria-selected="true"] { color: var(--teal-dark); }
+    .nav-btn[aria-selected="true"]::after { background: var(--teal); }
+
+    main { min-height: calc(100vh - 86px); }
+    .panel { display: none; }
+    .panel.active { display: block; animation: reveal .28s ease-out; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(5px); } }
+
+    .intro-band {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr);
+      gap: clamp(32px, 6vw, 90px);
+      align-items: center;
+      padding: clamp(60px, 9vw, 120px) clamp(24px, 7vw, 108px);
+      background: linear-gradient(90deg, #fff 0 65%, #f4f8f9 65%);
+    }
+    .intro-band h2 {
+      max-width: 800px;
+      margin: 0 0 24px;
+      font-size: clamp(38px, 5.7vw, 76px);
+      line-height: 1.08;
+      letter-spacing: -.045em;
+    }
+    .intro-band p { max-width: 720px; margin: 0; color: var(--ink-2); font-size: clamp(17px, 1.6vw, 22px); }
+    .primary-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      margin-top: 30px;
+      padding: 0 22px;
+      color: #fff;
+      border: 1px solid var(--teal);
+      border-radius: 8px;
+      background: var(--teal);
+      cursor: pointer;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .primary-action:hover { background: var(--teal-dark); }
+    .signal-art {
+      position: relative;
+      min-height: 330px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background-color: #fff;
+      background-image:
+        linear-gradient(var(--line-2) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line-2) 1px, transparent 1px);
+      background-size: 42px 42px;
+      box-shadow: var(--shadow);
+    }
+    .signal-art svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .signal-caption {
+      position: absolute;
+      right: 20px;
+      bottom: 15px;
+      padding: 5px 9px;
+      color: var(--muted);
+      background: rgba(255,255,255,.9);
+      font: 12px var(--mono);
+    }
+
+    .section {
+      max-width: 1260px;
+      margin: 0 auto;
+      padding: 76px 28px;
+    }
+    .section-head { display: grid; grid-template-columns: .55fr 1fr; gap: 40px; margin-bottom: 42px; }
+    .section-head h2 { margin: 0; font-size: clamp(30px, 4vw, 50px); line-height: 1.15; letter-spacing: -.025em; }
+    .section-head p { margin: 4px 0 0; color: var(--ink-2); font-size: 18px; }
+    .eyebrow {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--teal-dark);
+      font: 800 12px/1.2 var(--mono);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .learning-map { border-top: 1px solid var(--line); }
+    .module-row {
+      display: grid;
+      grid-template-columns: 80px minmax(180px, .7fr) 1.3fr 180px;
+      gap: 24px;
+      align-items: start;
+      padding: 30px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .module-num {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--teal-dark);
+      font: 800 16px var(--mono);
+    }
+    .module-row h3 { margin: 7px 0 0; font-size: 22px; line-height: 1.3; }
+    .module-row p { margin: 4px 0 0; color: var(--muted); }
+    .module-row ul { margin: 0; padding-left: 20px; color: var(--ink-2); }
+    .module-time { color: var(--muted); font: 700 13px var(--mono); text-align: right; padding-top: 12px; }
+
+    .workflow-strip {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      margin-top: 54px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .workflow-step { min-height: 140px; padding: 24px; border-right: 1px solid var(--line); }
+    .workflow-step:last-child { border-right: 0; }
+    .workflow-step span { color: var(--amber); font: 800 12px var(--mono); }
+    .workflow-step strong { display: block; margin: 10px 0 7px; font-size: 17px; }
+    .workflow-step small { color: var(--muted); }
+
+    .lab-shell {
+      display: grid;
+      grid-template-columns: 210px minmax(500px, 1fr) 250px;
+      min-height: calc(100vh - 86px);
+    }
+    .lesson-rail, .controls { padding: 38px 22px; background: #fbfcfd; }
+    .lesson-rail { border-right: 1px solid var(--line); }
+    .controls { border-left: 1px solid var(--line); }
+    .lesson-step {
+      position: relative;
+      display: grid;
+      grid-template-columns: 36px 1fr;
+      gap: 10px;
+      min-height: 124px;
+    }
+    .lesson-step:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: 34px;
+      bottom: 0;
+      left: 17px;
+      width: 2px;
+      background: var(--line);
+    }
+    .lesson-step.done::before { background: var(--teal); }
+    .step-dot {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border: 1px solid #adbbc8;
+      border-radius: 50%;
+      background: #fff;
+      font: 800 13px var(--mono);
+    }
+    .lesson-step.done .step-dot, .lesson-step.active .step-dot { color: #fff; border-color: var(--teal); background: var(--teal); }
+    .lesson-step h3 { margin: 5px 0 5px; font-size: 17px; line-height: 1.3; }
+    .lesson-step p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .lab-main { min-width: 0; padding: 34px clamp(22px, 3vw, 48px) 60px; }
+    .lab-title { display: flex; justify-content: space-between; gap: 20px; align-items: end; margin-bottom: 20px; }
+    .lab-title h2 { margin: 0; font-size: clamp(26px, 3vw, 40px); line-height: 1.15; }
+    .lab-title p { margin: 6px 0 0; color: var(--muted); }
+    .status { color: var(--green); font: 700 12px var(--mono); white-space: nowrap; }
+    .plot-frame { padding: 20px 20px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff; }
+    .legend { display: flex; flex-wrap: wrap; gap: 20px; margin: 0 0 12px 36px; color: var(--ink-2); font-size: 13px; }
+    .legend i { display: inline-block; width: 28px; height: 3px; margin: 0 7px 3px 0; background: var(--ink); }
+    .legend .base { height: 0; border-top: 2px dashed var(--amber); background: none; }
+    .legend .area { height: 10px; background: rgba(0,143,135,.25); }
+    #chromPlot { display: block; width: 100%; min-height: 420px; }
+    #chromPlot text { font-family: var(--sans); }
+    .plot-help { margin: 8px 0 0; color: var(--muted); font-size: 13px; text-align: center; }
+
+    .result-table { width: 100%; margin-top: 22px; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    .result-table th, .result-table td { padding: 13px 12px; border-bottom: 1px solid var(--line); text-align: left; }
+    .result-table th { color: var(--ink-2); font-size: 13px; }
+    .result-table td { font-size: 14px; }
+    .purity-good { color: var(--green); font-weight: 800; }
+    .purity-warn { color: var(--amber); font-weight: 800; }
+    .teaching-note {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-left: 3px solid var(--teal);
+      background: var(--wash);
+      color: var(--ink-2);
+      font-size: 14px;
+    }
+    .note-icon { color: var(--teal); font-weight: 900; }
+
+    .controls h3 { margin: 0 0 28px; font-size: 18px; }
+    .control-group { margin-bottom: 30px; }
+    .control-label { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; font-weight: 800; font-size: 14px; }
+    .control-value { color: var(--teal-dark); font: 800 13px var(--mono); }
+    input[type="range"] { width: 100%; accent-color: var(--teal); cursor: pointer; }
+    .range-ends { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; }
+    .control-button {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 10px;
+      border: 1px solid var(--teal);
+      border-radius: 8px;
+      background: var(--teal);
+      color: white;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .control-button.secondary { color: var(--ink); border-color: #adbbc8; background: #fff; }
+    .control-button:hover { filter: brightness(.96); }
+
+    .principle-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      margin-top: 34px;
+    }
+    .principle {
+      padding-top: 22px;
+      border-top: 3px solid var(--teal);
+    }
+    .principle:nth-child(2) { border-color: var(--amber); }
+    .principle:nth-child(3) { border-color: var(--ink); }
+    .principle h3 { margin: 0 0 8px; font-size: 20px; }
+    .principle p { margin: 0; color: var(--muted); }
+    .formula {
+      display: block;
+      margin-top: 18px;
+      padding: 12px 14px;
+      background: var(--wash);
+      font: 700 14px var(--mono);
+      text-align: center;
+    }
+
+    .tools-hero, .challenge-hero {
+      padding: 74px max(28px, calc((100vw - 1200px)/2));
+      border-bottom: 1px solid var(--line);
+      background: var(--wash);
+    }
+    .tools-hero h2, .challenge-hero h2 { max-width: 900px; margin: 0; font-size: clamp(36px, 5vw, 64px); line-height: 1.08; letter-spacing: -.04em; }
+    .tools-hero p, .challenge-hero p { max-width: 760px; margin: 20px 0 0; color: var(--ink-2); font-size: 19px; }
+
+    .tool-table-wrap { overflow-x: auto; border-top: 1px solid var(--ink); }
+    .tool-table { width: 100%; min-width: 820px; border-collapse: collapse; }
+    .tool-table th, .tool-table td { padding: 20px 18px; border-bottom: 1px solid var(--line); vertical-align: top; text-align: left; }
+    .tool-table th { color: var(--muted); font: 800 12px var(--mono); letter-spacing: .04em; }
+    .tool-table td:first-child { font-size: 21px; font-weight: 900; color: var(--ink); }
+    .tool-table small { display: block; margin-top: 5px; color: var(--muted); }
+    .fit-strong { color: var(--green); font-weight: 800; }
+    .fit-mid { color: var(--amber); font-weight: 800; }
+
+    .decision-lab {
+      display: grid;
+      grid-template-columns: minmax(0, .8fr) minmax(340px, 1.2fr);
+      gap: 48px;
+      margin-top: 68px;
+      padding-top: 50px;
+      border-top: 1px solid var(--line);
+    }
+    .decision-lab h3 { margin: 0 0 10px; font-size: 28px; }
+    .decision-lab > div > p { color: var(--muted); }
+    .scenario-list { display: grid; gap: 10px; margin-top: 22px; }
+    .scenario-btn {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+    }
+    .scenario-btn.active { color: var(--teal-dark); border-color: var(--teal); background: #f2fbfa; font-weight: 800; }
+    .recommendation {
+      min-height: 280px;
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .recommendation .tool-name { margin: 0 0 8px; font-size: 34px; }
+    .recommendation .reason { color: var(--ink-2); font-size: 17px; }
+    .recommendation ul { padding-left: 20px; color: var(--muted); }
+
+    .code-workbench { margin-top: 68px; }
+    .code-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line); }
+    .code-tab {
+      padding: 12px 18px;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      font: 800 13px var(--mono);
+    }
+    .code-tab.active { color: var(--teal-dark); border-color: var(--teal); }
+    .code-box {
+      position: relative;
+      min-height: 350px;
+      overflow: auto;
+      padding: 26px;
+      border-radius: 0 0 12px 12px;
+      background: #0b2540;
+      color: #dceaf5;
+    }
+    .code-box pre { margin: 0; white-space: pre; font: 13px/1.75 var(--mono); }
+    .copy-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      padding: 7px 11px;
+      color: #dceaf5;
+      border: 1px solid #46627b;
+      border-radius: 6px;
+      background: #153552;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .quiz-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      gap: 42px;
+    }
+    .question {
+      margin-bottom: 28px;
+      padding: 26px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .question h3 { margin: 0 0 16px; font-size: 19px; }
+    .options { display: grid; gap: 9px; }
+    .option {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 10px;
+      align-items: start;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .option:hover { background: var(--wash); }
+    .option input { margin-top: 5px; }
+    .quiz-summary {
+      position: sticky;
+      top: 110px;
+      height: fit-content;
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    .score { margin: 10px 0; color: var(--teal-dark); font: 900 48px/1 var(--mono); }
+    .feedback { color: var(--muted); font-size: 14px; }
+    .answer-review { margin-top: 20px; }
+    .answer-item { margin: 8px 0; font-size: 13px; }
+    .answer-item.ok { color: var(--green); }
+    .answer-item.no { color: var(--red); }
+
+    .source-list { margin-top: 64px; padding-top: 40px; border-top: 1px solid var(--line); }
+    .source-list h3 { margin: 0 0 16px; }
+    .source-list ol { padding-left: 23px; color: var(--muted); }
+    .source-list li { margin: 9px 0; }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 26px max(28px, calc((100vw - 1200px)/2));
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1100px) {
+      .app-header { grid-template-columns: 1fr; }
+      .top-nav { overflow-x: auto; margin-top: 7px; }
+      .lab-shell { grid-template-columns: 165px minmax(0, 1fr); }
+      .controls { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr) 160px; gap: 22px; border-top: 1px solid var(--line); border-left: 0; }
+      .controls h3 { grid-column: 1 / -1; margin-bottom: 0; }
+      .control-group { margin: 0; }
+      .controls .button-stack { align-self: center; }
+    }
+    @media (max-width: 800px) {
+      .intro-band { grid-template-columns: 1fr; background: #fff; }
+      .section-head, .decision-lab, .quiz-layout { grid-template-columns: 1fr; }
+      .module-row { grid-template-columns: 56px 1fr; }
+      .module-row > ul, .module-time { grid-column: 2; text-align: left; }
+      .workflow-strip { grid-template-columns: 1fr; }
+      .workflow-step { min-height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      .lab-shell { display: block; }
+      .lesson-rail { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 16px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .lesson-step { display: block; min-height: 0; text-align: center; }
+      .lesson-step::before { display: none; }
+      .step-dot { margin: 0 auto 5px; }
+      .lesson-step p { display: none; }
+      .controls { display: grid; grid-template-columns: 1fr; }
+      .principle-grid { grid-template-columns: 1fr; }
+      #chromPlot { min-height: 330px; }
+      .quiz-summary { position: static; }
+    }
+    @media (max-width: 560px) {
+      .app-header { position: static; padding: 12px 16px; }
+      .brand-mark { width: 38px; height: 38px; }
+      .nav-btn { padding: 10px; font-size: 13px; }
+      .brand p { display: none; }
+      .intro-band { padding: 50px 20px; }
+      .signal-art { min-height: 250px; }
+      .section { padding: 54px 20px; }
+      .lab-main { padding: 26px 12px 44px; }
+      .plot-frame { padding: 12px 8px 5px; }
+      .legend { margin-left: 12px; }
+      .lesson-rail { overflow-x: auto; grid-template-columns: repeat(4, 110px); }
+      .lesson-step h3 { font-size: 13px; }
+      .result-table th:nth-child(4), .result-table td:nth-child(4) { display: none; }
+      .footer { flex-direction: column; }
+    }
+    @media print {
+      .app-header, .controls, .primary-action, .copy-btn { display: none !important; }
+      .panel { display: block !important; break-before: page; }
+      .panel:first-of-type { break-before: auto; }
+      .lab-shell { display: block; }
+      .lesson-rail { display: none; }
+      .section, .lab-main { max-width: none; padding: 20px; }
+      .tools-hero, .challenge-hero { padding: 30px 20px; }
+      .code-box { color: #000; border: 1px solid #aaa; background: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">λ</div>
+      <div>
+        <h1>層析數據分析實驗室</h1>
+        <p>從訊號到可靠定量</p>
+      </div>
+    </div>
+    <nav class="top-nav" aria-label="教材章節" role="tablist">
+      <button class="nav-btn" role="tab" aria-selected="true" aria-controls="learn" data-panel="learn">學習路徑</button>
+      <button class="nav-btn" role="tab" aria-selected="false" aria-controls="lab" data-panel="lab">互動峰分析</button>
+      <button class="nav-btn" role="tab" aria-selected="false" aria-controls="tools" data-panel="tools">工具選擇</button>
+      <button class="nav-btn" role="tab" aria-selected="false" aria-controls="challenge" data-panel="challenge">課堂挑戰</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="learn" class="panel active" role="tabpanel">
+      <div class="intro-band">
+        <div>
+          <h2>看懂每一個峰，<br>也懷疑每一個面積。</h2>
+          <p>這份教材把層析圖從「看起來像峰」轉換為可追溯的分析結果。學生將親手改變基線、雜訊與重疊程度，觀察處理參數如何改變峰面積、純度與定量判斷。</p>
+          <button class="primary-action" data-go="lab">開始互動分析</button>
+        </div>
+        <div class="signal-art" aria-label="示意層析訊號">
+          <svg viewBox="0 0 600 340" role="img" aria-label="含基線漂移與重疊峰的層析圖">
+            <path d="M0 290 C90 282 160 280 220 265 C270 252 280 100 305 95 C328 93 331 235 350 245 C370 255 382 73 410 70 C445 70 450 252 478 262 C520 275 560 262 600 258" fill="none" stroke="#092b54" stroke-width="4"/>
+            <path d="M0 295 C160 286 330 270 600 255" fill="none" stroke="#d87900" stroke-width="3" stroke-dasharray="9 8"/>
+            <path d="M270 270 C282 190 288 100 305 95 C323 96 326 220 350 247 L350 270 Z" fill="#008f87" opacity=".22"/>
+            <path d="M350 268 C373 250 380 73 410 70 C442 72 451 246 478 262 L478 266 Z" fill="#008f87" opacity=".22"/>
+          </svg>
+          <span class="signal-caption">signal = baseline + peaks + noise</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <h2>三小時課堂路徑</h2>
+          <p>適合分析化學、食品分析或儀器分析課程。每個單元都以一個「可檢查的決策」為核心，而不只記憶軟體操作。</p>
+        </div>
+        <div class="learning-map">
+          <article class="module-row">
+            <div class="module-num">01</div>
+            <h3>資料與訊號</h3>
+            <ul><li>辨識 time、signal 與 DAD 波長維度</li><li>檢查取樣間隔、單位與缺值</li></ul>
+            <div class="module-time">25 MIN</div>
+          </article>
+          <article class="module-row">
+            <div class="module-num">02</div>
+            <h3>基線校正</h3>
+            <ul><li>比較 blank subtraction 與演算法估計</li><li>理解錯誤基線如何偏移面積</li></ul>
+            <div class="module-time">30 MIN</div>
+          </article>
+          <article class="module-row">
+            <div class="module-num">03</div>
+            <h3>峰偵測與邊界</h3>
+            <ul><li>調整高度或 prominence 閾值</li><li>區分小峰、雜訊與溶劑峰</li></ul>
+            <div class="module-time">30 MIN</div>
+          </article>
+          <article class="module-row">
+            <div class="module-num">04</div>
+            <h3>重疊峰與純度</h3>
+            <ul><li>以峰形模型分解共洗脫訊號</li><li>用 DAD 光譜判斷單一或多成分</li></ul>
+            <div class="module-time">35 MIN</div>
+          </article>
+          <article class="module-row">
+            <div class="module-num">05</div>
+            <h3>積分與定量</h3>
+            <ul><li>連結面積、校正曲線與濃度</li><li>判讀內標、線性範圍與殘差</li></ul>
+            <div class="module-time">35 MIN</div>
+          </article>
+          <article class="module-row">
+            <div class="module-num">06</div>
+            <h3>品質保證與報告</h3>
+            <ul><li>保留原始資料、參數與版本</li><li>人工覆核失敗峰與異常樣本</li></ul>
+            <div class="module-time">25 MIN</div>
+          </article>
+        </div>
+
+        <div class="workflow-strip" aria-label="層析資料處理流程">
+          <div class="workflow-step"><span>INPUT</span><strong>匯入與驗證</strong><small>檔案、欄位、單位、metadata</small></div>
+          <div class="workflow-step"><span>PREPROCESS</span><strong>基線與雜訊</strong><small>blank、FlatFit、AsLS、arPLS</small></div>
+          <div class="workflow-step"><span>DETECT</span><strong>找峰與分界</strong><small>height、prominence、peak borders</small></div>
+          <div class="workflow-step"><span>MODEL</span><strong>擬合與解卷積</strong><small>skew-normal、Fraser–Suzuki、BEMG</small></div>
+          <div class="workflow-step"><span>REPORT</span><strong>面積與濃度</strong><small>校正、內標、QC、可追溯輸出</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="lab" class="panel" role="tabpanel">
+      <div class="lab-shell">
+        <aside class="lesson-rail" aria-label="分析步驟">
+          <div class="lesson-step done">
+            <div class="step-dot">1</div>
+            <div><h3>匯入資料</h3><p>檢查時間、訊號與單位</p></div>
+          </div>
+          <div class="lesson-step done">
+            <div class="step-dot">2</div>
+            <div><h3>基線校正</h3><p>估計漂移並保留峰形</p></div>
+          </div>
+          <div class="lesson-step active">
+            <div class="step-dot">3</div>
+            <div><h3>峰偵測</h3><p>找出峰頂與積分邊界</p></div>
+          </div>
+          <div class="lesson-step">
+            <div class="step-dot">4</div>
+            <div><h3>積分與定量</h3><p>計算面積並評估純度</p></div>
+          </div>
+        </aside>
+
+        <div class="lab-main">
+          <div class="lab-title">
+            <div>
+              <h2>互動峰分析</h2>
+              <p>拖曳參數後按「套用處理」，比較處理前後結果。</p>
+            </div>
+            <div id="analysisStatus" class="status">● DEMO DATA READY</div>
+          </div>
+          <div class="plot-frame">
+            <div class="legend" aria-label="圖例">
+              <span><i></i>原始訊號</span>
+              <span><i class="base"></i>估計基線</span>
+              <span><i class="area"></i>積分區域</span>
+            </div>
+            <svg id="chromPlot" viewBox="0 0 900 500" role="img" aria-labelledby="plotTitle plotDesc">
+              <title id="plotTitle">互動層析圖</title>
+              <desc id="plotDesc">包含四個峰，其中第二與第三峰可依控制項改變重疊程度。</desc>
+            </svg>
+            <p class="plot-help">示範資料僅供教學；面積為模擬積分值。</p>
+          </div>
+
+          <table class="result-table" aria-label="模擬峰分析結果">
+            <thead><tr><th>峰</th><th>保留時間 (min)</th><th>面積 (mAU·s)</th><th>純度 (%)</th><th>判讀</th></tr></thead>
+            <tbody id="resultBody"></tbody>
+          </table>
+          <div class="teaching-note">
+            <span class="note-icon">!</span>
+            <div id="teachingNote"><strong>教學重點：</strong>先看基線是否合理，再看積分面積。高擬合度不一定代表化學上正確。</div>
+          </div>
+
+          <div class="principle-grid">
+            <article class="principle">
+              <h3>基線不是裝飾線</h3>
+              <p>基線定義了積分的零點。漂移被低估，面積會系統性偏高。</p>
+              <span class="formula">A = ∫[y(t) − z(t)] dt</span>
+            </article>
+            <article class="principle">
+              <h3>解析度不是距離而已</h3>
+              <p>峰中心的間距必須相對於峰寬評估；重疊會影響純度與定量。</p>
+              <span class="formula">Rₛ = 2(tR₂ − tR₁)/(w₁ + w₂)</span>
+            </article>
+            <article class="principle">
+              <h3>面積才連到濃度</h3>
+              <p>在有效線性範圍內，以校正曲線把積分面積轉為濃度。</p>
+              <span class="formula">Area = mC + b</span>
+            </article>
+          </div>
+        </div>
+
+        <aside class="controls" aria-label="訊號調整參數">
+          <h3>訊號調整參數</h3>
+          <div class="control-group">
+            <div class="control-label"><label for="baseline">基線漂移</label><span id="baselineValue" class="control-value">40%</span></div>
+            <input id="baseline" type="range" min="0" max="100" value="40">
+            <div class="range-ends"><span>低</span><span>高</span></div>
+          </div>
+          <div class="control-group">
+            <div class="control-label"><label for="noise">雜訊</label><span id="noiseValue" class="control-value">20%</span></div>
+            <input id="noise" type="range" min="0" max="100" value="20">
+            <div class="range-ends"><span>低</span><span>高</span></div>
+          </div>
+          <div class="control-group">
+            <div class="control-label"><label for="overlap">峰重疊</label><span id="overlapValue" class="control-value">60%</span></div>
+            <input id="overlap" type="range" min="0" max="100" value="60">
+            <div class="range-ends"><span>低</span><span>高</span></div>
+          </div>
+          <div class="button-stack">
+            <button id="applyProcess" class="control-button">套用處理</button>
+            <button id="resetProcess" class="control-button secondary">重設</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="tools" class="panel" role="tabpanel">
+      <div class="tools-hero">
+        <h2>不要問哪套最好。<br>先問你的資料是什麼。</h2>
+        <p>三套工具的設計目標不同。資料維度、儀器格式、是否需要純度檢查，以及課堂想教的概念，會決定最合理的選擇。</p>
+      </div>
+      <div class="section">
+        <div class="section-head">
+          <h2>工具比較</h2>
+          <p>以下比較聚焦在教學用途。正式研究前，仍應依目前版本文件、原始資料格式與驗證需求建立自己的 SOP。</p>
+        </div>
+        <div class="tool-table-wrap">
+          <table class="tool-table">
+            <thead><tr><th>工具</th><th>最適資料</th><th>主要強項</th><th>教學切入點</th><th>留意事項</th></tr></thead>
+            <tbody>
+              <tr>
+                <td>MOCCA2<small>pip install mocca2</small></td>
+                <td>HPLC/UHPLC-DAD；Agilent、Shimadzu、Waters 原始資料</td>
+                <td><span class="fit-strong">多波長純度、解卷積、批次追蹤</span></td>
+                <td>DAD 資料立方體、共洗脫、內標、反應篩選</td>
+                <td>參數仍需覆核；複雜峰的「正解」可能具有主觀性</td>
+              </tr>
+              <tr>
+                <td>hplc-py<small>pip install --upgrade hplc-py</small></td>
+                <td>time–signal 長格式文字或 CSV</td>
+                <td><span class="fit-strong">流程清楚、峰形擬合、快速定量</span></td>
+                <td>baseline → detection → fitting → calibration</td>
+                <td>主要是 1D 訊號；格式欄名與裁切範圍要先整理</td>
+              </tr>
+              <tr>
+                <td>chromatoPy<small>pip install chromatopy</small></td>
+                <td>轉換後 HPLC CSV、Chromeleon GC-FID TXT</td>
+                <td><span class="fit-mid">自動/手動積分、Gaussian fitting、群聚</span></td>
+                <td>比較自動與人工積分、GC-FID 批次樣本</td>
+                <td>互動流程與特定輸入格式依賴較高；先用小資料測試</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="decision-lab">
+          <div>
+            <h3>情境式選擇器</h3>
+            <p>選一個教學或研究情境，查看建議工具與理由。</p>
+            <div class="scenario-list">
+              <button class="scenario-btn active" data-scenario="dad">DAD 重疊峰與純度判斷</button>
+              <button class="scenario-btn" data-scenario="csv">單一 UV 訊號與校正曲線</button>
+              <button class="scenario-btn" data-scenario="fid">GC-FID 自動與手動積分</button>
+              <button class="scenario-btn" data-scenario="batch">96-well 反應篩選批次處理</button>
+            </div>
+          </div>
+          <div id="recommendation" class="recommendation" aria-live="polite"></div>
+        </div>
+
+        <div class="code-workbench">
+          <div class="section-head">
+            <h2>最小可教範例</h2>
+            <p>程式碼刻意保留「先畫圖、再檢查」的步驟。請勿把全自動處理視為免除人工品質控制。</p>
+          </div>
+          <div class="code-tabs" role="tablist" aria-label="Python 程式碼工具">
+            <button class="code-tab active" data-code="mocca">MOCCA2</button>
+            <button class="code-tab" data-code="hplc">hplc-py</button>
+            <button class="code-tab" data-code="chromato">chromatoPy</button>
+          </div>
+          <div class="code-box">
+            <button id="copyCode" class="copy-btn">複製程式碼</button>
+            <pre><code id="codeContent"></code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="challenge" class="panel" role="tabpanel">
+      <div class="challenge-hero">
+        <h2>先做判斷，再看分數。</h2>
+        <p>這五題檢查你是否能把軟體輸出轉換為分析化學決策。完成後會顯示逐題回饋。</p>
+      </div>
+      <div class="section quiz-layout">
+        <form id="quizForm">
+          <article class="question">
+            <h3>1. 基線緩慢上升，但演算法以水平線積分。最可能的影響是？</h3>
+            <div class="options">
+              <label class="option"><input type="radio" name="q1" value="a">峰面積被系統性高估</label>
+              <label class="option"><input type="radio" name="q1" value="b">保留時間一定變短</label>
+              <label class="option"><input type="radio" name="q1" value="c">所有峰純度自動提高</label>
+            </div>
+          </article>
+          <article class="question">
+            <h3>2. DAD 資料中，一個峰的前緣與後緣光譜形狀不同。優先懷疑什麼？</h3>
+            <div class="options">
+              <label class="option"><input type="radio" name="q2" value="a">進樣量一定太小</label>
+              <label class="option"><input type="radio" name="q2" value="b">共洗脫或峰不純</label>
+              <label class="option"><input type="radio" name="q2" value="c">移動相完全沒有吸收</label>
+            </div>
+          </article>
+          <article class="question">
+            <h3>3. 想用最簡單的 time–signal CSV 教峰形擬合與絕對定量，優先選哪一套？</h3>
+            <div class="options">
+              <label class="option"><input type="radio" name="q3" value="a">MOCCA2</label>
+              <label class="option"><input type="radio" name="q3" value="b">hplc-py</label>
+              <label class="option"><input type="radio" name="q3" value="c">只用試算表目測</label>
+            </div>
+          </article>
+          <article class="question">
+            <h3>4. 對 90 張 chromatograms 完成自動處理後，下一步最合理的是？</h3>
+            <div class="options">
+              <label class="option"><input type="radio" name="q4" value="a">直接刪除原始資料</label>
+              <label class="option"><input type="radio" name="q4" value="b">只報告平均面積</label>
+              <label class="option"><input type="radio" name="q4" value="c">檢查失敗峰、異常樣本與參數敏感性</label>
+            </div>
+          </article>
+          <article class="question">
+            <h3>5. 校正曲線 R² 很高，是否足以證明所有未知樣品定量可靠？</h3>
+            <div class="options">
+              <label class="option"><input type="radio" name="q5" value="a">是，R² 高就不必看殘差</label>
+              <label class="option"><input type="radio" name="q5" value="b">否，仍需檢查範圍、殘差、QC 與基質效應</label>
+              <label class="option"><input type="radio" name="q5" value="c">是，只要峰高夠高</label>
+            </div>
+          </article>
+        </form>
+
+        <aside class="quiz-summary">
+          <h3>課堂挑戰</h3>
+          <div id="score" class="score">—/5</div>
+          <p id="feedback" class="feedback">回答全部題目，再提交判斷。</p>
+          <button id="submitQuiz" class="control-button" type="button">提交答案</button>
+          <button id="resetQuiz" class="control-button secondary" type="button">重新作答</button>
+          <div id="answerReview" class="answer-review" aria-live="polite"></div>
+        </aside>
+
+        <div class="source-list" style="grid-column: 1 / -1">
+          <h3>教材來源與延伸閱讀</h3>
+          <ol>
+            <li><a href="https://bayer-group.github.io/MOCCA/" target="_blank" rel="noreferrer">MOCCA2 documentation</a>：原始資料支援、基線校正、adaptive peak picking、純度檢查、解卷積、compound tracking 與批次處理。</li>
+            <li><a href="https://github.com/cremerlab/hplc-py/" target="_blank" rel="noreferrer">cremerlab/hplc-py</a> 與 <a href="https://cremerlab.github.io/hplc-py/" target="_blank" rel="noreferrer">documentation</a>：tidy chromatogram、Chromatogram 類別、峰擬合與校正曲線。</li>
+            <li><a href="https://pypi.org/project/chromatopy/" target="_blank" rel="noreferrer">chromatoPy on PyPI</a>：HPLC 與 GC-FID 的 Gaussian fitting、自動/手動積分與樣本群聚。</li>
+            <li>Obořil J. et al. (2024). <a href="https://doi.org/10.1039/D4DD00214H" target="_blank" rel="noreferrer">Automated processing of chromatograms</a>. <em>Digital Discovery</em>, 3, 2041–2051.</li>
+          </ol>
+          <p><strong>使用提醒：</strong>本頁為教學模擬，不取代方法確效、儀器軟體稽核軌跡或實驗室 SOP。軟體介面與需求可能隨版本更新。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>層析數據分析實驗室 · 單檔離線教材</span>
+    <span>建議課程：分析化學／食品分析／儀器分析</span>
+  </footer>
+
+  <script>
+    const panels = [...document.querySelectorAll(".panel")];
+    const navButtons = [...document.querySelectorAll(".nav-btn")];
+
+    function showPanel(id) {
+      panels.forEach(panel => panel.classList.toggle("active", panel.id === id));
+      navButtons.forEach(button => button.setAttribute("aria-selected", button.dataset.panel === id ? "true" : "false"));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (id === "lab") requestAnimationFrame(() => renderPlot(true));
+    }
+    navButtons.forEach(button => button.addEventListener("click", () => showPanel(button.dataset.panel)));
+    document.querySelectorAll("[data-go]").forEach(button => button.addEventListener("click", () => showPanel(button.dataset.go)));
+
+    const svg = document.getElementById("chromPlot");
+    const sliders = {
+      baseline: document.getElementById("baseline"),
+      noise: document.getElementById("noise"),
+      overlap: document.getElementById("overlap")
+    };
+    const values = {
+      baseline: document.getElementById("baselineValue"),
+      noise: document.getElementById("noiseValue"),
+      overlap: document.getElementById("overlapValue")
+    };
+    Object.entries(sliders).forEach(([key, input]) => {
+      input.addEventListener("input", () => {
+        values[key].textContent = input.value + "%";
+        document.getElementById("analysisStatus").textContent = "○ PARAMETERS CHANGED";
+      });
+    });
+
+    const W = 900, H = 500;
+    const margin = { left: 62, right: 22, top: 26, bottom: 55 };
+    const innerW = W - margin.left - margin.right;
+    const innerH = H - margin.top - margin.bottom;
+    const xScale = t => margin.left + t / 20 * innerW;
+    const yScale = y => H - margin.bottom - y / 900 * innerH;
+    const gauss = (x, mu, sigma, amp) => amp * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
+
+    function make(tag, attrs = {}, text = "") {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+      if (text) el.textContent = text;
+      return el;
+    }
+
+    function pathFromPoints(points) {
+      return points.map((p, i) => `${i ? "L" : "M"}${xScale(p.t).toFixed(2)},${yScale(p.y).toFixed(2)}`).join(" ");
+    }
+
+    function computeData() {
+      const b = +sliders.baseline.value / 100;
+      const n = +sliders.noise.value / 100;
+      const o = +sliders.overlap.value / 100;
+      const mu2 = 10.35;
+      const mu3 = 12.25 - o * 1.15;
+      const peaks = [
+        { name: "峰 1", mu: 3.25, sigma: .34, amp: 400 },
+        { name: "峰 2A", mu: mu2, sigma: .50, amp: 650 },
+        { name: "峰 2B", mu: mu3, sigma: .43, amp: 490 },
+        { name: "峰 3", mu: 16.3, sigma: .42, amp: 390 }
+      ];
+      const raw = [], base = [], corrected = [];
+      for (let i = 0; i <= 400; i++) {
+        const t = i / 20;
+        const baseline = 18 + b * (2.8 * t + .16 * t * t) + 12 * Math.sin(t / 3.4);
+        const peakSignal = peaks.reduce((sum, p) => sum + gauss(t, p.mu, p.sigma, p.amp), 0);
+        const noise = n * 18 * (Math.sin(i * 1.71) + .55 * Math.sin(i * .37) + .25 * Math.sin(i * 3.11));
+        raw.push({ t, y: Math.max(0, baseline + peakSignal + noise) });
+        base.push({ t, y: baseline });
+        corrected.push({ t, y: Math.max(0, peakSignal + noise) });
+      }
+      return { raw, base, corrected, peaks, overlap: o, baseline: b, noise: n };
+    }
+
+    function renderPlot(processed = false) {
+      const data = computeData();
+      svg.replaceChildren();
+      const grid = make("g", { "aria-hidden": "true" });
+      for (let x = 0; x <= 20; x += 2) {
+        grid.append(make("line", { x1: xScale(x), y1: margin.top, x2: xScale(x), y2: H - margin.bottom, stroke: "#dce5ec", "stroke-width": 1, "stroke-dasharray": "3 4" }));
+        grid.append(make("text", { x: xScale(x), y: H - margin.bottom + 25, "text-anchor": "middle", fill: "#61768a", "font-size": 12 }, x));
+      }
+      for (let y = 0; y <= 900; y += 100) {
+        grid.append(make("line", { x1: margin.left, y1: yScale(y), x2: W - margin.right, y2: yScale(y), stroke: "#dce5ec", "stroke-width": 1, "stroke-dasharray": "3 4" }));
+        grid.append(make("text", { x: margin.left - 12, y: yScale(y) + 4, "text-anchor": "end", fill: "#61768a", "font-size": 12 }, y));
+      }
+      svg.append(grid);
+      svg.append(make("line", { x1: margin.left, y1: H - margin.bottom, x2: W - margin.right, y2: H - margin.bottom, stroke: "#8fa1b1" }));
+      svg.append(make("line", { x1: margin.left, y1: margin.top, x2: margin.left, y2: H - margin.bottom, stroke: "#8fa1b1" }));
+      svg.append(make("text", { x: W / 2, y: H - 12, "text-anchor": "middle", fill: "#274461", "font-size": 14 }, "時間 (min)"));
+      const yLabel = make("text", { x: 16, y: H / 2, transform: `rotate(-90 16 ${H/2})`, "text-anchor": "middle", fill: "#274461", "font-size": 14 }, "響應 (mAU)");
+      svg.append(yLabel);
+
+      if (processed) {
+        data.peaks.forEach((p, idx) => {
+          const start = p.mu - p.sigma * 2.25;
+          const end = p.mu + p.sigma * 2.25;
+          const areaPoints = data.corrected.filter(d => d.t >= start && d.t <= end);
+          if (areaPoints.length) {
+            const d = `M${xScale(start)},${yScale(0)} ` + pathFromPoints(areaPoints).replace(/^M/, "L") + ` L${xScale(end)},${yScale(0)} Z`;
+            svg.append(make("path", { d, fill: idx === 2 ? "rgba(216,121,0,.18)" : "rgba(0,143,135,.20)", stroke: "none" }));
+          }
+        });
+      }
+      svg.append(make("path", { d: pathFromPoints(data.base), fill: "none", stroke: "#d87900", "stroke-width": 2.4, "stroke-dasharray": "8 7" }));
+      svg.append(make("path", { d: pathFromPoints(data.raw), fill: "none", stroke: "#092b54", "stroke-width": 2.8, "stroke-linejoin": "round" }));
+
+      data.peaks.forEach((p, idx) => {
+        const baselineAtMu = data.base[Math.round(p.mu * 20)].y;
+        const totalAtMu = data.raw[Math.round(p.mu * 20)].y;
+        const labelY = Math.max(38, yScale(totalAtMu) - 24 - (idx === 2 ? 10 : 0));
+        svg.append(make("line", { x1: xScale(p.mu), y1: labelY + 7, x2: xScale(p.mu), y2: yScale(baselineAtMu), stroke: idx === 2 ? "#d87900" : "#008f87", "stroke-width": 1.2, "stroke-dasharray": "5 5", opacity: .8 }));
+        svg.append(make("text", { x: xScale(p.mu), y: labelY, "text-anchor": "middle", fill: "#092b54", "font-size": 12, "font-weight": 800 }, `${p.name} · ${p.mu.toFixed(2)} min`));
+      });
+      updateResults(data, processed);
+    }
+
+    function updateResults(data, processed) {
+      const body = document.getElementById("resultBody");
+      body.innerHTML = "";
+      data.peaks.forEach((p, i) => {
+        const theoretical = p.amp * p.sigma * Math.sqrt(2 * Math.PI) * 60;
+        const baselineBias = processed ? data.baseline * 0.012 : data.baseline * .07;
+        const noiseBias = (i % 2 ? -1 : 1) * data.noise * .018;
+        const overlapPenalty = (i === 1 || i === 2) ? data.overlap * 9.8 : 0;
+        const area = theoretical * (1 + baselineBias + noiseBias);
+        const purity = Math.max(82, 99.2 - overlapPenalty - data.noise * 2.5);
+        const verdict = purity >= 95 ? "可接受" : purity >= 90 ? "需覆核" : "疑似共洗脫";
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${p.name}</td><td>${p.mu.toFixed(2)}</td><td>${Math.round(area).toLocaleString()}</td><td class="${purity >= 95 ? "purity-good" : "purity-warn"}">${purity.toFixed(1)}</td><td>${verdict}</td>`;
+        body.append(tr);
+      });
+      const note = document.getElementById("teachingNote");
+      if (data.overlap > .7) {
+        note.innerHTML = "<strong>教學重點：</strong>峰 2A 與 2B 高度重疊。單靠 1D 積分邊界不夠；DAD 資料可再做光譜純度檢查與解卷積。";
+      } else if (data.baseline > .7) {
+        note.innerHTML = "<strong>教學重點：</strong>基線漂移明顯。先比較 blank subtraction 與基線估計，再討論積分面積。";
+      } else if (data.noise > .65) {
+        note.innerHTML = "<strong>教學重點：</strong>雜訊提高假陽性峰風險。調整閾值時，同時記錄漏檢與誤檢。";
+      } else {
+        note.innerHTML = "<strong>教學重點：</strong>先看基線是否合理，再看積分面積。高擬合度不一定代表化學上正確。";
+      }
+    }
+
+    document.getElementById("applyProcess").addEventListener("click", () => {
+      renderPlot(true);
+      const status = document.getElementById("analysisStatus");
+      status.textContent = "● PROCESSING COMPLETE";
+      status.animate([{ opacity: .3 }, { opacity: 1 }], { duration: 450 });
+    });
+    document.getElementById("resetProcess").addEventListener("click", () => {
+      sliders.baseline.value = 40; sliders.noise.value = 20; sliders.overlap.value = 60;
+      Object.keys(values).forEach(key => values[key].textContent = sliders[key].value + "%");
+      document.getElementById("analysisStatus").textContent = "● DEMO DATA READY";
+      renderPlot(false);
+    });
+
+    const scenarios = {
+      dad: {
+        name: "MOCCA2",
+        reason: "你的核心問題不只是找峰，而是利用 DAD 的波長維度判斷峰純度，並在共洗脫時分解成分。",
+        points: ["支援多家 HPLC 系統原始資料", "adaptive peak picking 與純度檢查", "重疊峰解卷積與跨 chromatogram 追蹤"]
+      },
+      csv: {
+        name: "hplc-py",
+        reason: "time–signal 的 tidy 資料最適合用清楚的 1D 流程教學：匯入、基線、峰偵測、skew-normal 擬合與定量。",
+        points: ["Chromatogram 類別流程集中", "fit_peaks() 快速產生峰參數與面積", "官方文件提供 calibration curve 範例"]
+      },
+      fid: {
+        name: "chromatoPy",
+        reason: "課程同時需要 GC-FID、手動點選積分與自動 Gaussian fitting，chromatoPy 的 FID 工作流程較貼近情境。",
+        points: ["自動與手動 peak integration", "可使用已儲存的峰標籤與時間窗", "提供 chromatogram 相似性群聚"]
+      },
+      batch: {
+        name: "MOCCA2",
+        reason: "批次 DAD chromatograms、標準品與內標可放入同一 dataset，自動處理後再追蹤 compound 與相對濃度。",
+        points: ["MoccaDataset 與 ProcessingSettings", "支援多核心處理", "適合反應篩選與 96-well 結果彙整"]
+      }
+    };
+    function showRecommendation(key) {
+      const s = scenarios[key];
+      document.getElementById("recommendation").innerHTML = `<span class="eyebrow">建議起點</span><h3 class="tool-name">${s.name}</h3><p class="reason">${s.reason}</p><ul>${s.points.map(p => `<li>${p}</li>`).join("")}</ul>`;
+    }
+    document.querySelectorAll(".scenario-btn").forEach(button => button.addEventListener("click", () => {
+      document.querySelectorAll(".scenario-btn").forEach(b => b.classList.toggle("active", b === button));
+      showRecommendation(button.dataset.scenario);
+    }));
+
+    const codeSamples = {
+      mocca: `# 安裝：pip install mocca2
+from mocca2 import example_data
+from matplotlib import pyplot as plt
+
+chrom = example_data.example_1()
+chrom.correct_baseline()
+chrom.extract_time(1.4, 1.8, inplace=True)
+chrom.extract_wavelength(220, None, inplace=True)
+
+chrom.find_peaks(min_height=2)
+chrom.deconvolve_peaks(
+    model="FraserSuzuki",
+    min_r2=0.999,
+    relaxe_concs=False,
+    max_comps=5,
+)
+chrom.plot()
+plt.show()  # 先視覺覆核，再匯出結果`,
+      hplc: `# 安裝：pip install --upgrade hplc-py
+from hplc.io import load_chromatogram
+from hplc.quant import Chromatogram
+
+df = load_chromatogram(
+    "sample.csv",
+    cols={"R.Time (min)": "time", "Intensity": "signal"}
+)
+chrom = Chromatogram(df)
+chrom.show()          # 檢查原始訊號
+chrom.crop([10, 20])  # 限定分析範圍
+
+peaks = chrom.fit_peaks()
+print(peaks[["retention_time", "area", "peak_id"]])
+chrom.show()          # 檢查重建訊號與峰形`,
+      chromato: `# 安裝：pip install chromatopy
+import chromatopy
+from chromatopy import FID
+
+# HPLC 原始檔先轉為 CSV
+chromatopy.hplc_to_csv(input_folder, output_folder)
+chromatopy.hplc_integration()
+chromatopy.assign_indices()
+
+# GC-FID：先自動積分，再以手動模式比較
+FID.integration(folder_path, manual_peak_integration=False)
+FID.integration(folder_path, manual_peak_integration=True)
+FID.plot_chromatogram(time_window=[0, 20])
+
+# 依 chromatogram 相似性分群
+FID.clusterer(n_clusters=4)`
+    };
+    const codeContent = document.getElementById("codeContent");
+    function showCode(key) {
+      codeContent.textContent = codeSamples[key];
+      document.querySelectorAll(".code-tab").forEach(b => b.classList.toggle("active", b.dataset.code === key));
+    }
+    document.querySelectorAll(".code-tab").forEach(button => button.addEventListener("click", () => showCode(button.dataset.code)));
+    document.getElementById("copyCode").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(codeContent.textContent);
+        document.getElementById("copyCode").textContent = "已複製";
+        setTimeout(() => document.getElementById("copyCode").textContent = "複製程式碼", 1200);
+      } catch {
+        document.getElementById("copyCode").textContent = "請手動選取";
+      }
+    });
+
+    const answers = { q1: "a", q2: "b", q3: "b", q4: "c", q5: "b" };
+    document.getElementById("submitQuiz").addEventListener("click", () => {
+      const form = new FormData(document.getElementById("quizForm"));
+      let score = 0, answered = 0, review = "";
+      Object.entries(answers).forEach(([q, answer], index) => {
+        const value = form.get(q);
+        if (value) answered++;
+        const ok = value === answer;
+        if (ok) score++;
+        review += `<div class="answer-item ${ok ? "ok" : "no"}">${ok ? "✓" : "✕"} 第 ${index + 1} 題${!value ? "（未作答）" : ""}</div>`;
+      });
+      document.getElementById("score").textContent = `${score}/5`;
+      document.getElementById("feedback").textContent = answered < 5 ? `尚有 ${5-answered} 題未作答。` : score === 5 ? "很好。你已把訊號處理連回分析決策。" : score >= 3 ? "基本概念正確；請覆核錯題的品質控制邏輯。" : "建議回到互動峰分析，觀察參數如何改變結果。";
+      document.getElementById("answerReview").innerHTML = review;
+    });
+    document.getElementById("resetQuiz").addEventListener("click", () => {
+      document.getElementById("quizForm").reset();
+      document.getElementById("score").textContent = "—/5";
+      document.getElementById("feedback").textContent = "回答全部題目，再提交判斷。";
+      document.getElementById("answerReview").innerHTML = "";
+    });
+
+    showRecommendation("dad");
+    showCode("mocca");
+    renderPlot(false);
+  </script>
+</body>
+</html>
