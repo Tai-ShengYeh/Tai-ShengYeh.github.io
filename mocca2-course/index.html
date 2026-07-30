@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MOCCA2：以 Python mocca2 套件學習 HPLC/UHPLC-DAD 自動資料處理，從入門到進階的繁體中文互動課程。">
+  <title>MOCCA2｜HPLC-DAD 自動資料處理 Python 課程</title>
+  <style>
+    :root{
+      --white:#fff;--ink:#0b2348;--text:#243b5a;--muted:#61758f;--line:#d9e3ed;
+      --soft:#f4f8fb;--soft2:#edf4f8;--teal:#078d88;--teal2:#dff3f1;
+      --blue:#1459a6;--amber:#e89016;--amber2:#fff4df;--red:#c74747;--green:#167b68;
+      --shadow:0 14px 36px rgba(11,35,72,.09);--radius:16px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;color:var(--text);background:var(--white);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.65}
+    button,input{font:inherit}
+    button,a{touch-action:manipulation}
+    a{color:inherit;text-decoration:none}
+    code,pre{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+    .skip{position:fixed;left:12px;top:-60px;background:var(--ink);color:#fff;padding:9px 13px;z-index:100}
+    .skip:focus{top:12px}
+    header{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;position:sticky;top:0;background:rgba(255,255,255,.97);z-index:50}
+    .nav{width:min(1380px,100%);margin:auto;padding:0 28px;display:flex;align-items:center;gap:28px}
+    .brand{display:flex;align-items:center;gap:12px;color:var(--ink);font-size:21px;font-weight:900;letter-spacing:-.02em;white-space:nowrap}
+    .brand svg{width:42px;height:33px}
+    .navlinks{display:flex;gap:28px;margin-left:auto;font-weight:800;color:var(--ink);font-size:14px}
+    .navlinks a:hover,.navlinks a:focus{color:var(--teal)}
+    .primary,.secondary,.ghost{border:0;border-radius:10px;padding:11px 18px;font-weight:900;cursor:pointer}
+    .primary{background:var(--amber);color:#fff}
+    .secondary{background:var(--ink);color:#fff}
+    .ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+    .primary:hover,.secondary:hover{filter:brightness(.94)}
+    .hero{max-width:1380px;margin:auto;padding:74px 32px 58px;display:grid;grid-template-columns:1.04fr .96fr;gap:64px;align-items:center}
+    .hero h1{font-size:clamp(38px,4.7vw,68px);line-height:1.08;letter-spacing:-.045em;margin:0;color:var(--ink)}
+    .hero h1 span{color:var(--teal)}
+    .hero .lead{font-size:19px;color:var(--muted);max-width:680px;margin:24px 0 28px}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .course-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:34px;max-width:650px}
+    .fact{border-left:3px solid var(--teal);padding-left:13px}
+    .fact strong{display:block;color:var(--ink);font-size:15px}
+    .fact span{font-size:13px;color:var(--muted)}
+    .console{border:1px solid #c9d6e3;border-radius:14px;box-shadow:var(--shadow);overflow:hidden;background:#fff}
+    .console-head{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+    .dot{width:9px;height:9px;border-radius:50%;background:#d7e0e8}.dot:nth-child(2){background:#acd7d2}.dot:nth-child(3){background:#efc578}
+    .console pre{margin:0;padding:18px 20px 8px;color:#163b78;font-size:14px;line-height:1.8;white-space:pre-wrap}
+    .comment{color:var(--green)}
+    .console-chart{height:235px;padding:0 14px 12px}
+    svg{display:block;width:100%;height:100%}
+    .band{background:var(--soft);border-block:1px solid var(--line)}
+    .section{max-width:1380px;margin:auto;padding:64px 32px}
+    .section-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:28px}
+    h2{font-size:clamp(28px,3vw,42px);line-height:1.18;letter-spacing:-.025em;color:var(--ink);margin:0}
+    .section-heading p{max-width:640px;color:var(--muted);margin:0}
+    .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:20px}
+    .level{padding:16px 20px;border:1px solid var(--line);border-top:4px solid var(--teal);background:#fff;border-radius:12px}
+    .level:nth-child(2){border-top-color:var(--blue)}.level:nth-child(3){border-top-color:var(--amber)}
+    .level strong{color:var(--ink);font-size:18px}.level span{float:right;color:var(--muted);font-size:13px}
+    .chapters{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .chapter-card{min-height:192px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;cursor:pointer;display:flex;flex-direction:column;transition:.18s ease}
+    .chapter-card:hover,.chapter-card:focus{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#9fc6c3;outline:none}
+    .chapter-card .num{color:var(--teal);font-weight:900;font-size:22px}
+    .chapter-card[data-level="1"] .num{color:var(--blue)}.chapter-card[data-level="2"] .num{color:#bf6f00}
+    .chapter-card h3{font-size:17px;line-height:1.45;color:var(--ink);margin:10px 0 7px}
+    .chapter-card p{font-size:13px;color:var(--muted);margin:0 0 16px}
+    .chapter-meta{display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:12px;color:var(--muted)}
+    .done{color:var(--green);font-weight:900}
+    .workflow{display:grid;grid-template-columns:repeat(7,1fr);gap:22px;align-items:center;margin-top:28px}
+    .flow-step{position:relative;text-align:center}
+    .flow-step:not(:last-child)::after{content:"→";position:absolute;right:-22px;top:47px;color:var(--muted);font-size:26px}
+    .mini-chart{height:105px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:7px}
+    .flow-step strong{display:block;color:var(--ink);margin-top:8px}.flow-step span{font-size:12px;color:var(--muted)}
+    .lesson-shell{display:none;min-height:calc(100vh - 72px);grid-template-columns:278px 1fr;background:#fff}
+    .lesson-shell.active{display:grid}
+    .sidebar{border-right:1px solid var(--line);padding:24px 18px;position:sticky;top:72px;height:calc(100vh - 72px);overflow:auto;background:#fbfdff}
+    .side-title{display:flex;justify-content:space-between;font-weight:900;color:var(--ink);font-size:13px;border-bottom:1px solid var(--line);padding:0 4px 12px}
+    .side-group{font-weight:900;color:var(--blue);font-size:13px;margin:20px 6px 8px}
+    .side-chapter{width:100%;display:grid;grid-template-columns:25px 1fr 18px;gap:6px;align-items:center;border:0;background:transparent;text-align:left;padding:9px 8px;border-radius:8px;color:var(--text);cursor:pointer;font-size:13px}
+    .side-chapter:hover{background:var(--soft2)}.side-chapter.active{background:var(--ink);color:#fff}.side-chapter .status{font-size:14px}
+    .progress-box{margin-top:24px;border:1px solid var(--line);border-radius:12px;padding:14px}
+    .progress-box strong{color:var(--ink);font-size:13px}.progress-bar{height:8px;border-radius:8px;background:#dbe4ec;margin:10px 0;overflow:hidden}
+    .progress-fill{height:100%;width:0;background:var(--teal);transition:width .3s ease}.progress-box small{color:var(--muted)}
+    .lesson{padding:38px clamp(24px,4vw,62px) 70px;min-width:0}
+    .lesson-top{display:flex;justify-content:space-between;gap:24px;align-items:start}
+    .lesson h1{color:var(--ink);font-size:clamp(27px,3vw,41px);line-height:1.2;margin:0}
+    .lesson-sub{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0}
+    .lesson-sub div{border-left:3px solid var(--teal);padding-left:13px;font-size:14px}.lesson-sub strong{display:block;color:var(--ink)}
+    .step-tabs{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:24px 0}
+    .step-tab{border:0;border-right:1px solid var(--line);background:#fff;padding:12px 8px;color:var(--text);font-weight:900;cursor:pointer}
+    .step-tab:last-child{border-right:0}.step-tab.active{background:var(--teal);color:#fff}
+    .lesson-panel{display:none}.lesson-panel.active{display:block}
+    .workspace{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+    .panel{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+    .panel-head{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:var(--ink);font-weight:900;font-size:14px}
+    .chart-wrap{height:340px;padding:16px}
+    .legend{display:flex;gap:14px;align-items:center;font-size:12px;color:var(--muted)}
+    .legend i{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:4px}
+    .controls{border-top:1px solid var(--line);padding:14px 16px;background:#fbfdff;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .control label{display:flex;justify-content:space-between;color:var(--ink);font-weight:800;font-size:12px}
+    input[type=range]{width:100%;height:30px;accent-color:var(--teal);cursor:pointer}
+    .codebox{background:#f7fafc;padding:18px;min-height:250px;overflow:auto}
+    .codebox pre{margin:0;font-size:13px;line-height:1.7;white-space:pre-wrap;color:#17396f}
+    .copy{border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 9px;cursor:pointer;color:var(--ink);font-size:12px;font-weight:800}
+    .parameter-note{padding:14px 16px;border-top:1px solid var(--line);font-size:13px}
+    .parameter-note code{color:var(--blue);font-weight:900}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+    .metric{border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center;background:#fff}
+    .metric small{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;color:var(--teal);font-size:24px;line-height:1.25}.metric span{font-size:10px;color:var(--muted)}
+    .decision{border-left:5px solid var(--teal);background:var(--teal2);padding:14px 16px;border-radius:9px;font-size:14px}
+    .decision.warn{border-color:var(--amber);background:var(--amber2)}.decision.bad{border-color:var(--red);background:#fff0f0}
+    .decision strong{color:var(--ink)}
+    .explain-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+    .content-card{border:1px solid var(--line);border-radius:14px;padding:22px;background:#fff}
+    .content-card h3{color:var(--ink);margin:0 0 12px;font-size:20px}.content-card h4{color:var(--ink);margin:20px 0 8px}
+    .content-card p,.content-card li{font-size:15px}
+    .formula{padding:17px 18px;background:var(--soft);border-left:4px solid var(--blue);font-family:Georgia,serif;color:var(--ink);font-size:19px;overflow:auto}
+    .symbol-table,.output-table{width:100%;border-collapse:collapse;font-size:13px}
+    .symbol-table th,.symbol-table td,.output-table th,.output-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+    .symbol-table th,.output-table th{background:var(--soft);color:var(--ink)}
+    .callout{padding:13px 15px;background:var(--amber2);border-radius:9px;font-size:13px;margin-top:14px}
+    .quiz-option{display:block;border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;cursor:pointer}
+    .quiz-option:hover{background:var(--soft)}.feedback{min-height:52px;padding:13px 15px;background:var(--soft);border-radius:9px;margin-top:12px}
+    .lesson-nav{display:flex;justify-content:space-between;gap:12px;margin-top:28px;border-top:1px solid var(--line);padding-top:20px}
+    .reference-list{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .reference{border:1px solid var(--line);border-radius:12px;padding:17px;color:var(--muted);font-size:13px;background:#fff}
+    .reference strong{display:block;color:var(--ink);margin-bottom:5px}
+    footer{background:var(--ink);color:#dce5ef;padding:30px 32px}.footer-inner{max-width:1380px;margin:auto;display:flex;justify-content:space-between;gap:20px;font-size:13px}
+    .hidden{display:none!important}
+    @media(max-width:1050px){
+      .hero{grid-template-columns:1fr}.chapters{grid-template-columns:repeat(3,1fr)}
+      .lesson-shell{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+      .sidebar .side-list{display:none}.progress-box{margin-top:0}.workspace,.explain-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:760px){
+      header{height:auto}.nav{padding:12px 18px}.navlinks{display:none}.nav .primary{margin-left:auto;padding:9px 12px}
+      .hero,.section{padding:42px 18px}.course-facts,.levels,.metrics{grid-template-columns:1fr}
+      .chapters{grid-template-columns:1fr 1fr}.workflow{grid-template-columns:1fr 1fr}
+      .flow-step::after{display:none}.section-heading,.lesson-top{align-items:start;flex-direction:column}
+      .lesson{padding:28px 16px 56px}.lesson-sub{grid-template-columns:1fr}.step-tabs{grid-template-columns:1fr}
+      .step-tab{border-right:0;border-bottom:1px solid var(--line)}.controls{grid-template-columns:1fr}
+      .reference-list{grid-template-columns:1fr}.footer-inner{flex-direction:column}.chart-wrap{height:290px}
+    }
+    @media(max-width:460px){.chapters,.workflow{grid-template-columns:1fr}.brand{font-size:18px}.brand svg{width:34px}.hero h1{font-size:38px}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要內容</a>
+  <header>
+    <nav class="nav" aria-label="主要導覽">
+      <a class="brand" href="#" id="homeLink" aria-label="MOCCA2 首頁">
+        <svg viewBox="0 0 44 34" aria-hidden="true"><path d="M1 29H43" fill="none" stroke="#cbd8e4"/><path d="M2 28C8 28 8 26 10 12c1.3 18 3 18 5 0 1.6-15 2.4-15 4 0 1.3 14 2 16 4 0 1.5-9 2.5-9 4 0 1.4 14 3 16 5 0 1.4-7 2.5-7 4 0 1.3 12 2.5 15 6 15" fill="none" stroke="#078d88" stroke-width="2"/></svg>
+        <span>MOCCA2</span>
+      </a>
+      <div class="navlinks">
+        <a href="#course-map">課程地圖</a><a href="#environment">學習環境</a>
+        <a href="#function-index">函式索引</a><a href="#references">參考資料</a>
+      </div>
+      <button class="primary" id="headerStart">開始學習 →</button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div id="homeView">
+      <section class="hero">
+        <div>
+          <h1>從原始層析圖到<br><span>可信賴的批次分析</span></h1>
+          <p class="lead">以 Python 與 MOCCA2 處理 HPLC／UHPLC-DAD 資料，逐步完成匯入、基線校正、自適應找峰、純度檢查、重疊峰去卷積、化合物追蹤與定量。每一步都回傳可判讀的數字證據。</p>
+          <div class="hero-actions"><button class="secondary" id="heroStart">從第 1 章開始</button><a class="ghost" href="#course-map">先看課程地圖</a></div>
+          <div class="course-facts">
+            <div class="fact"><strong>12 個漸進章節</strong><span>入門 → 中階 → 進階</span></div>
+            <div class="fact"><strong>官方範例可重跑</strong><span>example_data.example_1()</span></div>
+            <div class="fact"><strong>分析證據導向</strong><span>不是只調參數，而是學會判讀</span></div>
+          </div>
+        </div>
+        <div class="console" id="environment">
+          <div class="console-head"><i class="dot"></i><i class="dot"></i><i class="dot"></i><strong>Python / Jupyter</strong><span style="margin-left:auto">mocca2 0.1.18</span></div>
+          <pre><span class="comment"># pip install mocca2</span>
+from mocca2 import example_data
+
+chrom = example_data.example_1()
+chrom.correct_baseline()
+chrom.find_peaks(min_height=2)
+chrom.plot()</pre>
+          <div class="console-chart"><svg id="heroChart" viewBox="0 0 700 330" role="img" aria-label="層析圖示例"></svg></div>
+        </div>
+      </section>
+
+      <div class="band" id="course-map">
+        <section class="section">
+          <div class="section-heading"><div><h2>課程地圖</h2><p>先建立 Python、Chromatogram 與 DAD 資料的共同語言，再完成單一層析圖工作流，最後進入化合物追蹤、批次處理與方法品質證據。</p></div><button class="ghost" id="resetProgress">重設學習進度</button></div>
+          <div class="levels"><div class="level"><strong>入門</strong><span>第 1–4 章</span></div><div class="level"><strong>中階</strong><span>第 5–8 章</span></div><div class="level"><strong>進階</strong><span>第 9–12 章</span></div></div>
+          <div class="chapters" id="chapterCards"></div>
+        </section>
+      </div>
+
+      <section class="section">
+        <div class="section-heading"><div><h2>MOCCA2 完整處理工作流</h2><p>每一步都有明確輸入、輸出與品質診斷。網站會要求學生用圖形與數字回答「為什麼這個結果可信」。</p></div></div>
+        <div class="workflow" id="workflow"></div>
+      </section>
+
+      <div class="band" id="function-index">
+        <section class="section">
+          <div class="section-heading"><div><h2>核心函式索引</h2><p>課程只使用官方文件中可核對的函式與物件。點選函式可直接進入對應章節。</p></div></div>
+          <div class="reference-list" id="functionCards"></div>
+        </section>
+      </div>
+
+      <section class="section" id="references">
+        <div class="section-heading"><div><h2>參考資料與方法來源</h2><p>教學圖表為依據公開方法概念重繪的互動示例，不直接複製論文圖像。</p></div></div>
+        <div class="reference-list">
+          <a class="reference" href="https://bayer-group.github.io/MOCCA/" target="_blank" rel="noopener"><strong>MOCCA2 0.1.18 官方文件</strong>Getting Started、examples、類別與模組 API。</a>
+          <a class="reference" href="https://github.com/Bayer-Group/MOCCA" target="_blank" rel="noopener"><strong>Bayer-Group/MOCCA</strong>MOCCA2 原始碼、測試、範例資料與版本紀錄。</a>
+          <a class="reference" href="https://pypi.org/project/mocca2/" target="_blank" rel="noopener"><strong>PyPI：mocca2</strong>安裝版本、Python 需求與發布資訊。</a>
+          <a class="reference" href="https://doi.org/10.1039/D4DD00214H" target="_blank" rel="noopener"><strong>Obořil et al. (2024)</strong>MOCCA2 自動峰辨識、去卷積與 GUI 方法論。</a>
+          <a class="reference" href="https://doi.org/10.1021/acscentsci.2c01042" target="_blank" rel="noopener"><strong>Haas et al. (2023)</strong>原始 MOCCA 的開源層析資料分析與反應篩選工作流。</a>
+          <a class="reference" href="https://github.com/Bayer-Group/MOCCA-frontend" target="_blank" rel="noopener"><strong>MOCCA2 Web App</strong>官方 GUI 專案；適合與 Python API 課程交叉比較。</a>
+        </div>
+      </section>
+    </div>
+
+    <section class="lesson-shell" id="lessonView" aria-label="章節學習區">
+      <aside class="sidebar">
+        <div class="side-title"><span>課程章節</span><span id="sideProgress">0 / 12</span></div>
+        <div class="side-list" id="sideList"></div>
+        <div class="progress-box"><strong>學習進度</strong><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><small id="progressText">已完成 0 / 12 章</small></div>
+      </aside>
+      <article class="lesson">
+        <div class="lesson-top">
+          <div><h1 id="lessonTitle"></h1><div class="lesson-sub"><div><strong>學習目標</strong><span id="lessonGoal"></span></div><div><strong>先備知識</strong><span id="lessonPrereq"></span></div></div></div>
+          <button class="ghost" id="backMap">← 回課程地圖</button>
+        </div>
+        <div class="step-tabs" role="tablist" aria-label="章節學習步驟">
+          <button class="step-tab active" data-step="concept">1 概念</button>
+          <button class="step-tab" data-step="code">2 程式碼</button>
+          <button class="step-tab" data-step="output">3 輸出</button>
+          <button class="step-tab" data-step="interpret">4 判讀</button>
+          <button class="step-tab" data-step="practice">5 練習</button>
+        </div>
+        <div id="conceptPanel" class="lesson-panel active"></div>
+        <div id="codePanel" class="lesson-panel"></div>
+        <div id="outputPanel" class="lesson-panel"></div>
+        <div id="interpretPanel" class="lesson-panel"></div>
+        <div id="practicePanel" class="lesson-panel"></div>
+        <div class="lesson-nav"><button class="ghost" id="prevChapter">← 上一章</button><button class="secondary" id="nextChapter">下一章 →</button></div>
+      </article>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner"><span>MOCCA2 教學網站｜Python 套件：<strong>mocca2</strong></span><span>繁體中文 · Python 實作 · 可重現分析</span></div></footer>
+
+  <script>
+  const chapters=[
+    {title:"HPLC-DAD 與 MOCCA2",level:0,time:35,goal:"理解 MOCCA2 的適用資料、核心物件與完整處理流程。",prereq:"知道保留時間、吸光度與色譜峰的基本意義。",func:"Data2D / Chromatogram",desc:"先看懂時間 × 波長 × 吸光度的二維資料。",concept:"MOCCA2 的 `Data2D.data` 依官方定義為 absorbance[wavelength, time]；`Chromatogram` 在此基礎上加入樣品路徑、blank 與 peaks。",formula:"X ∈ ℝ<sup>n<sub>λ</sub> × n<sub>t</sub></sup>；x<sub>ij</sub>=A(λ<sub>i</sub>,t<sub>j</sub>)",symbols:[["time","保留時間軸，通常為 min"],["wavelength","DAD 波長軸，通常為 nm"],["data","吸光度矩陣 [wavelength, time]"]],code:`from mocca2 import example_data\n\nchrom = example_data.example_1()\nprint(chrom.data.shape)\nprint(chrom.time_step())\nprint(chrom.wavelength_step())\nchrom.plot_2d()`,why:["確認矩陣方向與 shape。","確認時間、波長單位及取樣間距。","保留 raw、blank 與樣品名稱。"],error:"MOCCA2 主要針對 HPLC／UHPLC-DAD；只有單波長訊號時，純度與光譜去卷積能力會受限。",q:"MOCCA2 的 Data2D.data 第一個維度代表什麼？",opts:["波長","時間","樣品編號"],ans:0},
+    {title:"安裝、範例資料與原始檔",level:0,time:45,goal:"建立 Python 環境，下載範例並匯入 Agilent、Shimadzu 或 Waters 資料。",prereq:"能在終端機或 Jupyter 執行 Python。",func:"Chromatogram()",desc:"從官方範例開始，再銜接儀器原始檔與 blank。",concept:"先以 `example_data` 驗證環境；實際資料可用 `Chromatogram(sample, blank=...)` 建立，解析器支援範圍仍需依官方文件與實際儀器版本核對。",formula:"X<sub>net</sub>=X<sub>sample</sub>−X<sub>blank</sub>",symbols:[["sample","樣品原始檔或 Data2D"],["blank","空白原始檔或 Data2D"],["interpolate_blank","是否將 blank 插值至樣品取樣軸"]],code:`# 終端機：pip install mocca2\n# 終端機：python -m mocca2 --download-data\nfrom mocca2 import Chromatogram, example_data\n\nchrom = example_data.example_1()\n# real = Chromatogram("sample.D", blank="blank.D")\nprint(chrom.name, chrom.data.shape)`,why:["先用 example_1() 驗證安裝。","只匯入一個實際檔並核對 shape。","不要覆寫或轉存後刪除原始資料。"],error:"儀器檔案格式與軟體版本會影響解析；匯入成功仍需核對時間、波長與訊號尺度。",q:"最安全的第一個環境測試是？",opts:["載入 example_data.example_1()","直接批次處理全部原始檔","只確認 pip 沒報錯"],ans:0},
+    {title:"裁切、插值與視覺檢查",level:0,time:45,goal:"使用時間／波長裁切與圖形 QC 定義有效分析區。",prereq:"已建立可用的 Chromatogram。",func:"extract_time() / extract_wavelength()",desc:"排除溶劑前緣與高雜訊波段，但保留分析目標。",concept:"`extract_time()` 與 `extract_wavelength()` 可回傳新物件或 inplace 修改；教學預設保留原物件。二維 heatmap 與 contracted trace 應一起檢查。",formula:"X′=X[λ<sub>min</sub>:λ<sub>max</sub>,t<sub>min</sub>:t<sub>max</sub>]",symbols:[["tmin,tmax","保留時間分析範圍"],["λmin,λmax","DAD 波長分析範圍"],["inplace","True 時直接修改原物件"]],code:`from mocca2 import example_data\nchrom = example_data.example_1()\n\nroi = chrom.extract_time(1.4, 3.8)\nroi = roi.extract_wavelength(220, 400)\nroi.plot()\nroi.plot_2d()`,why:["在裁切前後記錄 shape 與範圍。","確認沒有切掉目標峰邊界。","檢查飽和、負值、缺訊號與異常波段。"],error:"只看 1D trace 可能忽略特定波長的干擾；裁切也不能取代 blank 與系統適用性。",q:"為何時間與波長範圍都要檢查？",opts:["DAD 資料同時含兩個軸，干擾可能只出現在其中一區","因為裁切會自動提高濃度","只為了讓圖比較小"],ans:0},
+    {title:"基線校正與診斷",level:0,time:60,goal:"比較 FlatFit、AsLS 與 arPLS，使用 RMSE 與面積偏差判讀。",prereq:"能辨識無峰區、基線漂移與雜訊。",func:"correct_baseline()",desc:"讓峰偵測建立在接近零且平坦的局部背景上。",concept:"`correct_baseline()` 支援 `flatfit`、`asls` 與 `arpls`。官方說明指出 FlatFit、AsLS 適合較平滑資料，arPLS 對較 noisy 資料可能較合適；演算法選擇仍須以 QC 驗證。",formula:"X<sub>c</sub>(λ,t)=X(λ,t)−b̂(λ,t)；RMSE<sub>b</sub>=√[N<sup>−1</sup>Σ(b̂−b<sub>ref</sub>)²]",symbols:[["b̂","估計基線，不是真值"],["smoothness","基線平滑懲罰尺度"],["RMSEb","在獨立無峰區評估的基線殘差"]],code:`from mocca2 import example_data\nchrom = example_data.example_1()\n\ncorrected = chrom.correct_baseline(\n    method="arpls",\n    smoothness=1.0,\n    tol=1e-7,\n)\ncorrected.plot(zero_line=True)`,why:["比較多個無峰區的殘差。","檢查峰高、峰面積與峰界線是否被削弱。","記錄 method、smoothness、p、tol 與迭代設定。"],error:"基線看似平坦不代表校正正確；過度擬合可能吃掉寬峰或拖尾。",q:"基線品質最有力的證據是？",opts:["無峰區殘差加上標準／加標峰的面積偏差","曲線看起來最平","把所有負值截成零"],ans:0},
+    {title:"自適應找峰與峰邊界",level:1,time:65,goal:"調整 min_height、min_rel_height 與 split_threshold，平衡假陽性與漏峰。",prereq:"完成基線校正並理解 prominence。",func:"find_peaks()",desc:"用真峰、假陽性與漏峰數評估參數，不追求峰數最多。",concept:"MOCCA2 先將 2D 訊號 contraction 成 1D，再依 prominence 找峰、展開邊界、合併重疊峰並視 split_threshold 分裂。`min_height` 是最小 prominence。",formula:"Precision=TP/(TP+FP)；Recall=TP/(TP+FN)",symbols:[["min_height","最小絕對 prominence"],["min_rel_height","相對最高峰的最小 prominence"],["split_threshold","兩峰谷值相對較小峰高度的分裂界線"]],code:`from mocca2 import example_data\nchrom = example_data.example_2()\nchrom.correct_baseline()\nchrom.find_peaks(\n    contraction="mean",\n    min_height=1,\n    min_rel_height=0.01,\n    split_threshold=0.05,\n)\nchrom.plot()`,why:["用標準品或人工核對集計算 TP/FP/FN。","查看峰邊界是否回到局部基線。","檢查小峰是否只在單一波長出現。"],error:"降低 min_height 會增加靈敏度，也可能把雜訊與 ghost peaks 收進來。",q:"min_height 過低最可能造成什麼？",opts:["假陽性增加","所有峰自動變純","時間單位改變"],ans:0},
+    {title:"峰純度與共洗脫證據",level:1,time:55,goal:"以 DAD 光譜變化與 explained threshold 辨識可疑混合峰。",prereq:"理解峰內不同時間點都有一條吸收光譜。",func:"purity checking",desc:"把「看起來像單峰」轉成可檢驗的光譜一致性問題。",concept:"單一純成分在峰內不同時間點的光譜形狀應高度一致；若需要多個光譜成分才能解釋二維訊號，可能存在共洗脫。純度證據支持或反對單成分假設，但不是化合物鑑定。",formula:"X≈csᵀ；Explained=1−||X−X̂||²<sub>F</sub>/||X−X̄||²<sub>F</sub>",symbols:[["c","成分的時間濃度輪廓"],["s","成分的吸收光譜"],["Explained","模型解釋的訊號比例"]],code:`# dataset 工作流中的純度門檻\nfrom mocca2 import ProcessingSettings\n\nsettings = ProcessingSettings(\n    explained_threshold=0.998,\n    min_prominence=1,\n)\n# threshold 必須用標準、加標與已知混合物驗證`,why:["比較峰前、峰頂、峰後光譜。","報告 explained score 與殘差結構。","用已知混合物測試假陰性與假陽性。"],error:"高純度分數不等於已鑑定，也不能排除吸收光譜非常相似的共洗脫物。",q:"高峰純度分數最嚴謹的結論是？",opts:["資料支持單一光譜成分模型，但仍非身分證明","一定只有一種化合物","濃度一定正確"],ans:0},
+    {title:"重疊峰去卷積",level:1,time:75,goal:"使用 Fraser–Suzuki 等模型拆解重疊峰，檢查 R²、RMSE 與面積偏差。",prereq:"已偵測重疊峰並理解純度檢查。",func:"deconvolve_peaks()",desc:"增加成分數直到擬合達標，但防止為追求 R² 而過度擬合。",concept:"`deconvolve_peaks()` 逐步增加 components，直到達到 `min_r2` 或 `max_comps`。`relaxe_concs=False` 回傳峰模型函式；True 會用受限最小平方法再精煉濃度。",formula:"X(λ,t)=Σ<sub>k=1</sub><sup>K</sup>s<sub>k</sub>(λ)c<sub>k</sub>(t)+E(λ,t)",symbols:[["min_r2","去卷積要求的最小 R²"],["max_comps","允許擬合的最大成分數"],["E","模型殘差矩陣"]],code:`chromatogram.deconvolve_peaks(\n    model="FraserSuzuki",\n    min_r2=0.999,\n    relaxe_concs=False,\n    max_comps=5,\n)\n\nfor component in chromatogram.all_components():\n    print(component.integral)`,why:["同時看 component 光譜與洗脫輪廓。","以殘差結構判斷是否遺漏成分。","用已知混合物評估面積回收率與偏差。"],error:"R² 提高不代表化學分解正確；K 過大可能把雜訊拆成假成分。",q:"選擇去卷積結果時，為何不能只看最高 R²？",opts:["較多成分可能過度擬合雜訊","R² 與模型完全無關","R² 只適用 GC"],ans:0},
+    {title:"跨層析圖化合物追蹤",level:1,time:65,goal:"結合保留時間與光譜資訊，把同一化合物跨樣品追蹤。",prereq:"已有品質可接受的 peaks 或 components。",func:"Compound / clustering",desc:"不要把相近保留時間直接視為同一化合物。",concept:"MOCCA2 可將不同 chromatograms 中的 components 聚類成 compounds，再利用 reference chromatograms 命名。應同時考慮 RT、光譜與批次漂移，並對歧義配對保留稽核紀錄。",formula:"d<sub>ij</sub>=w<sub>t</sub>|t<sub>Ri</sub>−t<sub>Rj</sub>|+w<sub>s</sub>(1−sim(s<sub>i</sub>,s<sub>j</sub>))",symbols:[["Compound","跨 chromatograms 的候選同一化合物"],["reference_for_compound","標準或參考樣品提供的名稱"],["sim","光譜相似度"]],code:`from mocca2 import MoccaDataset\n\ndataset = MoccaDataset()\ndataset.add_chromatogram(\n    standard_chrom,\n    reference_for_compound="caffeine",\n    compound_concentration=0.050,\n)\ndataset.add_chromatogram(sample_chrom)`,why:["以標準品 RT 與 DAD 光譜交叉確認。","檢查一對多或多對一配對。","以 QC 樣品評估跨批次追蹤穩定性。"],error:"聚類結果是候選對應，不是法規層級鑑定；等吸收光譜物質可能仍需 MS 或加標確認。",q:"跨樣品追蹤最穩健的依據是？",opts:["保留時間、光譜與標準品共同支持","只看峰高","只要名稱相同"],ans:0},
+    {title:"內標、校正與相對濃度",level:2,time:70,goal:"加入內標與標準樣品，理解 response factor、反算與適用範圍。",prereq:"能追蹤同一化合物的積分面積。",func:"add_chromatogram() / get_relative_concentrations()",desc:"把成分積分轉換成可解釋的濃度與不確定度。",concept:"批次資料可指定 `istd_reference`、化合物與內標濃度，之後取得相對濃度。內標可補償部分進樣與訊號變異，但不能自動修復共洗脫、非線性或標準品錯誤。",formula:"R=A<sub>x</sub>/A<sub>IS</sub>；R=f(C<sub>x</sub>/C<sub>IS</sub>)",symbols:[["Ax,AIS","分析物與內標積分"],["f","由標準樣品估計的 response factor"],["Cx,CIS","分析物與內標濃度"]],code:`dataset.add_chromatogram(\n    istd_chrom,\n    reference_for_compound="istd",\n    istd_reference=True,\n    compound_concentration=0.06094,\n    istd_concentration=0.06094,\n)\n\nresults, factors = dataset.get_relative_concentrations()`,why:["確認內標不與分析物共洗脫。","用多濃度標準檢查線性與範圍。","報告校正殘差、回算偏差與外插。"],error:"單點 response factor 不等於完整方法確效；教材數值門檻不是通用法規標準。",q:"內標法仍需要檢查什麼？",opts:["共洗脫、線性、範圍與回算偏差","只需確認內標峰存在","不必做任何 QC"],ans:0},
+    {title:"MoccaDataset 批次處理",level:2,time:80,goal:"用 ProcessingSettings 一次處理多個 chromatograms 並理解每個 stage。",prereq:"已完成單一層析圖的完整工作流。",func:"MoccaDataset.process_all()",desc:"自動化不等於免檢查；以 QC gate 管理整批結果。",concept:"`process_all()` 會依序裁切波長、校正基線、找峰、去卷積、聚類 compounds、精煉 peaks 與命名。可使用多核心，但每批都要保存設定與失敗樣品。",formula:"raw → crop → baseline → peaks → deconvolution → clustering → naming",symbols:[["ProcessingSettings","集中保存處理參數"],["cores","平行處理核心數"],["verbose","輸出各 stage 進度"]],code:`from mocca2 import MoccaDataset, ProcessingSettings\n\nsettings = ProcessingSettings(\n    baseline_model="arpls",\n    min_elution_time=2.5,\n    max_elution_time=5.0,\n    min_wavelength=230,\n    min_rel_prominence=0.0,\n    min_prominence=1,\n    explained_threshold=0.998,\n)\ndataset.process_all(settings, verbose=True, cores=4)`,why:["先以小子集驗證設定。","每個 stage 抽查代表樣品與極端樣品。","記錄失敗、警告、執行時間與版本。"],error:"官方範例約 90 張 chromatograms 可需數分鐘；高 cores 不會保證結果正確，也受硬體限制。",q:"批次處理前最重要的步驟是？",opts:["先用代表性小子集驗證參數與 QC","直接把 cores 設到最大","只看最後濃度表"],ans:0},
+    {title:"方法性能與失敗案例",level:2,time:75,goal:"用 precision、recall、面積 bias、RSD 與殘差評估整體方法。",prereq:"能執行批次處理並取得已知參考結果。",func:"QC metrics",desc:"把漂亮圖形轉成能被驗證、比較與稽核的性能證據。",concept:"峰偵測、追蹤與定量需要不同的真值與指標。應以標準品、加標、重複、blank 與人工核對集建立獨立 QC，並納入失敗案例。",formula:"Bias%=100(Ĉ−C<sub>ref</sub>)/C<sub>ref</sub>；RSD%=100s/C̄",symbols:[["TP/FP/FN","峰偵測或追蹤的分類結果"],["Bias","定量系統偏差"],["RSD","重複性相對標準差"]],code:`import pandas as pd\n\nqc = pd.DataFrame({\n    "metric": ["peak_precision", "peak_recall", "area_bias_pct", "qc_rsd_pct"],\n    "value": [0.96, 0.92, 2.1, 3.4],\n})\nprint(qc)\n# 允收值須由研究設計、SOP 或法規預先定義`,why:["允收界線在分析前定義。","以獨立 QC 驗證，不用同一資料自證。","公開漏峰、錯配、過度去卷積與外插案例。"],error:"網站中的數字是教學模擬；真實允收標準必須依用途、基質、濃度與法規建立。",q:"最能支持自動找峰性能的是？",opts:["已知核對集上的 precision 與 recall","只報告總峰數","挑一張最好看的圖"],ans:0},
+    {title:"可重現專案與報告",level:2,time:70,goal:"保存版本、設定、原始資料、輸出與 QC，產生可重現分析報告。",prereq:"已完成 MOCCA2 批次工作流與方法評估。",func:"serialization / environment",desc:"讓另一位分析者能從 raw data 重建同一份結果。",concept:"完整專案至少保存唯讀 raw、處理腳本、ProcessingSettings、Python 與 mocca2 版本、樣品 metadata、QC 圖、排除理由與結果表；資料輸出不應取代稽核軌跡。",formula:"Reproducible result = data + code + parameters + environment + decisions",symbols:[["to_dict()","物件序列化的一部分"],["settings","完整處理參數"],["environment","Python 與套件版本"]],code:`from importlib.metadata import version\nimport json\n\nmanifest = {\n    "mocca2": version("mocca2"),\n    "settings": settings.__dict__,\n    "raw_files": raw_file_list,\n    "qc_rules": qc_rules,\n}\nwith open("results/manifest.json", "w", encoding="utf-8") as f:\n    json.dump(manifest, f, ensure_ascii=False, indent=2)`,why:["raw data 唯讀且具 checksum。","每次報告連結版本、參數與 QC。","人工排除與重跑原因寫入 log。"],error:"只保存 CSV 或截圖無法重建分析；也不要在未確認相容性前把序列化物件當永久格式。",q:"哪一組最接近可重現分析的最低要求？",opts:["資料、程式、參數、環境與決策紀錄","只有最終 Excel","只有 Python notebook 截圖"],ans:0}
+  ];
+
+  const funcs=[
+    ["Data2D / Chromatogram","核心二維資料與單一層析圖物件","0"],
+    ["extract_time()","裁切保留時間範圍","2"],
+    ["extract_wavelength()","裁切 DAD 波長範圍","2"],
+    ["correct_baseline()","FlatFit、AsLS、arPLS 基線校正","3"],
+    ["find_peaks()","自適應找峰與邊界處理","4"],
+    ["deconvolve_peaks()","重疊峰去卷積","6"],
+    ["all_components()","取得 components 與積分","6"],
+    ["MoccaDataset.add_chromatogram()","加入標準、內標與樣品","7"],
+    ["ProcessingSettings","集中定義批次處理參數","9"],
+    ["process_all()","執行完整批次工作流","9"],
+    ["get_relative_concentrations()","取得內標相對濃度","8"],
+    ["plot_2d()","顯示時間 × 波長 heatmap","2"]
+  ];
+  const completed=new Set(JSON.parse(localStorage.getItem("mocca2Progress")||"[]"));
+  let current=0,step="concept",baselineStrength=.72,minHeight=2,purityThreshold=.998,minR2=.999,maxComps=5;
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const esc=s=>s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  const levelName=i=>["入門","中階","進階"][i];
+
+  function signalData({shift=0,noise=.8,baseline=0,skew=0}={}){
+    const out=[];for(let i=0;i<=260;i++){const t=i/13;const g=(m,s,a)=>a*Math.exp(-.5*((t-m)/s)**2)*(1+skew*Math.max(0,t-m));
+      const y=8+baseline*(1.5*t+.07*t*t)+g(3.2+shift,.22,48)+g(5.7+shift,.3,78)+g(8.15+shift,.24,128)+g(10.8+shift,.32,96)+g(14.05+shift,.29,68)+g(16.5+shift,.33,55)+g(18.4+shift,.22,42)+noise*(Math.sin(i*1.73)+.55*Math.sin(i*.41));
+      out.push({t,y,b:8+baseline*(1.5*t+.07*t*t)});}return out;
+  }
+  function linePath(d,key="y",x=46,y=284,w=620,h=235,max=165){return d.map((p,i)=>`${i?"L":"M"}${(x+p.t/20*w).toFixed(1)},${(y-(p[key]||0)/max*h).toFixed(1)}`).join(" ")}
+  function axes(svg,title="響應 (mAU)"){
+    svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/><path d="M46 222H666M46 160H666M46 98H666" stroke-dasharray="3 5"/></g><g fill="#61758f" font-size="11"><text x="337" y="318">保留時間 (min)</text><text transform="translate(15 210) rotate(-90)">${title}</text><text x="43" y="302">0</text><text x="345" y="302">10</text><text x="650" y="302">20</text></g>`;
+  }
+  function drawHero(){const svg=$("#heroChart");axes(svg);const d=signalData({noise:.35});svg.insertAdjacentHTML("beforeend",`<path d="${linePath(d)}" fill="none" stroke="#078d88" stroke-width="2.5"/>`)}
+  function miniSVG(type){
+    const d=signalData({baseline:type===1?1.7:0,shift:type===2?.3:0,noise:.25});
+    const path=d.map((p,i)=>`${i?"L":"M"}${(8+p.t/20*120).toFixed(1)},${(83-p.y/165*70).toFixed(1)}`).join(" ");
+    if(type===4)return `<svg viewBox="0 0 138 92"><rect width="138" height="92" fill="#fff"/><g fill="#1459a6" font-size="8"><text x="9" y="16">Peak</text><text x="48" y="16">RT</text><text x="82" y="16">Area</text><text x="9" y="35">V1</text><text x="48" y="35">3.20</text><text x="82" y="35">1284</text><text x="9" y="54">V2</text><text x="48" y="54">5.71</text><text x="82" y="54">2260</text></g><path d="M7 22H130M7 41H130M7 60H130" stroke="#dbe5ed"/></svg>`;
+    return `<svg viewBox="0 0 138 92"><rect width="138" height="92" fill="#fff"/><path d="M8 83H130" stroke="#dbe5ed"/><path d="${path}" fill="none" stroke="${type===3?"#1459a6":"#078d88"}" stroke-width="2"/>${type===3?`<path d="${path}L128,83L8,83Z" fill="rgba(7,141,136,.17)" stroke="none"/>`:""}</svg>`;
+  }
+  function renderHome(){
+    $("#chapterCards").innerHTML=chapters.map((c,i)=>`<button class="chapter-card" data-level="${c.level}" data-chapter="${i}"><span class="num">${String(i+1).padStart(2,"0")}</span><h3>${c.title}</h3><p>${c.desc}</p><span class="chapter-meta"><span>約 ${c.time} 分鐘</span><span class="${completed.has(i)?"done":""}">${completed.has(i)?"✓ 已完成":"開始學習 →"}</span></span></button>`).join("");
+    $$(".chapter-card").forEach(b=>b.onclick=()=>openLesson(+b.dataset.chapter));
+    const flow=[["匯入","Data2D"],["基線","RMSE"],["找峰","TP / FP"],["純度","Explained"],["去卷積","R² / RMSE"],["追蹤","RT + 光譜"],["定量","Bias / RSD"]];
+    $("#workflow").innerHTML=flow.map((x,i)=>`<div class="flow-step"><div class="mini-chart">${miniSVG(i)}</div><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join("");
+    $("#functionCards").innerHTML=funcs.map(f=>`<button class="reference" data-go="${f[2]}" style="text-align:left;cursor:pointer"><strong><code>${f[0]}</code></strong>${f[1]}</button>`).join("");
+    $$("#functionCards button").forEach(b=>b.onclick=()=>openLesson(+b.dataset.go));
+  }
+  function updateProgress(){
+    const n=completed.size,p=Math.round(n/chapters.length*100);
+    $("#sideProgress").textContent=`${n} / 12`;$("#progressText").textContent=`已完成 ${n} / 12 章`;
+    $("#progressFill").style.width=p+"%";
+  }
+  function renderSidebar(){
+    let last=-1,html="";chapters.forEach((c,i)=>{if(c.level!==last){last=c.level;html+=`<div class="side-group">${levelName(last)}</div>`}
+      html+=`<button class="side-chapter ${i===current?"active":""}" data-side="${i}"><span>${i+1}</span><span>${c.title}</span><span class="status">${completed.has(i)?"✓":"○"}</span></button>`});
+    $("#sideList").innerHTML=html;$$("#sideList button").forEach(b=>b.onclick=()=>openLesson(+b.dataset.side));updateProgress();
+  }
+  function metricsFor(c){
+    if(c===3){const rm=18.4*(1-baselineStrength),bias=22.7*(1-baselineStrength);return [["基線 RMSE",rm.toFixed(1),"mAU"],["面積偏差","+"+bias.toFixed(1),"%"],["無峰區均值",(6.2*(1-baselineStrength)).toFixed(1),"mAU"],["校正係數 α",baselineStrength.toFixed(2),"教材模擬"]]}
+    if(c===4){const found=Math.max(2,Math.round(11-minHeight*1.5)),tp=Math.min(7,found),fp=Math.max(0,found-7);return [["候選峰",found,"個"],["真峰命中",tp,"/ 7"],["假陽性",fp,"個"],["Recall",(tp/7).toFixed(2),""]]}
+    if(c===5){const score=.994+purityThreshold*.005;return [["Explained",score.toFixed(4),""],["門檻",purityThreshold.toFixed(3),""],["光譜成分",score>=purityThreshold?1:2,"個"],["判讀",score>=purityThreshold?"支持純峰":"可疑混合",""]]}
+    if(c===6){const r2=Math.min(.9998,.985+(maxComps-1)*.0042),rmse=(12.5/maxComps).toFixed(2),bias=((minR2-.995)*520).toFixed(2);return [["components",maxComps,"上限"],["重建 R²",r2.toFixed(4),""],["殘差 RMSE",rmse,"mAU"],["面積偏差",(bias>=0?"+":"")+bias,"%"]]}
+    if(c===8)return [["標準點","5",""],["校正 R²","0.9992",""],["未知濃度","0.047","mol L⁻¹"],["回算偏差","+2.4","%"]];
+    if(c===9)return [["chromatograms","90","示例規模"],["processing stages","7",""],["parallel cores","4","示例"],["QC gate","每階段","必要"]];
+    return [["資料物件","Chromatogram",""],["時間範圍","0–20","min"],["波長範圍","200–400","nm"],["目前章節",c+1,"/ 12"]];
+  }
+  function decisionFor(c){
+    if(c===3){const bias=22.7*(1-baselineStrength);return {tone:bias<5?"":bias<10?"warn":"bad",text:bias<5?"面積偏差已落入本教材 ±5% 任務範圍；仍須用獨立 blank、標準或加標樣品確認。":bias<10?"基線已有改善，但面積偏差仍超出教材任務值。":"校正不足，漂移仍明顯影響峰面積。"}}
+    if(c===4){const found=Math.max(2,Math.round(11-minHeight*1.5));return {tone:found===7?"":found>7?"warn":"bad",text:found===7?"示範核對集的 7 個真峰全部命中且無假陽性；仍須檢查峰邊界。":found>7?`min_height 過低，出現 ${found-7} 個疑似假陽性。`:`min_height 過高，漏掉 ${7-found} 個示範真峰。`}}
+    if(c===5){const score=.994+purityThreshold*.005;return {tone:score>=purityThreshold?"":"warn",text:score>=purityThreshold?"本頁資料支持單一光譜成分模型；這不是化合物身分證明。":"峰內光譜變化超過門檻，應檢查共洗脫並考慮去卷積。"}}
+    if(c===6){const r2=Math.min(.9998,.985+(maxComps-1)*.0042);return {tone:r2>=minR2&&maxComps<=5?"":r2>=minR2?"warn":"bad",text:r2>=minR2&&maxComps<=5?"重建 R² 達標，殘差低；仍須檢查 component 光譜、峰形與面積回收率。":r2>=minR2?"雖達 R² 門檻，但成分上限偏高，需排除過度擬合。":"在目前成分上限下未達 min_r2；不可強行接受結果。"}}
+    return {tone:"",text:chapters[c].why[0]+" "+chapters[c].why[1]};
+  }
+  function drawLessonChart(root=$(".lesson-panel.active")){
+    const svg=root?.querySelector("#lessonChart");if(!svg)return;axes(svg,current===0?"響應 / 資料結構":"響應 (mAU)");
+    if(current===6){
+      const total=[],a=[],b=[];for(let i=0;i<=260;i++){const t=i/13,g=(m,s,h)=>h*Math.exp(-.5*((t-m)/s)**2),ya=g(8.55,.72,96),yb=g(9.55,.62,78);a.push({t,y:ya});b.push({t,y:yb});total.push({t,y:8+ya+yb+.9*Math.sin(i*.8)})}
+      svg.insertAdjacentHTML("beforeend",`<path d="${linePath(total)}" fill="none" stroke="#0b2348" stroke-width="2.8"/><path d="${linePath(a)}" fill="none" stroke="#078d88" stroke-width="2.1"/><path d="${linePath(b)}" fill="none" stroke="#c74747" stroke-width="2.1"/><text x="450" y="55" fill="#61758f" font-size="12">總訊號＋2 個候選 components</text>`);
+    }else{
+      const d=signalData({baseline:current===3?1.35:0,noise:current===4?1.5:.45});
+      svg.insertAdjacentHTML("beforeend",`<path d="${linePath(d)}" fill="none" stroke="#1459a6" stroke-width="2.35"/>`);
+      if(current===3){const corr=d.map(p=>({...p,y:p.y-baselineStrength*p.b+8}));svg.insertAdjacentHTML("beforeend",`<path d="${linePath(d,"b")}" fill="none" stroke="#e89016" stroke-width="2" stroke-dasharray="6 4"/><path d="${linePath(corr)}" fill="none" stroke="#078d88" stroke-width="2"/>`)}
+      if(current===4){const n=Math.max(2,Math.round(11-minHeight*1.5)),centers=[3.2,5.7,8.15,10.8,14.05,16.5,18.4,12.4,2.4,15.3,6.8];svg.insertAdjacentHTML("beforeend",centers.slice(0,n).map((t,i)=>`<circle cx="${46+t/20*620}" cy="${i<7?80+(i%3)*28:230-(i%2)*18}" r="6" fill="${i<7?"#078d88":"#c74747"}" stroke="#fff" stroke-width="2"/>`).join(""))}
+      if(current===5){svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/><path d="M46 222H666M46 160H666M46 98H666" stroke-dasharray="3 5"/></g>${[["#078d88",0],["#1459a6",.55],["#e89016",1.1]].map((x,j)=>{let p="";for(let i=0;i<=120;i++){const l=220+i*1.35;const v=28+92*Math.exp(-.5*((l-(246+j*2))/13)**2)+55*Math.exp(-.5*((l-(292-j*2))/17)**2)+7*Math.sin(i/8+x[1]);p+=`${i?"L":"M"}${46+i/120*620},${284-v/145*235} `}return `<path d="${p}" fill="none" stroke="${x[0]}" stroke-width="2.3"/>`}).join("")}<g fill="#61758f" font-size="11"><text x="338" y="318">波長 (nm)</text><text transform="translate(15 195) rotate(-90)">正規化吸光度</text></g>`}
+      if(current===8){svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/><path d="M46 222H666M46 160H666M46 98H666" stroke-dasharray="3 5"/></g><path d="M72 264L635 58" fill="none" stroke="#1459a6" stroke-width="2.5"/>${[[.01,215],[.025,171],[.04,125],[.055,83],[.07,45]].map((p,i)=>`<circle cx="${72+p[0]/.07*563}" cy="${p[1]}" r="6" fill="#078d88"/><text x="${78+p[0]/.07*563}" y="${p[1]-8}" fill="#61758f" font-size="10">S${i+1}</text>`).join("")}<g fill="#61758f" font-size="11"><text x="330" y="318">C / C_IS</text><text transform="translate(15 195) rotate(-90)">A / A_IS</text></g>`}
+    }
+    renderMetrics(root);
+  }
+  function renderMetrics(root=$(".lesson-panel.active")){
+    const m=metricsFor(current),d=decisionFor(current);
+    const holder=root?.querySelector("#liveMetrics");if(!holder)return;
+    holder.innerHTML=m.map(x=>`<div class="metric"><small>${x[0]}</small><strong>${x[1]}</strong><span>${x[2]}</span></div>`).join("");
+    const decision=root.querySelector("#decisionBox");
+    decision.className=`decision ${d.tone}`;decision.innerHTML=`<strong>判讀：</strong>${d.text}`;
+  }
+  function conceptControls(){
+    if(current===3)return `<div class="control"><label>教材基線移除係數 α <span id="baseOut">${baselineStrength.toFixed(2)}</span></label><input id="baseSlider" type="range" min="0" max="100" value="${baselineStrength*100}" aria-label="教材基線移除係數"></div><div class="parameter-note">α 只控制本頁模擬：X<sub>c,α</sub>=X−αb̂；它不是 <code>correct_baseline()</code> 的正式參數。品質請看 RMSE 與面積偏差。</div>`;
+    if(current===4)return `<div class="control"><label>min_height <span id="heightOut">${minHeight.toFixed(1)}</span></label><input id="heightSlider" type="range" min="5" max="50" value="${minHeight*10}" aria-label="minimum peak height"></div><div class="parameter-note">正式參數：最小 prominence。請同時觀察真峰、假陽性、漏峰與峰邊界。</div>`;
+    if(current===5)return `<div class="control"><label>explained_threshold <span id="purityOut">${purityThreshold.toFixed(3)}</span></label><input id="puritySlider" type="range" min="990" max="1000" value="${purityThreshold*1000}" aria-label="explained threshold"></div><div class="parameter-note">門檻越高越嚴格，但仍需用已知純峰與混合峰驗證 false positive / false negative。</div>`;
+    if(current===6)return `<div class="control"><label>min_r2 <span id="r2Out">${minR2.toFixed(3)}</span></label><input id="r2Slider" type="range" min="980" max="1000" value="${minR2*1000}" aria-label="minimum R squared"></div><div class="control"><label>max_comps <span id="compsOut">${maxComps}</span></label><input id="compsSlider" type="range" min="1" max="7" value="${maxComps}" aria-label="maximum components"></div>`;
+    return `<div class="parameter-note">本章先檢查物件、單位與輸出，再進入下一個分析步驟。圖形是教學模擬；程式碼使用套件內建資料，可在 Python 中重跑。</div>`;
+  }
+  function renderLesson(){
+    const c=chapters[current];$("#lessonTitle").textContent=`第 ${current+1} 章｜${c.title}`;$("#lessonGoal").textContent=c.goal;$("#lessonPrereq").textContent=c.prereq;renderSidebar();
+    $("#conceptPanel").innerHTML=`<div class="explain-grid"><div class="content-card"><h3>先建立概念</h3><p>${c.concept}</p><div class="formula">${c.formula}</div><div class="callout"><strong>本章問題：</strong>${c.desc}</div></div><div class="content-card"><h3>符號與分析量</h3><table class="symbol-table"><thead><tr><th>符號／參數</th><th>定義</th></tr></thead><tbody>${c.symbols.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td></tr>`).join("")}</tbody></table><div class="callout"><strong>方法限制：</strong>${c.error}</div></div></div>`;
+    $("#codePanel").innerHTML=`<div class="workspace"><div class="panel"><div class="panel-head"><span>Python 程式碼｜${c.func}</span><button class="copy" data-copy>複製</button></div><div class="codebox"><pre id="lessonCode">${esc(c.code)}</pre></div><div class="parameter-note">程式碼依據官方 manual / vignette；第一次執行可能需要安裝 dependencies。</div></div><div class="panel"><div class="panel-head"><span>輸出預覽與參數實驗</span><span class="legend"><span><i style="background:#078d88"></i>保留／處理後</span><span><i style="background:#c74747"></i>疑似錯誤</span></span></div><div class="chart-wrap"><svg id="lessonChart" viewBox="0 0 700 330" role="img" aria-label="${c.title}教學圖"></svg></div><div class="controls">${conceptControls()}</div></div></div><div class="metrics" id="liveMetrics"></div><div class="decision" id="decisionBox"></div>`;
+    const rows=current===6?[["sample_01","C1","8.55","24812","58.2"],["sample_01","C2","9.55","17835","41.8"],["sample_02","C1","8.57","23110","57.6"],["sample_02","C2","9.58","16996","42.4"]]:[["sample_01","3.20","48.2","322","0.24"],["sample_01","5.71","78.5","604","0.31"],["sample_01","8.15","127.8","846","0.27"],["sample_01","10.80","95.9","731","0.34"]];
+    $("#outputPanel").innerHTML=`<div class="explain-grid"><div class="content-card"><h3>預期輸出：先問物件代表什麼</h3><table class="output-table"><thead><tr>${(current===6?["sample","component","RT (min)","integral","area %"]:["sample","RT (min)","height","integral","width"]).map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table><div class="callout">數字為教學預覽；真正數值以你的 Python 執行結果為準。</div></div><div class="content-card"><h3>輸出檢查清單</h3><ol>${c.why.map(x=>`<li>${x}</li>`).join("")}</ol><h4>常見錯誤</h4><p>${c.error}</p></div></div>`;
+    $("#interpretPanel").innerHTML=`<div class="workspace"><div class="panel"><div class="panel-head"><span>圖形證據</span><span class="legend"><span><i style="background:#078d88"></i>可接受</span><span><i style="background:#e89016"></i>需檢查</span></span></div><div class="chart-wrap"><svg id="lessonChart" viewBox="0 0 700 330" role="img" aria-label="${c.title}判讀圖"></svg></div><div class="controls">${conceptControls()}</div></div><div class="content-card"><h3>判讀順序</h3><ol><li>先確認資料物件、單位與分析範圍。</li><li>再比較圖形與即時數字證據。</li><li>檢查參數改變是否改善目標指標，同時造成副作用。</li><li>最後才決定保留、調整或停止分析。</li></ol><div class="metrics" id="liveMetrics"></div><div class="decision" id="decisionBox"></div><div class="callout"><strong>不能跳過：</strong>${c.error}</div></div></div>`;
+    $("#practicePanel").innerHTML=`<div class="explain-grid"><div class="content-card"><h3>形成性練習</h3><p><strong>${c.q}</strong></p>${c.opts.map((o,i)=>`<label class="quiz-option"><input type="radio" name="quiz" value="${i}"> ${String.fromCharCode(65+i)}. ${o}</label>`).join("")}<button class="secondary" id="checkQuiz">檢查答案</button><div class="feedback" id="feedback">選擇後再檢查。答對會記錄本章進度。</div></div><div class="content-card"><h3>把答案連回證據</h3><p>不要只記函式名稱。請用一句話說明本章的輸入、輸出，以及至少一個品質檢查。</p><div class="formula">${c.formula}</div><div class="callout">完成本章後，建議在自己的 Jupyter 或 Python 環境重跑程式碼，再比較實際輸出。</div></div></div>`;
+    $$("[data-copy]").forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(c.code);b.textContent="已複製 ✓"}catch{b.textContent="請手動複製"}});
+    $("#checkQuiz").onclick=()=>{const p=$('input[name="quiz"]:checked'),f=$("#feedback");if(!p){f.textContent="請先選擇一個答案。";return}if(+p.value===c.ans){completed.add(current);localStorage.setItem("mocca2Progress",JSON.stringify([...completed]));f.innerHTML="<strong>正確。</strong>本章已完成；請再用自己的話說出判斷證據。";f.style.background="var(--teal2)";renderSidebar()}else{f.innerHTML="<strong>還不對。</strong>回到「概念」與「判讀」，找出能支持答案的證據。";f.style.background="#fff0f0"}};
+    bindControls();showStep(step);$("#prevChapter").disabled=current===0;$("#nextChapter").disabled=current===chapters.length-1;
+  }
+  function bindControls(root=$(".lesson-panel.active")){
+    if(!root)return;
+    const b=root.querySelector("#baseSlider");if(b)b.oninput=()=>{baselineStrength=+b.value/100;root.querySelector("#baseOut").textContent=baselineStrength.toFixed(2);drawLessonChart(root)};
+    const h=root.querySelector("#heightSlider");if(h)h.oninput=()=>{minHeight=+h.value/10;root.querySelector("#heightOut").textContent=minHeight.toFixed(1);drawLessonChart(root)};
+    const p=root.querySelector("#puritySlider");if(p)p.oninput=()=>{purityThreshold=+p.value/1000;root.querySelector("#purityOut").textContent=purityThreshold.toFixed(3);drawLessonChart(root)};
+    const r=root.querySelector("#r2Slider");if(r)r.oninput=()=>{minR2=+r.value/1000;root.querySelector("#r2Out").textContent=minR2.toFixed(3);drawLessonChart(root)};
+    const c=root.querySelector("#compsSlider");if(c)c.oninput=()=>{maxComps=+c.value;root.querySelector("#compsOut").textContent=maxComps;drawLessonChart(root)};
+    drawLessonChart(root);
+  }
+  function showStep(s){step=s;$$(".step-tab").forEach(b=>b.classList.toggle("active",b.dataset.step===s));$$(".lesson-panel").forEach(p=>p.classList.remove("active"));$("#"+s+"Panel").classList.add("active");if(s==="code"||s==="interpret")requestAnimationFrame(()=>{bindControls();drawLessonChart()})}
+  function openLesson(i){current=Math.max(0,Math.min(chapters.length-1,i));step="concept";$("#homeView").classList.add("hidden");$("#lessonView").classList.add("active");window.scrollTo(0,0);renderLesson()}
+  function backHome(){$("#lessonView").classList.remove("active");$("#homeView").classList.remove("hidden");renderHome();window.scrollTo({top:$("#course-map").offsetTop-72,behavior:"smooth"})}
+  $$(".step-tab").forEach(b=>b.onclick=()=>showStep(b.dataset.step));
+  $("#prevChapter").onclick=()=>openLesson(current-1);$("#nextChapter").onclick=()=>openLesson(current+1);
+  $("#backMap").onclick=backHome;$("#homeLink").onclick=e=>{e.preventDefault();$("#lessonView").classList.remove("active");$("#homeView").classList.remove("hidden");renderHome();window.scrollTo(0,0)};
+  $("#headerStart").onclick=()=>openLesson(0);$("#heroStart").onclick=()=>openLesson(0);
+  $("#resetProgress").onclick=()=>{if(confirm("要清除這個瀏覽器中的 12 章完成紀錄嗎？")){completed.clear();localStorage.removeItem("mocca2Progress");renderHome()}};
+  renderHome();drawHero();
+  </script>
+</body>
+</html>
