@@ -976,8 +976,18 @@ chrom.plot()</pre>
       out.push({t,y,b:8+baseline*(1.5*t+.07*t*t)});}return out;
   }
   function linePath(d,key="y",x=46,y=284,w=620,h=235,max=165){return d.map((p,i)=>`${i?"L":"M"}${(x+p.t/20*w).toFixed(1)},${(y-(p[key]||0)/max*h).toFixed(1)}`).join(" ")}
+  // y 軸格線 + 數字刻度。map 把資料值換成 SVG y 座標，所以格線一定落在整數刻度上，
+  // 而不是像素等距（等距會讓格線對應到 43.5、87.1 這種讀不出來的值）。
+  function yAxis(vals,map,fmt=v=>v){
+    let grid="",labs="";
+    vals.forEach(v=>{const y=+map(v).toFixed(1);
+      grid+=`M46 ${y}H666`;
+      labs+=`<text x="41" y="${(y+3.5).toFixed(1)}" text-anchor="end">${fmt(v)}</text>`});
+    return `<path d="${grid}" fill="none" stroke="#dbe5ed" stroke-dasharray="3 5"/><g fill="#61758f" font-size="10">${labs}</g>`;
+  }
+  const mAU=v=>284-v/165*235;               // linePath 用的同一組對應
   function axes(svg,title="響應 (mAU)"){
-    svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/><path d="M46 222H666M46 160H666M46 98H666" stroke-dasharray="3 5"/></g><g fill="#61758f" font-size="11"><text x="337" y="318">保留時間 (min)</text><text transform="translate(15 210) rotate(-90)">${title}</text><text x="43" y="302">0</text><text x="345" y="302">10</text><text x="650" y="302">20</text></g>`;
+    svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><path d="M46 35V284H666" fill="none" stroke="#dbe5ed"/>${yAxis([0,40,80,120,160],mAU)}<g fill="#61758f" font-size="11"><text x="337" y="318">保留時間 (min)</text><text transform="translate(15 210) rotate(-90)">${title}</text><text x="43" y="302">0</text><text x="345" y="302">10</text><text x="650" y="302">20</text></g>`;
   }
   function drawHero(){const svg=$("#heroChart");axes(svg);const d=signalData({noise:.35});svg.insertAdjacentHTML("beforeend",`<path d="${linePath(d)}" fill="none" stroke="#078d88" stroke-width="2.5"/>`)}
   function miniSVG(type){
@@ -1009,7 +1019,7 @@ chrom.plot()</pre>
     if(c===4){const found=Math.max(2,Math.round(11-minHeight*1.5)),tp=Math.min(7,found),fp=Math.max(0,found-7);return [["候選峰",found,"個"],["真峰命中",tp,"/ 7"],["假陽性",fp,"個"],["Recall",(tp/7).toFixed(2),""]]}
     if(c===5){const score=.994+purityThreshold*.005;return [["Explained",score.toFixed(4),""],["門檻",purityThreshold.toFixed(3),""],["光譜成分",score>=purityThreshold?1:2,"個"],["判讀",score>=purityThreshold?"支持純峰":"可疑混合",""]]}
     if(c===6){const r2=Math.min(.9998,.985+(maxComps-1)*.0042),rmse=(12.5/maxComps).toFixed(2),bias=((minR2-.995)*520).toFixed(2);return [["components",maxComps,"上限"],["重建 R²",r2.toFixed(4),""],["殘差 RMSE",rmse,"mAU"],["面積偏差",(bias>=0?"+":"")+bias,"%"]]}
-    if(c===8)return [["標準點","5",""],["校正 R²","0.9992",""],["未知濃度","0.047","mol L⁻¹"],["回算偏差","+2.4","%"]];
+    if(c===8)return [["標準點","5",""],["校正 R²","0.9992",""],["未知濃度","0.047","mol L⁻¹"],["QC 樣品偏差","+2.4","%"]];
     if(c===9)return [["chromatograms","90","示例規模"],["失敗樣品","1","去卷積階段"],["警告總數","18",""],["總耗時","187.7","s"]];
     if(c===0)return [["shape","(501, 2401)",""],["time_step","0.00833","min"],["wavelength_step","0.4","nm"],["取樣點／峰","≈24","足夠"]];
     if(c===1)return [["範例載入","成功",""],["shape 核對","一致",""],["扣 blank 後無峰區","0.3","mAU"],["待人工核對","3","項"]];
@@ -1036,7 +1046,8 @@ chrom.plot()</pre>
   }
   function drawLessonChart(root=$(".lesson-panel.active")){
     const svg=root?.querySelector("#lessonChart");if(!svg)return;axes(svg,current===0?"響應 / 資料結構":"響應 (mAU)");
-    const frame=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/><path d="M46 222H666M46 160H666M46 98H666" stroke-dasharray="3 5"/></g>`;
+    // 只有底圖與座標軸線；格線與刻度由各章自己的 yAxis() 補，因為每張圖的 y 量不同
+    const frame=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><path d="M46 35V284H666" fill="none" stroke="#dbe5ed"/>`;
     if(current===0){// 時間 × 波長 heatmap：本章要學生看的是兩個軸，不是一條 trace
       let cells="";
       for(let i=0;i<48;i++)for(let j=0;j<20;j++){
@@ -1044,7 +1055,8 @@ chrom.plot()</pre>
         const v=Math.exp(-.5*((t-8.15)/1.6)**2)*Math.exp(-.5*((l-272)/38)**2)+.75*Math.exp(-.5*((t-5.7)/1.1)**2)*Math.exp(-.5*((l-250)/30)**2)+.5*Math.exp(-.5*((t-14.05)/1.3)**2)*Math.exp(-.5*((l-296)/34)**2);
         cells+=`<rect x="${(46+i/48*620).toFixed(1)}" y="${(35+j/20*249).toFixed(1)}" width="${(620/48+.7).toFixed(1)}" height="${(249/20+.7).toFixed(1)}" fill="rgba(7,141,136,${Math.min(1,v*1.15).toFixed(3)})"/>`;
       }
-      svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#f6fafb"/>${cells}<g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/></g><g fill="#61758f" font-size="11"><text x="337" y="318">保留時間 (min)</text><text transform="translate(15 210) rotate(-90)">波長 (nm)</text><text x="24" y="292">200</text><text x="24" y="44">400</text></g><text x="660" y="56" text-anchor="end" fill="#0b2348" font-size="12">data[wavelength, time]</text>`;
+      const wl=l=>35+(400-l)/200*249;
+      svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#f6fafb"/>${cells}<path d="M46 35V284H666" fill="none" stroke="#dbe5ed"/><g fill="#61758f" font-size="10">${[200,250,300,350,400].map(l=>`<text x="41" y="${(wl(l)+3.5).toFixed(1)}" text-anchor="end">${l}</text>`).join("")}</g><g fill="#61758f" font-size="11"><text x="337" y="318">保留時間 (min)</text><text transform="translate(15 210) rotate(-90)">波長 (nm)</text><text x="43" y="302">0</text><text x="345" y="302">10</text><text x="650" y="302">20</text></g><text x="660" y="56" text-anchor="end" fill="#0b2348" font-size="12">data[wavelength, time]</text>`;
       renderMetrics(root);return;
     }
     if(current===1){// sample / blank / 相減後
@@ -1062,7 +1074,7 @@ chrom.plot()</pre>
     if(current===7){// 跨樣品 RT 群集：橘點是只滿足單一條件的可疑配對
       const X=s=>110+(s-1)/4*500,Y=r=>284-(r-5.2)/3.8*235;
       const pts=[[1,8.15,0],[2,8.17,0],[3,8.21,0],[4,8.19,1],[5,8.44,1],[1,5.71,0],[2,5.73,0],[3,5.75,0],[4,5.70,0],[5,5.78,0]];
-      svg.innerHTML=frame+`<rect x="92" y="${Y(8.55).toFixed(1)}" width="536" height="${(Y(8.05)-Y(8.55)).toFixed(1)}" fill="rgba(7,141,136,.10)"/><text x="624" y="${(Y(8.5)).toFixed(1)}" text-anchor="end" fill="#078d88" font-size="11">caffeine 群集</text>`
+      svg.innerHTML=frame+yAxis([6,7,8,9],Y,v=>v.toFixed(1))+`<rect x="92" y="${Y(8.55).toFixed(1)}" width="536" height="${(Y(8.05)-Y(8.55)).toFixed(1)}" fill="rgba(7,141,136,.10)"/><text x="624" y="${(Y(8.5)).toFixed(1)}" text-anchor="end" fill="#078d88" font-size="11">caffeine 群集</text>`
         +pts.map(p=>`<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="6.5" fill="${p[2]?"#e89016":"#078d88"}" stroke="#fff" stroke-width="2"/>`).join("")
         +`<g fill="#61758f" font-size="11"><text x="337" y="318">樣品</text><text transform="translate(15 205) rotate(-90)">保留時間 (min)</text>`
         +[1,2,3,4,5].map(s=>`<text x="${X(s).toFixed(1)}" y="302" text-anchor="middle">${s===1?"std":"s0"+(s-1)}</text>`).join("")+`</g>`;
@@ -1070,7 +1082,7 @@ chrom.plot()</pre>
     }
     if(current===9){// 各 stage 的警告與失敗分布
       const st=[["crop",0,0],["baseline",2,0],["find peaks",5,0],["deconvolve",7,1],["cluster",3,0],["refine",1,0],["naming",0,0]],bw=620/7;
-      svg.innerHTML=frame+st.map((s,i)=>{const h=s[1]/8*180,hf=s[2]?s[2]/8*180:0,x=46+i*bw+11,w=bw-22;
+      svg.innerHTML=frame+yAxis([0,2,4,6,8],v=>284-v/8*180)+st.map((s,i)=>{const h=s[1]/8*180,hf=s[2]?s[2]/8*180:0,x=46+i*bw+11,w=bw-22;
         return `<rect x="${x.toFixed(1)}" y="${(284-h).toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(0,h).toFixed(1)}" fill="#e89016" opacity=".85"/>`
           +(hf?`<rect x="${x.toFixed(1)}" y="${(284-h-hf).toFixed(1)}" width="${w.toFixed(1)}" height="${hf.toFixed(1)}" fill="#c74747"/>`:"")
           +`<text x="${(x+w/2).toFixed(1)}" y="${(284-h-hf-7).toFixed(1)}" text-anchor="middle" fill="#0b2348" font-size="10">${s[1]}${s[2]?" +"+s[2]:""}</text>`
@@ -1080,7 +1092,7 @@ chrom.plot()</pre>
     }
     if(current===10){// 每項指標除以自己的允收值：超過 1.0 就是不通過
       const m=[["Precision",.94],["Recall",.98],["錯配率",.84],["面積 Bias",.42],["QC RSD",1.13]],bw=620/5,base=284,top=68,lim=base-(1/1.3)*(base-top);
-      svg.innerHTML=frame+m.map((s,i)=>{const h=s[1]/1.3*(base-top),x=46+i*bw+17,w=bw-34,ok=s[1]<=1;
+      svg.innerHTML=frame+yAxis([0,.5,1],v=>base-v/1.3*(base-top),v=>v.toFixed(1))+m.map((s,i)=>{const h=s[1]/1.3*(base-top),x=46+i*bw+17,w=bw-34,ok=s[1]<=1;
         return `<rect x="${x.toFixed(1)}" y="${(base-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${ok?"#078d88":"#c74747"}" opacity=".9"/><text x="${(x+w/2).toFixed(1)}" y="${(base-h-7).toFixed(1)}" text-anchor="middle" fill="#0b2348" font-size="10">${s[1].toFixed(2)}</text><text x="${(x+w/2).toFixed(1)}" y="300" text-anchor="middle" fill="#61758f" font-size="9">${s[0]}</text>`}).join("")
         +`<path d="M46 ${lim.toFixed(1)}H666" stroke="#c74747" stroke-width="1.6" stroke-dasharray="6 4"/><text x="662" y="${(lim-7).toFixed(1)}" text-anchor="end" fill="#c74747" font-size="11">允收界線 1.0</text><text transform="translate(15 225) rotate(-90)" fill="#61758f" font-size="11">實測 ÷ 允收</text>`;
       renderMetrics(root);return;
@@ -1102,8 +1114,16 @@ chrom.plot()</pre>
       svg.insertAdjacentHTML("beforeend",`<path d="${linePath(d)}" fill="none" stroke="#1459a6" stroke-width="2.35"/>`);
       if(current===3){const corr=d.map(p=>({...p,y:p.y-baselineStrength*p.b+8}));svg.insertAdjacentHTML("beforeend",`<path d="${linePath(d,"b")}" fill="none" stroke="#e89016" stroke-width="2" stroke-dasharray="6 4"/><path d="${linePath(corr)}" fill="none" stroke="#078d88" stroke-width="2"/>`)}
       if(current===4){const n=Math.max(2,Math.round(11-minHeight*1.5)),centers=[3.2,5.7,8.15,10.8,14.05,16.5,18.4,12.4,2.4,15.3,6.8];svg.insertAdjacentHTML("beforeend",centers.slice(0,n).map((t,i)=>`<circle cx="${46+t/20*620}" cy="${i<7?80+(i%3)*28:230-(i%2)*18}" r="6" fill="${i<7?"#078d88":"#c74747"}" stroke="#fff" stroke-width="2"/>`).join(""))}
-      if(current===5){svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/><path d="M46 222H666M46 160H666M46 98H666" stroke-dasharray="3 5"/></g>${[["#078d88",0],["#1459a6",.55],["#e89016",1.1]].map((x,j)=>{let p="";for(let i=0;i<=120;i++){const l=220+i*1.35;const v=28+92*Math.exp(-.5*((l-(246+j*2))/13)**2)+55*Math.exp(-.5*((l-(292-j*2))/17)**2)+7*Math.sin(i/8+x[1]);p+=`${i?"L":"M"}${46+i/120*620},${284-v/145*235} `}return `<path d="${p}" fill="none" stroke="${x[0]}" stroke-width="2.3"/>`}).join("")}<g fill="#61758f" font-size="11"><text x="338" y="318">波長 (nm)</text><text transform="translate(15 195) rotate(-90)">正規化吸光度</text></g>`}
-      if(current===8){svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/><path d="M46 222H666M46 160H666M46 98H666" stroke-dasharray="3 5"/></g><path d="M72 264L635 58" fill="none" stroke="#1459a6" stroke-width="2.5"/>${[[.01,215],[.025,171],[.04,125],[.055,83],[.07,45]].map((p,i)=>`<circle cx="${72+p[0]/.07*563}" cy="${p[1]}" r="6" fill="#078d88"/><text x="${78+p[0]/.07*563}" y="${p[1]-8}" fill="#61758f" font-size="10">S${i+1}</text>`).join("")}<g fill="#61758f" font-size="11"><text x="330" y="318">C / C_IS</text><text transform="translate(15 195) rotate(-90)">A / A_IS</text></g>`}
+      if(current===5){const NY=n=>284-n*235,WX=l=>46+(l-220)/162*620;
+        svg.innerHTML=frame+yAxis([0,.25,.5,.75,1],v=>NY(v),v=>v.toFixed(2))+`${[["#078d88",0],["#1459a6",.55],["#e89016",1.1]].map((x,j)=>{let p="";for(let i=0;i<=120;i++){const l=220+i*1.35;const v=28+92*Math.exp(-.5*((l-(246+j*2))/13)**2)+55*Math.exp(-.5*((l-(292-j*2))/17)**2)+7*Math.sin(i/8+x[1]);p+=`${i?"L":"M"}${46+i/120*620},${NY(v/145)} `}return `<path d="${p}" fill="none" stroke="${x[0]}" stroke-width="2.3"/>`}).join("")}<g fill="#61758f" font-size="10">${[220,260,300,340,380].map(l=>`<text x="${WX(l).toFixed(1)}" y="302" text-anchor="middle">${l}</text>`).join("")}</g><g fill="#61758f" font-size="11"><text x="338" y="318">波長 (nm)</text><text transform="translate(15 195) rotate(-90)">正規化吸光度</text></g><g font-size="11"><text x="662" y="52" text-anchor="end" fill="#078d88">峰前</text><text x="662" y="68" text-anchor="end" fill="#1459a6">峰頂</text><text x="662" y="84" text-anchor="end" fill="#e89016">峰後</text></g>`}
+      if(current===8){// 座標與「輸出」頁的校正表同一組數字，圖表不會與表格互相矛盾
+        const CX=c=>70+c/1.1*560,AY=a=>274-a/1.1*225,
+          std=[[.143,.150],[.357,.366],[.571,.578],[.786,.790],[1.000,.995]],uk=.672,ukC=.669;
+        svg.innerHTML=frame+yAxis([0,.25,.5,.75,1],AY,v=>v.toFixed(2))
+          +`<path d="M${CX(0).toFixed(1)} ${AY(.006).toFixed(1)}L${CX(1.08).toFixed(1)} ${AY(1.075).toFixed(1)}" fill="none" stroke="#1459a6" stroke-width="2.4"/>`
+          +std.map((p,i)=>`<circle cx="${CX(p[0]).toFixed(1)}" cy="${AY(p[1]).toFixed(1)}" r="6" fill="#078d88"/><text x="${(CX(p[0])+9).toFixed(1)}" y="${(AY(p[1])-8).toFixed(1)}" fill="#61758f" font-size="10">S${i+1}</text>`).join("")
+          +`<path d="M46 ${AY(uk).toFixed(1)}H${CX(ukC).toFixed(1)}V284" fill="none" stroke="#e89016" stroke-width="1.6" stroke-dasharray="5 4"/><circle cx="${CX(ukC).toFixed(1)}" cy="${AY(uk).toFixed(1)}" r="6.5" fill="#e89016" stroke="#fff" stroke-width="2"/><text x="${(CX(ukC)+10).toFixed(1)}" y="${(AY(uk)+16).toFixed(1)}" fill="#e89016" font-size="11">未知樣品（落在 S3–S4 之間）</text>`
+          +`<g fill="#61758f" font-size="10">${[0,.25,.5,.75,1].map(c=>`<text x="${CX(c).toFixed(1)}" y="302" text-anchor="middle">${c.toFixed(2)}</text>`).join("")}</g><g fill="#61758f" font-size="11"><text x="330" y="318">C / C_IS</text><text transform="translate(15 195) rotate(-90)">A / A_IS</text></g>`}
     }
     renderMetrics(root);
   }
