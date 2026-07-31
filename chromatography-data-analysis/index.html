@@ -9,29 +9,59 @@
     :root{--navy:#082c62;--navy2:#174575;--teal:#078d88;--amber:#ee9000;--ink:#17263a;--muted:#5c6f82;--line:#d7e0ea;--wash:#f3f7fb;--ok:#187552;--bad:#b54444;--shadow:0 10px 28px rgba(8,44,98,.08);--r:14px;--sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--mono:Consolas,"SFMono-Regular",monospace}
     *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:#fff;font-family:var(--sans);line-height:1.65}button,input,select{font:inherit}button{color:inherit}a{color:var(--navy2);text-underline-offset:3px}:focus-visible{outline:3px solid rgba(7,141,136,.3);outline-offset:3px}
     header{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:68px;padding:10px clamp(18px,5vw,72px);border-bottom:1px solid var(--line);background:rgba(255,255,255,.96);backdrop-filter:blur(10px)}
-    .brand{display:flex;align-items:center;gap:12px;font-weight:900;color:var(--navy)}.brand svg{width:38px;height:30px}.topnav{display:flex;gap:22px}.topnav a{color:var(--ink);font-size:14px;font-weight:700;text-decoration:none}.topnav a:hover{color:var(--teal)}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:900;color:var(--navy)}.brand svg{width:38px;height:30px}.topnav{display:flex;gap:22px}.topnav a{color:var(--ink);font-size:16px;font-weight:700;text-decoration:none}.topnav a:hover{color:var(--teal)}
     .hero{display:grid;grid-template-columns:minmax(0,.8fr) minmax(440px,1.2fr);gap:clamp(36px,6vw,86px);align-items:center;max-width:1440px;margin:auto;padding:clamp(58px,8vw,110px) clamp(22px,6vw,90px) 58px}
     h1{margin:0;color:var(--navy);font-size:clamp(42px,6vw,76px);line-height:1.08;letter-spacing:-.045em}.lead{max-width:620px;margin:22px 0 0;color:var(--navy2);font-size:clamp(18px,1.6vw,22px)}
     .cta{display:inline-flex;align-items:center;justify-content:center;min-height:50px;margin-top:28px;padding:0 22px;color:#fff;border:0;border-radius:8px;background:var(--navy);font-weight:900;text-decoration:none;cursor:pointer}.cta:hover{background:var(--navy2)}
-    .progress-copy{display:flex;justify-content:space-between;max-width:420px;margin-top:24px;color:var(--muted);font-size:13px;font-weight:800}.progress{max-width:420px;height:7px;margin-top:7px;overflow:hidden;border-radius:10px;background:#e2e9f0}.progress>i{display:block;width:0;height:100%;background:var(--teal);transition:width .3s}
-    .hero-plot{min-width:0;padding:18px;border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--shadow)}.hero-plot svg{display:block;width:100%;height:auto}.legend{display:flex;flex-wrap:wrap;gap:18px;margin:0 0 8px 42px;color:var(--muted);font-size:12px}.key:before{content:"";display:inline-block;width:24px;height:3px;margin:0 7px 3px 0;background:var(--navy)}.key.base:before{height:0;border-top:2px solid var(--amber);background:none}.key.corrected:before{background:var(--teal)}
-    .pathbar{border-block:1px solid var(--line);background:var(--wash)}.pathbar-inner{display:grid;grid-template-columns:repeat(7,1fr);max-width:1320px;margin:auto;padding:24px clamp(16px,4vw,50px)}.pathstep{position:relative;text-align:center;font-size:12px;font-weight:800;color:var(--muted)}.pathstep:not(:last-child):after{content:"";position:absolute;top:16px;left:58%;right:-42%;border-top:1px dashed #a7b6c6}.pathstep b{position:relative;z-index:1;display:grid;width:34px;height:34px;margin:0 auto 7px;place-items:center;border:1px solid #a7b6c6;border-radius:50%;background:#fff;color:var(--navy)}.pathstep.active b,.pathstep.done b{color:#fff;border-color:var(--navy);background:var(--navy)}
+    .progress-copy{display:flex;justify-content:space-between;max-width:420px;margin-top:24px;color:var(--muted);font-size:15px;font-weight:800}.progress{max-width:420px;height:7px;margin-top:7px;overflow:hidden;border-radius:10px;background:#e2e9f0}.progress>i{display:block;width:0;height:100%;background:var(--teal);transition:width .3s}
+    .hero-plot{min-width:0;padding:18px;border:1px solid var(--line);border-radius:var(--r);background:#fff;box-shadow:var(--shadow)}.hero-plot svg{display:block;width:100%;height:auto}.legend{display:flex;flex-wrap:wrap;gap:18px;margin:0 0 8px 42px;color:var(--muted);font-size:14px}.key:before{content:"";display:inline-block;width:24px;height:3px;margin:0 7px 3px 0;background:var(--navy)}.key.base:before{height:0;border-top:2px solid var(--amber);background:none}.key.corrected:before{background:var(--teal)}
+    .pathbar{border-block:1px solid var(--line);background:var(--wash)}.pathbar-inner{display:grid;grid-template-columns:repeat(7,1fr);max-width:1320px;margin:auto;padding:24px clamp(16px,4vw,50px)}.pathstep{position:relative;text-align:center;font-size:14px;font-weight:800;color:var(--muted)}.pathstep:not(:last-child):after{content:"";position:absolute;top:16px;left:58%;right:-42%;border-top:1px dashed #a7b6c6}.pathstep b{position:relative;z-index:1;display:grid;width:34px;height:34px;margin:0 auto 7px;place-items:center;border:1px solid #a7b6c6;border-radius:50%;background:#fff;color:var(--navy)}.pathstep.active b,.pathstep.done b{color:#fff;border-color:var(--navy);background:var(--navy)}
     section{max-width:1320px;margin:auto;padding:70px clamp(20px,4.5vw,64px)}.section-head{display:flex;justify-content:space-between;gap:30px;align-items:end;margin-bottom:32px}.section-head h2{margin:0;color:var(--navy);font-size:clamp(30px,4vw,48px);line-height:1.15}.section-head p{max-width:620px;margin:0;color:var(--muted)}
-    .chapters{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:12px}.chapter-card{display:flex;min-height:205px;padding:18px;flex-direction:column;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.2s}.chapter-card:hover{transform:translateY(-3px);border-color:#9eb3c8;box-shadow:var(--shadow)}.chapter-card.active{border:2px solid var(--navy);background:#f7faff}.chapter-card.done{border-color:#8cc8b9}.chapter-card small{color:var(--muted);font:700 11px var(--mono)}.chapter-card h3{margin:10px 0 8px;color:var(--navy);font-size:18px;line-height:1.35}.chapter-card p{margin:0;color:var(--muted);font-size:13px}.chapter-card .card-bottom{display:flex;justify-content:space-between;margin-top:auto;padding-top:14px;color:var(--muted);font-size:11px}.mini{width:100%;height:42px;margin:8px 0}.mini path,.mini line,.mini polyline,.mini circle{vector-effect:non-scaling-stroke}
-    .lesson{margin-top:28px;overflow:hidden;border:2px solid var(--navy);border-radius:var(--r);background:#fff}.lesson-head{display:flex;justify-content:space-between;gap:24px;padding:24px 28px;border-bottom:1px solid var(--line);background:#f8faff}.lesson-head h2{margin:0;color:var(--navy);font-size:30px}.lesson-head p{margin:4px 0 0;color:var(--muted)}.lesson-content{display:grid;grid-template-columns:160px minmax(0,1fr);min-height:540px}
-    .mode-rail{padding:24px 14px;border-right:1px solid var(--line);background:#fbfcfe}.mode-btn{width:100%;margin-bottom:8px;padding:12px;border:0;border-radius:8px;background:transparent;cursor:pointer;text-align:left;font-weight:800}.mode-btn.active{color:var(--navy);background:#e9f2fb}.lesson-pane{padding:30px;min-width:0}.mode-panel{display:none}.mode-panel.active{display:block}.mode-panel h3{margin:0 0 18px;color:var(--navy);font-size:25px}.observe-grid,.practice-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:28px}.chartbox{padding:18px;border:1px solid var(--line);border-radius:12px;background:#fff}.chartbox svg{display:block;width:100%;height:auto}.teaching-points{display:grid;gap:14px}.point{display:grid;grid-template-columns:34px 1fr;gap:12px}.point b{display:grid;width:30px;height:30px;place-items:center;border-radius:50%;color:#fff;background:var(--navy)}.point h4{margin:2px 0 3px}.point p{margin:0;color:var(--muted);font-size:14px}.note{margin-top:20px;padding:15px 18px;border-left:4px solid var(--teal);background:var(--wash);color:var(--navy2)}
-    .controls{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}.control{position:relative;padding:14px;border:1px solid var(--line);border-radius:10px;background:#fff}.control label{display:flex;justify-content:space-between;font-size:13px;font-weight:800;pointer-events:none}.control input[type="range"]{position:relative;z-index:3;display:block;width:100%;height:32px;margin:2px 0 -5px;accent-color:var(--teal);cursor:grab;touch-action:none;pointer-events:auto}.control input[type="range"]:active{cursor:grabbing}.control span{color:var(--teal);font:800 12px var(--mono)}
-    .readout-title{margin:20px 0 8px;color:var(--navy);font-size:14px}.metric-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}.metric{padding:12px 14px;border:1px solid var(--line);border-radius:9px;background:#f8fbfd}.metric small{display:block;color:var(--muted);font-size:11px;font-weight:800}.metric strong{display:block;margin-top:2px;color:var(--navy);font:900 20px/1.25 var(--mono)}.metric em{display:block;margin-top:2px;color:var(--muted);font-size:11px;font-style:normal}.decision-box{margin-top:10px;padding:12px 14px;border-left:4px solid var(--teal);background:#eef8f7;color:var(--navy2);font-size:13px;font-weight:700}.decision-box.warn{border-left-color:var(--amber);background:#fff7e8}.decision-box.bad{border-left-color:var(--bad);background:#fff1f1}.decision-box b{color:var(--navy)}
-    .explain-table{width:100%;border-collapse:collapse}.explain-table th,.explain-table td{padding:14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.explain-table th{color:var(--navy);background:var(--wash)}.formula{margin:22px 0;padding:18px;background:#0b2d54;color:#fff;border-radius:10px;font:700 16px/1.7 var(--mono);text-align:center}.formula-name{display:block;margin-bottom:7px;color:#9fe1dc;font:800 13px var(--sans)}.formula-note{margin:-10px 0 20px;padding:14px 16px;border:1px solid #bfd1e2;border-radius:9px;background:#f5f9fd;color:var(--navy2);font-size:13px}.symbol-table code{color:var(--navy);font-weight:900}.method-caveat{margin-top:16px;padding:13px 16px;border-left:4px solid var(--amber);background:#fff8ea;color:#6b4a0a;font-size:13px}
-    .quiz{padding:22px;border:1px solid var(--line);border-radius:12px}.quiz h4{margin:0 0 15px;font-size:19px}.option{display:block;margin:8px 0;padding:11px 13px;border:1px solid var(--line);border-radius:8px;cursor:pointer}.option:has(input:checked){border-color:var(--teal);background:#f1fbfa}.feedback{min-height:58px;margin-top:12px;padding:12px;border-radius:8px;background:var(--wash);color:var(--muted)}.feedback.ok{color:var(--ok);background:#eef9f4}.feedback.no{color:var(--bad);background:#fff2f2}
+    .chapters{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:12px}.chapter-card{display:flex;min-height:205px;padding:18px;flex-direction:column;border:1px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;text-align:left;transition:.2s}.chapter-card:hover{transform:translateY(-3px);border-color:#9eb3c8;box-shadow:var(--shadow)}.chapter-card.active{border:2px solid var(--navy);background:#f7faff}.chapter-card.done{border-color:#8cc8b9}.chapter-card small{color:var(--muted);font:700 13px var(--mono)}.chapter-card h3{margin:10px 0 8px;color:var(--navy);font-size:20px;line-height:1.35}.chapter-card p{margin:0;color:var(--muted);font-size:15px}.chapter-card .card-bottom{display:flex;justify-content:space-between;margin-top:auto;padding-top:14px;color:var(--muted);font-size:13px}.mini{width:100%;height:42px;margin:8px 0}.mini path,.mini line,.mini polyline,.mini circle{vector-effect:non-scaling-stroke}
+    .lesson{margin-top:28px;overflow:hidden;border:2px solid var(--navy);border-radius:var(--r);background:#fff}.lesson-head{display:flex;justify-content:space-between;gap:24px;padding:24px 28px;border-bottom:1px solid var(--line);background:#f8faff}.lesson-head h2{margin:0;color:var(--navy);font-size:32px}.lesson-head p{margin:4px 0 0;color:var(--muted)}.lesson-content{display:grid;grid-template-columns:160px minmax(0,1fr);min-height:540px}
+    .mode-rail{padding:24px 14px;border-right:1px solid var(--line);background:#fbfcfe}.mode-btn{width:100%;margin-bottom:8px;padding:12px;border:0;border-radius:8px;background:transparent;cursor:pointer;text-align:left;font-weight:800}.mode-btn.active{color:var(--navy);background:#e9f2fb}.lesson-pane{padding:30px;min-width:0}.mode-panel{display:none}.mode-panel.active{display:block}.mode-panel h3{margin:0 0 18px;color:var(--navy);font-size:26px}.observe-grid,.practice-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:28px}.chartbox{padding:18px;border:1px solid var(--line);border-radius:12px;background:#fff}.chartbox svg{display:block;width:100%;height:auto}.teaching-points{display:grid;gap:14px}.point{display:grid;grid-template-columns:34px 1fr;gap:12px}.point b{display:grid;width:30px;height:30px;place-items:center;border-radius:50%;color:#fff;background:var(--navy)}.point h4{margin:2px 0 3px}.point p{margin:0;color:var(--muted);font-size:16px}.note{margin-top:20px;padding:15px 18px;border-left:4px solid var(--teal);background:var(--wash);color:var(--navy2)}
+    .controls{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:18px}.control{position:relative;padding:14px;border:1px solid var(--line);border-radius:10px;background:#fff}.control label{display:flex;justify-content:space-between;font-size:15px;font-weight:800;pointer-events:none}.control input[type="range"]{position:relative;z-index:3;display:block;width:100%;height:32px;margin:2px 0 -5px;accent-color:var(--teal);cursor:grab;touch-action:none;pointer-events:auto}.control input[type="range"]:active{cursor:grabbing}.control span{color:var(--teal);font:800 14px var(--mono)}
+    .readout-title{margin:20px 0 8px;color:var(--navy);font-size:16px}.metric-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}.metric{padding:12px 14px;border:1px solid var(--line);border-radius:9px;background:#f8fbfd}.metric small{display:block;color:var(--muted);font-size:13px;font-weight:800}.metric strong{display:block;margin-top:2px;color:var(--navy);font:900 22px/1.25 var(--mono)}.metric em{display:block;margin-top:2px;color:var(--muted);font-size:13px;font-style:normal}.decision-box{margin-top:10px;padding:12px 14px;border-left:4px solid var(--teal);background:#eef8f7;color:var(--navy2);font-size:15px;font-weight:700}.decision-box.warn{border-left-color:var(--amber);background:#fff7e8}.decision-box.bad{border-left-color:var(--bad);background:#fff1f1}.decision-box b{color:var(--navy)}
+    .explain-table{width:100%;border-collapse:collapse}.explain-table th,.explain-table td{padding:14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.explain-table th{color:var(--navy);background:var(--wash)}.formula{margin:22px 0;padding:18px;background:#0b2d54;color:#fff;border-radius:10px;font:700 18px/1.7 var(--mono);text-align:center}.formula-name{display:block;margin-bottom:7px;color:#9fe1dc;font:800 15px var(--sans)}.formula-note{margin:-10px 0 20px;padding:14px 16px;border:1px solid #bfd1e2;border-radius:9px;background:#f5f9fd;color:var(--navy2);font-size:15px}.symbol-table code{color:var(--navy);font-weight:900}.method-caveat{margin-top:16px;padding:13px 16px;border-left:4px solid var(--amber);background:#fff8ea;color:#6b4a0a;font-size:15px}
+    .quiz{padding:22px;border:1px solid var(--line);border-radius:12px}.quiz h4{margin:0 0 15px;font-size:21px}.option{display:block;margin:8px 0;padding:11px 13px;border:1px solid var(--line);border-radius:8px;cursor:pointer}.option:has(input:checked){border-color:var(--teal);background:#f1fbfa}.feedback{min-height:58px;margin-top:12px;padding:12px;border-radius:8px;background:var(--wash);color:var(--muted)}.feedback.ok{color:var(--ok);background:#eef9f4}.feedback.no{color:var(--bad);background:#fff2f2}
     .lesson-nav{display:flex;justify-content:space-between;gap:14px;padding:18px 28px;border-top:1px solid var(--line)}.navchapter{min-height:44px;padding:0 16px;border:1px solid var(--navy);border-radius:7px;background:#fff;color:var(--navy);cursor:pointer;font-weight:800}.navchapter.next{color:#fff;background:var(--navy)}.navchapter:disabled{opacity:.35;cursor:not-allowed}
-    .paper-band{max-width:none;background:var(--wash)}.paper-inner{max-width:1190px;margin:auto}.paper-card{padding:30px;border:1px solid #b8c9dc;border-radius:var(--r);background:#fff}.paper-card h3{margin:0;color:var(--navy);font-size:28px}.paper-card>p{color:var(--muted)}.paper-figure{display:grid;grid-template-columns:1fr 90px 1fr;gap:24px;align-items:center;margin-top:22px}.paper-figure svg{width:100%;height:auto}.arrow{color:var(--navy);font-size:45px;font-weight:900;text-align:center}.citation{margin-top:16px;color:var(--muted);font-size:12px}.figure-control{display:flex;align-items:center;gap:12px;margin-top:18px}.figure-control input{width:250px;accent-color:var(--amber)}
-    .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.tool{padding:24px;border:1px solid var(--line);border-radius:12px}.tool h3{margin:0;color:var(--navy);font-size:24px}.tool p{color:var(--muted)}.tool ul{padding-left:20px}.tool strong{color:var(--teal)}details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}summary{cursor:pointer;font-weight:800}.code{overflow:auto;margin-top:12px;padding:16px;border-radius:8px;background:#0b2d54;color:#e8f3ff;font:12px/1.7 var(--mono);white-space:pre}
-    footer{padding:30px clamp(20px,6vw,90px);border-top:1px solid var(--line);color:var(--muted);font-size:13px}.refs{max-width:1100px}.refs li{margin:8px 0}
-    @media(max-width:1050px){.hero{grid-template-columns:1fr}.chapters{grid-template-columns:repeat(4,1fr)}.tool-grid{grid-template-columns:1fr}.paper-figure{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
-    @media(max-width:740px){header{position:static}.topnav{display:none}.pathbar-inner{overflow:auto;grid-template-columns:repeat(7,105px)}.chapters{grid-template-columns:repeat(2,1fr)}.lesson-content{display:block}.mode-rail{display:flex;overflow:auto;padding:10px;border-right:0;border-bottom:1px solid var(--line)}.mode-btn{min-width:110px;margin:0}.observe-grid,.practice-grid{grid-template-columns:1fr}.controls,.metric-strip{grid-template-columns:1fr}.paper-card{padding:20px}.lesson-pane{padding:20px}.lesson-head{padding:20px}.hero-plot{padding:10px}}
-    @media(max-width:460px){.chapters{grid-template-columns:1fr}.chapter-card{min-height:170px}.lesson-nav{padding:14px}.navchapter{font-size:12px}.section-head{display:block}.section-head p{margin-top:12px}}
+    .paper-band{max-width:none;background:var(--wash)}.paper-inner{max-width:1190px;margin:auto}.arrow{color:var(--navy);font-size:45px;font-weight:900;text-align:center}.citation{margin-top:16px;color:var(--muted);font-size:14px}
+    .tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.tool{padding:24px;border:1px solid var(--line);border-radius:12px}.tool h3{margin:0;color:var(--navy);font-size:26px}.tool p{color:var(--muted)}.tool ul{padding-left:20px}.tool strong{color:var(--teal)}details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}summary{cursor:pointer;font-weight:800}.code{overflow:auto;margin-top:12px;padding:16px;border-radius:8px;background:#0b2d54;color:#e8f3ff;font:14px/1.7 var(--mono);white-space:pre}
+    .pylab-intro{max-width:780px;margin:0 0 26px;color:var(--muted)}.pylab-card{padding:26px;border:1px solid var(--line);border-radius:var(--r);margin-bottom:22px;background:#fff}.pylab-card>.pylab-tag{display:inline-block;margin-bottom:10px;padding:4px 12px;border-radius:20px;background:var(--wash);color:var(--teal);font:800 14px var(--mono)}.pylab-card h4{margin:0 0 16px;color:var(--navy);font-size:25px}.pylab-cols{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:24px;align-items:start}.pylab-cols .code{margin-top:0}.pylab-side .note,.pylab-side .method-caveat{margin-top:0;margin-bottom:14px}.pylab-side .note:last-child,.pylab-side .method-caveat:last-child{margin-bottom:0}
+    .pylab-fig{margin:14px 0 0;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--wash)}.pylab-fig img{display:block;width:100%;height:auto;border-radius:6px;background:#fff}.pylab-fig figcaption{margin-top:8px;color:var(--muted);font-size:14px;line-height:1.6}.pylab-fig figcaption strong{color:var(--navy2)}
+    .pylab-noimg{margin:14px 0 0;padding:14px 16px;border:1px dashed #9bb1c7;border-radius:10px;color:var(--muted);font-size:15px}
+    .pylab-compare th,.pylab-compare td{font-size:15px}.pylab-practice{margin-top:8px;padding:20px;border-radius:9px;background:#0b2d54;color:#fff}.pylab-practice p{margin:0 0 10px;font:700 17px/1.7 var(--mono)}.pylab-practice details{border-top-color:rgba(255,255,255,.25);color:#e8f3ff}.pylab-practice summary{color:#9fe1dc}
+    @media(max-width:1050px){.pylab-cols{grid-template-columns:1fr}}
+    footer{padding:30px clamp(20px,6vw,90px);border-top:1px solid var(--line);color:var(--muted);font-size:15px}.refs{max-width:1100px}.refs li{margin:8px 0}
+    @media(max-width:1050px){.hero{grid-template-columns:1fr}.chapters{grid-template-columns:repeat(4,1fr)}.tool-grid{grid-template-columns:1fr}.migrate-figs{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
+    @media(max-width:740px){header{position:static}.topnav{display:none}.pathbar-inner{overflow:auto;grid-template-columns:repeat(7,105px)}.chapters{grid-template-columns:repeat(2,1fr)}.lesson-content{display:block}.mode-rail{display:flex;overflow:auto;padding:10px;border-right:0;border-bottom:1px solid var(--line)}.mode-btn{min-width:110px;margin:0}.observe-grid,.practice-grid{grid-template-columns:1fr}.controls,.metric-strip{grid-template-columns:1fr}.migrate-card{padding:20px}.lesson-pane{padding:20px}.lesson-head{padding:20px}.hero-plot{padding:10px}.hero-plot svg text,.chartbox svg text,.migrate-card svg text,.figure-box svg text,.explain-figure svg text{font-size:18px}}
+    @media(max-width:460px){.chapters{grid-template-columns:1fr}.chapter-card{min-height:170px}.lesson-nav{padding:14px}.navchapter{font-size:14px}.section-head{display:block}.section-head p{margin-top:12px}}
     @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+    .figure-box{padding:18px;border:1px solid var(--line);border-radius:12px;background:#fff}.figure-box svg{display:block;width:100%;height:auto}
+    .explain-figure{max-width:620px;margin:0 auto 26px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff}.explain-figure svg{display:block;width:100%;height:auto}
+    .figure-legend{display:flex;flex-wrap:wrap;gap:18px;margin:0 0 10px;color:var(--muted);font-size:14px}.figure-legend .key:before{content:"";display:inline-block;width:22px;height:3px;margin:0 6px 3px 0;background:var(--navy)}.figure-legend .key.base:before{height:0;border-top:2px dashed var(--amber);background:none}.figure-legend .key.corrected:before{background:var(--teal)}.figure-legend .key.shade:before{height:10px;background:rgba(238,144,0,.35)}
+    .figure-legend .key.tick:before{height:0;border-top:2px dashed #9bb1c7;background:none}.figure-legend .key.dash-red:before{height:0;border-top:2px dashed #b54444;background:none}.figure-legend .key.dash-teal:before{height:0;border-top:2px dashed var(--teal);background:none}.figure-legend .key.dash-purple:before{height:0;border-top:2px dashed #8b63b4;background:none}
+    .figure-legend .key.dot-teal:before{width:11px;height:11px;border-radius:50%;background:var(--teal);margin-bottom:-1px}.figure-legend .key.dot-red:before{width:11px;height:11px;border-radius:50%;background:#b54444;margin-bottom:-1px}.figure-legend .key.dot-amber:before{width:11px;height:11px;border-radius:50%;background:var(--amber);margin-bottom:-1px}.figure-legend .key.shade-teal:before{height:10px;background:rgba(7,141,136,.22)}.figure-legend .key.dot-grey:before{width:9px;height:9px;border-radius:50%;background:#9bb1c7;margin-bottom:-1px}
+    .formula-live{margin:10px 0;padding:12px 14px;border:1px dashed var(--teal);border-radius:9px;background:#f2fbfa;color:var(--navy);font:700 15px/1.7 var(--mono)}.formula-live:empty{display:none;margin:0;padding:0;border:0}.formula-live .formula-name{display:block;margin-bottom:4px;color:var(--teal);font:800 13px var(--sans)}
+    .step-card{padding:20px;border:2px solid var(--navy);border-radius:12px;background:#f8faff}.step-card h4{margin:0 0 12px;color:var(--navy)}.step-progress{margin-bottom:14px;color:var(--muted);font:800 14px var(--mono)}.step-done{padding:18px;border-radius:12px;border:1px solid #8cc8b9;background:#f1faf6}.step-done table{width:100%;border-collapse:collapse}.step-done td{padding:8px;border-bottom:1px solid #d7e8e0;font-size:15px}
+    .mission-list{display:grid;gap:10px;margin:16px 0}.mission{display:grid;grid-template-columns:28px 1fr;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:9px;background:#fff}.mission.done{border-color:#8cc8b9;background:#f1faf6}.mission b{display:grid;width:26px;height:26px;place-items:center;border-radius:50%;border:2px solid var(--muted);color:var(--muted);font-size:15px}.mission.done b{border-color:var(--ok);color:#fff;background:var(--ok)}.mission p{margin:0;font-size:15px}.mission .mission-title{display:block;font-weight:800;color:var(--navy);margin-bottom:2px}
+    .demo-box{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:14px 0;padding:12px 14px;border:1px dashed var(--navy2);border-radius:9px;background:#f5f8fd}.demo-box p{margin:0;flex:1;min-width:200px;font-size:15px;color:var(--navy2)}
+    .log-table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}.log-table th,.log-table td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}.log-table th:first-child,.log-table td:first-child{text-align:left}.log-table th{background:var(--wash);color:var(--navy)}
+    .hide-truth-row{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:15px;font-weight:700}.proxy-box{padding:14px;border-radius:9px;border:1px solid var(--line);background:#fffef5}.proxy-box .judge-row{display:flex;gap:10px;margin-top:10px}
+    .self-explain textarea{width:100%;min-height:80px;padding:12px;border:1px solid var(--line);border-radius:9px;font:inherit;resize:vertical}.starter-row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.starter-chip{padding:7px 12px;border:1px solid var(--teal);border-radius:20px;background:#fff;color:var(--teal);font-size:14px;cursor:pointer}.starter-chip:hover{background:#eefaf9}
+    .data-formula-row{margin:8px 0;padding:10px 12px;border-left:3px solid var(--line);font:700 14px/1.6 var(--mono);color:var(--navy2)}
+    .completion-problem{padding:16px;border-radius:9px;background:#0b2d54;color:#fff;font:700 17px/1.8 var(--mono);text-align:center}.completion-problem input{width:70px;padding:4px 6px;border-radius:5px;border:0;font:inherit;text-align:center}
+    .practice-item{padding:20px;border:1px solid var(--line);border-radius:12px;margin-bottom:16px}.practice-item.done{border-color:#8cc8b9}.remediate-btn{margin-top:8px;padding:8px 14px;border:1px solid var(--bad);border-radius:7px;background:#fff;color:var(--bad);font-weight:800;cursor:pointer;font-size:14px}
+    .obj-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.obj-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border:1px solid var(--line);border-radius:20px;background:#fff;color:var(--muted);font:800 13px var(--mono)}.obj-chip.met{border-color:#8cc8b9;background:#f1faf6;color:var(--ok)}
+    .obj-list{display:grid;gap:10px;margin:14px 0}.obj-row{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:9px;background:#fff}.obj-row.met{border-color:#8cc8b9;background:#f1faf6}.obj-row b{display:grid;width:24px;height:24px;place-items:center;border-radius:50%;border:2px solid var(--muted);color:var(--muted);font-size:14px}.obj-row.met b{border-color:var(--ok);color:#fff;background:var(--ok)}.obj-row p{margin:0;font-size:16px}.obj-id{display:inline-block;margin-right:8px;color:var(--teal);font:800 13px var(--mono)}.obj-row em{display:block;margin-top:3px;color:var(--muted);font-size:14px;font-style:normal}
+    .migrate-notice{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 28px;border-bottom:1px solid var(--line);background:#fff8ea;color:#6b4a0a;font-size:16px}.migrate-notice p{margin:0;flex:1;min-width:240px}.migrate-notice button{min-height:34px;padding:0 14px;border:1px solid #c99a3c;border-radius:7px;background:#fff;color:#6b4a0a;font-weight:800;cursor:pointer}
+    .objmap{margin:0 0 30px;padding:0;border:1px solid var(--line);border-radius:12px;background:#fff}.objmap>summary{padding:16px 20px;color:var(--navy);font-size:17px}.objmap-inner{overflow:auto;padding:0 20px 20px}.objmap table{width:100%;border-collapse:collapse;font-size:15px}.objmap th,.objmap td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.objmap th{background:var(--wash);color:var(--navy)}.objmap td:first-child{border-right:1px solid var(--line)}.objmap code{color:var(--teal);font-weight:900}.objmap .goto{padding:5px 10px;border:1px solid var(--navy);border-radius:6px;background:#fff;color:var(--navy);font:800 13px var(--sans);cursor:pointer;white-space:nowrap}.objmap .goto:hover{color:#fff;background:var(--navy)}
+    .migrate-grid{display:grid;gap:22px}.migrate-card{padding:26px;border:1px solid #b8c9dc;border-radius:var(--r);background:#fff}.migrate-card h3{margin:0 0 4px;color:var(--navy);font-size:26px}.migrate-card .migrate-lead{margin:0 0 16px;color:var(--muted);font-size:16px}.migrate-card svg{display:block;width:100%;height:auto}.migrate-card .readout-title{font-size:16px}
+    .migrate-figs{display:grid;grid-template-columns:1fr 60px 1fr;gap:16px;align-items:center}.migrate-figs .arrow{font-size:36px}.migrate-onefig{padding:12px;border:1px solid var(--line);border-radius:10px;background:#fbfdff}
+    .migrate-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:16px}
+    .migrate-links,.pylab-links{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);color:var(--muted);font-size:15px}
+    .chip-link{padding:6px 12px;border:1px solid var(--navy);border-radius:20px;background:#fff;color:var(--navy);font:800 14px var(--sans);cursor:pointer}.chip-link:hover{color:#fff;background:var(--navy)}
+    .pylab-card .code{font-size:16px;line-height:1.75}.pylab-card .note,.pylab-card .method-caveat,.pylab-card .pylab-noimg{font-size:16px}.pylab-fig figcaption{font-size:15.5px}.pylab-compare th,.pylab-compare td{font-size:16px}.pylab-card .data-formula-row{font-size:15.5px}.pylab-card h4{font-size:23px}
   </style>
 </head>
 <body>
@@ -56,7 +86,7 @@
           <path d="M55 244 C130 240 205 233 280 225 S430 210 505 198 S610 185 680 176" fill="none" stroke="#ee9000" stroke-width="3"/>
           <path d="M55 244 C83 243 100 240 118 236 C133 232 139 129 151 118 C163 140 169 229 191 231 C235 230 245 224 269 218 C285 203 293 56 310 42 C329 60 335 202 358 209 C400 210 409 201 431 195 C447 183 456 107 471 96 C487 115 492 186 514 189 C552 188 568 183 587 178 C603 164 611 129 625 121 C641 136 646 170 680 176" fill="rgba(7,141,136,.12)" stroke="#082c62" stroke-width="3"/>
           <path d="M55 284 C82 284 105 283 118 279 C133 275 139 173 151 161 C164 179 169 281 191 282 C244 282 255 280 270 276 C287 262 293 101 310 87 C329 103 335 266 358 273 C407 274 418 271 431 267 C447 255 456 176 471 165 C488 181 492 262 514 265 C560 265 575 260 587 256 C603 244 611 207 625 200 C641 213 647 253 680 255" fill="none" stroke="#078d88" stroke-width="2.5"/>
-          <g fill="#5c6f82" font-size="12"><text x="350" y="320">時間 (min)</text><text transform="translate(17 200) rotate(-90)">偵測器響應 (mAU)</text></g>
+          <g fill="#5c6f82" font-size="14"><text x="350" y="320">時間 (min)</text><text transform="translate(17 200) rotate(-90)">偵測器響應 (mAU)</text></g>
         </svg>
       </div>
     </div>
@@ -64,11 +94,19 @@
     <div class="pathbar" id="path"><div class="pathbar-inner" id="pathSteps"></div></div>
 
     <section>
-      <div class="section-head"><h2>七個小章節，逐步建立概念</h2><p>建議依序完成。每張卡片都包含「觀察、操作、解釋、練習」，完成小測驗後才記錄進度。</p></div>
+      <div class="section-head"><h2>七個小章節，逐步建立概念</h2><p>建議依序完成。每一章有 3 個明確的學習目標，每個目標各有自己的評量；三個目標都達成，才算完成一章。</p></div>
+      <details class="objmap" id="objMap">
+        <summary>展開對照表：7 章 × 3 個學習目標 → 在哪個模式教 → 用什麼判定達成（共 21 列）</summary>
+        <div class="objmap-inner">
+          <p style="margin:0 0 12px;color:var(--muted);font-size:15px">「如何判定達成」寫的就是這一頁真的會檢查的條件。沒有對應評量的目標不會出現在這張表裡。</p>
+          <table><thead><tr><th>章節</th><th>目標 ID</th><th>學習目標</th><th>在哪裡教</th><th>如何判定達成</th><th></th></tr></thead><tbody id="objMapBody"></tbody></table>
+        </div>
+      </details>
       <div class="chapters" id="chapterCards"></div>
 
       <article class="lesson" id="lesson">
-        <div class="lesson-head"><div><h2 id="lessonTitle"></h2><p id="lessonGoal"></p></div><strong id="lessonTime"></strong></div>
+        <div class="lesson-head"><div><h2 id="lessonTitle"></h2><p id="lessonGoal"></p><div class="obj-chips" id="lessonObjectives"></div></div><strong id="lessonTime"></strong></div>
+        <div id="migrationNotice"></div>
         <div class="lesson-content">
           <nav class="mode-rail" aria-label="章節步驟">
             <button class="mode-btn active" data-mode="observe">① 觀察</button>
@@ -87,19 +125,60 @@
       </article>
     </section>
 
-    <section class="paper-band">
+    <section class="paper-band" id="migrate">
       <div class="paper-inner">
-        <div class="section-head"><h2>把論文圖表變成可操作的教材</h2><p>保留科學概念與來源，但重新繪圖、簡化標籤，讓初學者能改變參數並立即觀察結果。</p></div>
-        <div class="paper-card">
-          <h3>基線漂移如何扭曲峰面積？</h3>
-          <p>左圖是原始訊號，右圖是扣除估計基線後的訊號。拖曳滑桿，觀察漂移越大時，未校正面積的誤差如何放大。</p>
-          <div class="paper-figure">
-            <svg id="paperRaw" viewBox="0 0 430 250" role="img" aria-label="校正前層析圖"></svg>
-            <div class="arrow" aria-hidden="true">→</div>
-            <svg id="paperCorrected" viewBox="0 0 430 250" role="img" aria-label="校正後層析圖"></svg>
-          </div>
-          <div class="figure-control"><label for="paperDrift"><strong>基線漂移</strong></label><input id="paperDrift" type="range" min="0" max="100" value="55"><output id="paperDriftValue">55%</output></div>
-          <p class="citation">依據文獻方法概念改繪：Obořil et al. (2024), <em>Digital Discovery</em>, 3, 2041–2051。此圖為教學重繪，不是原論文圖像。</p>
+        <div class="section-head"><h2>把論文圖表變成可操作的教材</h2><p>三張卡片各自獨立：一張只處理一個遷移情境，有自己的滑桿與自己的即時數據，並標明它接回哪幾章。</p></div>
+        <div class="migrate-grid">
+
+          <article class="migrate-card" id="mgA">
+            <h3>情境 A：基線漂移把峰面積「灌水」了多少？</h3>
+            <p class="migrate-lead">左圖是原始訊號與橘色基線（陰影是被基線佔用的訊號），右圖是逐點扣掉基線後的訊號。拉大漂移，下面會即時算出「不校正就直接積分」會多算幾 %。</p>
+            <div class="migrate-figs">
+              <svg id="mgARaw" viewBox="0 0 430 250" role="img" aria-label="情境 A 校正前層析圖"></svg>
+              <div class="arrow" aria-hidden="true">→</div>
+              <svg id="mgACorrected" viewBox="0 0 430 250" role="img" aria-label="情境 A 校正後層析圖"></svg>
+            </div>
+            <div class="migrate-controls"><div class="control"><label for="mgADrift">基線漂移 <span id="mgADriftOut">55%</span></label><input id="mgADrift" type="range" min="0" max="100" value="55"></div></div>
+            <h4 class="readout-title">即時判讀數據（積分視窗 8.3–9.7 min）</h4>
+            <div class="metric-strip" id="mgAMetrics" aria-live="polite"></div>
+            <div class="decision-box" id="mgADecision" aria-live="polite"></div>
+            <p class="citation">依據文獻方法概念改繪：Obořil et al. (2024), <em>Digital Discovery</em>, 3, 2041–2051。此圖為教學重繪，不是原論文圖像；圖中的訊號、基線與所有數字都由本頁的教學模擬產生，不是論文中的數據。</p>
+            <div class="migrate-links"><span>這張卡片接回：</span><button type="button" class="chip-link" data-goto="2" data-mode="operate">第 3 章 · 基線校正</button><button type="button" class="chip-link" data-goto="4" data-mode="operate">第 5 章 · 峰面積與積分</button></div>
+          </article>
+
+          <article class="migrate-card" id="mgB">
+            <h3>情境 B：雜訊變大時，門檻的「安全視窗」還剩多寬？</h3>
+            <p class="migrate-lead">同時調整雜訊與偵測門檻 T。下面的安全視窗不是預設的說法，而是每次都實際把 T = 2…260 mAU 逐一試算一遍，找出「4 個真峰全中且 0 個假陽性」的那段區間。</p>
+            <div class="migrate-onefig">
+              <div class="figure-legend"><span class="key corrected">yᶜ(t) 扣除基線後訊號</span><span class="key dash-red">目前門檻 T</span><span class="key shade-teal">安全視窗</span><span class="key dot-teal">命中真峰</span><span class="key dot-red">假陽性</span></div>
+              <svg id="mgBChart" viewBox="0 0 700 330" role="img" aria-label="情境 B 雜訊與偵測門檻互動圖"></svg>
+            </div>
+            <div class="migrate-controls">
+              <div class="control"><label for="mgBNoise">雜訊水準 <span id="mgBNoiseOut"></span></label><input id="mgBNoise" type="range" min="0" max="100" value="28"></div>
+              <div class="control"><label for="mgBThreshold">偵測門檻 T <span id="mgBThresholdOut"></span></label><input id="mgBThreshold" type="range" min="0" max="100" value="30"></div>
+            </div>
+            <h4 class="readout-title">即時判讀數據</h4>
+            <div class="metric-strip" id="mgBMetrics" aria-live="polite"></div>
+            <div class="decision-box" id="mgBDecision" aria-live="polite"></div>
+            <p class="citation">依據文獻方法概念改繪：Obořil et al. (2024), <em>Digital Discovery</em>, 3, 2041–2051。此圖為教學重繪，不是原論文圖像；安全視窗是本頁模擬資料掃描出來的結果，不是論文報告的數值。</p>
+            <div class="migrate-links"><span>這張卡片接回：</span><button type="button" class="chip-link" data-goto="1" data-mode="operate">第 2 章 · 訊號與雜訊</button><button type="button" class="chip-link" data-goto="3" data-mode="operate">第 4 章 · 峰偵測</button></div>
+          </article>
+
+          <article class="migrate-card" id="mgC">
+            <h3>情境 C：峰距縮短時，Rₛ 什麼時候救不回來？</h3>
+            <p class="migrate-lead">縮短中央兩個成分的保留時間差 Δtᵣ，看解析度 Rₛ 怎麼掉，以及「肉眼數得到幾個峰頂」什麼時候開始說謊。</p>
+            <div class="migrate-onefig">
+              <div class="figure-legend"><span class="key">總訊號 y(t)</span><span class="key dash-teal">成分 A</span><span class="key dash-purple">成分 B</span></div>
+              <svg id="mgCChart" viewBox="0 0 700 330" role="img" aria-label="情境 C 峰重疊與解析度互動圖"></svg>
+            </div>
+            <div class="migrate-controls"><div class="control"><label for="mgCGap">中央峰距 Δtᵣ <span id="mgCGapOut"></span></label><input id="mgCGap" type="range" min="0" max="100" value="35"></div></div>
+            <h4 class="readout-title">即時判讀數據</h4>
+            <div class="metric-strip" id="mgCMetrics" aria-live="polite"></div>
+            <div class="decision-box" id="mgCDecision" aria-live="polite"></div>
+            <p class="citation">此卡片不引用上述論文：半高寬法解析度 Rₛ = 1.18Δtᵣ/(w₀.₅,₁+w₀.₅,₂) 與 Rₛ≈1.5 的經驗判準是層析教科書的標準內容；圖與數字同樣由本頁的教學模擬產生。</p>
+            <div class="migrate-links"><span>這張卡片接回：</span><button type="button" class="chip-link" data-goto="0" data-mode="observe">第 1 章 · 認識層析圖</button><button type="button" class="chip-link" data-goto="5" data-mode="operate">第 6 章 · 重疊峰與純度</button></div>
+          </article>
+
         </div>
       </div>
     </section>
@@ -118,10 +197,175 @@ chrom.show()
 peaks = chrom.fit_peaks()
 print(peaks[["retention_time","area"]])</pre></details><a href="https://github.com/cremerlab/hplc-py/" target="_blank" rel="noreferrer">GitHub 專案</a></article>
         <article class="tool"><h3>chromatoPy</h3><p><strong>適合：</strong>HPLC／GC-FID、手動積分比較與樣本群聚。</p><ul><li>自動與手動積分</li><li>Gaussian fitting</li><li>chromatogram similarity</li></ul><details><summary>最小 Python 範例</summary><pre class="code">from chromatopy import FID
-FID.integration(folder_path,
+FID.integration(selection_method="nearest",
                 manual_peak_integration=False)
 FID.plot_chromatogram(time_window=[0,20])
-FID.clusterer(n_clusters=4)</pre></details><a href="https://pypi.org/project/chromatopy/" target="_blank" rel="noreferrer">PyPI 頁面</a></article>
+FID.cluster(max_clusters=4)</pre></details><a href="https://pypi.org/project/chromatopy/" target="_blank" rel="noreferrer">PyPI 頁面</a></article>
+      </div>
+
+      <div style="margin-top:52px">
+        <h3 style="color:var(--navy);font-size:30px;margin:0 0 10px">詳細教學：用同一個食品檢驗情境串起三套工具</h3>
+        <p class="pylab-intro">情境：食品檢驗室要用 HPLC-UV／DAD 確認一支飲料樣品中的防腐劑（例如苯甲酸鈉）與色素濃度是否符合法規上限，並抽查是否有異常批次。下面拆成 <strong>5 張卡片，一張只做一件事</strong>，每張都標明它接回前面哪一章。<strong>程式碼請複製到你自己的 Python 環境（建議用 Jupyter Notebook）執行</strong>——本頁是靜態教材，不會在瀏覽器裡真的跑 Python。</p>
+
+        <article class="pylab-card">
+          <span class="pylab-tag">卡片 1 · MOCCA2 — 安裝、讀進真實 DAD 資料、扣基線</span>
+          <h4>先把一支真實的咖啡萃取液資料讀進來，並扣掉基線</h4>
+          <div class="pylab-cols">
+            <div>
+              <pre class="code">pip install mocca2
+python -m mocca2 --download-data   # 下載官方內建範例資料（含真實咖啡萃取液樣品）</pre>
+              <pre class="code">from mocca2 import example_data, Chromatogram
+from matplotlib import pyplot as plt
+
+# MOCCA2 內建的 diterpene_esters 資料集，是真實的咖啡萃取液
+# HPLC-DAD 資料（200–400 nm、0–25 分鐘），不是模擬數據
+df = example_data.diterpene_esters()
+row = df[df["sample"] == "Boiled coffee - 1-Rep1"].iloc[0]
+
+chrom = Chromatogram(row["chromatogram"], name="Boiled coffee - 1-Rep1")
+chrom.correct_baseline()          # 對應第3章：估計並扣除基線</pre>
+            </div>
+            <div class="pylab-side">
+              <div class="note"><strong>這一步在做什麼：</strong><code>correct_baseline()</code> 就是第 3 章那條橘色虛線 b(t) 的自動版本——套件替你估計背景並逐點扣掉，之後所有峰高、峰面積才是從合理的基準算起。</div>
+              <div class="method-caveat">正式分析自己的樣品時，把 <code>example_data.diterpene_esters()</code> 換成用 Agilent／Shimadzu／Waters 儀器軟體匯出的原始檔即可，其餘步驟相同。</div>
+            </div>
+          </div>
+          <div class="pylab-links"><span>這張卡片建立在：</span><button type="button" class="chip-link" data-goto="2" data-mode="observe">第 3 章 · 基線校正</button></div>
+        </article>
+
+        <article class="pylab-card">
+          <span class="pylab-tag">卡片 2 · MOCCA2 — 找峰與解卷積（附實際執行結果）</span>
+          <h4>那個看起來像「一個大峰」的地方，其實是幾個成分？</h4>
+          <div class="pylab-cols">
+            <div>
+              <pre class="code"># 接續上一張卡片建立好的 chrom 物件
+chrom.find_peaks(min_height=2)    # 對應第4章：adaptive peak picking
+chrom.deconvolve_peaks(           # 把重疊/共流出的峰拆開
+    model="FraserSuzuki", min_r2=0.99,
+    relaxe_concs=False, max_comps=5
+)
+
+chrom.plot()
+plt.show()</pre>
+              <figure class="pylab-fig">
+                <img src="img/mocca2-coffee-deconvolution.png" loading="lazy" alt="MOCCA2 對咖啡萃取液 HPLC-DAD 資料解卷積後的層析圖，5-6分鐘處的大峰被拆成兩個重疊的成分">
+                <figcaption><strong>這是實際執行左側程式碼、對 MOCCA2 官方內建的真實咖啡萃取液資料集畫出的圖</strong>（非示意圖）。注意 5–6 分鐘那個看起來像「一個大峰」的地方，被 <code>deconvolve_peaks</code> 拆成藍色＋橘色兩個重疊成分——這正是共流出的例子。</figcaption>
+              </figure>
+            </div>
+            <div class="pylab-side">
+              <div class="note"><strong>為什麼用它：</strong>MOCCA2 是三套裡唯一原生支援多波長（DAD）資料的，能同時看好幾個波長判斷「這個峰是純的，還是兩個化合物疊在一起」。<code>min_r2</code> 是解卷積模型的擬合門檻——數字越接近 1，代表允許的模型誤差越小。</div>
+              <div class="method-caveat"><strong>食品情境：</strong>色素或風味物質的峰如果和未知雜質共流出，單一波長看起來會像「一個乾淨的峰」，但 DAD 多波長搭配 <code>deconvolve_peaks</code>（如上圖）常能揭穿它其實是兩個化合物疊在一起。這正是食品摻偽／不純物檢測最實用的一步。</div>
+            </div>
+          </div>
+          <div class="pylab-links"><span>這張卡片建立在：</span><button type="button" class="chip-link" data-goto="3" data-mode="operate">第 4 章 · 峰偵測</button><button type="button" class="chip-link" data-goto="5" data-mode="observe">第 6 章 · 重疊峰與純度</button></div>
+        </article>
+
+        <article class="pylab-card">
+          <span class="pylab-tag">卡片 3 · hplc-py — 讀檔、峰擬合與積分品質（附實際執行結果）</span>
+          <h4>峰有點歪斜、又彼此靠很近，面積要怎麼拆才準？</h4>
+          <div class="pylab-cols">
+            <div>
+              <pre class="code">pip install hplc-py</pre>
+              <pre class="code">from hplc.io import load_chromatogram
+from hplc.quant import Chromatogram
+
+# juice_sample.txt 換成自己儀器匯出的 csv/txt 即可；
+# cols 是「原始欄位名稱 → hplc-py 要求的名稱」的對照表
+df = load_chromatogram('juice_sample.txt',
+    cols={'R.Time (min)': 'time', 'Intensity': 'signal'})
+chrom = Chromatogram(df)
+
+peaks = chrom.fit_peaks()      # 自動偵測 + skew-normal 擬合，回傳每個峰的面積
+scores = chrom.assess_fit()    # 擬合品質分數，對應第5章「積分準不準」
+chrom.show(time_range=[10, 20])</pre>
+              <figure class="pylab-fig">
+                <img src="img/hplcpy-peak-fit.png" loading="lazy" alt="hplc-py 對範例層析圖做 skew-normal 峰擬合的重建圖，顯示原始訊號、推論混合物與各個分解峰">
+                <figcaption><strong>這是實際執行上面程式碼（對 hplc-py 官方範例資料 example.csv）畫出的圖</strong>。黑線是原始訊號、紅色虛線是模型重建的混合物，彩色區塊是拆解出的 7 個獨立峰——注意 13–15 分鐘那兩個緊貼的峰（peak 2、peak 3），仍被準確拆開。</figcaption>
+              </figure>
+            </div>
+            <div class="pylab-side">
+              <div class="note"><strong>為什麼用它：</strong>hplc-py 用 skew-normal 分布擬合訊號，特別擅長處理「峰有點歪斜、彼此靠很近」的真實層析圖（如上圖 13–15 分鐘處）。<code>assess_fit()</code> 會回傳擬合品質分數，正好對應第 5 章問的「這個積分到底準不準」。</div>
+              <div class="method-caveat">這一步只到「面積」為止。面積還不能拿去對法規——要再往下走一張卡片，把面積換算成濃度。</div>
+            </div>
+          </div>
+          <div class="pylab-links"><span>這張卡片建立在：</span><button type="button" class="chip-link" data-goto="4" data-mode="operate">第 5 章 · 峰面積與積分</button></div>
+        </article>
+
+        <article class="pylab-card">
+          <span class="pylab-tag">卡片 4 · hplc-py — 用校正曲線把面積反算成濃度</span>
+          <h4>這個峰的面積，換算成防腐劑濃度是多少？</h4>
+          <div class="pylab-cols">
+            <div>
+              <pre class="code"># 接續上一張卡片：chrom 已經完成 fit_peaks()
+# 標準品事先量測出的校正曲線（斜率／截距），
+# 就是第7章教的 y = a·x + b，這裡拿來反推樣品濃度
+calibration = {
+    '苯甲酸鈉': {'retention_time': 15.53, 'slope': 10547.6,
+              'intercept': -205.6, 'unit': 'uM'},
+}
+quant_peaks = chrom.map_peaks(calibration)   # 面積 → 濃度
+print(quant_peaks[['retention_time', 'area', 'concentration']])</pre>
+              <div class="data-formula-row">實際印出結果（同一份範例資料）：retention_time = 15.53、area ≈ 1,786,925 → <code>map_peaks</code> 算出 concentration ≈ 169.43 µM（並非手算範例，是套件真正跑出來的數字）。</div>
+              <div class="pylab-practice">
+                <p>練習：驗證上面的真實輸出。校正曲線 slope = 10547.6、intercept = −205.6（單位 µM，公式為 area = slope × concentration + intercept）。程式實際印出峰面積 area ≈ 1,786,925，<code>map_peaks</code> 算出的 concentration 是 169.43 µM——這個數字是怎麼來的？</p>
+                <details><summary>看計算過程</summary>
+                  <p style="font:700 16px/1.8 var(--mono);color:#e8f3ff">concentration = (area − intercept) / slope<br>= (1786925 − (−205.6)) / 10547.6<br>= 1787130.6 / 10547.6<br>≈ 169.43 µM ✓ 與套件算出的一致</p>
+                </details>
+              </div>
+            </div>
+            <div class="pylab-side">
+              <div class="note"><strong>為什麼用它：</strong><code>map_peaks()</code> 直接把校正曲線（斜率／截距）套進去算出濃度，是三套裡「定量」流程最完整的一個——第 7 章的 x̂ᵤ=(yᵤ−b₀)/m 在這裡變成一行程式。</div>
+              <div class="method-caveat"><strong>食品情境：</strong>法規通常訂的是「濃度上限」（例如防腐劑 mg/L），不是面積上限，所以最後一定要像這樣把積分結果換算成濃度才能對照法規。</div>
+              <div class="method-caveat">反算出來的濃度一樣要落在標準品涵蓋的校正範圍內；超出範圍就該稀釋重測，不能直接外插。</div>
+            </div>
+          </div>
+          <div class="pylab-links"><span>這張卡片建立在：</span><button type="button" class="chip-link" data-goto="6" data-mode="operate">第 7 章 · 校正曲線與工具選擇</button></div>
+        </article>
+
+        <article class="pylab-card">
+          <span class="pylab-tag">卡片 5 · chromatoPy — 人工複核與批次異常篩檢</span>
+          <h4>自動積分結果，資深分析師要怎麼複核？</h4>
+          <div class="pylab-cols">
+            <div>
+              <pre class="code">pip install chromatopy   # 需要 Python 3.12.4 以上</pre>
+              <pre class="code">import chromatopy
+from chromatopy import FID
+
+# 手上若是 Agilent .D／.MS 原始資料夾，先轉成 csv；
+# 若已經是儀器軟體匯出的 csv/txt，這一步可以省略
+chromatopy.hplc_to_csv(base_path="raw_data/")
+
+# 執行後會跳出互動視窗：selection_method="nearest" 讓演算法
+# 自動抓最近的偵測峰；改成 "click" 則由人在圖上點選/確認每個峰
+FID.integration(selection_method="nearest", manual_peak_integration=False)
+
+# 資深分析師覺得某幾批的峰有疑慮，
+# 改成人工逐一點選來覆核
+FID.integration(selection_method="click", manual_peak_integration=True)
+
+FID.plot_chromatogram(time_window=[0, 20])
+
+# 依整體層析圖形狀把所有樣品分成最多4群，
+# 找出跟其他批次長得不一樣的離群批次
+FID.cluster(max_clusters=4)</pre>
+              <div class="pylab-noimg">這一步無法像前兩套一樣附上「執行後的圖」——<code>FID.integration()</code> 和 <code>hplc_integration()</code> 的設計本來就是跳出互動視窗、要求你用滑鼠即時點選每個峰，需要真實的儀器匯出檔案才能操作，沒辦法在靜態教材裡重現成一張截圖。這點本身也是重要的教學重點：<strong>不是每套工具都做到全自動——chromatoPy 刻意保留「人在迴圈中」的複核步驟。</strong></div>
+            </div>
+            <div class="pylab-side">
+              <div class="note"><strong>為什麼用它：</strong>chromatoPy 把「自動積分」和「手動複核」放在同一套流程裡，符合食品檢驗室常見的 QC 慣例：機器先跑一輪、人再檢查有疑慮的批次。<code>cluster()</code> 則是額外的把關——依整體圖形分群，快速抓出「長得不一樣」的異常批次。</div>
+              <div class="method-caveat"><strong>食品情境：</strong>原料摻偽或供應商換批次時，層析指紋圖譜往往會整體改變，但不一定表現在單一個峰上。<code>cluster(max_clusters=4)</code> 這類分群方法，比逐峰比對更容易先抓出「這批怪怪的，要重驗」。</div>
+            </div>
+          </div>
+          <div class="pylab-links"><span>這張卡片建立在：</span><button type="button" class="chip-link" data-goto="2" data-mode="operate">第 3 章 · 基線校正</button><button type="button" class="chip-link" data-goto="3" data-mode="operate">第 4 章 · 峰偵測</button></div>
+        </article>
+
+        <table class="explain-table pylab-compare">
+          <thead><tr><th>檢驗室的問題</th><th>該用哪套</th><th>上面哪張卡片</th><th>對應章節與學習目標</th></tr></thead>
+          <tbody>
+            <tr><td>這個峰乾不乾淨？有沒有和雜質共流出？</td><td><strong>MOCCA2</strong>（多波長解卷積、純度）</td><td>卡片 1、2</td><td>第4章 找峰（C4-O1）、第6章 重疊峰與純度（C6-O3）</td></tr>
+            <tr><td>樣品濃度是多少，符不符合法規上限？</td><td><strong>hplc-py</strong>（skew-normal 擬合 + 校正曲線）</td><td>卡片 3、4</td><td>第5章 積分（C5-O2）、第7章 校正曲線（C7-O1）</td></tr>
+            <tr><td>要人工複核、或抓出異常批次？</td><td><strong>chromatoPy</strong>（手動積分 + 樣品分群）</td><td>卡片 5</td><td>第3章 基線（C3-O3：人工判斷夠不夠好）</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
   </main>
@@ -132,15 +376,94 @@ FID.clusterer(n_clusters=4)</pre></details><a href="https://pypi.org/project/chr
 
   <script>
     const chapters=[
-      {title:"認識層析圖",time:12,goal:"先辨認座標、保留時間與偵測器響應。",focus:"一張層析圖其實是「訊號隨時間變化」的紀錄。",why:"x 軸通常是時間；y 軸是偵測器響應。峰頂時間可描述保留時間，但不能單獨證明化合物身分。",q:"層析圖的 x 軸通常代表什麼？",opts:["濃度","時間","峰面積"],ans:1},
-      {title:"訊號與雜訊",time:12,goal:"分辨真實峰、隨機雜訊與訊號強度。",focus:"不是所有起伏都是峰。先看訊號是否持續超過局部雜訊。",why:"訊雜比 S/N 描述峰高相對雜訊大小。閾值太低會多抓假峰；太高則漏掉小峰。",q:"找峰閾值設得太低，最可能發生什麼？",opts:["假陽性峰增加","所有峰面積變零","保留時間加倍"],ans:0},
-      {title:"基線校正",time:15,goal:"以基線估計誤差與面積偏差評估校正，而非只看曲線外觀。",focus:"峰面積必須從合理的基線算起；斜坡會把背景也算進面積。",why:"基線是「沒有分析物峰時」預期的訊號。校正不是把曲線變漂亮，而是估計 b(t) 並降低背景造成的系統性偏差。教材中的 α 只是已知真實基線與零基線之間的插值係數，不是通用的「校正程度」。",q:"哪一個量最適合直接評估基線校正對定量結果的影響？",opts:["曲線看起來是否平滑","峰面積相對偏差","檔案副檔名"],ans:1},
-      {title:"峰偵測",time:15,goal:"用高度、寬度與 prominence 找出候選峰。",focus:"峰偵測是提出候選位置，不等於完成化學鑑定。",why:"高度看絕對訊號，prominence 看峰相對周圍背景的突出程度；最小寬度可排除尖銳雜訊。",q:"哪個參數較能描述峰相對周圍背景的突出程度？",opts:["prominence","檔名","進樣瓶編號"],ans:0},
-      {title:"峰面積與積分",time:18,goal:"理解積分邊界、峰高、峰面積與濃度的關係。",focus:"積分是把峰與基線之間的訊號累加。邊界改變，面積也會改變。",why:"面積通常比峰高更能代表總分析物訊號，但前提是基線、邊界與線性範圍合理。",q:"只移動積分終點，最直接改變哪個量？",opts:["偵測波長","峰面積","樣品批號"],ans:1},
-      {title:"重疊峰與純度",time:18,goal:"辨認共洗脫，理解 DAD 光譜純度與解卷積。",focus:"兩個成分可能看起來像一個峰；單一波長圖不一定看得出來。",why:"DAD 在時間之外還保留波長維度。峰前、峰頂、峰後光譜若不一致，可能存在共洗脫；模型解卷積仍需視覺覆核。",q:"懷疑共洗脫時，DAD 最有用的額外資訊是？",opts:["波長光譜","樣品顏色名稱","操作者座位"],ans:0},
-      {title:"校正曲線與工具選擇",time:20,goal:"從峰面積連到濃度，並按資料與問題選工具。",focus:"高 R² 不代表所有未知樣品都可靠。還要看範圍、殘差、QC 與基質。",why:"校正模型把響應轉成濃度；未知樣品應位於有效範圍。DAD 純度選 MOCCA2；tidy CSV 教學選 hplc-py；GC-FID 與手動積分可看 chromatoPy。",q:"校正曲線 R² 很高，下一步最合理的是？",opts:["直接忽略所有 QC","檢查殘差與有效範圍","刪除原始資料"],ans:1}
+      {title:"認識層析圖",time:12,goal:"先辨認座標、保留時間與偵測器響應。",focus:"一張層析圖其實是「訊號隨時間變化」的紀錄。",why:"上圖中，深藍線是訊號 y(t)，橘色虛線是基線 b(t)，灰色垂直虛線標出每個峰頂對應的保留時間 tᵣ。x 軸通常是時間；y 軸是偵測器響應。峰頂時間可描述保留時間，但不能單獨證明化合物身分。",q:"層析圖的 x 軸通常代表什麼？",opts:["濃度","時間","峰面積"],ans:1,legend:[["","y(t) 訊號"],["base","b(t) 基線"],["tick","峰頂垂直虛線＝保留時間 tᵣ"]]},
+      {title:"訊號與雜訊",time:12,goal:"分辨真實峰、隨機雜訊與訊號強度。",focus:"不是所有起伏都是峰。先看訊號是否持續超過局部雜訊。",why:"上圖中，青綠圓點是通過門檻的真峰，紅色圓點是被雜訊誤判的假陽性；紅色虛線是判定門檻 T。訊雜比 S/N 描述峰高相對雜訊大小。閾值太低會多抓假峰；太高則漏掉小峰。",q:"找峰閾值設得太低，最可能發生什麼？",opts:["假陽性峰增加","所有峰面積變零","保留時間加倍"],ans:0,legend:[["","y(t) 訊號"],["dash-red","判定門檻 T"],["dot-teal","真峰（命中）"],["dot-red","假陽性（雜訊誤判）"]]},
+      {title:"基線校正",time:15,goal:"以基線估計誤差與面積偏差評估校正，而非只看曲線外觀。",focus:"峰面積必須從合理的基線算起；斜坡會把背景也算進面積。",why:"上圖中，深藍線是原始訊號 y(t)，橘色虛線是隨時間偏移的基線 b(t)，青綠線是校正後訊號 yᶜ(t)=y(t)−b(t)。校正不是把曲線變漂亮，而是估計 b(t) 並降低背景造成的系統性偏差。教材中的 α 只是已知真實基線與零基線之間的插值係數，不是通用的「校正程度」。",q:"哪一個量最適合直接評估基線校正對定量結果的影響？",opts:["曲線看起來是否平滑","峰面積相對偏差","檔案副檔名"],ans:1,legend:[["","y(t) 原始訊號"],["base","b(t) 基線"],["corrected","yᶜ(t) 校正後"],["shade","背景額外訊號"]]},
+      {title:"峰偵測",time:15,goal:"用高度、寬度與 prominence 找出候選峰。",focus:"峰偵測是提出候選位置，不等於完成化學鑑定。",why:"上圖中，青綠空心圓是符合條件的候選峰，紅色空心圓是被排除的訊號。高度看絕對訊號，prominence 看峰相對周圍背景的突出程度；最小寬度可排除尖銳雜訊。",q:"哪個參數較能描述峰相對周圍背景的突出程度？",opts:["prominence","檔名","進樣瓶編號"],ans:0,legend:[["dot-teal","候選峰（符合門檻）"],["dot-red","被排除的訊號"]]},
+      {title:"峰面積與積分",time:18,goal:"理解積分邊界、峰高、峰面積與濃度的關係。",focus:"積分是把峰與基線之間的訊號累加。邊界改變，面積也會改變。",why:"上圖的青綠陰影是積分區間內、峰與基線之間累加的訊號量；兩條垂直虛線是積分邊界 t₁、t₂。面積通常比峰高更能代表總分析物訊號，但前提是基線、邊界與線性範圍合理。",q:"只移動積分終點，最直接改變哪個量？",opts:["偵測波長","峰面積","樣品批號"],ans:1,legend:[["shade-teal","峰面積陰影"],["dash-teal","積分邊界 t₁、t₂"]]},
+      {title:"重疊峰與純度",time:18,goal:"辨認共洗脫，理解 DAD 光譜純度與解卷積。",focus:"兩個成分可能看起來像一個峰；單一波長圖不一定看得出來。",why:"上圖中，深藍線是儀器實際觀察到的合成訊號，青綠與紫色虛線是可能的兩個個別成分。DAD 在時間之外還保留波長維度。峰前、峰頂、峰後光譜若不一致，可能存在共洗脫；模型解卷積仍需視覺覆核。",q:"懷疑共洗脫時，DAD 最有用的額外資訊是？",opts:["波長光譜","樣品顏色名稱","操作者座位"],ans:0,legend:[["","總訊號 y(t)"],["dash-teal","成分 A"],["dash-purple","成分 B"]]},
+      {title:"校正曲線與工具選擇",time:20,goal:"從峰面積連到濃度，並按資料與問題選工具。",focus:"高 R² 不代表所有未知樣品都可靠。還要看範圍、殘差、QC 與基質。",why:"上圖中，青綠點是已知濃度的標準品，深藍線是回歸線，橘色點是未知樣品由響應投影到濃度軸的結果。校正模型把響應轉成濃度；未知樣品應位於有效範圍。DAD 純度選 MOCCA2；tidy CSV 教學選 hplc-py；GC-FID 與手動積分可看 chromatoPy。",q:"校正曲線 R² 很高，下一步最合理的是？",opts:["直接忽略所有 QC","檢查殘差與有效範圍","刪除原始資料"],ans:1,legend:[["dot-teal","標準點（已知濃度）"],["","回歸線 ŷ=b₀+mx"],["dot-amber","未知樣品投影"]]}
     ];
-    let current=0;const completed=new Set(JSON.parse(localStorage.getItem("chromLessons")||"[]"));
+    const ch3Deep={step:0,revealed:{baseline:false,shade:false,corrected:false},demoIdx:-1,missions:{m1:false,m2:false,m3:false},log:[],hideTruth:false,m3Judgment:null,selfExplainRevealed:false,completion:{blank1:null,blank2:null},practiceIdx:0,practiceResults:[]};
+    const AREA_WINDOW=[8.3,9.7],RESIDUAL_WINDOWS=[[5.5,7.5],[13,14.3]],RESIDUAL_THRESHOLD=6;
+    const ch3Spec={
+      observeSteps:[
+        {prompt:"深藍線在 t=2 min 約 20 mAU，在 t=18 min 約 55 mAU——兩處都遠離任何峰。這代表什麼？",opts:["18 min 時分析物比較多","背景訊號本身會隨時間上升","這是儀器故障"],ans:1,reveal:"baseline",okMsg:"沒錯。這條橘色虛線 b(t) 就是「即使沒有分析物」也會被記錄到的背景。",noMsg:"再想想：兩個時間點都刻意選在遠離峰的地方，差異不會是分析物造成的。"},
+        {prompt:"如果把 y(t) 到 0 之間的面積全部當成峰面積，橘色斜坡下方這塊陰影會怎樣？",opts:["會被正確排除","會被誤算進峰面積","完全不影響結果"],ans:1,reveal:"shade",okMsg:"對。這塊陰影就是「背景造成的額外訊號」，不扣掉基線就會被誤算進面積。",noMsg:"這塊陰影正好夾在原始訊號與基線之間——最後會被算進哪一塊？"},
+        {prompt:"逐點扣掉 b(t) 之後（yᶜ(t)=y(t)−b(t)），遠離峰的地方（例如 t=6 min）會變成？",opts:["回到接近 0","仍然持續上升","變成很大的負值"],ans:0,reveal:"corrected",okMsg:"正確！扣掉基線後，沒有分析物的地方應該回到接近 0 的共同基準。",noMsg:"提示：t=6 min 時 y(t) 和 b(t) 幾乎一樣大，兩者相減會接近多少？"}
+      ],
+      demoSteps:[
+        {alpha:0,say:"α=0：完全不校正。青綠線 yᶜ(t) 整條浮在零線上方，面積被多算。"},
+        {alpha:.5,say:"α=0.5：只扣掉一半背景。偏差減半，但無峰區仍明顯高於零。"},
+        {alpha:.87,say:"α=0.87：青綠線在無峰區貼回零線附近，偏差通常已落在 5% 以內。"}
+      ]
+    };
+    const ch4Deep={step:0,revealed:{local:false,thresholded:false,verified:false},demoIdx:-1,missions:{m1:false,m2:false,m3:false},log:[],hideTruth:false,m3Judgment:null,selfExplainRevealed:false,completion:{blank1:null,blank2:null},practiceIdx:0,practiceResults:[]};
+    const ch4Spec={
+      observeSteps:[
+        {prompt:"如果把所有局部最大值（比左右兩點都高的點）都當成候選峰，不設任何高度門檻，候選數量最可能是？",opts:["剛好 4 個，跟真峰一樣多","比 4 個多很多，因為雜訊本身也會產生局部最大值","比 4 個少，雜訊會蓋掉真峰"],ans:1,reveal:"local",okMsg:"沒錯。灰色小點是所有局部最大值——雜訊的每個小起伏只要比左右兩點高，就算一個，數量遠超過 4 個真峰。",noMsg:"再想想：雜訊本身高高低低，只要比左右兩點高，就會被算成一個局部最大值。"},
+        {prompt:"加上一個固定高度門檻 Tₕ=8 mAU 之後，候選峰數量最可能？",opts:["降到剛好 4 個，一個不多一個不少","降很多，但仍可能留著雜訊造成的假陽性","降到 0 個"],ans:1,reveal:"thresholded",okMsg:"對。門檻濾掉了大部分雜訊，但候選數是 5 個，比 4 個真峰多 1 個——還留著一個假陽性，只是還看不出是哪一個。",noMsg:"提示：門檻只保證訊號夠高，不保證這個訊號一定是化合物峰。"},
+        {prompt:"這批候選峰裡，有一個候選只比門檻高一點點（門檻餘裕很小），其他真峰都遠遠高出門檻。這代表什麼？",opts:["它一定是真峰，因為有超過門檻就算數","它很可能是雜訊剛好衝過門檻的假陽性，需要更多證據才能認定","門檻本身設定錯誤，需要重新設計演算法"],ans:1,reveal:"verified",okMsg:"正確！門檻餘裕最小的那個候選（t=10.00）最後被標成紅色——它不對應任何已知的真峰中心，是假陽性。「過門檻」只是必要條件，不是充分條件。",noMsg:"提示：真峰的訊號通常遠遠超過門檻；剛好卡在門檻附近的候選，更可能是雜訊。"}
+      ],
+      demoSteps:[
+        {th:2,say:"Tₕ=2 mAU：幾乎所有雜訊起伏都被當成候選峰，候選數暴增到 19 個，其中 15 個是假陽性。"},
+        {th:50,say:"Tₕ=50 mAU：候選數降到剛好 4 個，且都對應真峰，0 個假陽性——這是安全範圍。"},
+        {th:150,say:"Tₕ=150 mAU：門檻設太高，兩個較小的真峰（t=10.83、16.17）被漏掉，只剩下兩個最大的峰。"}
+      ]
+    };
+    const MODE_LABEL={observe:"① 觀察",operate:"② 操作",explain:"③ 解釋",practice:"④ 練習"};
+    const chapterObjectives=[
+      [{id:"C1-O1",text:"指出層析圖的 x 軸是時間、y 軸是偵測器響應，並說出常見單位。",teach:"observe",assess:"④ 練習第 1 題（選擇）"},
+       {id:"C1-O2",text:"從峰頂讀出保留時間 tᵣ，並說明它只能支持鑑別、不能單獨證明化合物身分。",teach:"explain",assess:"④ 練習第 2 題（選擇）"},
+       {id:"C1-O3",text:"說明峰重疊時，肉眼數到的峰數可能少於實際成分數。",teach:"operate",assess:"④ 練習第 3 題（選擇）"}],
+      [{id:"C2-O1",text:"用無峰區的雜訊 σₙ 計算訊雜比 S/N = H/σₙ。",teach:"explain",assess:"④ 練習第 2 題（計算，容許 ±0.5）"},
+       {id:"C2-O2",text:"說明判定門檻 T 太低會增加假陽性、太高會漏掉真峰。",teach:"operate",assess:"④ 練習第 1 題（選擇）"},
+       {id:"C2-O3",text:"說明 S/N 的定義因藥典／儀器軟體而異，比較前必須統一定義與無峰區。",teach:"explain",assess:"④ 練習第 3 題（選擇）"}],
+      [{id:"C3-O1",text:"指出 b(t) 是「沒有分析物時也會被記錄到的背景」，且會隨時間改變。",teach:"observe",assess:"④ 練習第 3 題（遷移題）"},
+       {id:"C3-O2",text:"用面積相對偏差 Biasᵣ（而不是曲線外觀）評估基線校正品質。",teach:"operate",assess:"② 操作任務一、二 ＋ ④ 練習第 1、2 題"},
+       {id:"C3-O3",text:"說明真實樣品無法直接算 RMSEᵦ，必須改用殘差、加標回收等替代證據。",teach:"explain",assess:"② 操作任務三（隱藏真值）＋ ④ 練習第 4 題"}],
+      [{id:"C4-O1",text:"區分「所有局部最大值」與「通過門檻的候選峰」。",teach:"observe",assess:"④ 練習第 3 題（遷移題）"},
+       {id:"C4-O2",text:"用命中數與假陽性數（而不是候選峰總數）評估找峰參數。",teach:"operate",assess:"② 操作任務一、二 ＋ ④ 練習第 1、2 題"},
+       {id:"C4-O3",text:"說明「通過門檻」是必要條件而非充分條件，身分確認需獨立證據。",teach:"explain",assess:"② 操作任務三（隱藏真值）＋ ④ 練習第 4 題"}],
+      [{id:"C5-O1",text:"說明積分邊界 t₁、t₂ 與基線偏移 δb 如何改變估計面積。",teach:"operate",assess:"④ 練習第 1 題（選擇）"},
+       {id:"C5-O2",text:"用面積回收率 100×Â/Aᵣₑ𝒻（教材目標 95–105%）判斷積分是否合理。",teach:"operate",assess:"④ 練習第 2 題（計算，容許 ±0.5）"},
+       {id:"C5-O3",text:"說明峰高與峰面積的差異，以及面積為何通常較能代表總分析物訊號。",teach:"explain",assess:"④ 練習第 3 題（選擇）"}],
+      [{id:"C6-O1",text:"用半高寬法計算解析度 Rₛ = 1.18Δtᵣ/(w₀.₅,₁+w₀.₅,₂)。",teach:"explain",assess:"④ 練習第 2 題（計算，容許 ±0.05）"},
+       {id:"C6-O2",text:"用 Rₛ≈1.5／1.0 判斷分離程度，並說明它是經驗判準而非絕對標準。",teach:"operate",assess:"④ 練習第 3 題（選擇）"},
+       {id:"C6-O3",text:"說明單一波長圖看不出共洗脫，DAD 光譜與解卷積能提供額外證據。",teach:"explain",assess:"④ 練習第 1 題（選擇）"}],
+      [{id:"C7-O1",text:"用 ŷ=b₀+mx 反算未知樣品濃度 x̂ᵤ=(yᵤ−b₀)/m。",teach:"operate",assess:"④ 練習第 2 題（計算，容許 ±0.05）"},
+       {id:"C7-O2",text:"判斷反算濃度是否落在校正範圍內，並拒絕沒有證據的外插。",teach:"operate",assess:"④ 練習第 3 題（選擇）"},
+       {id:"C7-O3",text:"說明高 R² 不足以保證定量可靠，仍需殘差、QC 與有效範圍檢查。",teach:"explain",assess:"④ 練習第 1 題（選擇）"}]
+    ];
+    const chapterQuizzes=[
+      [{obj:"C1-O1",type:"mc",prompt:"層析圖的 x 軸通常代表什麼？",opts:["濃度","時間","峰面積"],ans:1,hint:"回到觀察圖，看座標軸的標籤。",remediate:{mode:"observe",anchor:"observeNote"}},
+       {obj:"C1-O2",type:"mc",prompt:"只用峰頂的保留時間 tᵣ，可以做到下列哪一件事？",opts:["直接證明這個峰就是某個化合物","支持化合物鑑別，但仍需要標準品或光譜等其他證據","直接算出樣品濃度"],ans:1,hint:"tᵣ 是「支持證據」還是「充分證據」？",remediate:{mode:"explain",anchor:"explainSymbols"}},
+       {obj:"C1-O3",type:"mc",prompt:"把中央兩個成分的峰距 Δtᵣ 縮到接近 0 之後，肉眼在層析圖上數到的峰數會？",opts:["變得比實際成分數多","可能少於實際成分數","完全不受影響"],ans:1,hint:"兩個成分合成一個峰頂時，你數得到幾個？",remediate:{mode:"operate",anchor:"taskNote"}}],
+      [{obj:"C2-O2",type:"mc",prompt:"找峰閾值設得太低，最可能發生什麼？",opts:["假陽性峰增加","所有峰面積變零","保留時間加倍"],ans:0,hint:"門檻越低，越多雜訊起伏會通過。",remediate:{mode:"operate",anchor:"taskNote"}},
+       {obj:"C2-O1",type:"num",prompt:"無峰區雜訊 σₙ = 2.5 mAU，扣除基線後的峰高 H = 40 mAU。訊雜比 S/N = H/σₙ = ？（容許 ±0.5）",ans:16,tol:.5,hint:"直接把 H 除以 σₙ。",remediate:{mode:"explain",anchor:"explainFormula"}},
+       {obj:"C2-O3",type:"mc",prompt:"兩份報告都寫「S/N = 12」，但一份用藥典公式、一份用儀器軟體預設值。可以直接比較嗎？",opts:["可以，S/N 是通用定義","不行，必須先確認兩者用同一種 S/N 定義與同一段無峰區","可以，只要儀器型號相同就行"],ans:1,hint:"S/N 有沒有唯一的算法？",remediate:{mode:"explain",anchor:"explainSymbols"}}],
+      null,null,
+      [{obj:"C5-O1",type:"mc",prompt:"只移動積分終點，最直接改變哪個量？",opts:["偵測波長","峰面積","樣品批號"],ans:1,hint:"積分邊界決定累加到哪裡結束。",remediate:{mode:"operate",anchor:"taskNote"}},
+       {obj:"C5-O2",type:"num",prompt:"梯形法估計面積 Â = 168.0 mAU·min，已知參考面積 Aᵣₑ𝒻 = 175.0 mAU·min。面積回收率 = 100×Â/Aᵣₑ𝒻 = ？（單位 %，容許 ±0.5）",ans:96,tol:.5,hint:"把 168 除以 175 再乘 100。",remediate:{mode:"operate",anchor:"taskNote"}},
+       {obj:"C5-O3",type:"mc",prompt:"兩個峰的峰高相同、但寬度不同。下列哪一句正確？",opts:["面積一定相同，因為峰高相同","較寬的峰面積較大；面積通常比峰高更能代表總分析物訊號","峰高才是唯一可信的定量依據"],ans:1,hint:"面積是把峰底下的訊號全部累加起來。",remediate:{mode:"explain",anchor:"explainSymbols"}}],
+      [{obj:"C6-O3",type:"mc",prompt:"懷疑共洗脫時，DAD 最有用的額外資訊是？",opts:["波長光譜","樣品顏色名稱","操作者座位"],ans:0,hint:"DAD 在時間之外還多保留了哪一個維度？",remediate:{mode:"explain",anchor:"explainSymbols"}},
+       {obj:"C6-O1",type:"num",prompt:"Δtᵣ = 0.60 min，w₀.₅,₁ = 0.82 min、w₀.₅,₂ = 0.75 min。Rₛ = 1.18Δtᵣ/(w₀.₅,₁+w₀.₅,₂) = ？（容許 ±0.05）",ans:.45,tol:.05,hint:"先把兩個半高寬加起來，再代進公式。",remediate:{mode:"explain",anchor:"explainFormula"}},
+       {obj:"C6-O2",type:"mc",prompt:"某對相鄰峰算出 Rₛ = 1.2。最合理的說法是？",opts:["已達基線分離，可以放心分別積分","僅部分分離；積分與純度判斷要更小心，而 Rₛ≈1.5 本身只是常用的經驗判準","Rₛ 小於 1.5 就代表這個方法一定不合格"],ans:1,hint:"1.5 是經驗判準，不是法規紅線。",remediate:{mode:"operate",anchor:"taskNote"}}],
+      [{obj:"C7-O3",type:"mc",prompt:"校正曲線 R² 很高，下一步最合理的是？",opts:["直接忽略所有 QC","檢查殘差與有效範圍","刪除原始資料"],ans:1,hint:"R² 高只代表點靠近直線。",remediate:{mode:"explain",anchor:"explainSymbols"}},
+       {obj:"C7-O1",type:"num",prompt:"校正模型 ŷ = 5.0 + 40x（響應單位 AU）。未知樣品響應 yᵤ = 165.0 AU，反算濃度 x̂ᵤ = (yᵤ−b₀)/m = ？（容許 ±0.05）",ans:4,tol:.05,hint:"先扣掉截距，再除以斜率。",remediate:{mode:"operate",anchor:"taskNote"}},
+       {obj:"C7-O2",type:"mc",prompt:"同一條曲線（有效範圍 0–5），另一個樣品反算得到 x̂ᵤ = 7.8。最合理的處理是？",opts:["直接報告 7.8","稀釋或重新配製後重測，不在校正範圍外外插","把有效範圍直接改寫成 0–8"],ans:1,hint:"校正範圍之外沒有標準品支持。",remediate:{mode:"operate",anchor:"taskNote"}}]
+    ];
+    const LS_V2="chromLessons_v2",LS_V1="chromLessons";
+    const objState=(()=>{try{const r=JSON.parse(localStorage.getItem(LS_V2)||"null");if(r&&r.v===2&&r.obj&&typeof r.obj==="object")return{obj:r.obj,dismissed:Array.isArray(r.dismissed)?r.dismissed:[]}}catch(e){}return{obj:{},dismissed:[]}})();
+    function saveObjState(){try{localStorage.setItem(LS_V2,JSON.stringify({v:2,obj:objState.obj,dismissed:objState.dismissed}))}catch(e){}}
+    function objDone(id){return objState.obj[id]===true}
+    function markObjective(id){if(objState.obj[id]!==true){objState.obj[id]=true;saveObjState()}}
+    function chapterDone(i){return chapterObjectives[i].every(o=>objDone(o.id))}
+    // 舊版 key 只讀不寫：舊紀錄是用「一章一題」的標準拿到的，不足以證明新的三個目標都達成，
+    // 所以只拿來決定要不要顯示一次性的「請重新完成新評量」提示，不會直接標記完成。
+    const legacyDone=(()=>{try{const a=JSON.parse(localStorage.getItem(LS_V1)||"[]");return new Set(Array.isArray(a)?a.filter(n=>Number.isInteger(n)&&n>=0&&n<7):[])}catch(e){return new Set()}})();
+    function needsRecheckNotice(i){return legacyDone.has(i)&&!chapterDone(i)&&!objState.dismissed.includes(i)}
+    let current=0;
     const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
     function miniSvg(i){const variants=[
       '<path d="M3 37H92M12 36C23 36 24 7 34 7s10 29 20 29c9 0 9-21 18-21s9 21 18 21" fill="none" stroke="#082c62" stroke-width="2"/>',
@@ -152,9 +475,23 @@ FID.clusterer(n_clusters=4)</pre></details><a href="https://pypi.org/project/chr
       '<path d="M12 38V5M12 38H92M23 31l13-7 12 2 15-13 14 4 12-11" fill="none" stroke="#082c62" stroke-width="2"/><circle cx="63" cy="13" r="3" fill="#078d88"/>' ];
       return `<svg class="mini" viewBox="0 0 96 44" aria-hidden="true">${variants[i]}</svg>`}
     function renderCards(){const cards=$("#chapterCards"),path=$("#pathSteps");cards.innerHTML="";path.innerHTML="";chapters.forEach((c,i)=>{
-      const b=document.createElement("button");b.className=`chapter-card ${i===current?"active":""} ${completed.has(i)?"done":""}`;b.innerHTML=`<small>第 ${i+1} 章</small><h3>${c.title}</h3>${miniSvg(i)}<p>${c.goal}</p><span class="card-bottom"><span>◷ ${c.time} 分鐘</span><span>${completed.has(i)?"已完成 ✓":"未完成"}</span></span>`;b.onclick=()=>selectChapter(i,true);cards.append(b);
-      const p=document.createElement("div");p.className=`pathstep ${i===current?"active":""} ${completed.has(i)?"done":""}`;p.innerHTML=`<b>${completed.has(i)?"✓":i+1}</b><span>${c.title}</span>`;path.append(p)
+      const done=chapterDone(i),met=chapterObjectives[i].filter(o=>objDone(o.id)).length;
+      const b=document.createElement("button");b.className=`chapter-card ${i===current?"active":""} ${done?"done":""}`;b.innerHTML=`<small>第 ${i+1} 章</small><h3>${c.title}</h3>${miniSvg(i)}<p>${c.goal}</p><span class="card-bottom"><span>◷ ${c.time} 分鐘</span><span>${done?"已完成 ✓":`目標 ${met} / 3`}</span></span>`;b.onclick=()=>selectChapter(i,true);cards.append(b);
+      const p=document.createElement("div");p.className=`pathstep ${i===current?"active":""} ${done?"done":""}`;p.innerHTML=`<b>${done?"✓":i+1}</b><span>${c.title}</span>`;path.append(p)
     });updateProgress()}
+    function renderObjMap(){const tb=$("#objMapBody");if(!tb)return;
+      tb.innerHTML=chapters.map((c,i)=>chapterObjectives[i].map((o,k)=>`<tr>${k===0?`<td rowspan="${chapterObjectives[i].length}"><strong>第 ${i+1} 章</strong><br>${c.title}</td>`:""}<td><code>${o.id}</code></td><td>${o.text}</td><td>${MODE_LABEL[o.teach]}</td><td>${o.assess}</td>${k===0?`<td rowspan="${chapterObjectives[i].length}"><button type="button" class="goto" data-goto="${i}" data-mode="${o.teach}">前往</button></td>`:""}</tr>`).join("")).join("");
+      $$("#objMapBody .goto").forEach(b=>b.onclick=()=>{selectChapter(+b.dataset.goto,true);showMode(b.dataset.mode)})}
+    function renderObjectiveChips(){const el=$("#lessonObjectives");if(!el)return;
+      el.innerHTML=chapterObjectives[current].map(o=>`<span class="obj-chip ${objDone(o.id)?"met":""}" title="${o.text}">${objDone(o.id)?"✓":"○"} ${o.id}</span>`).join("")}
+    function objectiveChecklist(i){return `<div class="obj-list">${chapterObjectives[i].map(o=>`<div class="obj-row ${objDone(o.id)?"met":""}"><b>${objDone(o.id)?"✓":"○"}</b><p><span class="obj-id">${o.id}</span>${o.text}<em>教學：${MODE_LABEL[o.teach]}｜判定：${o.assess}</em></p></div>`).join("")}</div>`}
+    function renderMigrationNotice(){const el=$("#migrationNotice");if(!el)return;
+      if(!needsRecheckNotice(current)){el.innerHTML="";return}
+      el.innerHTML=`<div class="migrate-notice"><p><strong>此章節的教學目標已更新，請重新完成新的評量。</strong>舊版只用 1 題判定「完成」，新版改成 3 個學習目標各有自己的評量。你的舊紀錄仍保留著，但不會直接把這一章標成完成。</p><button type="button" id="dismissNotice">知道了，不再顯示</button></div>`;
+      $("#dismissNotice").onclick=()=>{if(!objState.dismissed.includes(current)){objState.dismissed.push(current);saveObjState()}renderMigrationNotice()}}
+    function refreshObjectiveUi(i){const el=$("#objChecklist");if(el)el.innerHTML=objectiveChecklist(i);
+      const s=$("#practiceSummary");if(s)s.textContent=chapterDone(i)?"三個學習目標都已達成，本章已標記完成。":"三個學習目標全部達成，才會把本章標記為完成。";
+      renderCards();renderObjectiveChips();renderMigrationNotice()}
     const chapterViews=[
       {values:[12,5,12],labels:["基線淨變化 Δb","雜訊 RMS σₙ","中央峰距 Δtᵣ"],task:"逐步縮短中央兩峰的 Δtᵣ，記錄可見峰數如何改變。百分比不再作為分析結論。"},
       {values:[8,65,16],labels:["基線淨變化 Δb","雜訊 RMS σₙ","高度閾值 T"],task:"先降低 T 直到出現假陽性，再提高到漏掉真峰；以候選峰、命中數與假陽性找合理範圍。"},
@@ -176,7 +513,7 @@ FID.clusterer(n_clusters=4)</pre></details><a href="https://pypi.org/project/chr
     const observationPoints=[
       [["辨認 x 軸","時間通常以 min 表示。"],["辨認 y 軸","響應可能是 mAU、counts 或其他單位。"],["讀保留時間","從峰頂向下讀取時間；它不是身分的唯一證據。"]],
       [["先看背景帶","淺色區表示局部雜訊範圍。"],["再看判定線","訊號越過閾值才成為候選峰。"],["比較真假峰","短暫尖刺可能是雜訊，不是化合物峰。"]],
-      [["找出漂移","橘色虛線不是水平，表示背景隨時間改變。"],["看偏差區","淡橘色區會被錯算進未校正面積。"],["比較校正後","扣除基線後，峰回到共同的零點。"]],
+      [["找出基線 b(t)","橘色虛線不是水平線，代表背景訊號本身也會隨時間改變。"],["看陰影區","陰影是被基線佔用的訊號量；若忽略基線，這塊會被誤算進峰面積。"],["比較校正後 yᶜ(t)","扣除基線後，遠離峰的訊號會回到接近零的共同基準。"]],
       [["辨認候選峰","青綠圓點標出演算法找到的峰頂。"],["檢查小尖刺","紅色叉號代表未通過條件的訊號。"],["記住限制","找峰只提出候選，不能單獨完成鑑定。"]],
       [["看積分邊界","兩條垂直線決定累加的開始與結束。"],["看面積陰影","陰影是峰與基線之間的訊號總和。"],["比較峰高","峰高相同時，峰寬不同仍會有不同面積。"]],
       [["看總訊號","深藍線是儀器實際觀察到的合成峰。"],["看成分曲線","兩條虛線代表可能的個別成分。"],["檢查純度","峰形或光譜不一致時要懷疑共洗脫。"]],
@@ -192,17 +529,40 @@ FID.clusterer(n_clusters=4)</pre></details><a href="https://pypi.org/project/chr
       if(chapter===4)return ((u-.5)*30).toFixed(1)+" mAU";
       return (20+u*240).toFixed(0)+" AU"
     }
-    function chartMarkup(){const v=chapterViews[current];return `<div class="chartbox" data-chapter="${current}"><svg class="lessonChart" viewBox="0 0 700 330" role="img" aria-label="${chapters[current].title}互動圖"></svg><div class="controls">${v.labels.map((label,i)=>{const key=["base","noise","overlap"][i],id=`ch${current}-${key}-${Math.random().toString(36).slice(2,7)}`;return `<div class="control"><label for="${id}">${label} <span class="${key}Out">${controlDisplay(current,i,v.values[i])}</span></label><input id="${id}" aria-label="${label}" class="${key}Slider" data-control="${key}" data-index="${i}" type="range" min="0" max="100" value="${v.values[i]}"></div>`}).join("")}</div><h4 class="readout-title">即時判讀數據</h4><div class="metric-strip" aria-live="polite"></div><div class="decision-box" aria-live="polite"></div></div>`}
+    function chartMarkup(){const v=chapterViews[current];return `<div class="chartbox" data-chapter="${current}"><svg class="lessonChart" viewBox="0 0 700 330" role="img" aria-label="${chapters[current].title}互動圖"></svg><div class="controls">${v.labels.map((label,i)=>{const key=["base","noise","overlap"][i],id=`ch${current}-${key}-${Math.random().toString(36).slice(2,7)}`;return `<div class="control"><label for="${id}">${label} <span class="${key}Out">${controlDisplay(current,i,v.values[i])}</span></label><input id="${id}" aria-label="${label}" class="${key}Slider" data-control="${key}" data-index="${i}" type="range" min="0" max="100" value="${v.values[i]}"></div>`}).join("")}</div><h4 class="readout-title">即時判讀數據</h4><div class="formula-live" aria-live="polite"></div><div class="metric-strip" aria-live="polite"></div><div class="decision-box" aria-live="polite"></div></div>`}
     function renderLesson(){const c=chapters[current];$("#lessonTitle").textContent=`第 ${current+1} 章｜${c.title}`;$("#lessonGoal").textContent=`本章目標：${c.goal}`;$("#lessonTime").textContent=`約 ${c.time} 分鐘`;
-      $("#observePanel").innerHTML=`<h3>先觀察：${c.title}的關鍵圖形</h3><div class="observe-grid">${chartMarkup()}<div class="teaching-points">${observationPoints[current].map((p,i)=>`<div class="point"><b>${i+1}</b><div><h4>${p[0]}</h4><p>${p[1]}</p></div></div>`).join("")}<div class="note">${c.focus}</div></div></div>`;
-      $("#operatePanel").innerHTML=`<h3>動手操作：${c.title}</h3>${chartMarkup()}<div class="note"><strong>本章任務：</strong>${chapterViews[current].task}</div>`;
+      renderObjectiveChips();renderMigrationNotice();
+      if(current===2){renderDeepObserve();renderDeepOperate();renderDeepExplain();renderDeepPractice()}
+      else if(current===3){renderCh4Observe();renderCh4Operate();renderCh4Explain();renderCh4Practice()}
+      else{
+      const figureLegend=c.legend?`<div class="figure-legend">${c.legend.map(([cls,label])=>`<span class="key${cls?" "+cls:""}">${label}</span>`).join("")}</div>`:"";
+      $("#observePanel").innerHTML=`<h3>先觀察：${c.title}的關鍵圖形</h3><div class="observe-grid"><div class="figure-box">${figureLegend}<svg class="observeStaticChart" viewBox="0 0 700 330" role="img" aria-label="${c.title}靜態示意圖"></svg></div><div class="teaching-points">${observationPoints[current].map((p,i)=>`<div class="point"><b>${i+1}</b><div><h4>${p[0]}</h4><p>${p[1]}</p></div></div>`).join("")}<div class="note" id="observeNote">${c.focus}</div></div></div>`;
+      $("#operatePanel").innerHTML=`<h3>動手操作：${c.title}</h3>${chartMarkup()}<div class="note" id="taskNote"><strong>本章任務：</strong>${chapterViews[current].task}</div>`;
       const f=formulaCards[current];
-      $("#explainPanel").innerHTML=`<h3>原理解釋：把圖形連回分析概念</h3><p>${c.why}</p><div class="formula"><span class="formula-name">${f.name}</span>${f.eq}</div><div class="formula-note">${f.note}</div><table class="explain-table symbol-table"><tr><th>符號</th><th>嚴謹定義</th></tr>${f.symbols.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td></tr>`).join("")}</table><div class="method-caveat"><strong>方法學提醒：</strong>模擬資料已知「真值」，所以能計算命中率、RMSE 或回收率；真實實驗通常不知道真值，必須以空白、標準品、加標、重複量測、殘差與方法確效建立證據。</div>`;
-      $("#practicePanel").innerHTML=`<h3>小練習：確認你真的理解</h3><div class="practice-grid"><div class="quiz"><h4>${c.q}</h4>${c.opts.map((o,i)=>`<label class="option"><input type="radio" name="chapterQuiz" value="${i}"> ${String.fromCharCode(65+i)}. ${o}</label>`).join("")}<button class="cta" id="checkAnswer" style="margin-top:14px">檢查答案</button><div class="feedback" id="chapterFeedback">選擇答案後再檢查。</div></div><div><h4>完成條件</h4><p>答對本題後，這一章會標示為完成，並更新上方學習進度。</p><div class="note">答錯很正常。回到「觀察」或「解釋」，再看一次圖形與定義。</div></div></div>`;
+      $("#explainPanel").innerHTML=`<h3>原理解釋：把圖形連回分析概念</h3><div class="explain-figure">${figureLegend}<svg class="explainStaticChart" viewBox="0 0 700 330" role="img" aria-label="${c.title}對照圖"></svg></div><p>${c.why}</p><div class="formula" id="explainFormula"><span class="formula-name">${f.name}</span>${f.eq}</div><div class="formula-note">${f.note}</div><table class="explain-table symbol-table" id="explainSymbols"><tr><th>符號</th><th>嚴謹定義</th></tr>${f.symbols.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td></tr>`).join("")}</table><div class="method-caveat"><strong>方法學提醒：</strong>模擬資料已知「真值」，所以能計算命中率、RMSE 或回收率；真實實驗通常不知道真值，必須以空白、標準品、加標、重複量測、殘差與方法確效建立證據。</div>`;
+      renderStdPractice();
+      }
       $("#prevBtn").disabled=current===0;$("#nextBtn").disabled=current===chapters.length-1;$("#prevBtn").textContent=current?`← 第 ${current} 章`:"← 上一章";$("#nextBtn").textContent=current<6?`第 ${current+2} 章 →`:"已到最後一章";
-      bindChartControls();$("#checkAnswer").onclick=checkAnswer;showMode("observe")}
+      bindChartControls();showMode("observe")}
     function selectChapter(i,scroll=false){current=Math.max(0,Math.min(6,i));renderCards();renderLesson();if(scroll)$("#lesson").scrollIntoView({behavior:"smooth",block:"start"})}
-    function showMode(mode){$$(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));$$(".mode-panel").forEach(p=>p.classList.toggle("active",p.id===mode+"Panel"));if(mode==="observe"||mode==="operate")requestAnimationFrame(()=>drawLessonChart($("#"+mode+"Panel")))}
+    function showMode(mode){$$(".mode-btn").forEach(b=>b.classList.toggle("active",b.dataset.mode===mode));$$(".mode-panel").forEach(p=>p.classList.toggle("active",p.id===mode+"Panel"));
+      if(current===2){
+        if(mode==="observe"){requestAnimationFrame(()=>drawBaselineLayers($("#observePanel .observeStaticChart"),ch3Deep.revealed))}
+        else if(mode==="operate"){requestAnimationFrame(()=>drawLessonChart($("#operatePanel")))}
+        else if(mode==="explain"){requestAnimationFrame(()=>drawBaselineLayers($("#explainPanel .explainStaticChart"),{baseline:true,shade:true,corrected:true}))}
+        return;
+      }
+      if(current===3){
+        if(mode==="observe"){requestAnimationFrame(()=>drawPeakDetectLayers($("#observePanel .observeStaticChart"),ch4Deep.revealed))}
+        else if(mode==="operate"){requestAnimationFrame(()=>drawLessonChart($("#operatePanel")))}
+        else if(mode==="explain"){requestAnimationFrame(()=>drawPeakDetectLayers($("#explainPanel .explainStaticChart"),{local:true,thresholded:true,verified:true}))}
+        return;
+      }
+      const stat=staticFigures[current];
+      if(mode==="observe"){requestAnimationFrame(()=>stat($("#observePanel .observeStaticChart")))}
+      else if(mode==="operate"){requestAnimationFrame(()=>drawLessonChart($("#operatePanel")))}
+      else if(mode==="explain"){requestAnimationFrame(()=>stat($("#explainPanel .explainStaticChart")))}
+    }
     $$(".mode-btn").forEach(b=>b.onclick=()=>showMode(b.dataset.mode));
     function series(base=.4,noise=.2,over=.45){const pts=[];for(let i=0;i<=240;i++){const t=i/12;const bl=16+base*(2*t+.12*t*t)+5*Math.sin(t/3);const g=(m,s,a)=>a*Math.exp(-.5*((t-m)/s)**2);const peakA=g(9,.35,210),peakB=g(11.4-over*2.35,.32,140);const sig=g(3.5,.32,170)+peakA+peakB+g(16.2,.4,150);const n=noise*10*(Math.sin(i*1.8)+.5*Math.sin(i*.43));pts.push({t,y:bl+sig+n,b:bl,c:sig+n,clean:sig,peakA,peakB})}return pts}
     function path(data,key,x0=48,y0=285,w=630,h=245,max=390){return data.map((d,i)=>`${i?"L":"M"}${(x0+d.t/20*w).toFixed(1)},${(y0-d[key]/max*h).toFixed(1)}`).join(" ")}
@@ -213,13 +573,26 @@ FID.clusterer(n_clusters=4)</pre></details><a href="https://pypi.org/project/chr
     function updateLessonMetrics(box,chapter,a,b,c,d){
       if(chapter===0){const gap=2.4-2.35*c,peaks=detectPeaks(d,25,peakCenters(c)),state=c<.35?"完全分離":c<.8?"部分重疊":"幾乎共洗脫";setMetrics(box,[["可見峰數",peaks.length+" 個","重疊後可能少看見一峰"],["中央峰距",gap.toFixed(2)+" min","兩個成分的保留時間差"],["重疊判定",state,"不能單靠峰頂確認身分"]],c<.8?"仍可看到中央兩峰；繼續提高重疊率，觀察谷底何時消失。":"中央兩成分已合成單一峰，肉眼只看峰數會低估成分數。",c<.8?"":"warn");return}
       if(chapter===1){const threshold=5+c*260,candidates=detectPeaks(d,threshold,peakCenters(.25)),hits=candidates.filter(p=>p.matched).length,falsePos=candidates.length-hits,noiseRms=Math.sqrt(d.reduce((s,p)=>s+(p.y-p.b-p.clean)**2,0)/d.length),sn=140/noiseRms,tone=falsePos?"bad":hits<4?"warn":"";setMetrics(box,[["候選峰",candidates.length+" 個","超過 T 的局部峰"],["命中真峰",hits+" / 4","已知模擬真峰"],["假陽性",falsePos+" 個","雜訊被誤判為峰"],["最小峰 S/N",sn.toFixed(1),"H / σₙ"]],falsePos?`T 太低：多抓了 ${falsePos} 個雜訊峰。`:hits<4?`T 太高：漏掉 ${4-hits} 個真峰。`:"目前 T 能命中 4 個真峰且沒有假陽性；這只代表本組模擬資料的合理區間。",tone);return}
-      if(chapter===2){const target=integrate(d,"clean");d.forEach(p=>{p.estimatedBaseline=c*p.b;p.corrected=p.y-p.estimatedBaseline});const corrected=integrate(d,"corrected"),signedBias=(corrected-target)/target*100,error=Math.abs(signedBias),rmse=Math.sqrt(d.reduce((s,p)=>s+(p.estimatedBaseline-p.b)**2,0)/d.length),tone=error>10?"bad":error>5?"warn":"";setMetrics(box,[["教材係數 α",c.toFixed(2),"僅控制估計基線"],["基線 RMSE",rmse.toFixed(1)+" mAU","已知模擬真值時可算"],["校正後面積",corrected.toFixed(0)+" mAU·min","∫[y−b̂]dt"],["面積相對偏差",(signedBias>=0?"+":"")+signedBias.toFixed(1)+"%","教材目標 |Bias|<5%"]],error>10?"估計基線仍偏離真值，面積有明顯系統性偏差。":error>5?"偏差已降低，但尚未達到教材的 5% 目標。":"面積相對偏差已低於 5%；真實資料仍須檢查無峰區殘差與方法確效。",tone);return}
-      if(chapter===3){const threshold=200-c*198,candidates=detectPeaks(d,threshold,peakCenters(.25)),hits=candidates.filter(p=>p.matched).length,falsePos=candidates.length-hits,tone=falsePos?"bad":hits<4?"warn":"";setMetrics(box,[["偵測峰",candidates.length+" 個","靈敏度提高會增加候選"],["真峰命中率",Math.round(hits/4*100)+"%","命中 "+hits+" / 4"],["假陽性",falsePos+" 個","越少越好"]],falsePos?"靈敏度過高，雜訊也被當成峰。":hits<4?"靈敏度不足，仍有真峰未被找到。":"四個真峰均命中且沒有假陽性；接著仍需用標準品或光譜確認身分。",tone);return}
+      if(chapter===2){const[wf,wt]=AREA_WINDOW;const target=integrate(d,"clean",wf,wt);d.forEach(p=>{p.estimatedBaseline=c*p.b;p.corrected=p.y-p.estimatedBaseline});const corrected=integrate(d,"corrected",wf,wt),signedBias=(corrected-target)/target*100,error=Math.abs(signedBias),rmse=Math.sqrt(d.reduce((s,p)=>s+(p.estimatedBaseline-p.b)**2,0)/d.length);
+        let resSum=0,resN=0;d.forEach(p=>{for(const[wa,wb]of RESIDUAL_WINDOWS){if(p.t>=wa&&p.t<=wb){resSum+=Math.abs(p.corrected);resN++;break}}});const residualMean=resN?resSum/resN:0;
+        ch3Deep.lastVars={alpha:c,deltaB:a,rmse,corrected,target,bias:signedBias,residualMean};
+        if(c<=0.03)ch3Deep.missions.m1=true;
+        if(ch3Deep.hideTruth){setMetrics(box,[["教材係數 α",c.toFixed(2),"僅控制估計基線"],["無峰區平均殘差",residualMean.toFixed(1)+" mAU","真值已隱藏"]],"真值已隱藏——請先根據左側「無峰區平均殘差」自行判斷，再按「揭曉真值」核對。","")}
+        else{const tone=error>10?"bad":error>5?"warn":"";setMetrics(box,[["教材係數 α",c.toFixed(2),"僅控制估計基線"],["基線 RMSE",rmse.toFixed(1)+" mAU","已知模擬真值時可算"],["峰面積(8.3–9.7 min)",corrected.toFixed(1)+" mAU·min","∫[y−b̂]dt"],["面積相對偏差",(signedBias>=0?"+":"")+signedBias.toFixed(1)+"%","教材目標 |Bias|<5%"]],error>10?"估計基線仍偏離真值，面積有明顯系統性偏差。":error>5?"偏差已降低，但尚未達到教材的 5% 目標。":"面積相對偏差已低於 5%；真實資料仍須檢查無峰區殘差與方法確效。",tone)}
+        setLiveFormula(box,`<span class="formula-name">即時代入</span>b̂<sub>α</sub>(t) = α·b(t) = ${c.toFixed(2)} × b(t)　；　Bias<sub>r</sub> = 100×(Â−A<sub>ref</sub>)/A<sub>ref</sub> = 100×(${corrected.toFixed(1)}−${target.toFixed(1)})/${target.toFixed(1)} = ${signedBias>=0?"+":""}${signedBias.toFixed(1)}%`);
+        renderMissionList();return}
+      if(chapter===3){const threshold=200-c*198,candidates=detectPeaks(d,threshold,peakCenters(.25)),hits=candidates.filter(p=>p.matched).length,falsePos=candidates.length-hits,tone=falsePos?"bad":hits<4?"warn":"";
+        const weakest=candidates.length?candidates.reduce((w,p)=>(p.v-threshold)<(w.v-threshold)?p:w):null;
+        ch4Deep.lastVars={threshold,candidates,hits,falsePos,weakest};
+        if(c>=0.97)ch4Deep.missions.m1=true;
+        if(ch4Deep.hideTruth&&weakest){setMetrics(box,[["偵測門檻 Tₕ",threshold.toFixed(0)+" mAU","靈敏度提高會增加候選"],["候選峰數",candidates.length+" 個","含可能的假陽性"],["最小門檻餘裕",(weakest.v-threshold).toFixed(1)+" mAU","最可疑候選峰，t="+weakest.t.toFixed(2)]],"真值已隱藏——請先根據「最小門檻餘裕」判斷那個候選峰是不是真峰，再按「揭曉真值」核對。","")}
+        else{setMetrics(box,[["偵測峰",candidates.length+" 個","靈敏度提高會增加候選"],["真峰命中率",Math.round(hits/4*100)+"%","命中 "+hits+" / 4"],["假陽性",falsePos+" 個","越少越好"]],falsePos?"靈敏度過高，雜訊也被當成峰。":hits<4?"靈敏度不足，仍有真峰未被找到。":"四個真峰均命中且沒有假陽性；接著仍需用標準品或光譜確認身分。",tone)}
+        renderCh4MissionList();return}
       if(chapter===4){const start=7.5+a*1.5,end=9.5+b*2.5,offset=(c-.5)*30;d.forEach(p=>{p.group=p.peakA+p.peakB;p.selected=Math.max(0,p.group-offset)});const target=integrate(d,"group"),selected=integrate(d,"selected",start,end),recovery=selected/target*100,signedBias=recovery-100,error=Math.abs(signedBias),tone=error>10?"bad":error>5?"warn":"";setMetrics(box,[["積分範圍",start.toFixed(2)+"–"+end.toFixed(2),"min"],["估計面積",selected.toFixed(0)+" mAU·min","梯形法積分"],["面積回收率",recovery.toFixed(1)+"%","100×Â/Aref"],["相對偏差",(signedBias>=0?"+":"")+signedBias.toFixed(1)+"%","保留高估／低估方向"]],recovery<95?"積分範圍太窄或基線太高，峰面積被低估。":recovery>105?"積分範圍太寬或基線太低，背景／鄰峰被多算。":"面積回收率位於本教材的 95–105% 任務範圍；真實允收標準由 SOP 決定。",tone);return}
       if(chapter===5){const gap=2.4-2.35*c,fwhmA=2.355*.35,fwhmB=2.355*.32,rs=1.18*gap/(fwhmA+fwhmB),visible=rs<.8?1:2,tone=rs<1?"bad":rs<1.5?"warn":"";setMetrics(box,[["峰距 Δtᵣ",gap.toFixed(2)+" min","保留時間差"],["半高寬總和",(fwhmA+fwhmB).toFixed(2)+" min","w₀.₅,₁+w₀.₅,₂"],["解析度 Rₛ",rs.toFixed(2),"半高寬法；≥1.5 常較理想"],["可辨成分峰",visible+" / 2","總訊號中的可見峰頂"]],rs>=1.5?"兩峰達到常用的基線分離經驗判準。":rs>=1?"僅部分分離，積分與純度判斷需更小心。":"兩峰未解析；應考慮 DAD 光譜、解卷積或調整分離條件。",tone);return}
       const intercept=5+a*45,slope=40,response=20+c*240,sy=1+b*9,concentration=(response-intercept)/slope,uncertainty=sy/slope,inRange=concentration>=0&&concentration<=5;setMetrics(box,[["回歸模型",`ŷ=${intercept.toFixed(1)}+40x`,"響應單位 AU"],["反算濃度",concentration.toFixed(2),"x̂ᵤ=(yᵤ−b₀)/m"],["近似 sₓ",uncertainty.toFixed(2),"sᵧ/|m|；非完整 CI"],["校正範圍",inRange?"0–5 內":"0–5 外","禁止無證據外插"]],inRange?"未知樣品位於校正範圍；仍需檢查殘差、QC 與完整反校正不確定度。":"反算濃度落在校正範圍外；調整樣品濃度後重測，不直接外插。",inRange?"":"bad")
     }
-    function drawBase(svg){svg.innerHTML=`<rect x="48" y="35" width="630" height="250" rx="4" fill="#fbfdff"/><g fill="none" stroke="#d8e2ec"><path d="M48 35V285H678"/><path d="M48 225H678M48 165H678M48 105H678" stroke-dasharray="3 5"/></g><g fill="#4f6478" font-size="12"><text x="345" y="318">時間 (min)</text><text transform="translate(15 200) rotate(-90)">響應 (mAU)</text></g>`}
+    function drawBase(svg){svg.innerHTML=`<rect x="48" y="35" width="630" height="250" rx="4" fill="#fbfdff"/><g fill="none" stroke="#d8e2ec"><path d="M48 35V285H678"/><path d="M48 225H678M48 165H678M48 105H678" stroke-dasharray="3 5"/></g><g fill="#4f6478" font-size="14"><text x="345" y="318">時間 (min)</text><text transform="translate(15 200) rotate(-90)">響應 (mAU)</text></g>`}
     function drawLessonChart(root=document){ [...root.querySelectorAll(".lessonChart")].forEach(svg=>{
       const box=svg.closest(".chartbox"),chapter=+box.dataset.chapter,a=+box.querySelector(".baseSlider").value/100,b=+box.querySelector(".noiseSlider").value/100,c=+box.querySelector(".overlapSlider").value/100;
       if(chapter===6){drawCalibration(svg,a,b,c);updateLessonMetrics(box,chapter,a,b,c,[]);return}
@@ -228,23 +601,389 @@ FID.clusterer(n_clusters=4)</pre></details><a href="https://pypi.org/project/chr
       if(chapter===2){d.forEach(p=>{p.estimatedBaseline=c*p.b;p.corrected=p.y-p.estimatedBaseline});svg.insertAdjacentHTML("beforeend",`<path d="${path(d,"y")} L678,285 L48,285 Z" fill="rgba(238,144,0,.14)" stroke="none"/><path d="${path(d,"corrected")}" fill="none" stroke="#078d88" stroke-width="2.3"/><path d="${path(d,"estimatedBaseline")}" fill="none" stroke="#8b63b4" stroke-width="2" stroke-dasharray="4 4"/>`)}
       if(chapter===4){const start=7.5+a*1.5,end=9.5+b*2.5,x1=48+start/20*630,x2=48+end/20*630,offset=(c-.5)*30,yBase=285-offset/390*245,selected=d.filter(p=>p.t>=start&&p.t<=end);svg.insertAdjacentHTML("beforeend",`<path d="${path(selected,"y")} L${x2},${yBase} L${x1},${yBase} Z" fill="rgba(7,141,136,.18)" stroke="none"/><path d="M${x1} 70V285M${x2} 70V285" fill="none" stroke="#078d88" stroke-width="2.4" stroke-dasharray="6 4"/><path d="M${x1} ${yBase}H${x2}" fill="none" stroke="#ee9000" stroke-width="2.3" stroke-dasharray="7 5"/>`)}
       svg.insertAdjacentHTML("beforeend",`<path d="${path(d,"y")}" fill="none" stroke="#082c62" stroke-width="2.6"/><path d="${path(d,"b")}" fill="none" stroke="#ee9000" stroke-width="2.3" stroke-dasharray="7 5"/>`);
-      if(chapter===0)svg.insertAdjacentHTML("beforeend",`<g fill="#082c62" font-size="12" font-weight="700"><path d="M158 98V285M332 54V285M559 132V285" stroke="#9bb1c7" stroke-dasharray="4 4"/><text x="135" y="90">RT 3.5</text><text x="307" y="46">RT 9.0</text><text x="535" y="124">RT 16.2</text></g>`);
-      if(chapter===1){const threshold=5+c*260,y=285-threshold/390*245,candidates=detectPeaks(d,threshold,peakCenters(.25));svg.insertAdjacentHTML("beforeend",`<rect x="48" y="${y-18}" width="630" height="36" fill="rgba(7,141,136,.09)"/><path d="M48 ${y}H678" fill="none" stroke="#b54444" stroke-width="2" stroke-dasharray="7 5"/><text x="555" y="${y-8}" fill="#b54444" font-size="12">threshold ${threshold.toFixed(0)} mAU</text>${candidates.map(p=>`<circle cx="${48+p.t/20*630}" cy="${285-p.y/390*245}" r="6" fill="${p.matched?"#078d88":"#b54444"}" stroke="#fff" stroke-width="2"/>`).join("")}`)}
-      if(chapter===3){const threshold=200-c*198,candidates=detectPeaks(d,threshold,peakCenters(.25));svg.insertAdjacentHTML("beforeend",`${candidates.map(p=>`<circle cx="${48+p.t/20*630}" cy="${285-p.y/390*245}" r="7" fill="#fff" stroke="${p.matched?"#078d88":"#b54444"}" stroke-width="3"/>`).join("")}<text x="520" y="62" fill="#4f6478" font-size="12">偵測門檻 ${threshold.toFixed(0)} mAU</text>`)}
-      if(chapter===0||chapter===5){const state=c<.35?"峰完全分離":c<.8?"峰部分重疊":"幾乎共洗脫";svg.insertAdjacentHTML("beforeend",`<g font-size="12" font-weight="800"><rect x="530" y="48" width="132" height="28" rx="14" fill="#e9f6f5"/><text x="596" y="67" fill="#087c77" text-anchor="middle">${state}</text></g>`)}
-      if(chapter===5)svg.insertAdjacentHTML("beforeend",`<path d="${path(d,"peakA")}" fill="none" stroke="#078d88" stroke-width="2.2" stroke-dasharray="7 5"/><path d="${path(d,"peakB")}" fill="none" stroke="#8b63b4" stroke-width="2.2" stroke-dasharray="7 5"/><g font-size="12" font-weight="800"><text x="300" y="272" fill="#078d88">成分 A</text><text x="405" y="272" fill="#8b63b4">成分 B</text></g>`);
+      if(chapter===0)svg.insertAdjacentHTML("beforeend",`<g fill="#082c62" font-size="14" font-weight="700"><path d="M158 98V285M332 54V285M559 132V285" stroke="#9bb1c7" stroke-dasharray="4 4"/><text x="135" y="90">RT 3.5</text><text x="307" y="46">RT 9.0</text><text x="535" y="124">RT 16.2</text></g>`);
+      if(chapter===1){const threshold=5+c*260,y=285-threshold/390*245,candidates=detectPeaks(d,threshold,peakCenters(.25));svg.insertAdjacentHTML("beforeend",`<rect x="48" y="${y-18}" width="630" height="36" fill="rgba(7,141,136,.09)"/><path d="M48 ${y}H678" fill="none" stroke="#b54444" stroke-width="2" stroke-dasharray="7 5"/><text x="555" y="${y-8}" fill="#b54444" font-size="14">threshold ${threshold.toFixed(0)} mAU</text>${candidates.map(p=>`<circle cx="${48+p.t/20*630}" cy="${285-p.y/390*245}" r="6" fill="${p.matched?"#078d88":"#b54444"}" stroke="#fff" stroke-width="2"/>`).join("")}`)}
+      if(chapter===3){const threshold=200-c*198,candidates=detectPeaks(d,threshold,peakCenters(.25)),hide=ch4Deep.hideTruth;svg.insertAdjacentHTML("beforeend",`${candidates.map(p=>`<circle cx="${48+p.t/20*630}" cy="${285-p.y/390*245}" r="7" fill="#fff" stroke="${hide?"#4f6478":(p.matched?"#078d88":"#b54444")}" stroke-width="3"/>`).join("")}<text x="520" y="62" fill="#4f6478" font-size="14">偵測門檻 ${threshold.toFixed(0)} mAU</text>`)}
+      if(chapter===0||chapter===5){const state=c<.35?"峰完全分離":c<.8?"峰部分重疊":"幾乎共洗脫";svg.insertAdjacentHTML("beforeend",`<g font-size="14" font-weight="800"><rect x="530" y="48" width="132" height="28" rx="14" fill="#e9f6f5"/><text x="596" y="67" fill="#087c77" text-anchor="middle">${state}</text></g>`)}
+      if(chapter===5)svg.insertAdjacentHTML("beforeend",`<path d="${path(d,"peakA")}" fill="none" stroke="#078d88" stroke-width="2.2" stroke-dasharray="7 5"/><path d="${path(d,"peakB")}" fill="none" stroke="#8b63b4" stroke-width="2.2" stroke-dasharray="7 5"/><g font-size="14" font-weight="800"><text x="300" y="272" fill="#078d88">成分 A</text><text x="405" y="272" fill="#8b63b4">成分 B</text></g>`);
       updateLessonMetrics(box,chapter,a,b,c,d);
     })}
     function drawCalibration(svg,interceptControl,errorControl,responseControl){
       const intercept=5+interceptControl*45,slope=40,sy=1+errorControl*9,response=20+responseControl*240,xhat=(response-intercept)/slope,x=xhat/5*555+80,y=285-response/280*230;
-      svg.innerHTML=`<rect x="60" y="35" width="600" height="250" rx="4" fill="#fbfdff"/><g fill="none" stroke="#d8e2ec"><path d="M60 35V285H660"/><path d="M60 225H660M60 165H660M60 105H660" stroke-dasharray="3 5"/></g><path d="M80 ${285-intercept/280*230}L635 ${285-(intercept+slope*5)/280*230}" fill="none" stroke="#082c62" stroke-width="3"/><g fill="#078d88">${[0,1,2,3,4,5].map(i=>{const yi=intercept+slope*i+(i%2?sy:-sy*.7);return `<circle cx="${80+i*111}" cy="${285-yi/280*230}" r="6"/>`}).join("")}</g><path d="M60 ${y}H${x}V285" fill="none" stroke="#ee9000" stroke-width="2.5" stroke-dasharray="7 5"/><circle cx="${x}" cy="${y}" r="7" fill="#ee9000"/><g fill="#4f6478" font-size="12"><text x="325" y="320">濃度 x（校正範圍 0–5）</text><text transform="translate(18 205) rotate(-90)">峰面積 y (AU)</text><text x="${Math.min(575,Math.max(75,x+10))}" y="${Math.max(48,y-10)}">未知樣品</text></g>`;
+      svg.innerHTML=`<rect x="60" y="35" width="600" height="250" rx="4" fill="#fbfdff"/><g fill="none" stroke="#d8e2ec"><path d="M60 35V285H660"/><path d="M60 225H660M60 165H660M60 105H660" stroke-dasharray="3 5"/></g><path d="M80 ${285-intercept/280*230}L635 ${285-(intercept+slope*5)/280*230}" fill="none" stroke="#082c62" stroke-width="3"/><g fill="#078d88">${[0,1,2,3,4,5].map(i=>{const yi=intercept+slope*i+(i%2?sy:-sy*.7);return `<circle cx="${80+i*111}" cy="${285-yi/280*230}" r="6"/>`}).join("")}</g><path d="M60 ${y}H${x}V285" fill="none" stroke="#ee9000" stroke-width="2.5" stroke-dasharray="7 5"/><circle cx="${x}" cy="${y}" r="7" fill="#ee9000"/><g fill="#4f6478" font-size="14"><text x="325" y="320">濃度 x（校正範圍 0–5）</text><text transform="translate(18 205) rotate(-90)">峰面積 y (AU)</text><text x="${Math.min(575,Math.max(75,x+10))}" y="${Math.max(48,y-10)}">未知樣品</text></g>`;
     }
-    function bindChartControls(){$$(".chartbox").forEach(box=>box.querySelectorAll('input[type="range"]').forEach(el=>{el.oninput=()=>{box.querySelector("."+el.dataset.control+"Out").textContent=controlDisplay(+box.dataset.chapter,+el.dataset.index,+el.value);drawLessonChart(box)}}));drawLessonChart($(".mode-panel.active"))}
-    function checkAnswer(){const picked=document.querySelector('input[name="chapterQuiz"]:checked'),f=$("#chapterFeedback");if(!picked){f.className="feedback no";f.textContent="請先選一個答案。";return}if(+picked.value===chapters[current].ans){completed.add(current);localStorage.setItem("chromLessons",JSON.stringify([...completed]));f.className="feedback ok";f.textContent="正確！本章已完成。你可以進入下一章。";renderCards()}else{f.className="feedback no";f.textContent="還不對。回到「解釋」看關鍵定義，再試一次。"}}
-    function updateProgress(){const n=completed.size,p=Math.round(n/7*100);$("#progressText").textContent=`學習進度 ${n} / 7`;$("#progressPct").textContent=p+"%";$("#progressFill").style.width=p+"%"}
+    function drawBaselineLayers(svg,revealed){if(!svg)return;
+      const d=series(.55,.1,.25).map(p=>({...p,idealCorrected:p.y-p.b}));
+      drawBase(svg);
+      svg.insertAdjacentHTML("beforeend",
+        `<g style="opacity:${revealed.shade?1:0}"><path d="${path(d,"b")} L678,285 L48,285 Z" fill="rgba(238,144,0,.14)" stroke="none"/></g>`+
+        `<g style="opacity:${revealed.baseline?1:0}"><path d="${path(d,"b")}" fill="none" stroke="#ee9000" stroke-width="2.4" stroke-dasharray="7 5"/></g>`+
+        `<path d="${path(d,"y")}" fill="none" stroke="#082c62" stroke-width="2.6"/>`+
+        `<g style="opacity:${revealed.corrected?1:0}"><path d="${path(d,"idealCorrected")}" fill="none" stroke="#078d88" stroke-width="2.4"/></g>`
+      );
+    }
+    function progressiveLegend(revealed){const items=[["","y(t) 原始訊號"]];if(revealed.baseline)items.push(["base","b(t) 基線"]);if(revealed.shade)items.push(["shade","背景額外訊號"]);if(revealed.corrected)items.push(["corrected","yᶜ(t) 校正後"]);return `<div class="figure-legend">${items.map(([cls,label])=>`<span class="key${cls?" "+cls:""}">${label}</span>`).join("")}</div>`}
+    function nearestPoint(d,t){return d.reduce((best,p)=>Math.abs(p.t-t)<Math.abs(best.t-t)?p:best)}
+    function peakTickMarkup(d,t,key="y"){const p=nearestPoint(d,t),x=(48+t/20*630).toFixed(1),yTop=(285-p[key]/390*245).toFixed(1);return `<path d="M${x} 285V${(+yTop-6).toFixed(1)}" stroke="#9bb1c7" stroke-dasharray="3 3"/><text x="${x}" y="${(+yTop-11).toFixed(1)}" fill="#082c62" font-size="13" font-weight="700" text-anchor="middle">tᵣ=${t}</text>`}
+    function drawIntroObserve(svg){if(!svg)return;
+      const d=series(.15,.08,.25);
+      drawBase(svg);
+      svg.insertAdjacentHTML("beforeend",
+        `<path d="${path(d,"y")}" fill="none" stroke="#082c62" stroke-width="2.6"/>`+
+        `<path d="${path(d,"b")}" fill="none" stroke="#ee9000" stroke-width="2.3" stroke-dasharray="7 5"/>`+
+        [3.5,9,16.2].map(t=>peakTickMarkup(d,t)).join("")
+      );
+    }
+    function drawNoiseObserve(svg){if(!svg)return;
+      const d=series(.2,.35,.25),threshold=12,y=285-threshold/390*245,candidates=detectPeaks(d,threshold,peakCenters(.25));
+      drawBase(svg);
+      svg.insertAdjacentHTML("beforeend",
+        `<rect x="48" y="${(y-18).toFixed(1)}" width="630" height="36" fill="rgba(7,141,136,.09)"/>`+
+        `<path d="M48 ${y.toFixed(1)}H678" fill="none" stroke="#b54444" stroke-width="2" stroke-dasharray="7 5"/>`+
+        `<path d="${path(d,"y")}" fill="none" stroke="#082c62" stroke-width="2.6"/>`+
+        candidates.map(p=>`<circle cx="${(48+p.t/20*630).toFixed(1)}" cy="${(285-p.y/390*245).toFixed(1)}" r="6" fill="${p.matched?"#078d88":"#b54444"}" stroke="#fff" stroke-width="2"/>`).join("")
+      );
+    }
+    function drawPeakDetectObserve(svg){if(!svg)return;
+      const d=series(.12,.22,.25),threshold=8,candidates=detectPeaks(d,threshold,peakCenters(.25));
+      drawBase(svg);
+      svg.insertAdjacentHTML("beforeend",
+        `<path d="${path(d,"y")}" fill="none" stroke="#082c62" stroke-width="2.6"/>`+
+        `<path d="${path(d,"b")}" fill="none" stroke="#ee9000" stroke-width="2.3" stroke-dasharray="7 5"/>`+
+        candidates.map(p=>`<circle cx="${(48+p.t/20*630).toFixed(1)}" cy="${(285-p.y/390*245).toFixed(1)}" r="7" fill="#fff" stroke="${p.matched?"#078d88":"#b54444"}" stroke-width="3"/>`).join("")
+      );
+    }
+    function drawIntegrationObserve(svg){if(!svg)return;
+      const d=series(.08,.05,.25),start=7.8,end=11.5,x1=48+start/20*630,x2=48+end/20*630,selected=d.filter(p=>p.t>=start&&p.t<=end);
+      drawBase(svg);
+      svg.insertAdjacentHTML("beforeend",
+        `<path d="${path(selected,"y")} L${x2.toFixed(1)},285 L${x1.toFixed(1)},285 Z" fill="rgba(7,141,136,.18)" stroke="none"/>`+
+        `<path d="M${x1.toFixed(1)} 60V285M${x2.toFixed(1)} 60V285" fill="none" stroke="#078d88" stroke-width="2.4" stroke-dasharray="6 4"/>`+
+        `<path d="${path(d,"y")}" fill="none" stroke="#082c62" stroke-width="2.6"/>`+
+        `<path d="${path(d,"b")}" fill="none" stroke="#ee9000" stroke-width="2.3" stroke-dasharray="7 5"/>`
+      );
+    }
+    function drawOverlapObserve(svg){if(!svg)return;
+      const d=series(.1,.08,.55);
+      drawBase(svg);
+      svg.insertAdjacentHTML("beforeend",
+        `<path d="${path(d,"y")}" fill="none" stroke="#082c62" stroke-width="2.6"/>`+
+        `<path d="${path(d,"peakA")}" fill="none" stroke="#078d88" stroke-width="2.2" stroke-dasharray="7 5"/>`+
+        `<path d="${path(d,"peakB")}" fill="none" stroke="#8b63b4" stroke-width="2.2" stroke-dasharray="7 5"/>`
+      );
+    }
+    function drawCalibrationObserve(svg){if(!svg)return;drawCalibration(svg,.33,.2,.5)}
+    const staticFigures={0:drawIntroObserve,1:drawNoiseObserve,3:drawPeakDetectObserve,4:drawIntegrationObserve,5:drawOverlapObserve,6:drawCalibrationObserve};
+    function setLiveFormula(box,html){const el=box&&box.querySelector(".formula-live");if(el)el.innerHTML=html}
+    function bindChartControls(){$$(".chartbox").forEach(box=>box.querySelectorAll('input[type="range"]').forEach(el=>{el.oninput=()=>{
+      if((current===2&&ch3Deep.demoIdx>=0)||(current===3&&ch4Deep.demoIdx>=0)){
+        if(current===2)ch3Deep.demoIdx=-1;else ch4Deep.demoIdx=-1;
+        const n=$("#demoNarration"),bt=$("#demoBtn");if(n)n.textContent="已切換成手動操作。";if(bt)bt.textContent="看示範"
+      }
+      box.querySelector("."+el.dataset.control+"Out").textContent=controlDisplay(+box.dataset.chapter,+el.dataset.index,+el.value);drawLessonChart(box)}}));drawLessonChart($(".mode-panel.active"))}
+    function renderMissionList(){const el=$("#missionList");if(!el)return;const items=[
+      {id:"m1",title:"任務一：完全不校正",body:"把 α 設為 0，感受不校正的代價有多大。"},
+      {id:"m2",title:"任務二：找到 α*",body:"記錄至少 3 組不同 α（範圍要跨 0.3 以上），且最後一組的 |Bias| ≤5%。"},
+      {id:"m3",title:"任務三：隱藏真值挑戰",body:"打開下方「隱藏真值」，只憑無峰區殘差判斷是否夠好，再核對。"}
+    ];el.innerHTML=items.map(m=>`<div class="mission ${ch3Deep.missions[m.id]?"done":""}"><b>${ch3Deep.missions[m.id]?"✓":"○"}</b><p><span class="mission-title">${m.title}</span>${m.body}</p></div>`).join("")}
+    function renderLogTable(){const el=$("#logTableBody");if(!el)return;el.innerHTML=ch3Deep.log.length?ch3Deep.log.map((r,i)=>`<tr><td>${i+1}</td><td>${r.alpha.toFixed(2)}</td><td>${r.rmse.toFixed(1)}</td><td>${(r.bias>=0?"+":"")+r.bias.toFixed(1)}%</td><td>${r.residualMean.toFixed(1)}</td></tr>`).join(""):`<tr><td colspan="5" style="color:var(--muted);text-align:center">尚未記錄任何一組</td></tr>`}
+    function recordLogRow(){const v=ch3Deep.lastVars;if(!v)return;ch3Deep.log.push({...v});renderLogTable();
+      if(ch3Deep.log.length>=3){const alphas=ch3Deep.log.map(r=>r.alpha),span=Math.max(...alphas)-Math.min(...alphas),last=ch3Deep.log[ch3Deep.log.length-1];if(span>=0.3&&Math.abs(last.bias)<=5)ch3Deep.missions.m2=true}
+      renderMissionList()}
+    function clickDemo(){ch3Deep.demoIdx=(ch3Deep.demoIdx+1>=ch3Spec.demoSteps.length)?-1:ch3Deep.demoIdx+1;
+      if(ch3Deep.demoIdx===-1){$("#demoNarration").textContent="點擊「看示範」重新從 α=0 開始。";$("#demoBtn").textContent="看示範";return}
+      runDemoStep(ch3Deep.demoIdx)}
+    function runDemoStep(idx){const box=$("#operatePanel .chartbox");if(!box)return;const step=ch3Spec.demoSteps[idx],slider=box.querySelector(".overlapSlider");
+      slider.value=Math.round(step.alpha*100);box.querySelector(".overlapOut").textContent=controlDisplay(2,2,+slider.value);drawLessonChart(box);
+      $("#demoNarration").textContent=step.say;$("#demoBtn").textContent=idx<ch3Spec.demoSteps.length-1?`下一步 (${idx+1}/${ch3Spec.demoSteps.length})`:"重新看示範"}
+    function judgeM3(label){ch3Deep.m3Judgment=label;ch3Deep.missions.m3=true;renderMissionList();$("#m3Feedback").textContent=`已記錄你的判斷：「${label}」。按「揭曉真值」核對。`}
+    function revealM3Truth(){const v=ch3Deep.lastVars;if(!v)return;const ok=Math.abs(v.bias)<=5,judgedOk=ch3Deep.m3Judgment==="夠好了",agree=judgedOk===ok;
+      $("#m3Feedback").innerHTML=`真實面積相對偏差是 <b>${(v.bias>=0?"+":"")+v.bias.toFixed(1)}%</b>（殘差替代指標會判斷「${ok?"夠好了":"還不夠"}」）。你剛剛的判斷${agree?"一致 ✓":"不一致——這正是替代指標偶爾會誤判的地方"}。`}
+    function renderDeepObserve(){const legend=progressiveLegend(ch3Deep.revealed),stepsDone=ch3Deep.step>=ch3Spec.observeSteps.length;let stepHtml;
+      if(!stepsDone){const s=ch3Spec.observeSteps[ch3Deep.step];stepHtml=`<div class="step-card"><div class="step-progress">步驟 ${ch3Deep.step+1} / ${ch3Spec.observeSteps.length}</div><h4>${s.prompt}</h4>${s.opts.map((o,i)=>`<label class="option"><input type="radio" name="obsStep" value="${i}"> ${String.fromCharCode(65+i)}. ${o}</label>`).join("")}<button class="cta" id="obsCommitBtn" style="margin-top:14px">承諾作答</button><div class="feedback" id="obsFeedback">選一個答案，按「承諾作答」揭曉下一層。</div></div>`}
+      else{stepHtml=`<div class="step-done"><h4>觀察筆記</h4><table>${ch3Spec.observeSteps.map((s,i)=>`<tr><td>${i+1}</td><td>${s.opts[s.ans]}</td></tr>`).join("")}</table><p style="margin-top:10px;color:var(--muted)">三層都已經揭曉。切換到「② 操作」試試看親自調整 α。</p></div>`}
+      $("#observePanel").innerHTML=`<h3>先觀察：一步步揭開基線校正</h3><div class="observe-grid"><div class="figure-box">${legend}<svg class="observeStaticChart" viewBox="0 0 700 330" role="img" aria-label="基線校正逐步揭示圖"></svg></div><div>${stepHtml}</div></div>`;
+      if(!stepsDone)$("#obsCommitBtn").onclick=commitObserveStep}
+    function commitObserveStep(){const enteredChapter=current,picked=document.querySelector('input[name="obsStep"]:checked'),f=$("#obsFeedback");
+      if(!picked){f.className="feedback no";f.textContent="請先選一個答案。";return}
+      const s=ch3Spec.observeSteps[ch3Deep.step];
+      if(+picked.value===s.ans){ch3Deep.revealed[s.reveal]=true;ch3Deep.step++;f.className="feedback ok";f.textContent=s.okMsg;
+        setTimeout(()=>{if(current!==enteredChapter)return;renderDeepObserve();drawBaselineLayers($("#observePanel .observeStaticChart"),ch3Deep.revealed)},700)}
+      else{f.className="feedback no";f.textContent=s.noMsg}}
+    function renderDeepOperate(){$("#operatePanel").innerHTML=`<h3>動手操作：親自調整基線校正</h3>${chartMarkup()}
+      <div class="demo-box"><button class="cta" id="demoBtn" style="min-height:38px">看示範</button><p id="demoNarration">先看 3 步示範，了解 α 如何影響結果，再自己操作。</p></div>
+      <div class="mission-list" id="missionList"></div>
+      <h4 class="readout-title">實驗紀錄表</h4>
+      <table class="log-table"><thead><tr><th>#</th><th>α</th><th>RMSE</th><th>Bias</th><th>殘差</th></tr></thead><tbody id="logTableBody"></tbody></table>
+      <button class="cta" id="recordBtn" style="margin:8px 0 18px">記錄這一組</button>
+      <div class="hide-truth-row" id="m3Mission"><label><input type="checkbox" id="hideTruthToggle"> 隱藏真值（任務三：只看無峰區殘差）</label></div>
+      <div class="proxy-box" id="m3Box" style="display:none"><p>無峰區平均殘差 ≤ 6 mAU 時，通常代表面積偏差也已在 5% 以內（這只是替代指標，不是證明）。</p>
+        <div class="judge-row"><button class="cta" id="judgeYes" style="min-height:36px">判斷：夠好了</button><button class="cta" id="judgeNo" style="min-height:36px;background:#fff;color:var(--navy);border:1px solid var(--navy)">判斷：還不夠</button><button class="cta" id="revealTruth" style="min-height:36px;background:var(--teal)">揭曉真值</button></div>
+        <p id="m3Feedback" style="margin-top:10px"></p></div>`;
+      renderMissionList();renderLogTable();
+      $("#demoBtn").onclick=clickDemo;$("#recordBtn").onclick=recordLogRow;
+      $("#hideTruthToggle").onchange=function(){ch3Deep.hideTruth=this.checked;$("#m3Box").style.display=this.checked?"block":"none";const box=$("#operatePanel .chartbox");if(box)drawLessonChart(box)};
+      $("#judgeYes").onclick=()=>judgeM3("夠好了");$("#judgeNo").onclick=()=>judgeM3("還不夠");$("#revealTruth").onclick=revealM3Truth}
+    function renderDeepExplain(){const legend=`<div class="figure-legend">${chapters[2].legend.map(([cls,label])=>`<span class="key${cls?" "+cls:""}">${label}</span>`).join("")}</div>`;
+      const dataRows=ch3Deep.log.length?ch3Deep.log.map((r,i)=>`<div class="data-formula-row">第 ${i+1} 組：b̂<sub>α</sub>(t) = ${r.alpha.toFixed(2)} × b(t) ；　Bias<sub>r</sub> = ${(r.bias>=0?"+":"")+r.bias.toFixed(1)}%</div>`).join(""):`<p class="note">回到「② 操作」按「記錄這一組」，這裡就會自動列出你的公式代入。</p>`;
+      const f=formulaCards[2],starters=["因為 b̂(t) 只扣掉了…","所以剩下的背景會…","當 α=1 時，b̂(t) 等於…"];
+      $("#explainPanel").innerHTML=`<h3>原理解釋：把圖形連回分析概念</h3>
+        <div class="explain-figure">${legend}<svg class="explainStaticChart" viewBox="0 0 700 330" role="img" aria-label="基線校正對照圖"></svg></div>
+        <div class="self-explain"><h4>先自己說說看</h4><p>用你自己的話：為什麼 α 越接近 1，面積偏差越小？</p><textarea id="selfExplainBox" placeholder="在這裡打字，至少 15 個字才能看到參考說法…">${ch3Deep.selfExplainText||""}</textarea><div class="starter-row">${starters.map(s=>`<button class="starter-chip" type="button" data-txt="${s}">${s}</button>`).join("")}</div><button class="cta" id="revealExpertBtn" style="margin-top:8px">看看參考說法</button><div class="note" id="expertNote" style="display:${ch3Deep.selfExplainRevealed?"block":"none"}">因為 b̂<sub>α</sub>(t)=α·b(t) 只扣掉了真實基線的一部分；α 越接近 1，剩下的背景就越接近 0，校正後面積自然越接近真值，偏差也越小。</div></div>
+        <h4 style="margin-top:24px">你的數據 → 公式</h4>${dataRows}
+        <p id="completionProblemAnchor" style="margin-top:20px">已知這一組資料 Â = 205.6 mAU·min，A<sub>ref</sub> = 178.2 mAU·min，試著自己完成計算：</p>
+        <div class="completion-problem">Bias<sub>r</sub> = 100 × (205.6 − 178.2) / 178.2 = 100 × <input type="number" id="blank1" step="0.1"> / 178.2 = <input type="number" id="blank2" step="0.1"> %</div>
+        <button class="cta" id="checkCompletionBtn" style="margin-top:10px">檢查計算</button><div class="feedback" id="completionFeedback">算完再按檢查。</div>
+        <div class="formula"><span class="formula-name">${f.name}</span>${f.eq}</div><div class="formula-note">${f.note}</div>
+        <table class="explain-table symbol-table"><tr><th>符號</th><th>嚴謹定義</th></tr>${f.symbols.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td></tr>`).join("")}</table>
+        <h4 style="margin-top:24px">常見誤解</h4>
+        <details><summary>「校正就是把線拉平」</summary><p>校正的目的是估計並扣掉背景 b(t)，不是讓曲線變好看；扣完之後無峰區應該接近 0，而不是「看起來平滑」。</p></details>
+        <details><summary>「α 越大越好，永遠設 1」</summary><p>α=1 只在「教材已知真實基線」時成立；真實樣品的估計基線本身就有誤差，盲目調大不會自動變好。</p></details>
+        <details><summary>「RMSE 小就等於定量正確」</summary><p>RMSE 只衡量基線估計與真值的差距；真正決定定量正確與否的是校正後面積的相對偏差，兩者不一定同步。</p></details>
+        <h4 style="margin-top:24px" id="simVsReal">模擬 vs 真實</h4>
+        <table class="explain-table"><tr><th>模擬資料你能做的</th><th>真實樣品你必須改做的</th></tr><tr><td>直接算 RMSEᵦ（因為知道真實 b(t)）</td><td>用無峰區殘差、重複量測估計背景穩定度</td></tr><tr><td>直接算面積相對偏差（因為知道 A_ref）</td><td>用加標回收率、標準品估計準確度</td></tr><tr><td>一次調整就能重算</td><td>需要方法確效、SOP 與稽核軌跡佐證</td></tr></table>`;
+      $$(".starter-chip").forEach(btn=>btn.onclick=()=>{const ta=$("#selfExplainBox");ta.value+=btn.dataset.txt;ta.focus()});
+      $("#revealExpertBtn").onclick=()=>{const ta=$("#selfExplainBox");if(ta.value.trim().length<15){ta.style.borderColor="var(--bad)";ta.placeholder="再多寫一點，至少 15 個字，才能看到參考說法。";return}ta.style.borderColor="";ch3Deep.selfExplainText=ta.value;ch3Deep.selfExplainRevealed=true;$("#expertNote").style.display="block"};
+      $("#checkCompletionBtn").onclick=checkCompletion}
+    function checkCompletion(){const b1=+$("#blank1").value,b2=+$("#blank2").value,f=$("#completionFeedback"),ok1=Math.abs(b1-27.4)<=0.5,ok2=Math.abs(b2-15.4)<=0.5;
+      if(ok1&&ok2){f.className="feedback ok";f.textContent="兩格都正確！Â−A_ref=27.4，再除以 A_ref 乘 100 就是 +15.4%。"}
+      else{f.className="feedback no";f.textContent=`再檢查一下：${!ok1?"第一格應該是 Â−A_ref = 205.6−178.2 = 27.4。":""}${!ok2?" 第二格是 100×27.4/178.2 ≈ 15.4%。":""}`}}
+    const practiceItems=[
+      {obj:"C3-O2",level:"應用",type:"mc",prompt:"某次操作記錄：α=0.55，面積相對偏差 +9.2%。以本章 |Bias|≤5% 的目標來說，這樣的結果？",opts:["已經達標，可以了","還沒達標，α 需要再提高","偏差方向錯了，α 應該降低"],ans:1,remediate:{mode:"operate",anchor:"missionList"}},
+      {obj:"C3-O2",level:"計算",type:"num",prompt:"已知 Â = 192.3 mAU·min，A_ref = 178.2 mAU·min，Bias_r = 100×(Â−A_ref)/A_ref = ？（單位 %，容許 ±0.5）",ans:7.9,tol:.5,remediate:{mode:"explain",anchor:"completionProblemAnchor"}},
+      {obj:"C3-O1",level:"遷移",type:"mc",prompt:"同一支管柱換到另一台漂移是原本兩倍的儀器。原本 α=0.74 剛好達標，換儀器後還夠嗎？",opts:["還夠，α 不需要調整","不夠，需要提高 α","不夠，需要降低 α"],ans:1,remediate:{mode:"operate",anchor:"missionList"}},
+      {obj:"C3-O3",level:"界線",type:"mc",prompt:"真實樣品沒辦法直接算出 RMSEᵦ，最主要的原因是？",opts:["真實儀器沒有計算 RMSE 的功能","真實樣品沒有已知的真實基線 b(t) 可以比較","真實樣品的訊號永遠是負的"],ans:1,remediate:{mode:"explain",anchor:"simVsReal"}}
+    ];
+    function evaluateCh3Objectives(){const r=ch3Deep.practiceResults,m=ch3Deep.missions;
+      if(r[2]===true)markObjective("C3-O1");
+      if(m.m1&&m.m2&&r[0]===true&&r[1]===true)markObjective("C3-O2");
+      if(m.m3&&r[3]===true)markObjective("C3-O3")}
+    function renderDeepPractice(){$("#practicePanel").innerHTML=`<h3>小練習：四道分層題目</h3>
+      <div class="demo-box"><button class="cta" id="recheckBtn" style="min-height:38px">重新判定</button><p>這四題和「② 操作」的三個任務，共同對應本章的三個學習目標。補完任務後回到這裡按「重新判定」，就會重新檢查一次。</p></div>
+      <div id="practiceItems"></div>
+      <h4 style="margin-top:22px">本章學習目標達成情形</h4><div id="objChecklist"></div>
+      <div class="note" id="practiceSummary"></div>`;
+      $("#recheckBtn").onclick=()=>{evaluateCh3Objectives();refreshObjectiveUi(2)};
+      renderPracticeItem()}
+    function renderPracticeItem(){const i=ch3Deep.practiceIdx,el=$("#practiceItems");
+      evaluateCh3Objectives();
+      if(i>=practiceItems.length){const correct=ch3Deep.practiceResults.filter(Boolean).length,missionsOk=ch3Deep.missions.m1&&ch3Deep.missions.m2&&ch3Deep.missions.m3;
+        el.innerHTML=`<div class="practice-item done"><h4>完成！答對 ${correct} / ${practiceItems.length} 題</h4><p>${missionsOk?"操作任務也都完成了。":"操作任務尚未全部完成——回到「② 操作」補完任務一、二、三，再按上面的「重新判定」。"}</p><p style="margin:8px 0 0;color:var(--muted);font-size:15px">參考：觀察步驟已完成 ${ch3Deep.step} / ${ch3Spec.observeSteps.length}（僅供參考，不列入判定）。</p></div>`;
+        refreshObjectiveUi(2);return}
+      const item=practiceItems[i];
+      const inputHtml=item.type==="mc"?item.opts.map((o,idx)=>`<label class="option"><input type="radio" name="pq${i}" value="${idx}"> ${String.fromCharCode(65+idx)}. ${o}</label>`).join(""):`<input type="number" id="pqNum${i}" step="0.1" style="padding:8px;border:1px solid var(--line);border-radius:6px;width:120px">`;
+      el.innerHTML=`<div class="practice-item"><small style="color:var(--muted);font-weight:800"><span class="obj-id">${item.obj}</span>${item.level}　第 ${i+1}/${practiceItems.length} 題</small><h4>${item.prompt}</h4>${inputHtml}<button class="cta" id="pqCheck" style="margin-top:14px">檢查答案</button><div class="feedback" id="pqFeedback">作答後再檢查。</div></div>`;
+      $("#pqCheck").onclick=()=>checkPracticeItem(item);refreshObjectiveUi(2)}
+    function checkPracticeItem(item){const f=$("#pqFeedback");let ok;
+      if(item.type==="mc"){const picked=document.querySelector(`input[name="pq${ch3Deep.practiceIdx}"]:checked`);if(!picked){f.className="feedback no";f.textContent="請先選一個答案。";return}ok=+picked.value===item.ans}
+      else{const val=$("#pqNum"+ch3Deep.practiceIdx).value;if(val===""){f.className="feedback no";f.textContent="請先輸入數字。";return}ok=Math.abs(+val-item.ans)<=item.tol}
+      ch3Deep.practiceResults[ch3Deep.practiceIdx]=ok;evaluateCh3Objectives();refreshObjectiveUi(2);
+      if(ok){f.className="feedback ok";f.textContent="正確！";const enteredChapter=current;setTimeout(()=>{if(current!==enteredChapter)return;ch3Deep.practiceIdx++;renderPracticeItem()},700)}
+      else{f.className="feedback no";f.innerHTML=`還不對。<button class="remediate-btn" id="goRemediate">回去看看</button>`;
+        $("#goRemediate").onclick=()=>{showMode(item.remediate.mode);setTimeout(()=>{const a=document.getElementById(item.remediate.anchor);if(a)a.scrollIntoView({behavior:"smooth",block:"center"})},60)}}}
+    function allLocalMaxima(data){const raw=[];for(let i=1;i<data.length-1;i++)if(data[i].c>data[i-1].c&&data[i].c>=data[i+1].c)raw.push({t:data[i].t,y:data[i].y});return raw}
+    function drawPeakDetectLayers(svg,revealed){if(!svg)return;
+      const d=series(.12,.22,.25),threshold=8,candidates=detectPeaks(d,threshold,peakCenters(.25));
+      drawBase(svg);
+      let extra="";
+      if(revealed.verified){
+        const fp=candidates.find(p=>!p.matched);
+        extra=candidates.map(p=>`<circle cx="${(48+p.t/20*630).toFixed(1)}" cy="${(285-p.y/390*245).toFixed(1)}" r="7" fill="#fff" stroke="${p.matched?"#078d88":"#b54444"}" stroke-width="3"/>`).join("")+
+          (fp?`<text x="${(48+fp.t/20*630).toFixed(1)}" y="${(285-fp.y/390*245-14).toFixed(1)}" fill="#b54444" font-size="13" font-weight="700" text-anchor="middle">+${(fp.v-threshold).toFixed(1)}</text>`:"");
+      } else if(revealed.thresholded){
+        const y=285-threshold/390*245;
+        extra=`<path d="M48 ${y.toFixed(1)}H678" fill="none" stroke="#9bb1c7" stroke-width="2" stroke-dasharray="7 5"/>`+
+          candidates.map(p=>`<circle cx="${(48+p.t/20*630).toFixed(1)}" cy="${(285-p.y/390*245).toFixed(1)}" r="7" fill="#fff" stroke="#4f6478" stroke-width="3"/>`).join("");
+      } else if(revealed.local){
+        extra=allLocalMaxima(d).map(p=>`<circle cx="${(48+p.t/20*630).toFixed(1)}" cy="${(285-p.y/390*245).toFixed(1)}" r="3" fill="#9bb1c7"/>`).join("");
+      }
+      svg.insertAdjacentHTML("beforeend",`<path d="${path(d,"y")}" fill="none" stroke="#082c62" stroke-width="2.6"/><path d="${path(d,"b")}" fill="none" stroke="#ee9000" stroke-width="2.3" stroke-dasharray="7 5"/>`+extra);
+    }
+    function progressiveLegendCh4(revealed){const items=[["","y(t) 訊號"]];
+      if(revealed.local)items.push(["dot-grey","所有局部最大值（含雜訊）"]);
+      if(revealed.thresholded&&!revealed.verified)items.push(["tick","門檻 Tₕ=8 mAU"],["dot-grey","通過門檻的候選峰（尚未判定）"]);
+      if(revealed.verified)items.push(["tick","門檻 Tₕ=8 mAU"],["dot-teal","命中真峰"],["dot-red","假陽性"]);
+      return `<div class="figure-legend">${items.map(([cls,label])=>`<span class="key${cls?" "+cls:""}">${label}</span>`).join("")}</div>`}
+    function renderCh4MissionList(){const el=$("#missionList");if(!el)return;const items=[
+      {id:"m1",title:"任務一：見識太靈敏的門檻",body:"把 Tₕ 滑桿拉到最右邊（最靈敏），看假陽性暴增。"},
+      {id:"m2",title:"任務二：找到安全範圍",body:"記錄至少 3 組不同 Tₕ（範圍要跨 40 mAU 以上），且最後一組是 4 個真峰全中、0 個假陽性。"},
+      {id:"m3",title:"任務三：隱藏真值挑戰",body:"打開下方「隱藏真值」，只憑候選峰的門檻餘裕判斷它是不是真峰，再核對。"}
+    ];el.innerHTML=items.map(m=>`<div class="mission ${ch4Deep.missions[m.id]?"done":""}"><b>${ch4Deep.missions[m.id]?"✓":"○"}</b><p><span class="mission-title">${m.title}</span>${m.body}</p></div>`).join("")}
+    function renderCh4LogTable(){const el=$("#logTableBody");if(!el)return;el.innerHTML=ch4Deep.log.length?ch4Deep.log.map((r,i)=>`<tr><td>${i+1}</td><td>${r.threshold.toFixed(0)}</td><td>${r.candidates}</td><td>${r.hits}/4</td><td>${r.falsePos}</td></tr>`).join(""):`<tr><td colspan="5" style="color:var(--muted);text-align:center">尚未記錄任何一組</td></tr>`}
+    function recordCh4LogRow(){const v=ch4Deep.lastVars;if(!v)return;ch4Deep.log.push({threshold:v.threshold,candidates:v.candidates.length,hits:v.hits,falsePos:v.falsePos});renderCh4LogTable();
+      if(ch4Deep.log.length>=3){const ths=ch4Deep.log.map(r=>r.threshold),span=Math.max(...ths)-Math.min(...ths),last=ch4Deep.log[ch4Deep.log.length-1];if(span>=40&&last.hits===4&&last.falsePos===0)ch4Deep.missions.m2=true}
+      renderCh4MissionList()}
+    function clickCh4Demo(){ch4Deep.demoIdx=(ch4Deep.demoIdx+1>=ch4Spec.demoSteps.length)?-1:ch4Deep.demoIdx+1;
+      if(ch4Deep.demoIdx===-1){$("#demoNarration").textContent="點擊「看示範」重新從最靈敏的門檻開始。";$("#demoBtn").textContent="看示範";return}
+      runCh4DemoStep(ch4Deep.demoIdx)}
+    function runCh4DemoStep(idx){const box=$("#operatePanel .chartbox");if(!box)return;const step=ch4Spec.demoSteps[idx],slider=box.querySelector(".overlapSlider");
+      const raw=Math.round((200-step.th)/198*100);slider.value=raw;box.querySelector(".overlapOut").textContent=controlDisplay(3,2,raw);drawLessonChart(box);
+      $("#demoNarration").textContent=step.say;$("#demoBtn").textContent=idx<ch4Spec.demoSteps.length-1?`下一步 (${idx+1}/${ch4Spec.demoSteps.length})`:"重新看示範"}
+    function judgeCh4M3(label){ch4Deep.m3Judgment=label;ch4Deep.missions.m3=true;renderCh4MissionList();$("#m3Feedback").textContent=`已記錄你的判斷：「${label}」。按「揭曉真值」核對。`}
+    function revealCh4M3Truth(){const v=ch4Deep.lastVars;if(!v||!v.weakest){$("#m3Feedback").textContent="目前沒有候選峰可供判斷，請調整 Tₕ。";return}
+      const isReal=v.weakest.matched,judgedReal=ch4Deep.m3Judgment==="真峰",agree=judgedReal===isReal;
+      $("#m3Feedback").innerHTML=`t=${v.weakest.t.toFixed(2)} 這個候選峰，門檻餘裕只有 <b>${(v.weakest.v-v.threshold).toFixed(1)} mAU</b>。它實際上${isReal?"確實對應一個已知真峰":"<b>不對應任何已知真峰——是假陽性</b>"}。你剛剛的判斷${agree?"一致 ✓":"不一致——這正是「過門檻不等於是真峰」的陷阱"}。`;
+      ch4Deep.hideTruth=false;const t=$("#hideTruthToggle");if(t)t.checked=false;const box=$("#operatePanel .chartbox");if(box)drawLessonChart(box)}
+    function renderCh4Observe(){const legend=progressiveLegendCh4(ch4Deep.revealed),stepsDone=ch4Deep.step>=ch4Spec.observeSteps.length;let stepHtml;
+      if(!stepsDone){const s=ch4Spec.observeSteps[ch4Deep.step];stepHtml=`<div class="step-card"><div class="step-progress">步驟 ${ch4Deep.step+1} / ${ch4Spec.observeSteps.length}</div><h4>${s.prompt}</h4>${s.opts.map((o,i)=>`<label class="option"><input type="radio" name="obsStep" value="${i}"> ${String.fromCharCode(65+i)}. ${o}</label>`).join("")}<button class="cta" id="obsCommitBtn" style="margin-top:14px">承諾作答</button><div class="feedback" id="obsFeedback">選一個答案，按「承諾作答」揭曉下一層。</div></div>`}
+      else{stepHtml=`<div class="step-done"><h4>觀察筆記</h4><table>${ch4Spec.observeSteps.map((s,i)=>`<tr><td>${i+1}</td><td>${s.opts[s.ans]}</td></tr>`).join("")}</table><p style="margin-top:10px;color:var(--muted)">三層都已經揭曉。切換到「② 操作」試試看親自調整 Tₕ。</p></div>`}
+      $("#observePanel").innerHTML=`<h3>先觀察：一步步揭開峰偵測</h3><div class="observe-grid"><div class="figure-box">${legend}<svg class="observeStaticChart" viewBox="0 0 700 330" role="img" aria-label="峰偵測逐步揭示圖"></svg></div><div>${stepHtml}</div></div>`;
+      if(!stepsDone)$("#obsCommitBtn").onclick=commitCh4ObserveStep}
+    function commitCh4ObserveStep(){const enteredChapter=current,picked=document.querySelector('input[name="obsStep"]:checked'),f=$("#obsFeedback");
+      if(!picked){f.className="feedback no";f.textContent="請先選一個答案。";return}
+      const s=ch4Spec.observeSteps[ch4Deep.step];
+      if(+picked.value===s.ans){ch4Deep.revealed[s.reveal]=true;ch4Deep.step++;f.className="feedback ok";f.textContent=s.okMsg;
+        setTimeout(()=>{if(current!==enteredChapter)return;renderCh4Observe();drawPeakDetectLayers($("#observePanel .observeStaticChart"),ch4Deep.revealed)},700)}
+      else{f.className="feedback no";f.textContent=s.noMsg}}
+    function renderCh4Operate(){$("#operatePanel").innerHTML=`<h3>動手操作：親自調整偵測門檻</h3>${chartMarkup()}
+      <div class="demo-box"><button class="cta" id="demoBtn" style="min-height:38px">看示範</button><p id="demoNarration">先看 3 步示範，了解 Tₕ 如何影響候選峰，再自己操作。</p></div>
+      <div class="mission-list" id="missionList"></div>
+      <h4 class="readout-title">實驗紀錄表</h4>
+      <table class="log-table"><thead><tr><th>#</th><th>Tₕ</th><th>候選數</th><th>命中/4</th><th>假陽性</th></tr></thead><tbody id="logTableBody"></tbody></table>
+      <button class="cta" id="recordBtn" style="margin:8px 0 18px">記錄這一組</button>
+      <div class="hide-truth-row" id="m3Mission"><label><input type="checkbox" id="hideTruthToggle"> 隱藏真值（任務三：只看門檻餘裕）</label></div>
+      <div class="proxy-box" id="m3Box" style="display:none"><p>候選峰的門檻餘裕（候選峰高度−Tₕ）越小，代表它只是剛好衝過門檻，越可能是雜訊而非真峰（這只是替代指標，不是證明）。</p>
+        <div class="judge-row"><button class="cta" id="judgeYes" style="min-height:36px">判斷：真峰</button><button class="cta" id="judgeNo" style="min-height:36px;background:#fff;color:var(--navy);border:1px solid var(--navy)">判斷：假陽性</button><button class="cta" id="revealTruth" style="min-height:36px;background:var(--teal)">揭曉真值</button></div>
+        <p id="m3Feedback" style="margin-top:10px"></p></div>`;
+      renderCh4MissionList();renderCh4LogTable();
+      $("#demoBtn").onclick=clickCh4Demo;$("#recordBtn").onclick=recordCh4LogRow;
+      $("#hideTruthToggle").onchange=function(){ch4Deep.hideTruth=this.checked;$("#m3Box").style.display=this.checked?"block":"none";const box=$("#operatePanel .chartbox");if(box)drawLessonChart(box)};
+      $("#judgeYes").onclick=()=>judgeCh4M3("真峰");$("#judgeNo").onclick=()=>judgeCh4M3("假陽性");$("#revealTruth").onclick=revealCh4M3Truth}
+    function renderCh4Explain(){const legend=`<div class="figure-legend">${chapters[3].legend.map(([cls,label])=>`<span class="key${cls?" "+cls:""}">${label}</span>`).join("")}</div>`;
+      const dataRows=ch4Deep.log.length?ch4Deep.log.map((r,i)=>`<div class="data-formula-row">第 ${i+1} 組：Tₕ = ${r.threshold.toFixed(0)} mAU ；　候選峰 = ${r.candidates} 個，命中 ${r.hits}/4，假陽性 ${r.falsePos} 個</div>`).join(""):`<p class="note">回到「② 操作」按「記錄這一組」，這裡就會自動列出你的公式代入。</p>`;
+      const f=formulaCards[3],starters=["因為候選峰增加，可能是…","要確認是不是真峰，還需要…","門檻只保證…"];
+      $("#explainPanel").innerHTML=`<h3>原理解釋：把圖形連回分析概念</h3>
+        <div class="explain-figure">${legend}<svg class="explainStaticChart" viewBox="0 0 700 330" role="img" aria-label="峰偵測對照圖"></svg></div>
+        <div class="self-explain"><h4>先自己說說看</h4><p>用你自己的話：為什麼候選峰數量增加，不代表偵測結果變得更可靠？</p><textarea id="selfExplainBox" placeholder="在這裡打字，至少 15 個字才能看到參考說法…">${ch4Deep.selfExplainText||""}</textarea><div class="starter-row">${starters.map(s=>`<button class="starter-chip" type="button" data-txt="${s}">${s}</button>`).join("")}</div><button class="cta" id="revealExpertBtn" style="margin-top:8px">看看參考說法</button><div class="note" id="expertNote" style="display:${ch4Deep.selfExplainRevealed?"block":"none"}">因為找峰演算法只檢查「訊號是否夠高、是否是局部極大值」，這兩個條件雜訊都可能滿足；候選峰變多，很可能只是門檻設太低、讓更多雜訊尖峰通過，而不是真的多了化合物。要確認候選是不是真峰，仍需要標準品、光譜或其他獨立證據。</div></div>
+        <h4 style="margin-top:24px">你的數據 → 公式</h4>${dataRows}
+        <p id="completionProblemAnchor" style="margin-top:20px">已知某次操作 Tₕ=8 mAU 時，候選峰數=5、命中真峰=4，試著自己完成計算：</p>
+        <div class="completion-problem">假陽性 = 候選峰數 − 命中 = 5 − 4 = <input type="number" id="blank1" step="1"> 個　；　精確率 Precision = 100 × 命中 / 候選峰數 = 100 × 4 / 5 = <input type="number" id="blank2" step="0.1"> %</div>
+        <button class="cta" id="checkCompletionBtn" style="margin-top:10px">檢查計算</button><div class="feedback" id="completionFeedback">算完再按檢查。</div>
+        <div class="formula"><span class="formula-name">${f.name}</span>${f.eq}</div><div class="formula-note">${f.note}</div>
+        <table class="explain-table symbol-table"><tr><th>符號</th><th>嚴謹定義</th></tr>${f.symbols.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td></tr>`).join("")}</table>
+        <h4 style="margin-top:24px">常見誤解</h4>
+        <details><summary>「候選峰越多，代表偵測越靈敏、結果越好」</summary><p>候選峰變多，很可能是門檻太低讓假陽性增加，不是偵測能力真的變好；還要看命中率與假陽性數。</p></details>
+        <details><summary>「只要選對演算法，就不需要人工檢查」</summary><p>找峰演算法只提出候選位置；確認候選是不是目標化合物，仍需要標準品滯留時間、光譜或其他獨立證據。</p></details>
+        <details><summary>「Tₕ 設得越高越保險」</summary><p>太高會把訊號較小的真峰也濾掉（如本章示範中 t=10.83、16.17 消失），一樣會犯錯，只是換一種犯法。</p></details>
+        <h4 style="margin-top:24px" id="simVsReal">模擬 vs 真實</h4>
+        <table class="explain-table"><tr><th>模擬資料你能做的</th><th>真實樣品你必須改做的</th></tr><tr><td>直接知道哪個候選對應真峰（matched）</td><td>用標準品滯留時間、光譜比對確認候選身分</td></tr><tr><td>直接算命中率與假陽性數</td><td>用重複進樣、加標回收評估偵測穩定度</td></tr><tr><td>一次調整 Tₕ 就能重算</td><td>需要方法確效、SOP 記錄參數選擇理由</td></tr></table>`;
+      $$(".starter-chip").forEach(btn=>btn.onclick=()=>{const ta=$("#selfExplainBox");ta.value+=btn.dataset.txt;ta.focus()});
+      $("#revealExpertBtn").onclick=()=>{const ta=$("#selfExplainBox");if(ta.value.trim().length<15){ta.style.borderColor="var(--bad)";ta.placeholder="再多寫一點，至少 15 個字，才能看到參考說法。";return}ta.style.borderColor="";ch4Deep.selfExplainText=ta.value;ch4Deep.selfExplainRevealed=true;$("#expertNote").style.display="block"};
+      $("#checkCompletionBtn").onclick=checkCh4Completion}
+    function checkCh4Completion(){const b1=+$("#blank1").value,b2=+$("#blank2").value,f=$("#completionFeedback"),ok1=b1===1,ok2=Math.abs(b2-80)<=0.5;
+      if(ok1&&ok2){f.className="feedback ok";f.textContent="兩格都正確！假陽性=5−4=1個；精確率=100×4/5=80%。"}
+      else{f.className="feedback no";f.textContent=`再檢查一下：${!ok1?"第一格應該是候選峰數−命中=5−4=1。":""}${!ok2?" 第二格是100×4/5=80%。":""}`}}
+    const ch4PracticeItems=[
+      {obj:"C4-O2",level:"應用",type:"mc",prompt:"某次操作記錄：Tₕ=100 mAU，候選峰=3 個，命中真峰=2/4。這代表？",opts:["結果已經很好，可以結束","Tₕ設太高，至少有真峰被漏掉","候選峰太多，需要提高Tₕ"],ans:1,remediate:{mode:"operate",anchor:"missionList"}},
+      {obj:"C4-O2",level:"計算",type:"num",prompt:"已知候選峰數=6，命中真峰=4，精確率 Precision=100×命中/候選峰數=？（單位%，容許 ±0.5）",ans:66.7,tol:.5,remediate:{mode:"explain",anchor:"completionProblemAnchor"}},
+      {obj:"C4-O1",level:"遷移",type:"mc",prompt:"換成雜訊更大的儀器（雜訊 RMS 加倍），原本 Tₕ=15 mAU 剛好 0 假陽性、4/4 命中。換儀器後這個 Tₕ 還夠嗎？",opts:["還夠，Tₕ 不需要調整","不夠，需要提高 Tₕ 以濾掉更大的雜訊","不夠，需要降低 Tₕ"],ans:1,remediate:{mode:"operate",anchor:"missionList"}},
+      {obj:"C4-O3",level:"界線",type:"mc",prompt:"候選峰通過高度門檻、且命中率100%、假陽性0個，這樣就能確定它是目標化合物嗎？",opts:["可以，數據已經證明了","不行，還需要標準品滯留時間、光譜等獨立證據確認身分","不行，因為峰偵測演算法本身有錯誤"],ans:1,remediate:{mode:"explain",anchor:"simVsReal"}}
+    ];
+    function evaluateCh4Objectives(){const r=ch4Deep.practiceResults,m=ch4Deep.missions;
+      if(r[2]===true)markObjective("C4-O1");
+      if(m.m1&&m.m2&&r[0]===true&&r[1]===true)markObjective("C4-O2");
+      if(m.m3&&r[3]===true)markObjective("C4-O3")}
+    function renderCh4Practice(){$("#practicePanel").innerHTML=`<h3>小練習：四道分層題目</h3>
+      <div class="demo-box"><button class="cta" id="recheckBtn" style="min-height:38px">重新判定</button><p>這四題和「② 操作」的三個任務，共同對應本章的三個學習目標。補完任務後回到這裡按「重新判定」，就會重新檢查一次。</p></div>
+      <div id="practiceItems"></div>
+      <h4 style="margin-top:22px">本章學習目標達成情形</h4><div id="objChecklist"></div>
+      <div class="note" id="practiceSummary"></div>`;
+      $("#recheckBtn").onclick=()=>{evaluateCh4Objectives();refreshObjectiveUi(3)};
+      renderCh4PracticeItem()}
+    function renderCh4PracticeItem(){const i=ch4Deep.practiceIdx,el=$("#practiceItems");
+      evaluateCh4Objectives();
+      if(i>=ch4PracticeItems.length){const correct=ch4Deep.practiceResults.filter(Boolean).length,missionsOk=ch4Deep.missions.m1&&ch4Deep.missions.m2&&ch4Deep.missions.m3;
+        el.innerHTML=`<div class="practice-item done"><h4>完成！答對 ${correct} / ${ch4PracticeItems.length} 題</h4><p>${missionsOk?"操作任務也都完成了。":"操作任務尚未全部完成——回到「② 操作」補完任務一、二、三，再按上面的「重新判定」。"}</p><p style="margin:8px 0 0;color:var(--muted);font-size:15px">參考：觀察步驟已完成 ${ch4Deep.step} / ${ch4Spec.observeSteps.length}（僅供參考，不列入判定）。</p></div>`;
+        refreshObjectiveUi(3);return}
+      const item=ch4PracticeItems[i];
+      const inputHtml=item.type==="mc"?item.opts.map((o,idx)=>`<label class="option"><input type="radio" name="pq${i}" value="${idx}"> ${String.fromCharCode(65+idx)}. ${o}</label>`).join(""):`<input type="number" id="pqNum${i}" step="0.1" style="padding:8px;border:1px solid var(--line);border-radius:6px;width:120px">`;
+      el.innerHTML=`<div class="practice-item"><small style="color:var(--muted);font-weight:800"><span class="obj-id">${item.obj}</span>${item.level}　第 ${i+1}/${ch4PracticeItems.length} 題</small><h4>${item.prompt}</h4>${inputHtml}<button class="cta" id="pqCheck" style="margin-top:14px">檢查答案</button><div class="feedback" id="pqFeedback">作答後再檢查。</div></div>`;
+      $("#pqCheck").onclick=()=>checkCh4PracticeItem(item);refreshObjectiveUi(3)}
+    function checkCh4PracticeItem(item){const f=$("#pqFeedback");let ok;
+      if(item.type==="mc"){const picked=document.querySelector(`input[name="pq${ch4Deep.practiceIdx}"]:checked`);if(!picked){f.className="feedback no";f.textContent="請先選一個答案。";return}ok=+picked.value===item.ans}
+      else{const val=$("#pqNum"+ch4Deep.practiceIdx).value;if(val===""){f.className="feedback no";f.textContent="請先輸入數字。";return}ok=Math.abs(+val-item.ans)<=item.tol}
+      ch4Deep.practiceResults[ch4Deep.practiceIdx]=ok;evaluateCh4Objectives();refreshObjectiveUi(3);
+      if(ok){f.className="feedback ok";f.textContent="正確！";const enteredChapter=current;setTimeout(()=>{if(current!==enteredChapter)return;ch4Deep.practiceIdx++;renderCh4PracticeItem()},700)}
+      else{f.className="feedback no";f.innerHTML=`還不對。<button class="remediate-btn" id="goRemediate">回去看看</button>`;
+        $("#goRemediate").onclick=()=>{showMode(item.remediate.mode);setTimeout(()=>{const a=document.getElementById(item.remediate.anchor);if(a)a.scrollIntoView({behavior:"smooth",block:"center"})},60)}}}
+    const stdQuizState={};
+    function stdState(i){return stdQuizState[i]||(stdQuizState[i]={idx:0,results:[]})}
+    function renderStdPractice(){$("#practicePanel").innerHTML=`<h3>小練習：三個學習目標，各一題</h3>
+      <p style="margin:-8px 0 16px;color:var(--muted)">每一題只對應一個學習目標。答錯可以直接改答案重試，或按「回去看看」跳到對應的教學段落。</p>
+      <div id="practiceItems"></div>
+      <h4 style="margin-top:22px">本章學習目標達成情形</h4><div id="objChecklist"></div>
+      <div class="note" id="practiceSummary"></div>`;
+      renderStdPracticeItem()}
+    function renderStdPracticeItem(){const i=current,st=stdState(i),quiz=chapterQuizzes[i],el=$("#practiceItems");
+      if(st.idx>=quiz.length){const correct=st.results.filter(Boolean).length;
+        el.innerHTML=`<div class="practice-item done"><h4>三題都作答完成（答對 ${correct} / ${quiz.length}）</h4><p>${chapterDone(i)?"三個學習目標都已達成，本章已標記完成。":"還有學習目標沒達成——按下面重新作答，把還沒過的那一題再做一次。"}</p><button class="cta" id="stdRetry" style="margin-top:12px;min-height:40px">重新作答</button></div>`;
+        $("#stdRetry").onclick=()=>{st.idx=0;st.results=[];renderStdPracticeItem()};
+        refreshObjectiveUi(i);return}
+      const item=quiz[st.idx],obj=chapterObjectives[i].find(o=>o.id===item.obj);
+      const inputHtml=item.type==="mc"?item.opts.map((o,k)=>`<label class="option"><input type="radio" name="sq${i}_${st.idx}" value="${k}"> ${String.fromCharCode(65+k)}. ${o}</label>`).join(""):`<input type="number" id="sqNum" step="0.01" style="padding:8px;border:1px solid var(--line);border-radius:6px;width:140px">`;
+      el.innerHTML=`<div class="practice-item"><small style="color:var(--muted);font-weight:800"><span class="obj-id">${item.obj}</span>第 ${st.idx+1}/${quiz.length} 題　對應目標：${obj?obj.text:""}</small><h4>${item.prompt}</h4>${inputHtml}<button class="cta" id="sqCheck" style="margin-top:14px">檢查答案</button><div class="feedback" id="sqFeedback">作答後再檢查。</div></div>`;
+      $("#sqCheck").onclick=()=>checkStdPracticeItem(item);
+      refreshObjectiveUi(i)}
+    function checkStdPracticeItem(item){const i=current,st=stdState(i),f=$("#sqFeedback");let ok;
+      if(item.type==="mc"){const picked=document.querySelector(`input[name="sq${i}_${st.idx}"]:checked`);if(!picked){f.className="feedback no";f.textContent="請先選一個答案。";return}ok=+picked.value===item.ans}
+      else{const el=$("#sqNum");if(!el||el.value===""){f.className="feedback no";f.textContent="請先輸入數字。";return}ok=Math.abs(+el.value-item.ans)<=item.tol}
+      st.results[st.idx]=ok;
+      if(ok){markObjective(item.obj);f.className="feedback ok";f.textContent=`正確！學習目標 ${item.obj} 已達成。`;refreshObjectiveUi(i);
+        const entered=i;setTimeout(()=>{if(current!==entered)return;st.idx++;renderStdPracticeItem()},700)}
+      else{f.className="feedback no";f.innerHTML=`還不對。${item.hint||""} <button class="remediate-btn" id="goRemediate">回去看看</button>`;
+        $("#goRemediate").onclick=()=>{showMode(item.remediate.mode);setTimeout(()=>{const a=document.getElementById(item.remediate.anchor);if(a)a.scrollIntoView({behavior:"smooth",block:"center"})},60)}}}
+    function updateProgress(){const n=chapters.reduce((s,c,i)=>s+(chapterDone(i)?1:0),0),p=Math.round(n/7*100);$("#progressText").textContent=`學習進度 ${n} / 7`;$("#progressPct").textContent=p+"%";$("#progressFill").style.width=p+"%"}
     $("#startBtn").onclick=()=>selectChapter(0,true);$("#prevBtn").onclick=()=>selectChapter(current-1,true);$("#nextBtn").onclick=()=>selectChapter(current+1,true);
-    function drawPaper(){const drift=+$("#paperDrift").value/100,d=series(drift,.08,.15);[["#paperRaw","y","校正前（原始訊號）","#082c62"],["#paperCorrected","c","校正後（基線校正）","#078d88"]].forEach(([id,key,title,color])=>{const svg=$(id);svg.innerHTML=`<text x="20" y="22" fill="#082c62" font-weight="800">${title}</text><rect x="42" y="38" width="373" height="182" rx="4" fill="#fbfdff"/><g fill="none" stroke="#d8e2ec"><path d="M42 38V220H415"/><path d="M42 175H415M42 130H415M42 85H415" stroke-dasharray="3 5"/></g><path d="${path(d,key,42,220,373,170,330)}" fill="none" stroke="${color}" stroke-width="2.5"/>${key==="y"?`<path d="${path(d,"b",42,220,373,170,330)}" fill="none" stroke="#ee9000" stroke-width="2" stroke-dasharray="6 4"/>`:""}<text x="195" y="245" fill="#4f6478" font-size="11">時間 (min)</text>`});$("#paperDriftValue").textContent=$("#paperDrift").value+"%"}
-    $("#paperDrift").oninput=drawPaper;renderCards();renderLesson();drawPaper();
+    function drawMigrateA(){const raw=+$("#mgADrift").value,d=series(raw/100,.08,.15);$("#mgADriftOut").textContent=raw+"%";
+      const[wf,wt]=AREA_WINDOW,x1=(42+wf/20*373).toFixed(1),x2=(42+wt/20*373).toFixed(1);
+      [["#mgARaw","y","校正前（原始訊號）","#082c62"],["#mgACorrected","c","校正後（扣掉基線）","#078d88"]].forEach(([id,key,title,color])=>{const svg=$(id);
+        svg.innerHTML=`<text x="20" y="22" fill="#082c62" font-weight="800">${title}</text><rect x="42" y="38" width="373" height="182" rx="4" fill="#fbfdff"/><g fill="none" stroke="#d8e2ec"><path d="M42 38V220H415"/><path d="M42 175H415M42 130H415M42 85H415" stroke-dasharray="3 5"/></g>`+
+          (key==="y"?`<path d="${path(d,"b",42,220,373,170,330)} L415,220 L42,220 Z" fill="rgba(238,144,0,.16)" stroke="none"/>`:"")+
+          `<path d="M${x1} 38V220M${x2} 38V220" fill="none" stroke="#078d88" stroke-width="1.6" stroke-dasharray="5 4"/>`+
+          `<path d="${path(d,key,42,220,373,170,330)}" fill="none" stroke="${color}" stroke-width="2.5"/>`+
+          (key==="y"?`<path d="${path(d,"b",42,220,373,170,330)}" fill="none" stroke="#ee9000" stroke-width="2" stroke-dasharray="6 4"/>`:"")+
+          `<text x="195" y="245" fill="#4f6478" font-size="13">時間 (min)</text>`});
+      const ref=integrate(d,"clean",wf,wt),uncorrected=integrate(d,"y",wf,wt),corrected=integrate(d,"c",wf,wt),
+        rawBias=(uncorrected-ref)/ref*100,corBias=(corrected-ref)/ref*100,tone=rawBias>25?"bad":rawBias>10?"warn":"";
+      setMetrics($("#mgA"),[["未校正面積",uncorrected.toFixed(1)+" mAU·min","直接 ∫y dt（含背景）"],["扣基線後面積",corrected.toFixed(1)+" mAU·min","∫[y−b] dt"],["參考面積 Aᵣₑ𝒻",ref.toFixed(1)+" mAU·min","模擬中的已知真值"],["不校正的相對偏差",(rawBias>=0?"+":"")+rawBias.toFixed(1)+"%","100×(Â−Aᵣₑ𝒻)/Aᵣₑ𝒻"]],
+        `漂移越大，未校正的面積被灌水越多：目前多算 <b>${rawBias.toFixed(1)}%</b>。扣掉基線後偏差回到 ${corBias.toFixed(1)}%——但那是因為模擬裡「真實 b(t) 已知」；真實樣品只能估計 b(t)，所以要改看無峰區殘差與加標回收。`,tone)}
+    const MG_B_TMIN=2,MG_B_TMAX=260;
+    function migrateBSafeWindow(d,centers){let best=null,cur=null;
+      for(let T=MG_B_TMIN;T<=MG_B_TMAX;T+=2){const cand=detectPeaks(d,T,centers),hits=cand.filter(p=>p.matched).length;
+        if(hits===4&&cand.length===4){cur?cur.hi=T:cur={lo:T,hi:T}}
+        else{if(cur&&(!best||cur.hi-cur.lo>best.hi-best.lo))best=cur;cur=null}}
+      if(cur&&(!best||cur.hi-cur.lo>best.hi-best.lo))best=cur;
+      return best}
+    function drawMigrateB(){const noiseU=+$("#mgBNoise").value/100,T=MG_B_TMIN+ +$("#mgBThreshold").value/100*(MG_B_TMAX-MG_B_TMIN),
+      d=series(.12,noiseU,.25),centers=peakCenters(.25),cand=detectPeaks(d,T,centers),hits=cand.filter(p=>p.matched).length,fp=cand.length-hits,
+      noiseRms=Math.sqrt(d.reduce((s,p)=>s+(p.y-p.b-p.clean)**2,0)/d.length),win=migrateBSafeWindow(d,centers),inWin=!!win&&T>=win.lo&&T<=win.hi;
+      $("#mgBNoiseOut").textContent="σₙ ≈ "+noiseRms.toFixed(2)+" mAU";$("#mgBThresholdOut").textContent=T.toFixed(0)+" mAU";
+      const svg=$("#mgBChart"),yOf=v=>285-v/390*245;drawBase(svg);
+      svg.insertAdjacentHTML("beforeend",
+        (win?`<rect x="48" y="${yOf(win.hi).toFixed(1)}" width="630" height="${(yOf(win.lo)-yOf(win.hi)).toFixed(1)}" fill="rgba(7,141,136,.16)"/><text x="660" y="${(yOf(win.hi)+14).toFixed(1)}" fill="#087c77" font-size="13" font-weight="700" text-anchor="end">安全視窗 ${win.lo}–${win.hi} mAU</text>`:"")+
+        `<path d="M48 ${yOf(T).toFixed(1)}H678" fill="none" stroke="#b54444" stroke-width="2" stroke-dasharray="7 5"/><text x="56" y="${(yOf(T)-7).toFixed(1)}" fill="#b54444" font-size="14">T = ${T.toFixed(0)} mAU</text>`+
+        `<path d="${path(d,"c")}" fill="none" stroke="#078d88" stroke-width="2.4"/>`+
+        cand.map(p=>`<circle cx="${(48+p.t/20*630).toFixed(1)}" cy="${yOf(p.v).toFixed(1)}" r="6" fill="${p.matched?"#078d88":"#b54444"}" stroke="#fff" stroke-width="2"/>`).join(""));
+      setMetrics($("#mgB"),[["雜訊 RMS σₙ",noiseRms.toFixed(2)+" mAU","無峰區殘差的均方根"],["候選峰",cand.length+" 個","超過 T 的局部極大值"],["命中真峰",hits+" / 4","已知模擬真峰"],["假陽性",fp+" 個","雜訊被誤判為峰"],["安全視窗",win?`${win.lo}–${win.hi} mAU`:"不存在",win?`寬 ${win.hi-win.lo} mAU`:"此雜訊下沒有全中且零假陽性的 T"]],
+        win?(inWin?`目前的 T 落在安全視窗內（${win.lo}–${win.hi} mAU）。注意視窗的<b>下界會隨雜訊上升</b>——同一個 T 換到雜訊更大的儀器就未必安全。`:`目前的 T ${T<win.lo?"低於":"高於"}安全視窗（${win.lo}–${win.hi} mAU）：${T<win.lo?`雜訊被多抓了 ${fp} 個`:`漏掉了 ${4-hits} 個真峰`}。`):"在這個雜訊水準下，掃遍 T = 2…260 mAU 都找不到「4 個真峰全中且 0 假陽性」的設定——這時該處理的是雜訊本身，不是繼續調門檻。",
+        win?(inWin?"":"bad"):"bad")}
+    function drawMigrateC(){const u=+$("#mgCGap").value/100,gap=2.4-2.35*u,d=series(.1,.05,u),
+      fwhmA=2.355*.35,fwhmB=2.355*.32,rs=1.18*gap/(fwhmA+fwhmB);
+      let visible=0;for(let i=1;i<d.length-1;i++){if(d[i].t<7.5||d[i].t>13.5)continue;if(d[i].clean>d[i-1].clean&&d[i].clean>=d[i+1].clean)visible++}
+      $("#mgCGapOut").textContent=gap.toFixed(2)+" min";
+      const svg=$("#mgCChart");drawBase(svg);
+      svg.insertAdjacentHTML("beforeend",
+        `<path d="${path(d,"y")}" fill="none" stroke="#082c62" stroke-width="2.6"/>`+
+        `<path d="${path(d,"peakA")}" fill="none" stroke="#078d88" stroke-width="2.2" stroke-dasharray="7 5"/>`+
+        `<path d="${path(d,"peakB")}" fill="none" stroke="#8b63b4" stroke-width="2.2" stroke-dasharray="7 5"/>`+
+        `<g font-size="14" font-weight="800"><rect x="518" y="48" width="150" height="28" rx="14" fill="${rs>=1.5?"#e9f6f5":rs>=1?"#fff7e8":"#fff1f1"}"/><text x="593" y="67" fill="${rs>=1.5?"#087c77":rs>=1?"#8a5a00":"#b54444"}" text-anchor="middle">Rₛ = ${rs.toFixed(2)}</text></g>`);
+      setMetrics($("#mgC"),[["中央峰距 Δtᵣ",gap.toFixed(2)+" min","兩成分的保留時間差"],["半高寬總和",(fwhmA+fwhmB).toFixed(2)+" min","w₀.₅,₁+w₀.₅,₂"],["解析度 Rₛ",rs.toFixed(2),"1.18Δtᵣ/(w₀.₅,₁+w₀.₅,₂)"],["肉眼可辨峰頂",visible+" / 2","無雜訊訊號的局部極大值"]],
+        rs>=1.5?"達到常用的基線分離經驗判準（Rₛ≈1.5）；仍要看峰形與面積比是否合理。":rs>=1?"僅部分分離，積分邊界與純度判斷都要更小心。":`兩峰未解析${visible<2?"，而且肉眼只數得到 1 個峰頂——峰數已經在說謊":""}；應改看 DAD 光譜、解卷積或調整分離條件。`,
+        rs>=1.5?"":rs>=1?"warn":"bad")}
+    function bindMigrateCards(){$("#mgADrift").oninput=drawMigrateA;$("#mgBNoise").oninput=drawMigrateB;$("#mgBThreshold").oninput=drawMigrateB;$("#mgCGap").oninput=drawMigrateC;
+      $$(".chip-link").forEach(b=>b.onclick=()=>{selectChapter(+b.dataset.goto,true);showMode(b.dataset.mode)});
+      drawMigrateA();drawMigrateB();drawMigrateC()}
+    renderObjMap();bindMigrateCards();renderCards();renderLesson();
   </script>
 </body>
 </html>
