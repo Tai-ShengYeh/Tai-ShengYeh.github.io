@@ -1649,6 +1649,16 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
   </div>
 </div>
 
+<div class="note good">
+  <span class="nt">想親手驗證這一節嗎？</span>
+  <p style="margin-bottom:0">
+    上面的 pH 模擬器是<strong>算出來的</strong>。
+    <a href="#s23"><strong>附錄第 23 節</strong></a>備有一份完整的實驗指引——
+    三支標準品、五種移動相、一個下午，可以印出來直接帶進實驗室，
+    用真實的儀器檢驗上面那三個預測是否成立。
+  </p>
+</div>
+
 <h3>延伸案例：真實的論文怎麼做同一件事</h3>
 
 <p>
@@ -2934,6 +2944,43 @@ c1 範圍 5.9113 - 8.5366
 </ol>
 </div>
 
+<h4>這門課在整條學習路徑上的位置</h4>
+
+<div class="card">
+<p style="margin-top:0">
+  本站另外兩門課處理的是<strong>同一件事的前後段</strong>。三門課用的是相似的樣品與同一間實驗室的儀器，
+  合起來就是一條完整的路：<strong>條件怎麼選 → 選好之後怎麼定量 → 訊號怎麼自動處理</strong>。
+</p>
+
+<div class="flow" style="margin:18px 0 8px">
+  <div class="fstep"><div class="fn2">1</div><div class="fc">
+    <div class="ft">本課程 · HPLC 分離最佳化<span class="chip b" style="margin-left:8px">你在這裡</span></div>
+    <div class="fd"><strong>問題：把峰分開。</strong>
+      滯留模型、解析度、恆溶劑與梯度、pH 控制，最後用電腦掃出最佳條件。
+      <span style="color:var(--ink3)">得到的產出是「一組可以用的分析條件」。</span></div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">2</div><div class="fc">
+    <div class="ft"><a href="https://tai-shengyeh.github.io/hplc-caffeine/">高效液相層析 · 咖啡因定量 →</a></div>
+    <div class="fd"><strong>問題：峰分開之後，怎麼算出濃度。</strong>
+      外標法完整流程：峰面積積分 → 檢量線 → 樣品濃度。
+      進階版還談基線校正（airPLS）、滯留時間對齊、殘差診斷與 LOD/LOQ。
+      <span style="color:var(--ink3)">正好接續本課程第 3 節那三張真實層析圖之後的下一步。</span></div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">3</div><div class="fc">
+    <div class="ft"><a href="https://tai-shengyeh.github.io/mocca2-course/">MOCCA2 · 從入門到進階 →</a></div>
+    <div class="fd"><strong>問題：訊號本身怎麼自動處理。</strong>
+      基線校正、自適應找峰、<strong>峰純度判斷、重疊峰去卷積</strong>、跨樣品化合物追蹤。
+      <span style="color:var(--ink3)">當你遇到本課程第 5 節那種「這個峰底下是不是藏了別的東西」的疑問時，
+      答案在那門課裡——它需要 PDA 的光譜維度才做得到。</span></div></div></div>
+</div>
+
+<p style="margin-bottom:0;font-size:14.5px;color:var(--ink2)">
+  另有 <a href="https://tai-shengyeh.github.io/chromatographr-course/">ChromatographyR</a>（R 版層析資料分析）與
+  <a href="https://tai-shengyeh.github.io/chromatography-data-analysis/">層析數據分析互動教學</a>
+  可作為平行參考。
+</p>
+</div>
+
 <h4>教材中的實測層析資料</h4>
 
 <div class="card">
@@ -3056,6 +3103,280 @@ c1 範圍 5.9113 - 8.5366
 <li>理解分析時間與解析度之間必須取捨，不存在「又快又完美分離」的萬能解</li>
 <li>知道遇到不同的化合物或分離情境時，該去哪裡查十個滯留模型該用哪一個</li>
 </ul>
+<hr>
+
+<h2 id="s23"><span class="num">23.</span>附錄：pH 實驗指引（可印出帶進實驗室）</h2>
+
+<p class="lede">
+  第 10 節的 pH 模擬器是<strong>算出來的</strong>。這份指引讓你用真實的儀器去驗證它——
+  三支標準品、五種移動相、一個下午。
+</p>
+
+<div class="note">
+  <span class="nt">你要驗證的三個預測</span>
+  <ol style="margin-bottom:0">
+    <li><strong>咖啡因的滯留時間不會隨 pH 改變</strong>（它在 pH 2–8 都是中性）</li>
+    <li><strong>苯甲酸與己二烯酸都會隨 pH 升高而提早出來</strong>（解離成陰離子，不再黏管柱）</li>
+    <li><strong>苯甲酸會比己二烯酸早一步開始提早</strong>（p<var>K</var><sub>a</sub> 4.20 &lt; 4.76），
+        因此三者的<strong>出峰順序有機會翻轉</strong></li>
+  </ol>
+</div>
+
+<div class="note warn">
+  <span class="nt">先說清楚：預測的是「趨勢」，不是具體數字</span>
+  <p style="margin-bottom:0">
+    第 10 節模擬器裡的交叉 pH（4.45、5.42）是用<strong>代表性參數</strong>算的。
+    你那根管柱、你的乙腈比例、你的緩衝液濃度都不一樣，
+    <strong>實際的交叉點一定會落在別的位置</strong>。
+    定性的三個預測很穩健；定量的數字要靠你自己量。
+    <strong>如果你量到的交叉 pH 和模擬器不同，那不是實驗失敗，那正是實驗的價值。</strong>
+  </p>
+</div>
+
+<h3>1. 器材與試劑</h3>
+
+<div class="tw">
+<table>
+<thead><tr><th>項目</th><th>規格</th><th>備註</th></tr></thead>
+<tbody>
+<tr><td>HPLC</td><td>幫浦 + UV 或 PDA 偵測器 + C18 管柱</td><td>矽膠基質 C18 的耐受範圍多為 <strong>pH 2–8</strong>，本實驗最高只到 7.0</td></tr>
+<tr><td>苯甲酸</td><td>分析級，MW 122.12</td><td>水中溶解度低（約 3.4 g/L），需先溶於甲醇</td></tr>
+<tr><td>己二烯酸</td><td>分析級，MW 112.13</td><td>水中溶解度更低（約 1.6 g/L）</td></tr>
+<tr><td>咖啡因</td><td>分析級，MW 194.19</td><td>水溶性佳；<strong>粉末具毒性，勿吸入</strong></td></tr>
+<tr><td>磷酸二氫鉀 KH₂PO₄</td><td>分析級</td><td>配緩衝液用</td></tr>
+<tr><td>磷酸 H₃PO₄ / 氫氧化鈉 NaOH</td><td>調 pH 用</td><td><strong>腐蝕性</strong>，戴手套護目鏡</td></tr>
+<tr><td>乙腈 ACN</td><td>HPLC 級</td><td><strong>有毒、易燃，於通風櫃操作</strong></td></tr>
+<tr><td>甲醇</td><td>HPLC 級</td><td>配標準品母液用</td></tr>
+<tr><td>pH 計</td><td>使用前以 pH 4.01 / 7.00 標準液校正</td><td><strong>沒校正的 pH 計會毀掉整個實驗</strong></td></tr>
+<tr><td>0.45 µm 濾膜</td><td>水系（緩衝液）／有機系（樣品）</td><td>緩衝液務必過濾並除氣</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>2. 標準品配製</h3>
+
+<div class="card">
+<h4 style="margin-top:0">母液（各 1000 mg/L，分開配）</h4>
+<p>
+  各稱取 <strong>25.0 mg</strong>，分別溶於<strong>甲醇</strong>後定容至 <strong>25 mL</strong> 量瓶。
+  三支分開配、分開保存（4 °C 避光，可放約一個月）。
+</p>
+<h4>混合工作標準品（各 50 mg/L，20 mL）</h4>
+<p style="margin-bottom:0">
+  各取母液 <strong>1.0 mL</strong>（三支共 3.0 mL）於 20 mL 量瓶，<strong>以純水定容至 20 mL</strong>。<br>
+  最終有機溶劑比例約 15%，低於移動相的乙腈比例，可避免溶劑效應造成的峰變形。
+</p>
+</div>
+
+<div class="note warn">
+  <span class="nt">咖啡因的濃度可能需要調高</span>
+  <p style="margin-bottom:0">
+    在 230 nm 下，苯甲酸吸收最強、己二烯酸中等，<strong>咖啡因相對弱</strong>（它的最大吸收在 273 nm 附近）。
+    如果第一針下去咖啡因的峰太小：
+    <strong>有 PDA 就同時監測 230 nm 與 273 nm</strong>；
+    只有單波長偵測器，就把咖啡因的濃度提高到 <strong>100–200 mg/L</strong>（另外配一支較濃的母液）。
+    <strong>濃度不影響滯留時間</strong>（第 3 節已用實測資料驗證過），所以三者濃度不同不會干擾本實驗的結論。
+  </p>
+</div>
+
+<h3>3. 移動相配方</h3>
+
+<p>
+  五種移動相，<strong>差別只有緩衝液的 pH</strong>，其餘完全相同——這是本實驗唯一該變的變數。
+</p>
+
+<div class="card">
+<h4 style="margin-top:0">緩衝液母液：25 mM KH₂PO₄</h4>
+<p>
+  稱取 <strong>3.40 g</strong> KH₂PO₄ 溶於純水，定容至 <strong>1000 mL</strong>。
+  分成五份，各以 H₃PO₄ 或 NaOH 調到下列 pH：
+</p>
+<div class="tw" style="margin:12px 0">
+<table>
+<thead><tr><th>編號</th><th>目標 pH</th><th>調整方向</th><th>為什麼選這個點</th></tr></thead>
+<tbody>
+<tr><td class="num-col">A</td><td class="num-col"><strong>3.0</strong></td><td>加 H₃PO₄</td><td>兩根酸完全質子化，對照組（多數文獻方法的條件）</td></tr>
+<tr><td class="num-col">B</td><td class="num-col"><strong>4.0</strong></td><td>加 H₃PO₄</td><td>苯甲酸開始解離（接近其 p<var>K</var><sub>a</sub> 4.20）</td></tr>
+<tr><td class="num-col">C</td><td class="num-col"><strong>4.5</strong></td><td>微調</td><td>兩根酸解離程度差最大，<strong>最可能看到順序變化</strong></td></tr>
+<tr><td class="num-col">D</td><td class="num-col"><strong>5.0</strong></td><td>加 NaOH</td><td>己二烯酸也開始明顯解離</td></tr>
+<tr><td class="num-col">E</td><td class="num-col"><strong>6.0</strong></td><td>加 NaOH</td><td>兩根酸皆大幅解離，預期都跑到咖啡因前面</td></tr>
+</tbody>
+</table>
+</div>
+<p style="margin-bottom:0">
+  <strong>移動相＝乙腈 : 緩衝液 ＝ 30 : 70（v/v）</strong>，過濾除氣後使用。<br>
+  <span style="font-size:14px;color:var(--ink2)">
+  若你原本的方法比例不同，請沿用原比例——重點是<strong>五次之間保持一致</strong>，不是用我建議的數字。</span>
+</p>
+</div>
+
+<div class="note bad">
+  <span class="nt">最容易做錯的一步：pH 要在「加乙腈之前」調</span>
+  <p>
+    <strong>先把緩衝液調到目標 pH，再拿去和乙腈混合。</strong>
+    絕對不要混合之後才調 pH。
+  </p>
+  <p style="margin-bottom:0">
+    原因是加入有機溶劑會改變溶液的酸鹼行為，混合後量到的數值和純水相的意義不同
+    （文獻上分別記作 pH<sup>w</sup><sub>w</sub> 與 pH<sup>s</sup><sub>w</sub>）。
+    國際慣例是<strong>報告水相在混合前的 pH</strong>。
+    兩種做法都能做出實驗，但混用就無法和任何文獻比較，也無法和你自己下一次的實驗比較。
+  </p>
+</div>
+
+<div class="note warn">
+  <span class="nt">磷酸鹽在 pH 4–5.5 的緩衝能力較弱</span>
+  <p style="margin-bottom:0">
+    磷酸的兩個 p<var>K</var><sub>a</sub> 是 2.15 與 7.20，所以<strong>本實驗最關鍵的 pH 4.5–5.0 區間，
+    磷酸鹽其實不是最佳緩衝劑</strong>。因應方式：
+    ① 每一批<strong>現配現用</strong>，不要放隔夜；
+    ② 調完之後<strong>把實際量到的 pH 記下來</strong>（例如你想調 4.50，實際是 4.47，就記 4.47）；
+    ③ 分析資料時<strong>用實際值，不要用目標值</strong>。
+    這不是瑕疵——真實的方法開發就是這樣處理的。
+  </p>
+</div>
+
+<h3>4. 儀器條件與操作順序</h3>
+
+<div class="tw">
+<table>
+<thead><tr><th>參數</th><th>設定</th></tr></thead>
+<tbody>
+<tr><td>管柱</td><td>C18，5 µm，4.6 × 150 mm（或你原本使用的管柱）</td></tr>
+<tr><td>流速</td><td>1.0 mL/min</td></tr>
+<tr><td>管柱溫度</td><td><strong>固定於 30 °C</strong>（溫度會影響滯留，必須控制）</td></tr>
+<tr><td>注射量</td><td>10 µL</td></tr>
+<tr><td>偵測</td><td>230 nm（有 PDA 則同時記錄 200–400 nm）</td></tr>
+<tr><td>分析時間</td><td>15 分鐘（pH 3.0 時滯留最長，預留餘裕）</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="flow">
+  <div class="fstep"><div class="fn2">1</div><div class="fc">
+    <div class="ft">量 t₀（每換一次移動相都要做）</div>
+    <div class="fd">注射 10 µL <strong>純水</strong>或 <strong>0.01% 尿嘧啶（uracil）</strong>，
+      記下第一個訊號擾動出現的時間。<strong>沒有 t₀ 就算不出 k，整個實驗就白做了</strong>（見第 4 節）。</div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">2</div><div class="fc">
+    <div class="ft">單標定位</div>
+    <div class="fd">三支標準品<strong>各單獨注射一次</strong>，確認誰是誰。
+      pH 改變後順序可能翻轉，<strong>不能靠「上次的順序」認峰</strong>——這正是本實驗的重點。</div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">3</div><div class="fc">
+    <div class="ft">混標分析</div>
+    <div class="fd">注射混合工作標準品，<strong>重複 2–3 針</strong>取平均。記錄每個峰的
+      滯留時間、峰高、峰面積與軟體報告的 R<sub>s</sub>。</div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">4</div><div class="fc">
+    <div class="ft">換下一個 pH</div>
+    <div class="fd">先以<strong>純水沖 20 分鐘</strong>洗掉鹽類，再以新移動相平衡
+      <strong>至少 10 管柱體積</strong>（約 20–30 分鐘）直到基線穩定。回到步驟 1。</div></div></div>
+</div>
+
+<div class="note bad">
+  <span class="nt">管柱保養：實驗結束一定要做</span>
+  <p style="margin-bottom:0">
+    <strong>絕對不要讓緩衝液留在管柱裡過夜</strong>——鹽類析出會堵塞管柱與幫浦。
+    結束時依序沖洗：<strong>純水 20 分鐘 → 甲醇或乙腈/水 50:50 共 20 分鐘</strong>，再保存。
+  </p>
+</div>
+
+<h3>5. 資料記錄表</h3>
+
+<div class="tw">
+<table>
+<thead><tr><th>實測 pH</th><th>t₀ (min)</th><th>咖啡因 t<sub>R</sub></th><th>苯甲酸 t<sub>R</sub></th><th>己二烯酸 t<sub>R</sub></th><th>出峰順序</th><th>最小 R<sub>s</sub></th></tr></thead>
+<tbody>
+<tr><td class="num-col">A ____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td>____</td><td class="num-col">____</td></tr>
+<tr><td class="num-col">B ____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td>____</td><td class="num-col">____</td></tr>
+<tr><td class="num-col">C ____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td>____</td><td class="num-col">____</td></tr>
+<tr><td class="num-col">D ____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td>____</td><td class="num-col">____</td></tr>
+<tr><td class="num-col">E ____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td class="num-col">____</td><td>____</td><td class="num-col">____</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>6. 預期結果與判讀</h3>
+
+<div class="tw">
+<table>
+<thead><tr><th>你會看到</th><th>代表什麼</th></tr></thead>
+<tbody>
+<tr><td><strong>咖啡因的 t<sub>R</sub> 五次幾乎相同</strong>（變化 &lt; 2%）</td>
+    <td style="color:var(--good)">✓ 預測 1 成立。它是中性分子，pH 動不了它。<br>
+        <span style="font-size:13px;color:var(--ink3)">也是很好的內部檢查：若咖啡因跑掉了，代表溫度、流速或管柱狀態有變，而不是 pH 的效應。</span></td></tr>
+<tr><td><strong>兩根酸的 t<sub>R</sub> 隨 pH 升高而變短</strong>，畫成圖是 S 形下降</td>
+    <td style="color:var(--good)">✓ 預測 2 成立。解離成陰離子後不再親油。</td></tr>
+<tr><td><strong>苯甲酸下降得比己二烯酸早</strong></td>
+    <td style="color:var(--good)">✓ 預測 3 成立。p<var>K</var><sub>a</sub> 較小者先解離。</td></tr>
+<tr><td><strong>某個 pH 下少了一個峰</strong></td>
+    <td style="color:var(--gold)">很可能是<strong>共沖提</strong>，不是樣品出問題（見第 10 節思考題二）。
+        用單標各打一針確認，或改用 PDA 檢查峰純度。</td></tr>
+<tr><td><strong>高 pH 下所有峰都擠在死時間附近</strong></td>
+    <td style="color:var(--bad)">兩根酸都完全解離了。此時 pH 已無法用來分離，
+        要改調乙腈比例（第 6–8 節）。</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>7. 資料分析：擬合模型 7</h3>
+
+<p>
+  把每個 pH 下的 <var>t</var><sub>R</sub> 換成 <var>k</var> = (<var>t</var><sub>R</sub> − <var>t</var><sub>0</sub>)/<var>t</var><sub>0</sub>，
+  再擬合第 10 節那條式子，就能得到每個化合物的 <var>k</var><sub>0</sub>、<var>k</var><sub>1</sub> 與 p<var>K</var>。
+</p>
+
+<pre><div class="plabel">R<span>模型 7 擬合（已實測驗證）</span></div><code><span class="kw">library</span>(tidyverse)
+
+<span class="cm"># 模型 7：k = (k0 + k1*10^(pH-pK)) / (1 + 10^(pH-pK))</span>
+<span class="fn">fit_model7</span> &lt;- <span class="kw">function</span>(pH, tR, t0) {
+  k &lt;- (tR - t0) / t0
+  m &lt;- <span class="fn">nls</span>(k ~ (k0 + k1 * <span class="nu">10</span>^(pH - pK)) / (<span class="nu">1</span> + <span class="nu">10</span>^(pH - pK)),
+           start = <span class="fn">list</span>(k0 = <span class="fn">max</span>(k), k1 = <span class="fn">min</span>(k), pK = <span class="fn">median</span>(pH)),
+           control = <span class="fn">nls.control</span>(maxiter = <span class="nu">200</span>, warnOnly = <span class="kw">TRUE</span>))
+  <span class="fn">tibble</span>(k0 = <span class="fn">coef</span>(m)[[<span class="st">"k0"</span>]], k1 = <span class="fn">coef</span>(m)[[<span class="st">"k1"</span>]],
+         pK = <span class="fn">coef</span>(m)[[<span class="st">"pK"</span>]], rss = <span class="fn">sum</span>(<span class="fn">residuals</span>(m)^<span class="nu">2</span>))
+}
+
+<span class="cm"># 換成你自己的數字</span>
+pH  &lt;- <span class="fn">c</span>(<span class="nu">3.02</span>, <span class="nu">4.03</span>, <span class="nu">4.47</span>, <span class="nu">5.01</span>, <span class="nu">5.98</span>)   <span class="cm"># 實測 pH，不是目標值</span>
+tR  &lt;- <span class="fn">c</span>(<span class="nu">5.37</span>, <span class="nu">5.10</span>, <span class="nu">4.42</span>, <span class="nu">3.55</span>, <span class="nu">2.71</span>)   <span class="cm"># 苯甲酸的滯留時間</span>
+<span class="fn">fit_model7</span>(pH, tR, t0 = <span class="nu">1.20</span>)</code></pre>
+
+<div class="note good">
+  <span class="nt">五個 pH 點就夠了嗎？夠。</span>
+  <p style="margin-bottom:0">
+    我們用已知參數造假資料（加上 ±0.02 分鐘的量測誤差）測試過這段程式：
+    <strong>用 7 個 pH 點，擬合回來的 p<var>K</var> 誤差是 0.02；只用 5 個點，誤差 0.03。</strong>
+    對一堂實驗課來說，五個點是合理且足夠的設計。<br>
+    擬合出來的 p<var>K</var> 可以和文獻值比對（苯甲酸 4.20、己二烯酸 4.76）。
+    <strong>但別期待完全相同</strong>——你量到的是<strong>在含 30% 乙腈的環境中</strong>的表觀值，
+    通常會比純水中的文獻值高 0.3–0.8。這個差距本身就是很好的討論題材。
+  </p>
+</div>
+
+<h3>8. 報告該回答的問題</h3>
+
+<ul class="check">
+  <li>三個預測分別成立嗎？用你的數據說明，不要只寫「符合預期」。</li>
+  <li>你量到的交叉 pH 是多少？和第 10 節模擬器的 4.45 / 5.42 差多少？<strong>為什麼會差</strong>？</li>
+  <li>擬合出的 p<var>K</var> 與文獻值差多少？這個差距是誤差還是有系統性的原因？</li>
+  <li>如果要你為這三個成分挑一個 pH 寫進 SOP，你選哪個？<strong>理由是什麼</strong>
+      （回顧第 10 節思考題三：耐用性 vs 速度）。</li>
+  <li>咖啡因在這個實驗裡扮演什麼角色？如果拿掉它，實驗的說服力會少掉什麼？</li>
+</ul>
+
+<div class="note">
+  <span class="nt">安全提醒</span>
+  <p style="margin-bottom:0">
+    乙腈與甲醇<strong>有毒且易燃</strong>，配製與廢液處理都在通風櫃內進行，全程戴手套與護目鏡。
+    磷酸與氫氧化鈉具<strong>腐蝕性</strong>，調 pH 時緩慢加入並持續攪拌。
+    咖啡因粉末<strong>具毒性</strong>，稱量時避免揚塵。
+    含乙腈的廢液屬<strong>有機溶劑廢液</strong>，不可倒入水槽。
+  </p>
+</div>
+
 </main>
 </div>
 <button id="toTop" aria-label="回到頂端">↑</button>
@@ -3998,7 +4319,7 @@ document.querySelectorAll(".quiz").forEach(function(q){
     {t:"入門　讀懂層析圖", ids:["s1","s2","s3","s4","s5"]},
     {t:"中階　調整與最佳化", ids:["s6","s7","s8","s9","s10"]},
     {t:"進階　R 實作", ids:["s11","s12","s13","s14","s15","s16","s17","s18"]},
-    {t:"附錄　查詢用", ids:["s19","s20","s21","s22"]}
+    {t:"附錄　查詢用", ids:["s19","s20","s21","s22","s23"]}
   ];
   var title = document.createElement("div");
   title.className = "navtitle"; title.textContent = "HPLC 分離最佳化";
