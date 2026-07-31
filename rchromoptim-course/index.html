@@ -477,7 +477,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
     就會<strong>大幅提早沖出來</strong>。咖啡因則幾乎不受影響（它在 pH 2 以上都是中性）。
     所以<strong>把 pH 調高，這兩根酸的峰會往左跑，順序真的可能翻轉</strong>——
     這正是文獻方法幾乎都刻意把 pH 壓在 4 以下的原因：不是習慣，是為了讓滯留穩定、順序可重現。
-    <span style="color:var(--ink3)">（想控制 pH 來分離可解離化合物？那就要用<a href="#s16">附錄</a>的模型 7、8、10，而不是模型 1。）</span>
+    <span style="color:var(--ink3)">（想控制 pH 來分離可解離化合物？那就要用<a href="#s18">附錄</a>的模型 7、8、10，而不是模型 1。）</span>
   </p>
 </div>
 
@@ -845,7 +845,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
 <p>
   這就是論文 Table 2 的<strong>模型 1</strong>，在 R 程式裡寫作 <code>model=1</code>。
   它是整個套件裡最簡單的一個，也是我們整份教材的主角。
-  （另外還有九個模型，處理 pH、雙溶劑等更複雜的情況——放在 <a href="#s16">附錄</a>，你現在不需要它們。）
+  （另外還有九個模型，處理 pH、雙溶劑等更複雜的情況——放在 <a href="#s18">附錄</a>，你現在不需要它們。）
 </p>
 
 <div class="note good">
@@ -1366,7 +1366,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
 <p>
   這就是論文 Table 2 的<strong>模型 7</strong>（<code>model=7</code>）。
   它和模型 1 的角色完全對稱：模型 1 描述 <var>φ</var> 怎麼影響 <var>k</var>，模型 7 描述 pH 怎麼影響 <var>k</var>。
-  <a href="#s16">附錄</a>裡的模型 8 和 10 則是把兩者合起來，同時處理 <var>φ</var> 和 pH。
+  <a href="#s18">附錄</a>裡的模型 8 和 10 則是把兩者合起來，同時處理 <var>φ</var> 和 pH。
 </p>
 
 <div class="sim" id="sim-ph">
@@ -1582,7 +1582,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
         如果某個參數的估計值剛好等於你設的 <code>upper</code>（預設 200），
         代表模型沒有真的收斂，只是<strong>被邊界擋住了</strong>。
         論文自己的範例資料就有這個現象——模型 4 的 <var>c</var><sub>2</sub> 對某些溶質卡在上限。
-        遇到這種情形的處理方式，請見<a href="#s18">附錄的常見問題排除</a>。
+        遇到這種情形的處理方式，請見<a href="#s20">附錄的常見問題排除</a>。
       </p>
     </div>
     <p style="margin-bottom:0">
@@ -1868,7 +1868,428 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
 <div class="opt" data-ok="0">程式會自動幫你叫用 fitshape 補齊參數</div>
 <div class="expl">RChromOptim 在偵測到參數檔不足 6 列（沒有峰形列）時，<strong>不會報錯</strong>，而是靜靜地代入一組預設峰形值，畫出來的峰會又高又窄、幾乎變成一條條垂直線，跟真實峰形完全不像。更容易被忽略的是：這時候最佳化用來判斷「分得開不開」的標準，會從真正考慮峰寬的解析度 Rs，<strong>悄悄換成只算滯留時間差的 dt</strong>。所以每次看最佳化輸出，都要養成習慣確認結果欄位寫的是 <span class="kbd">Rs</span> 還是 <span class="kbd">dt</span>——如果是 dt，代表你的峰形參數八成沒補齊。</div>
 </div>
-<h2 id="s16"><span class="num">16.</span>十個滯留模型完整對照表</h2>
+<hr>
+
+<h2 id="s16"><span class="num">16.</span>現代 R 版：tidyverse + ggplot2<span class="chip a">進階</span></h2>
+
+<p class="lede">
+  論文的套件寫於 2019 年，是 base R 風格的互動式程式。
+  R 語言在這幾年變化很大——本節用 <strong>R 4.6.1 + tidyverse 2.0 + ggplot2 4.0</strong> 把同一套方法重寫一次，
+  並附上<strong>可直接下載執行的完整腳本</strong>。
+</p>
+
+<div class="note warn">
+  <span class="nt">先說清楚：為什麼要重寫，而不是說原作者做得不好</span>
+  <p style="margin-bottom:0">
+    原始 <code>RChromOptim</code> 的設計目標是「讓不寫程式的層析工作者也能用滑鼠操作」，
+    在 2019 年那是合理且體貼的選擇。但同樣的設計換到今天的教學與研究情境，會有幾個實際的痛點：
+    <strong>不能自動化、不能跨平台、不能重現</strong>。
+    重寫的目的不是取代它，而是讓你在<strong>理解演算法之後</strong>，能把它放進自己可重複執行的工作流。
+  </p>
+</div>
+
+<h3>改了哪些地方</h3>
+
+<div class="tw">
+<table>
+<thead><tr><th>面向</th><th>原始 RChromOptim（2019, base R）</th><th>現代版（R 4.6.1）</th></tr></thead>
+<tbody>
+<tr><td><strong>指定檔案</strong></td>
+    <td><code>choose.files()</code> 跳視窗用滑鼠點</td>
+    <td>路徑當參數傳入，可迴圈批次處理</td></tr>
+<tr><td><strong>作業系統</strong></td>
+    <td>僅 Windows（<code>choose.files()</code>、<code>windows()</code> 是 Windows 專屬）</td>
+    <td>Windows / macOS / Linux 皆可</td></tr>
+<tr><td><strong>資料結構</strong></td>
+    <td>矩陣與 <code>for</code> 迴圈，欄位靠位置索引</td>
+    <td><code>tibble</code> 長格式，欄位有名字</td></tr>
+<tr><td><strong>逐溶質擬合</strong></td>
+    <td>手寫迴圈，每個函式內重複定義輔助函式</td>
+    <td><code>nest()</code> + <code>map()</code> + <code>broom</code>，一次寫好</td></tr>
+<tr><td><strong>繪圖</strong></td>
+    <td>base graphics，直接畫在螢幕上</td>
+    <td>ggplot2，回傳物件可再組合、可存檔</td></tr>
+<tr><td><strong>語法</strong></td>
+    <td>R 3.x 風格</td>
+    <td>R 4.1+ 原生管線 <code>|&gt;</code>、匿名函式 <code>\(x)</code></td></tr>
+<tr><td><strong>可重現性</strong></td>
+    <td>依賴人在正確時機點對位置</td>
+    <td>純函式、無副作用，可寫進報告或自動測試</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>核心：用 nest + map 一次擬合所有溶質</h3>
+
+<p>
+  這是整份改寫最能展現差別的地方。原程式要用迴圈跑過每個溶質、把結果塞進矩陣；
+  tidyverse 的作法是<strong>把每個溶質的資料收進一格裡（nest），再對每一格套用同一個函式（map）</strong>。
+</p>
+
+<pre><div class="plabel">R<span>逐溶質擬合模型 1：ln k = c0 − c1·f</span></div><code><span class="fn">fit_model1</span> &lt;- <span class="kw">function</span>(data, t0 = T0) {
+  data |&gt;
+    <span class="fn">mutate</span>(lnk = <span class="fn">log</span>((tR - t0) / t0)) |&gt;      <span class="cm"># 先換成 ln k</span>
+    <span class="fn">nest</span>(.by = solute) |&gt;                        <span class="cm"># 每個溶質收成一列</span>
+    <span class="fn">mutate</span>(
+      fit    = <span class="fn">map</span>(data, \(d) <span class="fn">lm</span>(lnk ~ f, data = d)),   <span class="cm"># 每列各跑一次迴歸</span>
+      tidy   = <span class="fn">map</span>(fit, broom::tidy),
+      glance = <span class="fn">map</span>(fit, broom::glance)
+    ) |&gt;
+    <span class="fn">mutate</span>(
+      c0 = <span class="fn">map_dbl</span>(tidy, \(x) x$estimate[x$term == <span class="st">"(Intercept)"</span>]),
+      c1 = <span class="fn">map_dbl</span>(tidy, \(x) -x$estimate[x$term == <span class="st">"f"</span>]),  <span class="cm"># 斜率取負才是 c1</span>
+      r_squared = <span class="fn">map_dbl</span>(glance, <span class="st">"r.squared"</span>),
+      .keep = <span class="st">"unused"</span>
+    )
+}</code></pre>
+
+<div class="note">
+  <span class="nt">三個現代 R 語法，順便學起來</span>
+  <ul style="margin-bottom:0">
+    <li><code>|&gt;</code> 是 <strong>R 4.1 內建的管線</strong>，把左邊的結果餵給右邊的函式當第一個參數。
+        不需要載入 magrittr 的 <code>%&gt;%</code>。</li>
+    <li><code>\(d) ...</code> 是 <strong>R 4.1 的匿名函式簡寫</strong>，等同 <code>function(d) ...</code>。</li>
+    <li><code>nest(.by = solute)</code> 用的是 <strong>dplyr 1.1+ 的 <code>.by</code> 參數</strong>，
+        不必再寫 <code>group_by()</code> 然後記得 <code>ungroup()</code>。</li>
+  </ul>
+</div>
+
+<h3>解析度與最佳化：把迴圈換成資料表</h3>
+
+<p>
+  <code>lead()</code> 讓「相鄰兩峰相減」變成一行；掃描最佳化則是<strong>先把每個 <var>φ</var> 的完整結果算出來收進表格</strong>，
+  再從表格裡挑出符合時間預算、<var>R</var><sub>s</sub> 最大的那一列。
+</p>
+
+<pre><div class="plabel">R<span>相鄰峰解析度 + 掃描最佳化（對應 iopt）</span></div><code><span class="cm"># Rs = 2(tR2 - tR1) / (w1 + w2)，只算相鄰對</span>
+<span class="fn">resolution_table</span> &lt;- <span class="kw">function</span>(peaks) {
+  peaks |&gt;
+    <span class="fn">arrange</span>(tR) |&gt;
+    <span class="fn">mutate</span>(pair = <span class="fn">paste</span>(solute, <span class="fn">lead</span>(solute), sep = <span class="st">"/"</span>),
+           Rs   = <span class="nu">2</span> * (<span class="fn">lead</span>(tR) - tR) / (w + <span class="fn">lead</span>(w))) |&gt;
+    <span class="fn">filter</span>(!<span class="fn">is.na</span>(Rs)) |&gt;
+    <span class="fn">select</span>(pair, Rs)
+}
+
+<span class="fn">optimise_isocratic</span> &lt;- <span class="kw">function</span>(params, f_range = <span class="fn">c</span>(<span class="nu">0.30</span>, <span class="nu">0.60</span>), df = <span class="nu">0.005</span>,
+                               t_max = <span class="nu">20</span>, t0 = T0) {
+  scan &lt;- <span class="fn">tibble</span>(f = <span class="fn">seq</span>(f_range[<span class="nu">1</span>], f_range[<span class="nu">2</span>], by = df)) |&gt;
+    <span class="fn">mutate</span>(
+      peaks  = <span class="fn">map</span>(f, \(x) <span class="fn">predict_isocratic</span>(params, x, t0)),
+      worst  = <span class="fn">map</span>(peaks, min_resolution),
+      Rs     = <span class="fn">map_dbl</span>(worst, <span class="st">"Rs"</span>),
+      tR_max = <span class="fn">map_dbl</span>(peaks, \(p) <span class="fn">max</span>(p$tR)),
+      feasible = tR_max &lt;= t_max          <span class="cm"># 時間預算</span>
+    )
+  best &lt;- scan |&gt; <span class="fn">filter</span>(feasible) |&gt; <span class="fn">slice_max</span>(Rs, n = <span class="nu">1</span>)
+  <span class="fn">list</span>(scan = scan, best = best)
+}</code></pre>
+
+<h3>梯度：數值解基本梯度方程式</h3>
+
+<p>
+  第 9 節那條積分式 ∫d<var>t</var>/(<var>t</var><sub>0</sub><var>k</var>(<var>t</var>)) = 1，
+  在這裡用<strong>累積和</strong>解決——把時間切成小格，每格前進一點點，累積到 1 就出管柱。
+  完全向量化，沒有迴圈。
+</p>
+
+<pre><div class="plabel">R<span>梯度沖提的滯留時間</span></div><code><span class="fn">predict_gradient_one</span> &lt;- <span class="kw">function</span>(c0, c1, f_start, f_end, tG, tD, t0 = T0, dt = <span class="nu">0.002</span>) {
+  tt  &lt;- <span class="fn">seq</span>(<span class="nu">0</span>, <span class="nu">400</span>, by = dt)
+  phi &lt;- <span class="fn">case_when</span>(                            <span class="cm"># 管柱入口看到的組成（含延遲 tD）</span>
+    tt &lt;= tD              ~ f_start,
+    (tt - tD) / tG &gt;= <span class="nu">1</span>   ~ f_end,
+    .default              = f_start + (f_end - f_start) * (tt - tD) / tG
+  )
+  k    &lt;- <span class="fn">exp</span>(c0 - c1 * phi)
+  prog &lt;- <span class="fn">cumsum</span>(dt / (t0 * k))                 <span class="cm"># 已走完的管柱比例</span>
+  i    &lt;- <span class="fn">which</span>(prog &gt;= <span class="nu">1</span>)[<span class="nu">1</span>]
+  before &lt;- <span class="kw">if</span> (i &gt; <span class="nu">1</span>) prog[i - <span class="nu">1</span>] <span class="kw">else</span> <span class="nu">0</span>
+  te   &lt;- tt[i] + dt * (<span class="nu">1</span> - before) / (prog[i] - before)   <span class="cm"># 格內線性內插</span>
+  <span class="fn">tibble</span>(tR = te + t0, k_elute = k[i])
+}</code></pre>
+
+<div class="note good">
+  <span class="nt">一個一定要寫的自我檢查</span>
+  <p>
+    數值解很容易寫錯一格（off-by-one），而且錯了通常<strong>不會報錯，只會安靜地偏差</strong>。
+    有一個檢查可以立刻抓到：<strong>當起始組成等於結束組成時，梯度其實就是恆溶劑</strong>，
+    數值解必須退化成解析解 <var>t</var><sub>R</sub> = <var>t</var><sub>0</sub>(1+<var>k</var>)。
+  </p>
+  <pre style="margin-bottom:0"><div class="plabel">R<span>退化檢查</span></div><code>iso   &lt;- <span class="fn">predict_isocratic</span>(params, <span class="nu">0.45</span>)
+degen &lt;- <span class="fn">predict_gradient</span>(params, <span class="nu">0.45</span>, <span class="nu">0.45</span>, tG = <span class="nu">15</span>)
+<span class="fn">stopifnot</span>(<span class="fn">all</span>(<span class="fn">abs</span>(<span class="fn">sort</span>(iso$tR) - <span class="fn">sort</span>(degen$tR)) &lt; <span class="nu">1e-4</span>))</code></pre>
+  <p style="margin-bottom:0;margin-top:12px">
+    這不是形式主義——<strong>本教材的 R 版第一次寫出來就是錯的</strong>：內插時多減了一格 <code>dt</code>，
+    所有梯度滯留時間都偏移了 0.002 分鐘。畫出來的圖完全正常、程式也沒報錯，
+    就是上面這行 <code>stopifnot()</code> 把它抓出來的。
+  </p>
+</div>
+
+<h3>執行結果</h3>
+
+<pre><div class="plabel">終端機<span>Rscript rchromoptim_modern.R</span></div><code>== 模型 1 擬合結果 ==
+  solute    c0    c1 r_squared  sigma   p_c1     n
+1 A1      3.14  6.64     0.998 0.0333 0.0011     4
+2 A2      3.46  6.60     0.998 0.0298 0.0009     4
+3 A3      3.67  5.91     0.999 0.0201 0.0005     4
+  ...
+9 A9      5.60  7.77     0.997 0.0433 0.0014     4
+
+c0 範圍 3.1404 - 5.6030
+c1 範圍 5.9113 - 8.5366
+論文 i-optim 工作表公布值：c0 3.1404-5.6030，c1 5.9113-8.5366   <span class="cm">&lt;- 完全一致</span>
+
+== 最佳化 (t_max = 20) ==
+ f = 0.410  Rs = 2.453  tR_max = 17.13  最難分 = A4/A5
+ t_max = 15 -&gt; f = 0.430  Rs = 2.027
+ t_max = 10 -&gt; f = 0.490  Rs = 0.914
+
+== 梯度 (0.35-&gt;0.70, tG=11, tD=0.7) ==
+ Rs = 1.633 (A4/A5)  tR_max = 9.99
+ 檢查通過：f_start == f_end 時梯度解退化為恆溶劑解（誤差 &lt; 1e-4 min）</code></pre>
+
+<div class="note warn">
+  <span class="nt">為什麼這裡是 2.453，網頁模擬器卻是 2.455？</span>
+  <p style="margin-bottom:0">
+    因為<strong>參數取到幾位小數不一樣</strong>。網頁模擬器用的是論文公布的四位小數值（<var>c</var><sub>1</sub> = 6.6413），
+    R 腳本用的是 <code>lm()</code> 算出來的全精度值（6.64126514…）。同一組擬合、同一條公式，
+    只是四捨五入的位置不同：全精度 <var>R</var><sub>s</sub> = 2.4535，四位小數 <var>R</var><sub>s</sub> = 2.4554。
+    <strong>差異在小數第三位，不影響任何結論</strong>——但知道差異從哪裡來，比假裝它不存在重要。
+    腳本裡有一段就是專門印出這個對照。
+  </p>
+</div>
+
+<h3>ggplot2 的輸出</h3>
+
+<p>
+  三張圖用 <code>patchwork</code> 的 <code>/</code> 與 <code>|</code> 運算子拼起來，一行程式碼：
+</p>
+
+<pre><div class="plabel">R<span>組圖並存檔</span></div><code>p &lt;- (<span class="fn">plot_model1</span>(data, params) | <span class="fn">plot_optimisation</span>(opt)) /
+      <span class="fn">plot_chromatogram</span>(best_peaks, <span class="st">"最佳條件 f = 0.410"</span>)
+
+<span class="fn">ggsave</span>(<span class="st">"demo.png"</span>, p, width = <span class="nu">12</span>, height = <span class="nu">8</span>, dpi = <span class="nu">130</span>)</code></pre>
+
+<figure style="margin:24px 0">
+  <img src="rchromoptim_modern_demo.png" alt="現代 R 版輸出：模型 1 擬合圖、掃描最佳化圖、最佳條件層析圖"
+       style="width:100%;height:auto;border:1px solid var(--line);border-radius:var(--radius);background:#fff">
+  <figcaption style="font-size:13px;color:var(--ink3);margin-top:8px;line-height:1.7">
+    腳本實際跑出來的輸出。左上：九條 ln <var>k</var>–<var>φ</var> 直線與實測點。
+    右上：掃描最佳化，<strong>φ ≈ 0.355 的共沖提塌陷清楚可見</strong>，綠點為最佳解。
+    下：最佳條件下的模擬層析圖，九個峰全部基線分離。
+  </figcaption>
+</figure>
+
+<div class="note good">
+  <span class="nt">下載完整腳本</span>
+  <p style="margin-bottom:0">
+    <a href="rchromoptim_modern.R" download><strong>rchromoptim_modern.R</strong></a>
+    ——完整可執行，含所有函式、註解與示範流程。
+    需要 <code>tidyverse</code> 與 <code>patchwork</code>：<br>
+    <code>install.packages(c("tidyverse", "patchwork"))</code>，然後 <code>Rscript rchromoptim_modern.R</code>。<br>
+    範例資料已內嵌在腳本裡，<strong>不需要另外準備檔案就能跑</strong>；
+    要換成自己的資料時，把路徑傳給 <code>read_retention("你的檔案.txt")</code> 即可。
+  </p>
+</div>
+
+<hr>
+
+<h2 id="s17"><span class="num">17.</span>Python 版：pandas + numpy + scipy<span class="chip a">進階</span></h2>
+
+<p class="lede">
+  同一套方法，用 Python 再寫一次。這不只是「換個語言」——
+  <strong>兩個獨立實作跑出同一組數字，本身就是最強的正確性證據</strong>。
+</p>
+
+<div class="note">
+  <span class="nt">為什麼要有 Python 版</span>
+  <ul style="margin-bottom:0">
+    <li>很多食品科學的課程與實驗室<strong>是用 Python 教資料分析</strong>的，尤其是需要接機器學習或影像的場合。</li>
+    <li>儀器廠商的 API、實驗室資訊系統（LIMS）串接，大多提供 Python SDK。</li>
+    <li>最重要的：<strong>你可以拿它來檢查 R 版有沒有算錯</strong>。下面會看到這件事實際發揮作用。</li>
+  </ul>
+</div>
+
+<h3>同一件事，兩種語言怎麼寫</h3>
+
+<p>
+  把兩份腳本並排看，是很有效的學習方式——你會發現<strong>思路完全一樣，只是詞彙不同</strong>。
+</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>要做的事</th><th>R（tidyverse）</th><th>Python（pandas / numpy）</th></tr></thead>
+<tbody>
+<tr><td>讀 tab 分隔檔</td><td><code>readr::read_tsv(path)</code></td><td><code>pd.read_csv(path, sep="\t")</code></td></tr>
+<tr><td>寬轉長</td><td><code>pivot_longer()</code></td><td><code>DataFrame.melt()</code></td></tr>
+<tr><td>逐溶質分組</td><td><code>nest(.by = solute)</code></td><td><code>groupby("solute")</code></td></tr>
+<tr><td>線性迴歸</td><td><code>lm(lnk ~ f)</code></td><td><code>scipy.stats.linregress(f, lnk)</code></td></tr>
+<tr><td>取相鄰列</td><td><code>lead(tR)</code></td><td><code>Series.shift(-1)</code></td></tr>
+<tr><td>累積和</td><td><code>cumsum()</code></td><td><code>np.cumsum()</code></td></tr>
+<tr><td>找第一個超過門檻的位置</td><td><code>which(prog &gt;= 1)[1]</code></td><td><code>np.searchsorted(prog, 1.0)</code></td></tr>
+<tr><td>挑最大值那一列</td><td><code>slice_max(Rs, n = 1)</code></td><td><code>df.loc[df.Rs.idxmax()]</code></td></tr>
+<tr><td>繪圖</td><td><code>ggplot2</code></td><td><code>matplotlib</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>擬合：groupby 取代 nest</h3>
+
+<pre><div class="plabel">Python<span>逐溶質擬合模型 1</span></div><code><span class="kw">def</span> <span class="fn">fit_model1</span>(data: pd.DataFrame, t0: <span class="kw">float</span> = T0) -&gt; pd.DataFrame:
+    <span class="st">"""以模型 1 擬合滯留資料：ln k = c0 - c1 * f。"""</span>
+    <span class="kw">if</span> <span class="kw">not</span> (data[<span class="st">"tR"</span>] &gt; t0).<span class="fn">all</span>():
+        <span class="kw">raise</span> <span class="fn">ValueError</span>(<span class="st">"所有 tR 必須大於 t0，否則 ln k 無定義"</span>)
+
+    rows = []
+    <span class="kw">for</span> solute, grp <span class="kw">in</span> data.<span class="fn">groupby</span>(<span class="st">"solute"</span>, sort=<span class="kw">False</span>, observed=<span class="kw">True</span>):
+        f   = grp[<span class="st">"f"</span>].<span class="fn">to_numpy</span>(dtype=<span class="kw">float</span>)
+        lnk = np.<span class="fn">log</span>((grp[<span class="st">"tR"</span>].<span class="fn">to_numpy</span>(dtype=<span class="kw">float</span>) - t0) / t0)
+        res = stats.<span class="fn">linregress</span>(f, lnk)
+        rows.<span class="fn">append</span>(<span class="fn">dict</span>(
+            solute=solute,
+            c0=res.intercept,
+            c1=-res.slope,          <span class="cm"># 斜率取負才是 c1</span>
+            r_squared=res.rvalue**<span class="nu">2</span>,
+            p_c1=res.pvalue,
+        ))
+    <span class="kw">return</span> pd.<span class="fn">DataFrame</span>(rows)</code></pre>
+
+<div class="note">
+  <span class="nt">兩種風格的差別在哪</span>
+  <p style="margin-bottom:0">
+    R 的 <code>nest + map</code> 是<strong>函數式</strong>寫法：資料留在表格裡，你把函式套上去。<br>
+    Python 這裡用的是<strong>迴圈累積</strong>：把每組結果做成 dict，最後一次組成 DataFrame。<br>
+    後者在 Python 圈是很常見且清楚的寫法。兩種都對——<strong>可讀性比「哪種比較潮」重要</strong>。
+  </p>
+</div>
+
+<h3>梯度：用 searchsorted 找沖提點</h3>
+
+<p>
+  Python 版用 <code>np.searchsorted()</code> 在累積陣列裡二分搜尋，比逐格比對更快也更乾淨：
+</p>
+
+<pre><div class="plabel">Python<span>數值解基本梯度方程式</span></div><code>tt  = np.<span class="fn">arange</span>(<span class="nu">0</span>, t_limit + dt, dt)
+phi = np.<span class="fn">where</span>(                                <span class="cm"># 管柱入口看到的組成（含延遲 tD）</span>
+    tt &lt;= tD,
+    f_start,
+    np.<span class="fn">where</span>((tt - tD) / tG &gt;= <span class="nu">1</span>,
+             f_end,
+             f_start + (f_end - f_start) * (tt - tD) / tG),
+)
+k    = np.<span class="fn">exp</span>(c0 - c1 * phi)
+prog = np.<span class="fn">cumsum</span>(dt / (t0 * k))               <span class="cm"># 已走完的管柱比例</span>
+
+idx    = np.<span class="fn">searchsorted</span>(prog, <span class="nu">1.0</span>)            <span class="cm"># 第一個 >= 1 的位置</span>
+before = prog[idx - <span class="nu">1</span>] <span class="kw">if</span> idx &gt; <span class="nu">0</span> <span class="kw">else</span> <span class="nu">0.0</span>
+te     = tt[idx] + dt * (<span class="nu">1</span> - before) / (prog[idx] - before)
+<span class="kw">return</span> te + t0, k[idx]</code></pre>
+
+<h3>執行結果：和 R 版一模一樣</h3>
+
+<pre><div class="plabel">終端機<span>python rchromoptim_modern.py</span></div><code>== 模型 1 擬合結果 ==
+solute     c0     c1  r_squared  sigma   p_c1  n
+    A1 3.1404 6.6413     0.9977 0.0333 0.0011  4
+    A2 3.4649 6.6043     0.9981 0.0298 0.0009  4
+    ...
+    A9 5.6030 7.7662     0.9972 0.0433 0.0014  4
+
+c0 範圍 3.1404 - 5.6030
+c1 範圍 5.9113 - 8.5366
+論文 i-optim 工作表公布值：c0 3.1404-5.6030，c1 5.9113-8.5366
+
+== 最佳化 (t_max = 20) ==
+ f = 0.410  Rs = 2.4535  tR_max = 17.13  最難分 = A4/A5
+ t_max = 15 -&gt; f = 0.430  Rs = 2.027
+ t_max = 10 -&gt; f = 0.490  Rs = 0.914
+
+== f = 0.350 的共沖提檢查 ==
+ 最小 Rs = 0.2343（A7/A6）           <span class="cm">&lt;- 第 8 節那個陷阱</span>
+
+== 梯度 (0.35-&gt;0.70, tG=11, tD=0.7) ==
+ Rs = 1.6330 (A4/A5)  tR_max = 9.99
+
+檢查通過：f_start == f_end 時梯度解退化為恆溶劑解
+         （最大誤差 8.67e-13 min &lt; 1e-4）</code></pre>
+
+<figure style="margin:24px 0">
+  <img src="rchromoptim_modern_demo_py.png" alt="Python 版輸出：模型 1 擬合圖、掃描最佳化圖、最佳條件層析圖"
+       style="width:100%;height:auto;border:1px solid var(--line);border-radius:var(--radius);background:#fff">
+  <figcaption style="font-size:13px;color:var(--ink3);margin-top:8px;line-height:1.7">
+    Python 版（matplotlib）的輸出。與第 16 節的 ggplot2 圖<strong>版面風格不同，但曲線與數值完全相同</strong>。
+  </figcaption>
+</figure>
+
+<div class="note good">
+  <span class="nt">這才是重點：交叉驗證（cross-validation）</span>
+  <p>
+    兩份腳本是<strong>不同語言、不同的線性迴歸函式（<code>lm</code> vs <code>scipy.stats.linregress</code>）、
+    不同的搜尋方式（<code>which</code> vs <code>searchsorted</code>）</strong>寫的，卻得到：
+  </p>
+  <div class="tw" style="margin:12px 0">
+  <table>
+  <thead><tr><th>檢查項目</th><th>R 版</th><th>Python 版</th></tr></thead>
+  <tbody>
+  <tr><td>c0 範圍</td><td class="num-col">3.1404 – 5.6030</td><td class="num-col">3.1404 – 5.6030</td></tr>
+  <tr><td>c1 範圍</td><td class="num-col">5.9113 – 8.5366</td><td class="num-col">5.9113 – 8.5366</td></tr>
+  <tr><td>最佳 f（t<sub>max</sub>=20）</td><td class="num-col">0.410</td><td class="num-col">0.410</td></tr>
+  <tr><td>最佳 R<sub>s</sub></td><td class="num-col">2.4535</td><td class="num-col">2.4535</td></tr>
+  <tr><td>t<sub>Rmax</sub></td><td class="num-col">17.13</td><td class="num-col">17.13</td></tr>
+  <tr><td>梯度 R<sub>s</sub>／t<sub>Rmax</sub></td><td class="num-col">1.633 / 9.99</td><td class="num-col">1.633 / 9.99</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p style="margin-bottom:0">
+    而且<strong>兩者都獨立重現了論文公布的 c0／c1 範圍</strong>。
+    三個來源（論文、R、Python）互相吻合，你可以相當有把握地說：這個計算是對的。
+  </p>
+</div>
+
+<div class="note bad">
+  <span class="nt">交叉驗證不是形式主義：它在這份教材裡真的抓到過錯</span>
+  <p style="margin-bottom:0">
+    第 16 節提過，R 版的梯度數值解一開始寫錯了一格，所有梯度滯留時間偏移 0.002 分鐘。
+    當時發現的方式是「退化檢查」；而後來 Python 版寫好，
+    它的退化誤差是 <strong>8.67 × 10⁻¹³ 分鐘</strong>（等於機器精度），
+    R 版修正後也降到同一個量級——<strong>兩邊對上了，才確定真的修好了</strong>。
+    如果只有一個實作，你永遠只能說「看起來沒問題」。
+  </p>
+</div>
+
+<div class="quiz" data-quiz="q9">
+  <div class="qh">思考題</div>
+  <div class="qq">
+    你寫了一個分析程式，跑出來的圖很漂亮、也沒有出現任何錯誤訊息。
+    以下哪一項<strong>最能</strong>提高你對結果正確性的信心？
+  </div>
+  <button class="opt" data-ok="0">再跑一次，確認結果一樣</button>
+  <button class="opt" data-ok="0">把程式碼從頭到尾再讀一遍</button>
+  <button class="opt" data-ok="1">找一個「答案已知」的特例餵進去，檢查程式有沒有給出那個已知答案</button>
+  <button class="opt" data-ok="0">把變數名稱取得更清楚、加上更多註解</button>
+  <div class="expl">
+    <strong>正確答案是「用已知答案的特例去測」。</strong><br>
+    再跑一次只會重現同樣的錯誤（程式是決定性的）；重讀程式碼會受你自己的思考盲點影響——
+    你當初就是那樣想才寫錯的；註解和命名改善可讀性，但不會改變計算結果。<br>
+    本教材用了兩個這樣的特例：<strong>①</strong> 起訖組成相同時，梯度必須退化成恆溶劑解析解；
+    <strong>②</strong> 擬合出的 c0／c1 必須重現論文已公布的數值範圍。
+    第一個抓出了真正的錯誤，第二個確認了整條資料流沒接錯。<br>
+    <span style="color:var(--ink3)">這個觀念在分析化學裡其實你已經很熟悉了——它就是<strong>「跑標準品」</strong>：
+    用已知濃度的樣品確認儀器讀數正確，再去測未知樣品。寫程式是同一回事。</span>
+  </div>
+</div>
+
+<div class="note good">
+  <span class="nt">下載完整腳本</span>
+  <p style="margin-bottom:0">
+    <a href="rchromoptim_modern.py" download><strong>rchromoptim_modern.py</strong></a>
+    ——完整可執行，函式名稱與第 16 節的 R 版一一對應，方便兩邊對照閱讀。<br>
+    需要：<code>pip install numpy pandas scipy matplotlib</code>，然後 <code>python rchromoptim_modern.py</code>。<br>
+    範例資料同樣已內嵌，<strong>不需要另外準備檔案</strong>；要用自己的資料就傳路徑給
+    <code>read_retention("你的檔案.txt")</code>。
+  </p>
+</div>
+
+<h2 id="s18"><span class="num">18.</span>十個滯留模型完整對照表</h2>
 <p class="lede">大部分食品分析的工作，其實只會用到模型 1 或模型 3。只有當你遇到「可解離的化合物」（例如有機酸、胺類——像乙酸、檸檬酸、生物胺）、或是需要控制 pH 值來調整分離效果時，才需要翻到這張完整清單。</p>
 
 <details>
@@ -1960,7 +2381,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
 </div>
 </details>
 
-<h2 id="s17"><span class="num">17.</span>函數速查表</h2>
+<h2 id="s19"><span class="num">19.</span>函數速查表</h2>
 <p class="lede">RChromOptim 套件一共有 10 個函數，命名有規律可循，看懂前綴和字根就能猜出功能。</p>
 
 <div class="tw">
@@ -1988,7 +2409,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
 前綴：<code>i</code> = isocratic 恆溶劑、<code>g</code> = gradient 梯度、<code>mg</code> = 雙線性梯度（bi-linear gradient）。字根：<code>fitk</code> = 擬合滯留（fit retention）、<code>fitshape</code> = 擬合峰形（fit peak shape）、<code>pred</code> = 預測（predict）、<code>opt</code> = 最佳化（optimize）。看到函數名稱，把前綴和字根拆開讀，就知道它在做什麼。
 </div>
 
-<h2 id="s18"><span class="num">18.</span>常見問題排除</h2>
+<h2 id="s20"><span class="num">20.</span>常見問題排除</h2>
 <p class="lede">這些是使用 RChromOptim 時真實會遇到的狀況，坦白列出來，照著檢查通常就能解決。</p>
 
 <details>
@@ -2057,7 +2478,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
 </div>
 </details>
 
-<h2 id="s19"><span class="num">19.</span>中英名詞對照與延伸閱讀</h2>
+<h2 id="s21"><span class="num">21.</span>中英名詞對照與延伸閱讀</h2>
 <p class="lede">整理課程中出現過的關鍵術語中英對照，以及原始論文的補充資源。</p>
 
 <div class="tw">
@@ -2154,6 +2575,62 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
         一邊用本教材的建模＋掃描法，比較兩者<strong>找到的最佳條件是否一致、各花了幾次實驗</strong>。
         這正好回答第 10 節那個「兩種策略」的問題。</li>
   </ul>
+</div>
+
+<h4>本教材使用的軟體與版本</h4>
+
+<div class="card">
+<p style="margin-top:0">
+  第 16、17 節的兩份腳本是在下列環境撰寫並實際執行驗證的。做研究或寫報告時，
+  <strong>軟體版本應該和文獻一樣被記錄下來</strong>——這是可重現性的一部分。
+</p>
+<div class="tw" style="margin:0">
+<table>
+<thead><tr><th>語言</th><th>版本</th><th>主要套件</th></tr></thead>
+<tbody>
+<tr><td><strong>R</strong></td><td class="num-col">4.6.1</td>
+    <td><code>tidyverse</code> 2.0.0（<code>dplyr</code> 1.2.1、<code>tidyr</code> 1.3.2、<code>purrr</code> 1.2.2、<code>readr</code> 2.2.0）、<code>ggplot2</code> 4.0.3、<code>broom</code> 1.0.13、<code>patchwork</code> 1.3.2</td></tr>
+<tr><td><strong>Python</strong></td><td class="num-col">3.12.10</td>
+    <td><code>numpy</code> 2.2.6、<code>pandas</code> 2.3.3、<code>scipy</code> 1.16.3、<code>matplotlib</code> 3.10.8</td></tr>
+</tbody>
+</table>
+</div>
+<p style="margin-bottom:0;margin-top:14px;font-size:14.5px;color:var(--ink2)">
+  在 R 裡用 <code>sessionInfo()</code>、在 Python 裡用 <code>pip freeze</code> 就能列出你自己的版本清單，
+  建議附在報告的附錄裡。
+</p>
+</div>
+
+<h4>授權、版權與引用方式</h4>
+
+<div class="note warn">
+  <span class="nt">哪些東西不在這裡，以及為什麼</span>
+  <p>
+    本教材<strong>沒有</strong>散布原論文的 PDF、補充材料（<code>Data.xlsx</code>、<code>RChromOptim.RData</code>、
+    <code>R_Functions.docx</code>、<code>R_Instructions.pdf</code>、<code>Text files</code> 資料夾）或示範影片——
+    這些的著作權屬於原出版者（Elsevier）與原作者。
+    請透過你所屬機構的圖書館或期刊網站合法取得。
+  </p>
+  <p style="margin-bottom:0">
+    教材與腳本中出現的，只有<strong>少量事實性數據</strong>（9 個溶質在 4 個 <var>φ</var> 下的滯留時間，
+    以及論文正文已公布的模型參數範圍），且均已標明出處。
+    這樣的引用屬於學術寫作的正常範圍，也是讓你能<strong>親手驗證結果</strong>的必要條件。
+  </p>
+</div>
+
+<div class="card">
+<p style="margin-top:0"><strong>如果你在報告或論文中使用本教材：</strong></p>
+<p>
+  <strong>方法本身</strong>請引用原論文（這是必須的）：<br>
+  Zisi, Ch., Pappa-Louisi, A., &amp; Nikitas, P. (2020). Separation optimization in HPLC analysis
+  implemented in R programming language. <em>Journal of Chromatography A</em>, 1617, 460823.
+  https://doi.org/10.1016/j.chroma.2019.460823
+</p>
+<p style="margin-bottom:0">
+  <strong>第 16、17 節的重新實作程式</strong>是本教材為教學目的獨立撰寫的，
+  與原作者無關，也未經原作者背書。若你直接使用或修改這兩份腳本，請一併註明來源網址，
+  並<strong>務必仍然引用上面那篇原論文</strong>——演算法與模型是他們的貢獻。
+</p>
 </div>
 
 <h3>你學會了什麼</h3>
@@ -3007,8 +3484,8 @@ document.querySelectorAll(".quiz").forEach(function(q){
   var groups = [
     {t:"入門　讀懂層析圖", ids:["s1","s2","s3","s4","s5"]},
     {t:"中階　調整與最佳化", ids:["s6","s7","s8","s9","s10"]},
-    {t:"進階　R 實作", ids:["s11","s12","s13","s14","s15"]},
-    {t:"附錄　查詢用", ids:["s16","s17","s18","s19"]}
+    {t:"進階　R 實作", ids:["s11","s12","s13","s14","s15","s16","s17"]},
+    {t:"附錄　查詢用", ids:["s18","s19","s20","s21"]}
   ];
   var title = document.createElement("div");
   title.className = "navtitle"; title.textContent = "HPLC 分離最佳化";
