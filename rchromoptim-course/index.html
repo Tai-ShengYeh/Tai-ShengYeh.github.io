@@ -1,0 +1,3067 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HPLC 分離最佳化教學 — 從讀懂層析圖到用 R 找出最佳條件</title>
+<style>
+/* ============ 設計系統 ============ */
+:root{
+  --bg:#fbfaf7; --bg2:#ffffff; --bg3:#f2efe9;
+  --ink:#1e2733; --ink2:#4a5766; --ink3:#7c8896;
+  --line:#e2ddd3; --line2:#cfc8bb;
+  --brand:#0d7377; --brand2:#14a3a8; --brand-soft:#e0f2f1;
+  --warm:#c8632b; --warm-soft:#fdefe4;
+  --gold:#b8860b; --gold-soft:#fdf6e0;
+  --good:#2e7d4f; --good-soft:#e6f4ea;
+  --bad:#b3352e; --bad-soft:#fdeceb;
+  --peakA:#0d7377; --peakB:#c8632b; --peakC:#7048a8; --peakD:#b8860b; --peakE:#2e7d4f;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(30,39,51,.06), 0 4px 16px rgba(30,39,51,.06);
+  --mono:"Cascadia Code","SF Mono",Consolas,"Noto Sans Mono CJK TC",monospace;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#14181d; --bg2:#1b2027; --bg3:#232931;
+    --ink:#e8eaed; --ink2:#b3bac3; --ink3:#828b96;
+    --line:#2e353e; --line2:#3d4650;
+    --brand:#4dd0d5; --brand2:#7fe3e6; --brand-soft:#10312f;
+    --warm:#f0975e; --warm-soft:#31221a;
+    --gold:#e0b64a; --gold-soft:#2c2617;
+    --good:#6cc38d; --good-soft:#16291d;
+    --bad:#f08a83; --bad-soft:#2e1a19;
+    --peakA:#4dd0d5; --peakB:#f0975e; --peakC:#b39ae0; --peakD:#e0b64a; --peakE:#6cc38d;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14181d; --bg2:#1b2027; --bg3:#232931;
+  --ink:#e8eaed; --ink2:#b3bac3; --ink3:#828b96;
+  --line:#2e353e; --line2:#3d4650;
+  --brand:#4dd0d5; --brand2:#7fe3e6; --brand-soft:#10312f;
+  --warm:#f0975e; --warm-soft:#31221a;
+  --gold:#e0b64a; --gold-soft:#2c2617;
+  --good:#6cc38d; --good-soft:#16291d;
+  --bad:#f08a83; --bad-soft:#2e1a19;
+  --peakA:#4dd0d5; --peakB:#f0975e; --peakC:#b39ae0; --peakD:#e0b64a; --peakE:#6cc38d;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+}
+:root[data-theme="light"]{
+  --bg:#fbfaf7; --bg2:#ffffff; --bg3:#f2efe9;
+  --ink:#1e2733; --ink2:#4a5766; --ink3:#7c8896;
+  --line:#e2ddd3; --line2:#cfc8bb;
+  --brand:#0d7377; --brand2:#14a3a8; --brand-soft:#e0f2f1;
+  --warm:#c8632b; --warm-soft:#fdefe4;
+  --gold:#b8860b; --gold-soft:#fdf6e0;
+  --good:#2e7d4f; --good-soft:#e6f4ea;
+  --bad:#b3352e; --bad-soft:#fdeceb;
+  --peakA:#0d7377; --peakB:#c8632b; --peakC:#7048a8; --peakD:#b8860b; --peakE:#2e7d4f;
+  --shadow:0 1px 2px rgba(30,39,51,.06), 0 4px 16px rgba(30,39,51,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:20px}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:16.5px; line-height:1.85;
+  -webkit-font-smoothing:antialiased;
+}
+/* ============ 版面 ============ */
+.wrap{display:flex; gap:0; max-width:1500px; margin:0 auto}
+#nav{
+  position:sticky; top:0; align-self:flex-start; height:100vh; overflow-y:auto;
+  width:268px; flex:0 0 268px; padding:22px 14px 40px 22px;
+  border-right:1px solid var(--line); background:var(--bg2);
+}
+#nav .navtitle{font-size:13px; font-weight:700; letter-spacing:.08em; color:var(--ink3); margin:0 0 14px 6px}
+#nav a{
+  display:block; padding:5px 10px; margin:1px 0; border-radius:8px;
+  color:var(--ink2); text-decoration:none; font-size:13.5px; line-height:1.5;
+  border-left:2px solid transparent;
+}
+#nav a:hover{background:var(--bg3); color:var(--ink)}
+#nav a.on{background:var(--brand-soft); color:var(--brand); font-weight:600; border-left-color:var(--brand)}
+#nav .lvl{
+  margin:16px 0 5px; padding:4px 10px; font-size:11.5px; font-weight:700;
+  letter-spacing:.1em; color:var(--ink3); text-transform:uppercase;
+}
+#nav .lvl:first-of-type{margin-top:0}
+main{flex:1 1 auto; min-width:0; padding:0 46px 120px; max-width:960px}
+/* ============ 頁首 ============ */
+.hero{padding:64px 0 40px; border-bottom:1px solid var(--line); margin-bottom:12px}
+.eyebrow{
+  display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:.12em;
+  color:var(--brand); background:var(--brand-soft); padding:5px 13px; border-radius:99px;
+}
+.hero h1{font-size:42px; line-height:1.25; margin:20px 0 14px; letter-spacing:-.02em; font-weight:800}
+.hero .sub{font-size:19px; color:var(--ink2); line-height:1.7; max-width:44em; margin:0}
+.hero .meta{margin-top:24px; font-size:13.5px; color:var(--ink3); line-height:1.9}
+.hero .meta code{font-size:12.5px}
+/* ============ 標題 ============ */
+h2{
+  font-size:29px; font-weight:800; letter-spacing:-.015em;
+  margin:76px 0 6px; padding-top:8px; line-height:1.35;
+}
+h2 .num{
+  display:inline-block; min-width:1.9em; color:var(--brand); font-variant-numeric:tabular-nums;
+}
+h3{font-size:20.5px; font-weight:700; margin:44px 0 10px; line-height:1.45}
+h4{font-size:17px; font-weight:700; margin:28px 0 8px; color:var(--ink)}
+.lede{font-size:17.5px; color:var(--ink2); margin:0 0 8px; line-height:1.75}
+p{margin:15px 0}
+a{color:var(--brand); text-underline-offset:3px}
+strong{font-weight:700; color:var(--ink)}
+ul,ol{padding-left:1.5em; margin:15px 0}
+li{margin:7px 0}
+li::marker{color:var(--ink3)}
+hr{border:0; border-top:1px solid var(--line); margin:52px 0}
+/* ============ 章節分級標記 ============ */
+.chip{
+  display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.06em;
+  padding:3px 10px; border-radius:99px; vertical-align:middle; margin-left:10px;
+  position:relative; top:-3px;
+}
+.chip.b{background:var(--good-soft); color:var(--good)}
+.chip.m{background:var(--gold-soft); color:var(--gold)}
+.chip.a{background:var(--warm-soft); color:var(--warm)}
+/* ============ 卡片與提示 ============ */
+.card{
+  background:var(--bg2); border:1px solid var(--line); border-radius:var(--radius);
+  padding:22px 26px; margin:24px 0; box-shadow:var(--shadow);
+}
+.note{
+  border-left:4px solid var(--brand); background:var(--brand-soft);
+  border-radius:0 10px 10px 0; padding:16px 22px; margin:24px 0;
+}
+.note.warn{border-left-color:var(--warm); background:var(--warm-soft)}
+.note.bad{border-left-color:var(--bad); background:var(--bad-soft)}
+.note.good{border-left-color:var(--good); background:var(--good-soft)}
+.note .nt{font-weight:700; display:block; margin-bottom:2px; font-size:15px}
+.note p:first-of-type{margin-top:4px}
+.note p:last-child{margin-bottom:0}
+.note ul{margin-bottom:0}
+/* 生活化類比框 */
+.analogy{
+  background:linear-gradient(180deg,var(--gold-soft),transparent);
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:20px 24px; margin:24px 0;
+}
+.analogy .at{font-weight:800; color:var(--gold); font-size:14px; letter-spacing:.04em; margin-bottom:6px}
+.analogy p:last-child{margin-bottom:0}
+/* ============ 表格 ============ */
+.tw{overflow-x:auto; margin:24px 0; border:1px solid var(--line); border-radius:var(--radius); background:var(--bg2)}
+table{border-collapse:collapse; width:100%; font-size:14.5px; min-width:460px}
+th,td{padding:11px 15px; text-align:left; border-bottom:1px solid var(--line); vertical-align:top; line-height:1.65}
+th{background:var(--bg3); font-weight:700; font-size:13.5px; white-space:nowrap; color:var(--ink)}
+tbody tr:last-child td{border-bottom:0}
+td code,th code{font-size:13px}
+.num-col{text-align:right; font-variant-numeric:tabular-nums; font-family:var(--mono); font-size:13.5px}
+/* ============ 程式碼 ============ */
+code{
+  font-family:var(--mono); font-size:.885em; background:var(--bg3);
+  padding:.14em .45em; border-radius:5px; border:1px solid var(--line);
+  word-break:break-word;
+}
+pre{
+  background:var(--bg2); border:1px solid var(--line2); border-radius:var(--radius);
+  padding:0; margin:20px 0; overflow:hidden; box-shadow:var(--shadow);
+}
+pre .plabel{
+  display:flex; justify-content:space-between; align-items:center;
+  background:var(--bg3); border-bottom:1px solid var(--line);
+  padding:7px 16px; font-size:12px; font-weight:700; color:var(--ink3);
+  letter-spacing:.05em; font-family:var(--sans);
+}
+pre code{
+  display:block; background:none; border:0; padding:16px 18px; border-radius:0;
+  font-size:13.5px; line-height:1.75; overflow-x:auto; white-space:pre;
+}
+.cm{color:var(--ink3); font-style:italic}
+.fn{color:var(--brand); font-weight:600}
+.st{color:var(--warm)}
+.kw{color:var(--peakC); font-weight:600}
+.nu{color:var(--good)}
+/* ============ 公式 ============ */
+.eq{
+  background:var(--bg3); border:1px solid var(--line); border-radius:10px;
+  padding:16px 22px; margin:20px 0; text-align:center;
+  font-size:18px; font-family:Georgia,"Times New Roman",serif; overflow-x:auto;
+}
+.eq .en{float:right; color:var(--ink3); font-size:14px; font-family:var(--sans)}
+.eq .where{
+  display:block; margin-top:10px; font-size:13.5px; color:var(--ink2);
+  font-family:var(--sans); text-align:left;
+}
+var,.v{font-family:Georgia,serif; font-style:italic}
+sub{font-size:.72em}
+/* ============ 互動模擬器 ============ */
+.sim{
+  background:var(--bg2); border:1px solid var(--line2); border-radius:18px;
+  padding:0; margin:30px 0; overflow:hidden; box-shadow:var(--shadow);
+}
+.sim-head{
+  padding:16px 24px; background:var(--bg3); border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+}
+.sim-head .st1{font-weight:800; font-size:16px}
+.sim-head .st2{font-size:13px; color:var(--ink3)}
+.sim-body{padding:20px 24px 24px}
+.canvas-box{position:relative; width:100%; margin-bottom:6px}
+canvas{width:100%; height:auto; display:block; border-radius:10px; touch-action:pan-y}
+.ctrls{display:grid; grid-template-columns:repeat(auto-fit,minmax(258px,1fr)); gap:16px 26px; margin-top:16px}
+.ctrl label{
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-size:13.5px; font-weight:600; margin-bottom:3px; gap:8px;
+}
+.ctrl .lbtxt{flex:1 1 auto; min-width:0}
+.ctrl .val{
+  font-family:var(--mono); font-size:14px; color:var(--brand); font-weight:700;
+  background:var(--brand-soft); padding:1px 9px; border-radius:6px; white-space:nowrap;
+}
+.ctrl .hint{font-size:12px; color:var(--ink3); font-weight:400; line-height:1.5; display:block; margin-top:2px}
+input[type=range]{
+  width:100%; margin:5px 0 0; -webkit-appearance:none; appearance:none;
+  background:transparent; cursor:pointer; height:22px;
+}
+input[type=range]::-webkit-slider-runnable-track{height:6px; background:var(--line2); border-radius:99px}
+input[type=range]::-moz-range-track{height:6px; background:var(--line2); border-radius:99px}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:19px; height:19px; border-radius:50%;
+  background:var(--brand); border:3px solid var(--bg2); margin-top:-7px;
+  box-shadow:0 1px 4px rgba(0,0,0,.28);
+}
+input[type=range]::-moz-range-thumb{
+  width:15px; height:15px; border-radius:50%; background:var(--brand);
+  border:3px solid var(--bg2); box-shadow:0 1px 4px rgba(0,0,0,.28);
+}
+.readout{
+  display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;
+  padding-top:16px; border-top:1px dashed var(--line2);
+}
+.stat{
+  flex:1 1 128px; background:var(--bg3); border-radius:10px; padding:10px 14px;
+  border:1px solid var(--line);
+}
+.stat .k{font-size:11.5px; color:var(--ink3); font-weight:700; letter-spacing:.05em; line-height:1.5}
+.stat .v{
+  font-family:var(--mono); font-size:21px; font-weight:700; font-style:normal;
+  line-height:1.3; margin-top:1px;
+}
+.stat.ok .v{color:var(--good)} .stat.warn .v{color:var(--gold)} .stat.no .v{color:var(--bad)}
+.verdict{
+  margin-top:14px; padding:12px 18px; border-radius:10px; font-size:14.5px;
+  font-weight:600; line-height:1.65;
+}
+.verdict.ok{background:var(--good-soft); color:var(--good)}
+.verdict.warn{background:var(--gold-soft); color:var(--gold)}
+.verdict.no{background:var(--bad-soft); color:var(--bad)}
+.btn{
+  font-family:var(--sans); font-size:13.5px; font-weight:700; cursor:pointer;
+  background:var(--bg2); color:var(--ink2); border:1px solid var(--line2);
+  padding:6px 15px; border-radius:8px; transition:.12s;
+}
+.btn:hover{background:var(--brand-soft); color:var(--brand); border-color:var(--brand)}
+.btn.on{background:var(--brand); color:#fff; border-color:var(--brand)}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; align-items:center}
+.btn-row .lb{font-size:12.5px; color:var(--ink3); font-weight:700; margin-right:2px}
+/* ============ 摺疊 ============ */
+details{
+  border:1px solid var(--line); border-radius:var(--radius);
+  margin:20px 0; background:var(--bg2); overflow:hidden;
+}
+details[open]{box-shadow:var(--shadow)}
+summary{
+  cursor:pointer; padding:14px 22px; font-weight:700; font-size:15.5px;
+  list-style:none; display:flex; align-items:center; gap:10px; user-select:none;
+}
+summary::-webkit-details-marker{display:none}
+summary::before{
+  content:"▸"; color:var(--brand); font-size:13px; transition:transform .18s; flex:0 0 auto;
+}
+details[open]>summary::before{transform:rotate(90deg)}
+summary:hover{background:var(--bg3)}
+details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)}
+.dbody{padding:6px 24px 20px}
+.dbody>*:first-child{margin-top:14px}
+.dbody>*:last-child{margin-bottom:0}
+/* ============ 測驗 ============ */
+.quiz{
+  border:1px solid var(--line2); border-radius:var(--radius); background:var(--bg2);
+  padding:20px 24px; margin:26px 0; box-shadow:var(--shadow);
+}
+.quiz .qh{
+  font-size:12px; font-weight:800; letter-spacing:.1em; color:var(--warm);
+  margin-bottom:8px; text-transform:uppercase;
+}
+.quiz .qq{font-weight:700; font-size:16px; margin-bottom:12px; line-height:1.7}
+.opt{
+  display:block; width:100%; text-align:left; font-family:var(--sans); font-size:14.5px;
+  padding:10px 16px; margin:7px 0; border-radius:9px; cursor:pointer; line-height:1.65;
+  border:1px solid var(--line2); background:var(--bg); color:var(--ink);
+  transition:.12s;
+}
+.opt:hover:not(.done){border-color:var(--brand); background:var(--brand-soft)}
+.opt.right{background:var(--good-soft); border-color:var(--good); color:var(--good); font-weight:700}
+.opt.wrong{background:var(--bad-soft); border-color:var(--bad); color:var(--bad)}
+.opt.done{cursor:default}
+.expl{
+  margin-top:12px; padding:12px 18px; background:var(--bg3); border-radius:9px;
+  font-size:14px; line-height:1.75; display:none; border-left:3px solid var(--brand);
+}
+.expl.show{display:block}
+/* ============ 檢核清單 ============ */
+.check{list-style:none; padding:0; margin:18px 0}
+.check li{
+  position:relative; padding:9px 12px 9px 40px; margin:6px 0; line-height:1.7;
+  background:var(--bg2); border:1px solid var(--line); border-radius:9px;
+}
+.check li::before{
+  content:"✓"; position:absolute; left:14px; top:9px;
+  color:var(--good); font-weight:800; font-size:15px;
+}
+/* ============ 流程圖 ============ */
+.flow{display:flex; flex-direction:column; gap:0; margin:26px 0}
+.fstep{
+  display:flex; gap:16px; align-items:flex-start; padding:15px 20px;
+  background:var(--bg2); border:1px solid var(--line); border-radius:12px;
+}
+.fstep .fn2{
+  flex:0 0 auto; width:30px; height:30px; border-radius:50%;
+  background:var(--brand); color:#fff; display:flex; align-items:center;
+  justify-content:center; font-weight:800; font-size:14px; margin-top:2px;
+}
+.fstep .fc{flex:1 1 auto; min-width:0}
+.fstep .ft{font-weight:700; font-size:15.5px; margin-bottom:1px}
+.fstep .fd{font-size:14px; color:var(--ink2); line-height:1.7}
+.fstep code{font-size:13px}
+.farrow{text-align:center; color:var(--line2); font-size:17px; line-height:1; padding:5px 0}
+/* ============ 其他 ============ */
+.two{display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:24px 0}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+.kbd{
+  font-family:var(--mono); font-size:12.5px; background:var(--bg2); color:var(--ink);
+  border:1px solid var(--line2); border-bottom-width:2px; border-radius:5px; padding:1px 6px;
+}
+.legend{display:flex; gap:16px; flex-wrap:wrap; font-size:13px; margin:12px 0 0; color:var(--ink2)}
+.legend span{display:flex; align-items:center; gap:6px}
+.sw{width:13px; height:13px; border-radius:3px; flex:0 0 auto}
+#toTop{
+  position:fixed; right:22px; bottom:22px; width:44px; height:44px; border-radius:50%;
+  background:var(--brand); color:#fff; border:0; font-size:19px; cursor:pointer;
+  box-shadow:0 3px 14px rgba(0,0,0,.24); display:none; z-index:50; line-height:1;
+}
+#toTop.show{display:block}
+#navToggle{
+  display:none; position:fixed; left:14px; bottom:22px; z-index:60;
+  background:var(--brand); color:#fff; border:0; border-radius:10px;
+  padding:10px 16px; font-size:14px; font-weight:700; cursor:pointer;
+  box-shadow:0 3px 14px rgba(0,0,0,.24); font-family:var(--sans);
+}
+@media (max-width:980px){
+  main{padding:0 22px 110px}
+  .hero h1{font-size:31px} .hero{padding:38px 0 30px} .hero .sub{font-size:17px}
+  h2{font-size:24px; margin-top:58px} h3{font-size:18.5px}
+  body{font-size:16px}
+  #nav{
+    position:fixed; left:0; top:0; z-index:200; transform:translateX(-100%);
+    transition:transform .22s; box-shadow:4px 0 22px rgba(0,0,0,.16); width:280px;
+  }
+  #nav.open{transform:translateX(0)}
+  #navToggle{display:block}
+  .sim-body{padding:16px 15px 20px} .card{padding:18px 18px} .dbody{padding:6px 17px 18px}
+  .quiz{padding:17px 18px} .note{padding:14px 17px} .analogy{padding:16px 18px}
+  .eq{font-size:16px; padding:14px 15px}
+}
+@media print{
+  #nav,#toTop,#navToggle,.sim{display:none}
+  body{font-size:11pt} main{padding:0} details{page-break-inside:avoid}
+  details:not([open])>.dbody{display:block}
+}
+</style>
+</head>
+<body>
+<button id="navToggle" aria-label="開關目錄">☰ 目錄</button>
+<div class="wrap">
+<nav id="nav"></nav>
+<main>
+<header class="hero">
+  <span class="eyebrow">食品營養系 · 儀器分析入門到進階</span>
+  <h1>波峰疊在一起，怎麼辦？</h1>
+  <p class="sub">
+    從讀懂一張層析圖開始，一路走到用 R 語言的 <strong>RChromOptim</strong> 套件，
+    自動算出「最省時間又分得最開」的 HPLC 分析條件。
+    全程不需要你先懂物理化學——我們用滑桿、比喻和實際的食品檢驗例子把它講清楚。
+  </p>
+  <p class="meta">
+    <strong>教材依據：</strong>Zisi, Ch., Pappa-Louisi, A., &amp; Nikitas, P. (2020).
+    <em>Separation optimization in HPLC analysis implemented in R programming language.</em>
+    <em>Journal of Chromatography A</em>, 1617, 460823.<br>
+    <strong>使用檔案：</strong><code>RChromOptim.RData</code>（R 函數）、<code>Data.xlsx</code>（範例數據）、<code>Text files/</code>（輸入檔範例）<br>
+    <strong>建議時間：</strong>入門 40 分鐘 ／ 中階 50 分鐘 ／ 進階實作 90 分鐘　·
+    <strong>提示：</strong>本頁所有圖都可以拖動滑桿即時互動，請務必動手玩。
+  </p>
+</header>
+
+<div class="note">
+  <span class="nt">這份教材怎麼讀</span>
+  <p>左側目錄把內容分成三層，你可以照順序讀，也可以直接跳到需要的地方：</p>
+  <ul>
+    <li><span class="chip b" style="margin-left:0">入門</span>　完全沒碰過 HPLC 也看得懂。學會<strong>讀懂一張層析圖</strong>。</li>
+    <li><span class="chip m" style="margin-left:0">中階</span>　理解<strong>為什麼調整條件能改變分離結果</strong>，以及背後那一條簡單的公式。</li>
+    <li><span class="chip a" style="margin-left:0">進階</span>　實際打開 R，用論文的套件<strong>跑完整套最佳化流程</strong>。</li>
+  </ul>
+</div>
+
+<h2 id="s1"><span class="num">1.</span>一個你真的會遇到的問題<span class="chip b">入門</span></h2>
+
+<p class="lede">先講一個情境。理解了這個情境，後面所有的數學才有意義。</p>
+
+<p>
+你在食品分析實驗室工作，桌上有一瓶市售的<strong>機能性飲料</strong>。品管主管要你回答一件事：
+這瓶飲料裡的<strong>咖啡因</strong>有沒有超過標示？<strong>防腐劑</strong>（苯甲酸、己二烯酸）有沒有超過法規上限？
+（<span style="color:var(--ink3)">己二烯酸即 sorbic acid，我國《食品添加物使用範圍及限量暨規格標準》採此名稱，部分教科書譯作「山梨酸」。</span>）
+</p>
+
+<p>
+你把樣品打進 HPLC（高效液相層析儀，High-Performance Liquid Chromatography），
+機器跑了十分鐘，吐出一張圖。你期待看到三個漂亮、分得開的波峰，
+每個波峰代表一種成分，峰的面積就是它的含量。
+</p>
+
+<p>結果你看到的是這樣：</p>
+
+<div class="sim" id="sim-hook">
+  <div class="sim-head">
+    <span class="st1">情境示範：三種成分擠在一起</span>
+    <span class="st2">按下按鈕看兩種結果的差別</span>
+  </div>
+  <div class="sim-body">
+    <div class="canvas-box"><canvas id="cv-hook" width="900" height="330"></canvas></div>
+    <div class="btn-row">
+      <span class="lb">選擇分析條件：</span>
+      <button class="btn on" data-hook="bad">❌ 條件沒調好</button>
+      <button class="btn" data-hook="good">✅ 條件調好了</button>
+    </div>
+    <div class="verdict" id="hook-verdict"></div>
+  </div>
+</div>
+
+<p>
+在「沒調好」的那張圖裡，<strong>咖啡因和苯甲酸的波峰疊在一起</strong>。
+這不是小事——你沒辦法量出任何一個的正確面積，也就<strong>算不出正確的含量</strong>。
+在檢驗報告上，這代表數據不能用，整批樣品要重跑。
+</p>
+
+<div class="note">
+  <span class="nt">這個出峰順序是真的嗎？</span>
+  <p>
+    是。在最常見的分析條件下——逆相 C18 管柱、<strong>酸性移動相（磷酸鹽緩衝液 pH 約 3.5–4.5）</strong>搭配甲醇或乙腈——
+    文獻報告的沖提順序就是<strong>咖啡因 → 苯甲酸 → 己二烯酸</strong>。
+    Kritsunankul 與 Jakmunee（2011）分析軟性飲料中五種添加物時，明確記錄順序為
+    醋磺內酯鉀 → 糖精 → 咖啡因 → 苯甲酸 → 己二烯酸，全程約 14 分鐘；
+    Lino 等人（2010）分析葡萄牙市售飲料也採用同一類條件（C18、KH₂PO₄／乙腈 90:10、pH 4.2、220 nm）。
+  </p>
+  <p style="margin-bottom:0">
+    <strong>為什麼咖啡因最先出來？</strong>因為它的親脂性最低（log P ≈ −0.07），
+    最不愛黏 C18；苯甲酸（log P ≈ 1.87）和己二烯酸（log P ≈ 1.33）都比它疏水得多，所以留得比較久。
+    這也解釋了為什麼<strong>咖啡因和苯甲酸這一對特別容易擠在一起</strong>——
+    它們剛好卡在「一個不太黏、一個開始黏」的交界，正是本教材要處理的典型問題。
+  </p>
+</div>
+
+<div class="note warn">
+  <span class="nt">順序不是固定的：pH 會改寫它</span>
+  <p style="margin-bottom:0">
+    苯甲酸（p<var>K</var><sub>a</sub> ≈ 4.2）和己二烯酸（p<var>K</var><sub>a</sub> ≈ 4.8）都是<strong>弱酸</strong>。
+    移動相偏酸時它們維持中性、乖乖黏在管柱上；一旦 pH 升高、它們解離成帶負電的離子，
+    就會<strong>大幅提早沖出來</strong>。咖啡因則幾乎不受影響（它在 pH 2 以上都是中性）。
+    所以<strong>把 pH 調高，這兩根酸的峰會往左跑，順序真的可能翻轉</strong>——
+    這正是文獻方法幾乎都刻意把 pH 壓在 4 以下的原因：不是習慣，是為了讓滯留穩定、順序可重現。
+    <span style="color:var(--ink3)">（想控制 pH 來分離可解離化合物？那就要用<a href="#s16">附錄</a>的模型 7、8、10，而不是模型 1。）</span>
+  </p>
+</div>
+
+<div class="analogy">
+  <div class="at">生活類比：合唱團裡的獨唱</div>
+  <p>
+    想像三個人同時唱歌。如果他們的聲音重疊在一起，你只聽得到「一團聲音」，
+    沒辦法判斷誰唱得大聲、誰唱得小聲。
+    但如果讓他們<strong>一個接一個、中間留空隙</strong>唱，你就能清楚評價每一個人。
+  </p>
+  <p>
+    HPLC 做的就是這件事：把混在一起的成分，<strong>在時間上排隊</strong>，一個一個送到偵測器面前。
+    這份教材要教你的，就是<strong>怎麼安排這個隊伍，讓大家不要擠在一起，又不要排太久</strong>。
+  </p>
+</div>
+
+<div class="note warn">
+  <span class="nt">為什麼不能「排很久就好」？</span>
+  <p>
+    你當然可以讓每個成分間隔十分鐘慢慢出來，保證分得開。但一批樣品可能有 60 瓶，
+    每瓶多跑 30 分鐘就是多 30 小時，還要多燒掉好幾公升的溶劑（多半是甲醇或乙腈，有毒且昂貴）。
+    所以真正的目標是<strong>「在可接受的時間內，把最難分的那一對分開」</strong>——
+    這正是「最佳化（optimization）」這個詞的意思，也是這整篇論文在做的事。
+  </p>
+</div>
+
+<h2 id="s2"><span class="num">2.</span>HPLC 到底在做什麼<span class="chip b">入門</span></h2>
+
+<p class="lede">如果你把 HPLC 想成一場賽跑，幾乎所有名詞都會瞬間變得直觀。</p>
+
+<h3>三個角色</h3>
+
+<div class="tw">
+<table>
+<thead><tr><th>HPLC 的東西</th><th>賽跑的比喻</th><th>它實際在做什麼</th></tr></thead>
+<tbody>
+<tr><td><strong>管柱</strong><br><span style="font-size:13px;color:var(--ink3)">column</span></td>
+    <td>一條很長、佈滿黏膠的跑道</td>
+    <td>一根裝滿多孔顆粒的不鏽鋼管（通常 5–25 公分）。顆粒表面接了一層油性的碳鏈（C18），會「黏住」樣品分子。</td></tr>
+<tr><td><strong>移動相</strong><br><span style="font-size:13px;color:var(--ink3)">mobile phase</span></td>
+    <td>從後面推選手的水流</td>
+    <td>幫浦持續打進去的液體，通常是<strong>水 + 有機溶劑</strong>（甲醇或乙腈）的混合液，把樣品往前推。</td></tr>
+<tr><td><strong>溶質</strong><br><span style="font-size:13px;color:var(--ink3)">solute / analyte</span></td>
+    <td>選手</td>
+    <td>你要測的成分本身：咖啡因、苯甲酸、維生素 C……。論文裡一律叫「solute」。</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>比賽怎麼進行</h3>
+
+<p>
+每一個分子在管柱裡不斷重複兩件事：<strong>被黏在顆粒表面上（不動）</strong>，
+和<strong>溶在液體裡被水流帶著走（前進）</strong>。
+</p>
+
+<div class="analogy">
+  <div class="at">關鍵直覺</div>
+  <p>
+    一個分子<strong>「黏著的時間佔比越高，就跑得越慢，越晚出來」</strong>。
+  </p>
+  <p>
+    咖啡因偏油性，比較愛黏在 C18 上 → 跑得慢 → 晚出來。<br>
+    維生素 C 很親水，幾乎不黏 → 幾乎被水流直接沖走 → 很早出來。<br>
+    所以<strong>不同成分會在不同時間抵達終點</strong>，這就是分離。
+  </p>
+</div>
+
+<p>
+管柱的另一端有一個<strong>偵測器（detector）</strong>，通常是紫外光偵測器。
+它像終點線的攝影機，每一瞬間都記錄「現在流過去的液體裡有多少東西」。
+把這個訊號對時間畫成一條線，就是<strong>層析圖（chromatogram）</strong>——
+本教材從頭到尾都在看的那張圖。
+</p>
+
+<h2 id="s3"><span class="num">3.</span>讀懂一張層析圖<span class="chip b">入門</span></h2>
+
+<p class="lede">一張層析圖只有兩個軸，但藏了三種資訊。看懂這三種，你就看懂了八成。</p>
+
+<div class="sim" id="sim-anatomy">
+  <div class="sim-head">
+    <span class="st1">層析圖解剖</span>
+    <span class="st2">把滑鼠移到圖上任一個波峰，看它代表什麼</span>
+  </div>
+  <div class="sim-body">
+    <div class="canvas-box"><canvas id="cv-anatomy" width="900" height="360"></canvas></div>
+    <div class="btn-row">
+      <span class="lb">標示：</span>
+      <button class="btn on" data-anat="t0">死時間 t₀</button>
+      <button class="btn on" data-anat="tr">滯留時間 t<sub>R</sub></button>
+      <button class="btn on" data-anat="w">峰寬 w</button>
+      <button class="btn" data-anat="area">峰面積</button>
+    </div>
+  </div>
+</div>
+
+<div class="tw">
+<table>
+<thead><tr><th>你看到的</th><th>它告訴你</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td><strong>波峰的位置</strong>（橫軸）</td>
+    <td><strong>是什麼</strong>成分</td>
+    <td>拿標準品跑一次，記下它出現的時間。之後樣品在同一時間出現波峰 → 大概就是它（定性）。</td></tr>
+<tr><td><strong>波峰的面積</strong></td>
+    <td>有<strong>多少</strong></td>
+    <td>面積和濃度成正比。做一條標準曲線，就能算出樣品濃度（定量）。</td></tr>
+<tr><td><strong>波峰的寬度與間隔</strong></td>
+    <td>這個方法<strong>好不好</strong></td>
+    <td>峰又窄又分得開 → 面積量得準。峰又寬又重疊 → 數據不可信。<strong>這就是本教材的主角。</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="nt">為什麼波峰是「山形」而不是一根線？</span>
+  <p>
+    同一種成分的幾百萬個分子，不會剛好同時抵達終點。有的分子運氣好走中間水道，早一點到；
+    有的多黏了幾次，晚一點到。整體分布就形成一個<strong>鐘形（高斯，Gaussian）曲線</strong>。
+  </p>
+  <p>
+    而且<strong>走得越久的成分，峰越寬</strong>——因為它有更多時間讓這些差異累積開來。
+    這件事很重要：它是後面「梯度沖提」存在的理由，論文的 <code>fitshape</code> 函數就是專門在描述這個現象。
+  </p>
+</div>
+
+<h2 id="s4"><span class="num">4.</span>三個一定要記住的數字<span class="chip b">入門</span></h2>
+
+<p class="lede">整篇論文的公式都建立在這三個量上面。它們其實都只是「時間」的不同講法。</p>
+
+<h3>t₀ — 死時間（column dead time）</h3>
+<p>
+一個<strong>完全不黏管柱</strong>的分子，從打進去到流出來需要的時間。
+它等於管柱裡液體的體積除以流速，代表<strong>「不可能比這更快」的下限</strong>。
+一般分析管柱大約是 <strong>1 分鐘左右</strong>。在論文所有函數裡它叫 <code>t0</code>，是你必須自己量、自己輸入的參數。
+</p>
+
+<h3>t<sub>R</sub> — 滯留時間（retention time）</h3>
+<p>
+某個成分的波峰<strong>最高點</strong>出現的時間。這是你在層析圖上直接讀到的數字。
+論文中寫作 <code>tR</code>。
+</p>
+
+<h3>k — 滯留因子（retention factor）</h3>
+<p>
+這是最關鍵、也最常被搞混的一個。它的定義是：
+</p>
+
+<div class="eq">
+  <span class="en">(定義式)</span>
+  <var>k</var> = ( <var>t</var><sub>R</sub> − <var>t</var><sub>0</sub> ) ⁄ <var>t</var><sub>0</sub>
+  <span class="where">
+    也可以反過來寫成後面會一直用到的形式：　<var>t</var><sub>R</sub> = <var>t</var><sub>0</sub> ( 1 + <var>k</var> )
+  </span>
+</div>
+
+<div class="analogy">
+  <div class="at">k 是什麼意思？用白話說</div>
+  <p>
+    <var>t</var><sub>R</sub> − <var>t</var><sub>0</sub> 是這個分子「<strong>比不黏的分子多花的時間</strong>」，
+    也就是它<strong>黏在管柱上的總時間</strong>。除以 <var>t</var><sub>0</sub> 之後，
+    <var>k</var> 就變成：
+  </p>
+  <p style="text-align:center;font-size:17px;margin:14px 0">
+    <strong><var>k</var> = 黏著的時間 ÷ 流動的時間</strong>
+  </p>
+  <p>
+    <var>k</var> = 0 → 完全不黏，跟溶劑一起沖出來。<br>
+    <var>k</var> = 1 → 黏著和流動各花一半時間，<var>t</var><sub>R</sub> 是 <var>t</var><sub>0</sub> 的 2 倍。<br>
+    <var>k</var> = 10 → 黏著時間是流動時間的 10 倍，<var>t</var><sub>R</sub> 是 <var>t</var><sub>0</sub> 的 11 倍。
+  </p>
+</div>
+
+<div class="note good">
+  <span class="nt">為什麼要多發明一個 k，直接用 t<sub>R</sub> 不好嗎？</span>
+  <p>
+    因為 <var>t</var><sub>R</sub> <strong>會隨著儀器改變</strong>：換一根長一點的管柱、把流速調快，
+    所有 <var>t</var><sub>R</sub> 都會跟著變，可是「這個分子有多愛黏管柱」其實沒變。
+  </p>
+  <p>
+    <var>k</var> 把管柱長度和流速的影響<strong>除掉了</strong>，剩下的是分子本身的化學性質。
+    所以<strong>所有的理論模型都用 k 來寫，不用 t<sub>R</sub></strong>——
+    包括論文 Table 2 的十個模型，全部都是在描述 <var>k</var>。
+    算出 <var>k</var> 之後，再用 <var>t</var><sub>R</sub> = <var>t</var><sub>0</sub>(1+<var>k</var>) 換回你看得到的時間。
+  </p>
+</div>
+
+<div class="quiz" data-quiz="q1">
+  <div class="qh">隨堂測驗</div>
+  <div class="qq">
+    某支管柱的 t₀ = 1.2 分鐘。你在 pH 3.0 的移動相下打進<strong>己二烯酸</strong>標準品，
+    波峰最高點出現在 4.8 分鐘。己二烯酸的滯留因子 k 是多少？
+  </div>
+  <button class="opt" data-ok="0">k = 4.8</button>
+  <button class="opt" data-ok="0">k = 4.0</button>
+  <button class="opt" data-ok="1">k = 3.0</button>
+  <button class="opt" data-ok="0">k = 3.6</button>
+  <div class="expl">
+    <strong>k = (t<sub>R</sub> − t₀) / t₀ = (4.8 − 1.2) / 1.2 = 3.6 / 1.2 = 3.0</strong><br>
+    意思是：己二烯酸黏在管柱上的時間，是它隨著液體流動時間的 3 倍。<br>
+    <span style="color:var(--ink3)">題目特別註明「pH 3.0」是有意義的——己二烯酸是弱酸，換一個 pH 這個 k 就會變。
+    為什麼會變、變多少，<a href="#s10">第 10 節</a>會用一個模擬器讓你親眼看到。</span><br>
+    <span style="color:var(--ink3)">常見錯誤：選 4.0 是忘了先減 t₀（直接 4.8/1.2）；選 3.6 是減了但忘了除。</span>
+  </div>
+</div>
+
+<h2 id="s5"><span class="num">5.</span>解析度 R<sub>s</sub>：這份教材的主角<span class="chip b">入門</span></h2>
+
+<p class="lede">
+  前面說「波峰要分得開」，但「分得開」不能只憑感覺——需要一個數字。這個數字就是解析度。
+</p>
+
+<p>
+  解析度（resolution，記作 <var>R</var><sub>s</sub>）衡量<strong>相鄰兩個波峰</strong>分離得多好。定義是：
+</p>
+
+<div class="eq">
+  <var>R</var><sub>s</sub> = 2 ( <var>t</var><sub>R2</sub> − <var>t</var><sub>R1</sub> ) ⁄ ( <var>w</var><sub>1</sub> + <var>w</var><sub>2</sub> )
+  <span class="where">
+    <var>t</var><sub>R1</sub>、<var>t</var><sub>R2</sub>：兩個波峰的滯留時間　·
+    <var>w</var><sub>1</sub>、<var>w</var><sub>2</sub>：兩個波峰在<strong>基線</strong>上的寬度
+  </span>
+</div>
+
+<p>
+  這個式子在講一件很單純的事：<strong>「兩個峰離多遠」除以「兩個峰本身有多胖」</strong>。
+  分子越大（離得遠）或分母越小（峰越瘦），解析度就越好。
+</p>
+
+<div class="sim" id="sim-rs">
+  <div class="sim-head">
+    <span class="st1">親手感受 R<sub>s</sub></span>
+    <span class="st2">拖動滑桿改變兩個峰的距離和寬度，看 R<sub>s</sub> 怎麼變</span>
+  </div>
+  <div class="sim-body">
+    <div class="canvas-box"><canvas id="cv-rs" width="900" height="330"></canvas></div>
+    <div class="ctrls">
+      <div class="ctrl">
+        <label><span class="lbtxt">兩峰的距離　Δt<sub>R</sub></span><span class="val" id="v-rs-d">0.60 分鐘</span></label>
+        <input type="range" id="r-rs-d" min="0" max="200" value="60">
+        <span class="hint">相當於調整選擇性——讓兩個成分的化學行為差更多</span>
+      </div>
+      <div class="ctrl">
+        <label><span class="lbtxt">波峰的胖瘦　w</span><span class="val" id="v-rs-w">0.40 分鐘</span></label>
+        <input type="range" id="r-rs-w" min="8" max="120" value="40">
+        <span class="hint">相當於管柱效率——好的管柱、短的滯留時間會讓峰更瘦</span>
+      </div>
+    </div>
+    <div class="readout">
+      <div class="stat" id="st-rs"><div class="k">解析度 Rs</div><div class="v" id="v-rs">1.50</div></div>
+      <div class="stat"><div class="k">重疊面積</div><div class="v" id="v-rs-ov">0.3%</div></div>
+      <div class="stat"><div class="k">定量誤差（估）</div><div class="v" id="v-rs-err">&lt;1%</div></div>
+    </div>
+    <div class="verdict" id="rs-verdict"></div>
+  </div>
+</div>
+
+<h3>要記住的三個門檻</h3>
+
+<div class="tw">
+<table>
+<thead><tr><th>R<sub>s</sub></th><th>看起來像</th><th>能不能用</th></tr></thead>
+<tbody>
+<tr><td class="num-col"><strong>&lt; 0.8</strong></td><td>幾乎是一個峰，或只有一個小肩膀</td>
+    <td style="color:var(--bad)"><strong>不能用。</strong>連「有幾個成分」都判斷不出來。</td></tr>
+<tr><td class="num-col"><strong>≈ 1.0</strong></td><td>看得出是兩個峰，但谷底沒有落到基線</td>
+    <td style="color:var(--gold)"><strong>勉強。</strong>定性可以，定量誤差約 2–3%。</td></tr>
+<tr><td class="num-col"><strong>≥ 1.5</strong></td><td>兩個峰之間回到基線</td>
+    <td style="color:var(--good)"><strong>合格。</strong>稱為「基線分離」，定量誤差 &lt; 0.3%。<strong>這是法規和期刊的標準門檻。</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="note">
+  <span class="nt">整份教材的核心目標，一句話</span>
+  <p style="font-size:17px">
+    在混合物<strong>所有相鄰的成分對</strong>當中，找出<strong>最難分的那一對</strong>（<var>R</var><sub>s</sub> 最小的那對），
+    然後調整分析條件，讓<strong>這個最小的 <var>R</var><sub>s</sub> 盡可能大</strong>，
+    同時<strong>總分析時間不要超過你能接受的上限</strong>。
+  </p>
+  <p style="margin-bottom:0">
+    論文裡把這個「最小 <var>R</var><sub>s</sub>」寫作 <strong><var>R</var><sub>s</sub></strong>
+    （原文：<em>the resolution of the least resolved pair of adjacent solutes</em>），
+    把時間上限寫作 <strong><var>t</var><sub>max</sub></strong>。
+    <code>iopt</code>、<code>gopt</code> 這些最佳化函數做的事，
+    就是自動幫你掃過所有可能的條件，找出讓這個 <var>R</var><sub>s</sub> 最大的那一組。
+  </p>
+</div>
+
+<div class="quiz" data-quiz="q2">
+  <div class="qh">隨堂測驗</div>
+  <div class="qq">
+    你的樣品有 5 個成分。相鄰四對的 R<sub>s</sub> 分別是 2.4、<strong>1.1</strong>、3.0、1.8。
+    你會怎麼描述這個分析方法？
+  </div>
+  <button class="opt" data-ok="0">平均 R<sub>s</sub> = 2.08，表現良好，可以放行</button>
+  <button class="opt" data-ok="1">這個方法不合格，因為最難分的一對只有 1.1，未達基線分離</button>
+  <button class="opt" data-ok="0">只要有一對超過 1.5 就算合格</button>
+  <button class="opt" data-ok="0">要把 5 個 R<sub>s</sub> 值加起來看總分</button>
+  <div class="expl">
+    <strong>分離品質由「最差的那一對」決定，不是平均值。</strong>
+    就像一條鎖鏈的強度取決於最弱的那一環。那對 R<sub>s</sub> = 1.1 的成分沒有基線分離，
+    它們的峰面積會互相干擾，定量結果不可信——不管其他三對分得多漂亮。<br>
+    這正是為什麼論文的最佳化函數一律回報「<em>least resolved pair</em>（最難分的一對）」的 R<sub>s</sub>，
+    而不是平均值。<span style="color:var(--ink3)">（注意：4 對相鄰組合來自 5 個成分，n 個成分有 n−1 對。）</span>
+  </div>
+</div>
+<hr>
+
+<h2 id="s6"><span class="num">6.</span>那顆能改變一切的旋鈕：有機修飾劑<span class="chip m">中階</span></h2>
+
+<p class="lede">
+  你已經知道要讓 R<sub>s</sub> 變大。問題是——你到底能<strong>轉哪個旋鈕</strong>？
+</p>
+
+<p>
+  在逆相層析（reversed-phase，就是用 C18 這種油性管柱的主流做法）裡，
+  最有力、最常用、也最容易調的一個變數，是<strong>移動相裡有機溶劑的比例</strong>。
+</p>
+
+<p>
+  移動相是水和有機溶劑（乙腈 acetonitrile 或甲醇 methanol）的混合液。
+  這個有機溶劑就叫<strong>有機修飾劑（organic modifier）</strong>，
+  它佔的體積分率記作 <var>φ</var>（希臘字母 phi）。
+  <strong>在這份教材和論文的所有 R 程式碼裡，它一律寫成 <code>f</code></strong>——
+  請記住 <code>f</code> 就是 <var>φ</var>，論文特別註明了這件事。
+</p>
+
+<div class="analogy">
+  <div class="at">為什麼加有機溶劑會讓東西跑更快？</div>
+  <p>
+    C18 管柱表面是<strong>油性</strong>的。樣品分子之所以會黏上去，是因為它比較不喜歡待在水裡
+    （所謂「疏水作用」）。
+  </p>
+  <p>
+    現在你往水裡加乙腈。移動相變得「比較油」了，
+    對分子來說<strong>待在液體裡沒那麼難受了</strong>，
+    它就比較不需要躲到管柱表面上。<strong>黏得少 → k 變小 → 更早出來。</strong>
+  </p>
+  <p style="margin-bottom:0">
+    一句話：<strong><var>φ</var> 越大，所有東西都跑得越快。</strong>
+    這就是那顆旋鈕。
+  </p>
+</div>
+
+<h2 id="s7"><span class="num">7.</span>模型 1：把直覺變成一條公式<span class="chip m">中階</span></h2>
+
+<p class="lede">
+  「<var>φ</var> 越大跑越快」是定性的。要讓電腦幫你算，需要一條定量的式子。
+</p>
+
+<p>
+  真實的實驗數據告訴我們一件很漂亮的事：如果你把 <strong>ln <var>k</var></strong>（滯留因子取自然對數）
+  對 <strong><var>φ</var></strong> 畫圖，資料點幾乎會落在<strong>一條直線</strong>上。
+</p>
+
+<div class="eq">
+  <span class="en">模型 1</span>
+  ln <var>k</var> = <var>c</var><sub>0</sub> − <var>c</var><sub>1</sub> <var>φ</var>
+  <span class="where">
+    <var>c</var><sub>0</sub>：直線在 <var>φ</var>=0（純水）時的截距——代表這個分子<strong>天生有多愛黏管柱</strong><br>
+    <var>c</var><sub>1</sub>：直線的斜率（取正值）——代表這個分子<strong>對有機溶劑有多敏感</strong>
+  </span>
+</div>
+
+<p>
+  這就是論文 Table 2 的<strong>模型 1</strong>，在 R 程式裡寫作 <code>model=1</code>。
+  它是整個套件裡最簡單的一個，也是我們整份教材的主角。
+  （另外還有九個模型，處理 pH、雙溶劑等更複雜的情況——放在 <a href="#s16">附錄</a>，你現在不需要它們。）
+</p>
+
+<div class="note good">
+  <span class="nt">兩個參數，就描述完一個分子的全部行為</span>
+  <p>
+    這件事的威力在於：只要你做<strong>三到四次實驗</strong>，量出同一個成分在不同 <var>φ</var> 下的
+    <var>t</var><sub>R</sub>，就能算出它的 <var>c</var><sub>0</sub> 和 <var>c</var><sub>1</sub>。
+    然後你就能<strong>預測它在任何 <var>φ</var> 下的滯留時間</strong>，不用再做實驗。
+  </p>
+  <p style="margin-bottom:0">
+    這正是 <code>ifitk</code> 這個函數在做的事（i = isocratic 恆溶劑，fitk = 擬合 <var>k</var>）。
+    而算出參數之後，<var>t</var><sub>R</sub> = <var>t</var><sub>0</sub>(1 + <var>k</var>) 就把它換回你看得懂的時間。
+  </p>
+</div>
+
+<h3>用真實數據看看</h3>
+
+<p>
+  下面是論文附帶的真實實驗數據（<code>Data.xlsx</code> 的 <code>i-ret.fit</code> 工作表）。
+  9 個成分，在 4 種不同的 <var>φ</var> 下各跑一次，管柱死時間 <var>t</var><sub>0</sub> = 1.4 分鐘。
+  這批樣品是<strong>酚類污染物與芳香烴</strong>——像五氯酚、溴酚這些，
+  正是飲用水和食品安全檢驗會遇到的目標物。
+</p>
+
+<div class="tw">
+<table>
+<thead><tr><th><var>φ</var></th><th>A1</th><th>A2</th><th>A3</th><th>A4</th><th>A5</th><th>A6</th><th>A7</th><th>A8</th><th>A9</th></tr></thead>
+<tbody>
+<tr><td class="num-col">0.40</td><td class="num-col">3.735</td><td class="num-col">4.671</td><td class="num-col">6.646</td><td class="num-col">7.662</td><td class="num-col">8.498</td><td class="num-col">10.76</td><td class="num-col">11.09</td><td class="num-col">15.99</td><td class="num-col">19.00</td></tr>
+<tr><td class="num-col">0.45</td><td class="num-col">3.000</td><td class="num-col">3.650</td><td class="num-col">5.200</td><td class="num-col">5.600</td><td class="num-col">5.900</td><td class="num-col">6.850</td><td class="num-col">8.000</td><td class="num-col">10.38</td><td class="num-col">12.69</td></tr>
+<tr><td class="num-col">0.50</td><td class="num-col">2.537</td><td class="num-col">3.010</td><td class="num-col">4.208</td><td class="num-col">4.349</td><td class="num-col">4.430</td><td class="num-col">4.842</td><td class="num-col">6.051</td><td class="num-col">7.239</td><td class="num-col">8.921</td></tr>
+<tr><td class="num-col">0.60</td><td class="num-col">2.013</td><td class="num-col">2.265</td><td class="num-col">3.000</td><td class="num-col">2.940</td><td class="num-col">2.910</td><td class="num-col">3.061</td><td class="num-col">3.866</td><td class="num-col">4.198</td><td class="num-col">5.085</td></tr>
+</tbody>
+</table>
+<div style="padding:9px 15px;font-size:13px;color:var(--ink3);border-top:1px solid var(--line)">
+  表格內容為滯留時間 t<sub>R</sub>（分鐘）。管柱：Kinetex 2.6 µm XB-C18，150 × 4.6 mm；移動相：乙腈／水 pH 5.7；t<sub>0</sub> = 1.4 分鐘。
+</div>
+</div>
+
+<p>
+  把每個數字換成 <var>k</var> = (<var>t</var><sub>R</sub> − 1.4)/1.4，再取 ln，然後畫圖。
+  下面這張圖就是結果——<strong>九條漂亮的直線</strong>：
+</p>
+
+<div class="sim" id="sim-lnk">
+  <div class="sim-head">
+    <span class="st1">模型 1 的真面目</span>
+    <span class="st2">點選成分名稱可單獨查看它的直線</span>
+  </div>
+  <div class="sim-body">
+    <div class="canvas-box"><canvas id="cv-lnk" width="900" height="400"></canvas></div>
+    <div class="btn-row" id="lnk-btns"><span class="lb">顯示：</span></div>
+    <div class="readout">
+      <div class="stat"><div class="k">選取成分</div><div class="v" id="v-lnk-n" style="font-size:16px">全部</div></div>
+      <div class="stat"><div class="k">截距 c₀</div><div class="v" id="v-lnk-c0">—</div></div>
+      <div class="stat"><div class="k">斜率 c₁</div><div class="v" id="v-lnk-c1">—</div></div>
+      <div class="stat"><div class="k">R²（貼合度）</div><div class="v" id="v-lnk-r2">—</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <span class="nt">你剛剛做的，就是 ifitk 做的事</span>
+  <p>
+    這九組 (<var>c</var><sub>0</sub>, <var>c</var><sub>1</sub>) 是用最基本的<strong>線性迴歸</strong>算出來的
+    ——就是你在統計課學過、Excel 也能做的那個「加上趨勢線」。
+  </p>
+  <p>
+    我們把上面那張表用線性迴歸算出來的結果，和論文自己公布在 <code>Data.xlsx</code> 的
+    <code>i-optim</code> 工作表裡的模型 1 參數<strong>完全吻合</strong>
+    （<var>c</var><sub>0</sub> 落在 3.1404–5.6030，<var>c</var><sub>1</sub> 落在 5.9113–8.5366）。
+  </p>
+  <p style="margin-bottom:0">
+    換句話說：<strong>這一步你其實用 Excel 就做得出來。</strong>
+    R 套件真正幫你省力的，是後面那些手算不了的部分——峰形、模擬、和掃過幾千種條件的最佳化。
+  </p>
+</div>
+
+<div class="quiz" data-quiz="q3">
+  <div class="qq">
+    A3（苯）的參數是 c₀ = 3.669、c₁ = 5.911；A6（五氯酚）是 c₀ = 5.244、c₁ = 8.537。
+    當你把 φ 從 0.40 提高到 0.50，哪一個成分的滯留時間<strong>縮短得比較劇烈</strong>？
+  </div>
+  <div class="qh">隨堂測驗</div>
+  <button class="opt" data-ok="0">A3，因為它的 c₀ 比較小</button>
+  <button class="opt" data-ok="1">A6，因為它的 c₁（斜率）比較大</button>
+  <button class="opt" data-ok="0">兩個一樣，因為 φ 的變化量相同</button>
+  <button class="opt" data-ok="0">無法判斷，需要知道 t₀</button>
+  <div class="expl">
+    <strong>c₁ 是斜率，決定「對有機溶劑有多敏感」。</strong>
+    c₁ 越大，同樣提高 φ，ln k 掉得越多，t<sub>R</sub> 縮得越兇。<br>
+    實際數字：A3 從 6.646 → 4.208 分鐘（縮 37%），A6 從 10.76 → 4.842 分鐘（縮 55%）。<br>
+    <strong>這件事非常重要</strong>：因為不同成分縮短的幅度不一樣，
+    <strong>它們之間的相對位置會改變</strong>——甚至可能交換順序。下一節就會看到。
+  </div>
+</div>
+
+<h2 id="s8"><span class="num">8.</span>親手最佳化：把旋鈕轉一遍<span class="chip m">中階</span></h2>
+
+<p class="lede">
+  現在你有了九個成分的 <var>c</var><sub>0</sub> 和 <var>c</var><sub>1</sub>，就能預測<strong>任何 <var>φ</var> 下的完整層析圖</strong>。
+  下面這個模擬器把整件事串起來了——請務必動手拖。
+</p>
+
+<div class="note">
+  <span class="nt">模擬器在算什麼</span>
+  <p style="margin-bottom:0">
+    ① 對每個成分算 <var>k</var> = exp(<var>c</var><sub>0</sub> − <var>c</var><sub>1</sub><var>φ</var>)　→
+    ② <var>t</var><sub>R</sub> = <var>t</var><sub>0</sub>(1 + <var>k</var>)　→
+    ③ 用峰形公式 <var>h</var> = <var>h</var><sub>0</sub> + <var>h</var><sub>1</sub><var>t</var><sub>R</sub>、
+    <var>s</var> = <var>s</var><sub>0</sub> + <var>s</var><sub>1</sub><var>t</var><sub>R</sub> 畫出每個高斯峰　→
+    ④ 算出所有相鄰峰對的 <var>R</var><sub>s</sub>，回報<strong>最小的那個</strong>。
+    這正是 <code>iopt</code> 函數內部的計算流程。
+  </p>
+</div>
+
+<div class="sim" id="sim-iso">
+  <div class="sim-head">
+    <span class="st1">恆溶劑分離模擬器</span>
+    <span class="st2">9 個真實成分 · t₀ = 1.4 分鐘 · 資料來自論文</span>
+  </div>
+  <div class="sim-body">
+    <div class="canvas-box"><canvas id="cv-iso" width="900" height="340"></canvas></div>
+    <div class="ctrls">
+      <div class="ctrl">
+        <label><span class="lbtxt">有機修飾劑比例　<var>φ</var></span><span class="val" id="v-iso-f">0.450</span></label>
+        <input type="range" id="r-iso-f" min="300" max="600" value="450">
+        <span class="hint">往右 = 乙腈更多 = 全部跑更快。範圍 0.30–0.60，和論文 <code>iopt</code> 的預設搜尋範圍一致</span>
+      </div>
+      <div class="ctrl">
+        <label><span class="lbtxt">可接受的分析時間上限　<var>t</var><sub>max</sub></span><span class="val" id="v-iso-tmax">20 分鐘</span></label>
+        <input type="range" id="r-iso-tmax" min="6" max="30" value="20">
+        <span class="hint">你的時間預算。對應 <code>iopt</code> 的 <code>tmax</code> 參數</span>
+      </div>
+    </div>
+    <div class="readout">
+      <div class="stat" id="st-iso-rs"><div class="k">最小 Rs</div><div class="v" id="v-iso-rs">—</div></div>
+      <div class="stat"><div class="k">最難分的一對</div><div class="v" id="v-iso-pair" style="font-size:16px">—</div></div>
+      <div class="stat" id="st-iso-tm"><div class="k">最後出峰時間</div><div class="v" id="v-iso-tm">—</div></div>
+      <div class="stat"><div class="k">沖提順序</div><div class="v" id="v-iso-ord" style="font-size:12.5px;line-height:1.5">—</div></div>
+    </div>
+    <div class="verdict" id="iso-verdict"></div>
+    <div class="btn-row">
+      <span class="lb">快速跳到：</span>
+      <button class="btn" data-isof="410">最佳解 φ = 0.410</button>
+      <button class="btn" data-isof="350">陷阱 φ = 0.350</button>
+      <button class="btn" data-isof="600">太快 φ = 0.600</button>
+      <button class="btn" data-isof="300">太慢 φ = 0.300</button>
+    </div>
+  </div>
+</div>
+
+<h3>電腦是怎麼「找到」最佳解的</h3>
+
+<p>
+  你剛剛用手拖滑桿，其實就是在做最佳化——只是很慢。
+  <code>iopt</code> 做的事一模一樣，只是它<strong>每隔 0.005 把 <var>φ</var> 從 0.30 掃到 0.60</strong>
+  （這個步長就是參數 <code>df</code>），一共 61 個點，每個點都算一次最小 <var>R</var><sub>s</sub>，
+  然後挑出<strong>在時間預算內 <var>R</var><sub>s</sub> 最大</strong>的那一個。
+</p>
+
+<p>下面這張圖就是掃描的完整結果。論文的 Fig. 7 畫的就是這種圖：</p>
+
+<div class="sim" id="sim-scan">
+  <div class="sim-head">
+    <span class="st1">掃描曲線：Rs 與 t<sub>Rmax</sub> 對 φ</span>
+    <span class="st2">把滑鼠移到圖上任一位置查看該 φ 的數值（與上方模擬器連動）</span>
+  </div>
+  <div class="sim-body">
+    <div class="canvas-box"><canvas id="cv-scan" width="900" height="380"></canvas></div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--peakA)"></span>最小 R<sub>s</sub>（越高越好）</span>
+      <span><span class="sw" style="background:var(--peakB)"></span>最後出峰時間 t<sub>Rmax</sub>（越低越快）</span>
+      <span><span class="sw" style="background:var(--good)"></span>符合時間預算且 R<sub>s</sub> ≥ 1.5 的區間</span>
+    </div>
+  </div>
+</div>
+
+<div class="note good">
+  <span class="nt">讀出來的答案</span>
+  <p>
+    在 <var>t</var><sub>max</sub> = 20 分鐘的預算下，最佳解是
+    <strong><var>φ</var> = 0.410，<var>R</var><sub>s</sub> = 2.455，最後一個峰在 17.13 分鐘出來</strong>。
+    這正是 <code>iopt(model=1, t0=1.4, tmin=2, tmax=20, fmin=0.3, fmax=0.6, df=0.005)</code> 會給你的答案。
+  </p>
+  <p style="margin-bottom:0">
+    把時間預算縮到 15 分鐘 → 最佳 <var>φ</var> = 0.430，<var>R</var><sub>s</sub> = 2.029，還是合格。<br>
+    縮到 10 分鐘 → 最好也只有 <var>R</var><sub>s</sub> = 0.916，<strong>怎麼調都達不到 1.5</strong>。
+    這時候恆溶劑做不到了，你必須換方法——這就是下一節梯度沖提登場的理由。
+  </p>
+</div>
+
+<h3>那個藏在 φ = 0.35 的陷阱</h3>
+
+<p>
+  如果你剛剛按過「陷阱 <var>φ</var> = 0.350」，應該會嚇一跳：
+  明明 <var>φ</var> 更小、時間更長、照理說應該分得更開，
+  <var>R</var><sub>s</sub> 卻從 <var>φ</var>=0.325 的 1.50 暴跌到 <strong>0.235</strong>。
+</p>
+
+<div class="analogy">
+  <div class="at">發生了什麼事：兩條線交叉了</div>
+  <p>
+    回去看第 7 節那張 ln <var>k</var> 對 <var>φ</var> 的圖。
+    <strong>A6（五氯酚）的斜率比 A7（甲苯）陡</strong>——
+    它們的兩條直線會在某個 <var>φ</var> 相交。
+  </p>
+  <p>
+    在交點左邊，A7 比 A6 晚出來；在交點右邊，順序<strong>反過來</strong>。
+    而在交點上，兩個成分的 <var>t</var><sub>R</sub> <strong>一模一樣</strong>——完全重疊，
+    這叫<strong>共沖提（coelution）</strong>。
+  </p>
+  <p style="margin-bottom:0">
+    你可以在模擬器上把 <var>φ</var> 從 0.30 慢慢拖到 0.40，親眼看到這兩個峰靠近、合體、再分開。
+  </p>
+</div>
+
+<div class="note bad">
+  <span class="nt">這就是為什麼需要電腦最佳化</span>
+  <p>
+    這個陷阱<strong>沒有任何直覺能預測</strong>。
+    如果你用傳統的試誤法，先試 <var>φ</var>=0.30（不錯）再試 0.35（災難），
+    你很可能得出「往下調會變糟」的錯誤結論就放棄了——
+    卻永遠不會發現真正的最佳解在 0.41。
+  </p>
+  <p style="margin-bottom:0">
+    <code>iopt</code> 把整個範圍<strong>掃過一遍</strong>，所以它看得到全貌。
+    這才是「電腦輔助最佳化」真正的價值：<strong>不是算得比較準，是不會漏看</strong>。
+  </p>
+</div>
+
+<div class="quiz" data-quiz="q4">
+  <div class="qh">隨堂測驗</div>
+  <div class="qq">
+    你把 φ 一路往上調到 0.60，發現最後一個峰 5 分鐘就出來了，超快。
+    可是 R<sub>s</sub> 只有 0.002。這代表什麼？
+  </div>
+  <button class="opt" data-ok="0">儀器壞了，需要重新校正</button>
+  <button class="opt" data-ok="0">很好，時間短就是好方法</button>
+  <button class="opt" data-ok="1">所有成分都被沖出來了，但幾乎全部擠在一起，等於什麼都沒分開</button>
+  <button class="opt" data-ok="0">需要把 t₀ 重新測一次</button>
+  <div class="expl">
+    <strong>φ 太高時，所有 k 值都趨近於 0，全部成分幾乎和溶劑一起沖出來。</strong>
+    速度是快了，但層析圖上只剩一團擠在一起的東西，完全沒有分析價值。<br>
+    這說明了最佳化<strong>一定是一個取捨</strong>：
+    速度和解析度往相反方向走，你要找的是「在能忍受的時間內，解析度最好」的那個平衡點，
+    而不是任何單一指標的極端值。
+  </div>
+</div>
+
+<hr>
+
+<h2 id="s9"><span class="num">9.</span>當一個 φ 值救不了你：梯度沖提<span class="chip m">中階</span></h2>
+
+<p class="lede">
+  剛才我們發現：10 分鐘的預算下，不管 <var>φ</var> 怎麼調都達不到基線分離。
+  這不是運氣不好，而是一個有名字的結構性問題。
+</p>
+
+<h3>一般沖提問題（the general elution problem）</h3>
+
+<p>
+  當你的樣品裡<strong>同時有很親水的成分和很疏水的成分</strong>時，你會陷入兩難：
+</p>
+
+<div class="two">
+  <div class="card" style="margin:0">
+    <h4 style="margin-top:0;color:var(--bad)">φ 調低（溶劑弱）</h4>
+    <p style="margin-bottom:0">
+      前面那幾個親水的成分分得很漂亮 ✓<br>
+      但後面疏水的成分<strong>幾乎不出來</strong>，
+      而且因為在管柱裡待太久，峰<strong>又矮又寬</strong>，
+      甚至矮到看不見。✗
+    </p>
+  </div>
+  <div class="card" style="margin:0">
+    <h4 style="margin-top:0;color:var(--bad)">φ 調高（溶劑強）</h4>
+    <p style="margin-bottom:0">
+      後面疏水的成分很快出來、峰又高又瘦 ✓<br>
+      但前面那幾個親水的成分<strong>全部擠在死時間附近</strong>，
+      黏成一團完全分不開。✗
+    </p>
+  </div>
+</div>
+
+<p>
+  兩邊都對，也都不夠。<strong>沒有任何單一的 <var>φ</var> 能同時滿足兩端。</strong>
+  這就是「一般沖提問題」。
+</p>
+
+<div class="analogy">
+  <div class="at">解法：不要一直用同一個 φ</div>
+  <p>
+    既然前段需要弱溶劑、後段需要強溶劑，那就<strong>讓 <var>φ</var> 隨時間慢慢變大</strong>。
+  </p>
+  <p style="margin-bottom:0">
+    開始時 <var>φ</var> 低，溫柔地把親水的成分一個一個分開送出來；
+    接著 <var>φ</var> 逐漸升高，越來越用力地把後面那些死黏著的疏水成分「洗」下來。
+    這就是<strong>梯度沖提（gradient elution）</strong>。
+  </p>
+</div>
+
+<h3>梯度的三個參數</h3>
+
+<div class="tw">
+<table>
+<thead><tr><th>參數</th><th>意思</th><th>程式裡的名字</th></tr></thead>
+<tbody>
+<tr><td><strong><var>φ</var><sub>min</sub> → <var>φ</var><sub>max</sub></strong></td>
+    <td>從多少開始、升到多少。例如 0.30 → 0.60</td><td><code>fmin</code>、<code>fmax</code></td></tr>
+<tr><td><strong><var>t</var><sub>G</sub></strong>（梯度時間）</td>
+    <td>花多久時間爬完這一段。<strong>這是最主要要最佳化的旋鈕。</strong>
+        <var>t</var><sub>G</sub> 短 = 爬得陡 = 快但擠；<var>t</var><sub>G</sub> 長 = 爬得緩 = 慢但分得開</td>
+    <td><code>tG</code>、搜尋範圍 <code>tGmin</code>/<code>tGmax</code></td></tr>
+<tr><td><strong><var>t</var><sub>D</sub></strong>（延遲時間）</td>
+    <td>幫浦「開始改變比例」到「新的比例真的抵達管柱入口」之間的延遲，
+        因為中間隔著管路和混合室。<strong>每台儀器都不一樣，必須自己量。</strong></td>
+    <td><code>tD</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="sim" id="sim-grad">
+  <div class="sim-head">
+    <span class="st1">梯度沖提模擬器</span>
+    <span class="st2">同樣的 9 個成分。上圖是梯度程式，下圖是結果</span>
+  </div>
+  <div class="sim-body">
+    <div class="canvas-box"><canvas id="cv-grad" width="900" height="430"></canvas></div>
+    <div class="ctrls">
+      <div class="ctrl">
+        <label><span class="lbtxt">梯度時間　<var>t</var><sub>G</sub></span><span class="val" id="v-g-tg">15 分鐘</span></label>
+        <input type="range" id="r-g-tg" min="20" max="400" value="150">
+        <span class="hint">從 <var>φ</var><sub>min</sub> 爬到 <var>φ</var><sub>max</sub> 花的時間。對應 <code>gopt</code> 的 <code>tG</code></span>
+      </div>
+      <div class="ctrl">
+        <label><span class="lbtxt">起始比例　<var>φ</var><sub>min</sub></span><span class="val" id="v-g-f1">0.20</span></label>
+        <input type="range" id="r-g-f1" min="0" max="500" value="200">
+        <span class="hint">太高的話，前面幾個成分會擠在一起</span>
+      </div>
+      <div class="ctrl">
+        <label><span class="lbtxt">結束比例　<var>φ</var><sub>max</sub></span><span class="val" id="v-g-f2">0.65</span></label>
+        <input type="range" id="r-g-f2" min="200" max="900" value="650">
+        <span class="hint">太低的話，最後幾個成分會拖很久才出來</span>
+      </div>
+    </div>
+    <div class="readout">
+      <div class="stat" id="st-g-rs"><div class="k">最小 Rs</div><div class="v" id="v-g-rs">—</div></div>
+      <div class="stat"><div class="k">最難分的一對</div><div class="v" id="v-g-pair" style="font-size:16px">—</div></div>
+      <div class="stat" id="st-g-tm"><div class="k">最後出峰時間</div><div class="v" id="v-g-tm">—</div></div>
+      <div class="stat"><div class="k">峰寬（首／末）</div><div class="v" id="v-g-w" style="font-size:15px">—</div></div>
+    </div>
+    <div class="verdict" id="g-verdict"></div>
+    <div class="btn-row">
+      <span class="lb">比較看看：</span>
+      <button class="btn" data-gpre="iso">切回恆溶劑（φ 固定 0.45）</button>
+      <button class="btn" data-gpre="rescue">10 分鐘達標的梯度</button>
+      <button class="btn" data-gpre="good">從容的梯度</button>
+      <button class="btn" data-gpre="steep">太陡的梯度</button>
+    </div>
+  </div>
+</div>
+
+<div class="note good">
+  <span class="nt">回答第 8 節留下的問題：梯度真的救得了 10 分鐘嗎？</span>
+  <p>
+    救得了。請按上面的「<strong>10 分鐘達標的梯度</strong>」按鈕
+    （<var>φ</var> 從 0.35 爬到 0.70，<var>t</var><sub>G</sub> = 11 分鐘）。
+  </p>
+  <div class="tw" style="margin:14px 0">
+  <table>
+  <thead><tr><th>時間預算</th><th>恆溶劑最好能做到</th><th>梯度最好能做到</th></tr></thead>
+  <tbody>
+  <tr><td class="num-col"><strong>10 分鐘</strong></td>
+      <td style="color:var(--bad)">R<sub>s</sub> = 0.916　❌ 不合格</td>
+      <td style="color:var(--good)"><strong>R<sub>s</sub> = 1.63</strong>　✅ 基線分離</td></tr>
+  <tr><td class="num-col">15 分鐘</td>
+      <td>R<sub>s</sub> = 2.03　✅</td><td>R<sub>s</sub> = 2.41　✅</td></tr>
+  <tr><td class="num-col">20 分鐘</td>
+      <td>R<sub>s</sub> = 2.46　✅</td><td>R<sub>s</sub> = 2.45　✅（幾乎相同）</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p style="margin-bottom:0">
+    看最後一列：時間夠寬裕時，梯度<strong>並沒有比較好</strong>。
+    梯度的價值不是「一定比較強」，而是<strong>在時間被壓縮的時候，它還撐得住，而恆溶劑已經垮了</strong>。
+    這也再次說明為什麼論文同時保留兩套函數。
+  </p>
+</div>
+
+<div class="note">
+  <span class="nt">注意看峰寬</span>
+  <p>
+    切換「恆溶劑」和「好的梯度」，特別注意<strong>最後幾個峰的寬度</strong>。
+  </p>
+  <p style="margin-bottom:0">
+    恆溶劑時，第 9 個峰又矮又胖（因為它在管柱裡待了 17 分鐘，擴散得很厲害）。
+    梯度時，後面的成分被越來越強的溶劑「推」著走，
+    <strong>每個峰的寬度變得差不多</strong>——這是梯度沖提最漂亮的附加好處，
+    也讓後面的成分更容易被偵測到。
+  </p>
+</div>
+
+<div class="note warn">
+  <span class="nt">梯度的代價：數學變難了</span>
+  <p>
+    恆溶劑時 <var>k</var> 是固定的，<var>t</var><sub>R</sub> = <var>t</var><sub>0</sub>(1+<var>k</var>) 一行就算完。
+  </p>
+  <p>
+    但梯度時 <var>φ</var> 一直在變，所以 <var>k</var> <strong>也一直在變</strong>。
+    你必須解一條積分方程式（論文的 Eq. 1）：
+  </p>
+  <div class="eq" style="background:var(--bg2)">
+    ∫<sub>0</sub><sup style="font-size:.7em"><var>t</var><sub>R</sub></sup> d<var>t</var> ⁄ ( <var>t</var><sub>0</sub> <var>k</var>(<var>t</var>) ) = 1
+    <span class="where">
+      白話：分子在管柱裡每一小段時間往前推進一點點，<strong>累積走完 100% 的管柱長度時就出來了</strong>。
+      這個模擬器就是這樣一小步一小步算出來的。
+    </span>
+  </div>
+  <p style="margin-bottom:0">
+    這個積分手算不了。論文的 <code>gfitk</code>、<code>gpred</code>、<code>gopt</code>
+    提供兩種解法：<code>mode="A"</code> 用解析解（比較快，但只適用模型 1–5 和 8），
+    <code>mode="NP"</code> 用數值逼近（比較慢，但所有模型都能用）。
+    <strong>這就是你真的需要這套 R 軟體、而不是 Excel 的地方。</strong>
+  </p>
+</div>
+
+<div class="quiz" data-quiz="q5">
+  <div class="qh">隨堂測驗</div>
+  <div class="qq">
+    同事說：「梯度比較好用，以後全部都跑梯度就對了。」這個說法哪裡需要補充？
+  </div>
+  <button class="opt" data-ok="0">沒問題，梯度確實在所有情況下都比較好</button>
+  <button class="opt" data-ok="1">梯度跑完必須花時間讓管柱回到起始條件（再平衡），而且需要更貴的雙幫浦系統；成分性質相近的簡單樣品用恆溶劑更省事也更穩定</button>
+  <button class="opt" data-ok="0">梯度會破壞管柱，不能常用</button>
+  <button class="opt" data-ok="0">梯度只能用在酸性樣品</button>
+  <div class="expl">
+    <strong>梯度解決的是「成分性質差很多」的問題。</strong>
+    如果你的樣品成分性質相近（例如只測三種防腐劑），恆溶劑就夠了，而且有幾個實際優勢：
+    不需要再平衡（每針之間省 5–10 分鐘）、基線更穩、儀器更便宜、方法更容易轉移到別的實驗室。<br>
+    論文同時提供恆溶劑（<code>iopt</code>）和梯度（<code>gopt</code>）兩套函數，正是因為<strong>兩種都有它的位置</strong>。
+    選擇的依據是你的樣品，不是流行。
+  </div>
+</div>
+<hr>
+
+<h2 id="s10"><span class="num">10.</span>第二顆旋鈕：pH<span class="chip m">中階</span></h2>
+
+<p class="lede">
+  <var>φ</var> 和梯度控制的是「<strong>所有成分一起變快或變慢</strong>」。
+  但有一顆旋鈕不一樣——它能改變「<strong>誰跑得比誰快</strong>」，甚至把出峰順序整個翻過來。
+</p>
+
+<p>
+  回到第 1 節那瓶飲料。三個目標物裡，<strong>咖啡因是中性分子</strong>，
+  但<strong>苯甲酸和己二烯酸都是弱酸</strong>。這個差別在調 <var>φ</var> 時看不出來，
+  一旦你動 pH，它就會主宰一切。
+</p>
+
+<div class="analogy">
+  <div class="at">關鍵：帶電的分子不黏管柱</div>
+  <p>
+    C18 管柱表面是油性的，它只喜歡「油性的、電中性的」分子。
+  </p>
+  <p>
+    弱酸在<strong>酸性</strong>環境裡維持完整的分子形式（—COOH），是中性的、偏油的
+    → <strong>黏得住，出得晚</strong>。<br>
+    但當 pH 升高，它會<strong>解離</strong>成帶負電的離子（—COO⁻）。
+    帶電的東西親水、不親油 → <strong>幾乎不黏了，很快就被沖出來</strong>。
+  </p>
+  <p style="margin-bottom:0">
+    咖啡因呢？它在 pH 2 到 8 之間都是中性的，<strong>完全不受影響</strong>，
+    不管 pH 怎麼變，它都待在原地。
+  </p>
+</div>
+
+<h3>轉折點在哪裡：p<var>K</var><sub>a</sub></h3>
+
+<p>
+  每個弱酸都有一個專屬的數字 p<var>K</var><sub>a</sub>，代表它「<strong>剛好一半解離</strong>」時的 pH。
+  在 p<var>K</var><sub>a</sub> 以下它主要是中性的，以上主要是離子態，轉變集中在前後約兩個 pH 單位之間。
+</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>成分</th><th>酸鹼性質</th><th>p<var>K</var><sub>a</sub></th><th>pH 升高時</th></tr></thead>
+<tbody>
+<tr><td><strong>咖啡因</strong></td><td>中性（極弱鹼）</td><td class="num-col">—</td>
+    <td style="color:var(--ink3)">不變</td></tr>
+<tr><td><strong>苯甲酸</strong></td><td>單質子弱酸</td><td class="num-col">4.20</td>
+    <td style="color:var(--warm)">較早解離 → 先變快</td></tr>
+<tr><td><strong>己二烯酸</strong></td><td>單質子弱酸</td><td class="num-col">4.76</td>
+    <td style="color:var(--warm)">較晚解離 → 後變快</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>
+  注意這兩個 p<var>K</var><sub>a</sub> <strong>差了 0.56</strong>。
+  就是這 0.56 的差距，讓兩根酸在不同 pH 下「各自以不同的速度提早出來」，
+  也讓整個出峰順序有機會被改寫。
+</p>
+
+<h3>描述它的公式：模型 7</h3>
+
+<div class="eq">
+  <span class="en">模型 7</span>
+  <var>k</var> = ( <var>k</var><sub>0</sub> + <var>k</var><sub>1</sub> · 10<sup>(pH−p<var>K</var>)</sup> ) ⁄ ( 1 + 10<sup>(pH−p<var>K</var>)</sup> )
+  <span class="where">
+    <var>k</var><sub>0</sub>：<strong>中性態</strong>的滯留因子（大）　·
+    <var>k</var><sub>1</sub>：<strong>完全解離態</strong>的滯留因子（小）<br>
+    低 pH 時 10<sup>(pH−p<var>K</var>)</sup> 趨近 0，<var>k</var> → <var>k</var><sub>0</sub>；
+    高 pH 時該項變得很大，<var>k</var> → <var>k</var><sub>1</sub>。
+    中間是一條平滑的 S 形轉折。
+  </span>
+</div>
+
+<p>
+  這就是論文 Table 2 的<strong>模型 7</strong>（<code>model=7</code>）。
+  它和模型 1 的角色完全對稱：模型 1 描述 <var>φ</var> 怎麼影響 <var>k</var>，模型 7 描述 pH 怎麼影響 <var>k</var>。
+  <a href="#s16">附錄</a>裡的模型 8 和 10 則是把兩者合起來，同時處理 <var>φ</var> 和 pH。
+</p>
+
+<div class="sim" id="sim-ph">
+  <div class="sim-head">
+    <span class="st1">pH 模擬器：看出峰順序被改寫</span>
+    <span class="st2">上圖是三個成分的滯留時間隨 pH 變化，下圖是該 pH 下的層析圖</span>
+  </div>
+  <div class="sim-body">
+    <div class="canvas-box"><canvas id="cv-ph" width="900" height="470"></canvas></div>
+    <div class="ctrls">
+      <div class="ctrl">
+        <label><span class="lbtxt">移動相 pH</span><span class="val" id="v-ph">3.00</span></label>
+        <input type="range" id="r-ph" min="250" max="700" value="300">
+        <span class="hint">慢慢往右拖，注意<strong>咖啡因（灰色虛線）完全不動</strong>，兩根酸卻一路往下掉</span>
+      </div>
+    </div>
+    <div class="readout">
+      <div class="stat" id="st-ph-rs"><div class="k">最小 Rs</div><div class="v" id="v-ph-rs">—</div></div>
+      <div class="stat"><div class="k">最難分的一對</div><div class="v" id="v-ph-pair" style="font-size:14px">—</div></div>
+      <div class="stat"><div class="k">最後出峰時間</div><div class="v" id="v-ph-tm">—</div></div>
+      <div class="stat"><div class="k">出峰順序</div><div class="v" id="v-ph-ord" style="font-size:13px;line-height:1.5">—</div></div>
+    </div>
+    <div class="verdict" id="ph-verdict"></div>
+    <div class="btn-row">
+      <span class="lb">關鍵位置：</span>
+      <button class="btn" data-ph="300">pH 3.0　經典條件</button>
+      <button class="btn" data-ph="445">pH 4.45　陷阱一</button>
+      <button class="btn" data-ph="500">pH 5.0　三明治</button>
+      <button class="btn" data-ph="542">pH 5.42　陷阱二</button>
+      <button class="btn" data-ph="700">pH 7.0　完全顛倒</button>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <span class="nt">模擬用的數值哪裡來</span>
+  <p style="margin-bottom:0">
+    p<var>K</var><sub>a</sub> 用的是苯甲酸 4.20、己二烯酸 4.76 這兩個標準文獻值。
+    <var>k</var><sub>0</sub> 與 <var>k</var><sub>1</sub> 則是<strong>依照文獻報告的典型滯留時間反推</strong>的代表值
+    （<var>t</var><sub>0</sub> = 1.2 分鐘，酸性條件下咖啡因約 2.6 分、苯甲酸約 4.1 分、己二烯酸約 5.7 分），
+    目的是讓你看清楚趨勢。<strong>換一根管柱、換一種有機溶劑，絕對值會不一樣，但「兩根酸會提早、咖啡因不動」這個行為是通則。</strong>
+  </p>
+</div>
+
+<h3>三段不同的出峰順序</h3>
+
+<p>把 pH 從 2.5 拖到 7.0，你會經過三個截然不同的區間：</p>
+
+<div class="tw">
+<table>
+<thead><tr><th>pH 區間</th><th>出峰順序</th><th>發生什麼事</th></tr></thead>
+<tbody>
+<tr><td class="num-col"><strong>2.5 – 4.4</strong></td>
+    <td>咖啡因 → 苯甲酸 → 己二烯酸</td>
+    <td>兩根酸都是中性、都黏得牢。<strong>這就是文獻方法採用的區間</strong>，也是第 1 節那張圖的順序。</td></tr>
+<tr><td class="num-col" style="color:var(--bad)"><strong>≈ 4.45</strong></td>
+    <td style="color:var(--bad)">咖啡因 ＝ 苯甲酸</td>
+    <td style="color:var(--bad)">苯甲酸已解離到追上咖啡因，<strong>兩個峰完全重疊</strong>。</td></tr>
+<tr><td class="num-col"><strong>4.5 – 5.4</strong></td>
+    <td>苯甲酸 → 咖啡因 → 己二烯酸</td>
+    <td>苯甲酸已經跑到咖啡因前面，己二烯酸還沒。咖啡因被夾在中間。</td></tr>
+<tr><td class="num-col" style="color:var(--bad)"><strong>≈ 5.42</strong></td>
+    <td style="color:var(--bad)">咖啡因 ＝ 己二烯酸</td>
+    <td style="color:var(--bad)">換己二烯酸追上咖啡因，<strong>再一次完全重疊</strong>。</td></tr>
+<tr><td class="num-col"><strong>5.5 – 7.0</strong></td>
+    <td>苯甲酸 → 己二烯酸 → 咖啡因</td>
+    <td>兩根酸都完全解離、都很早出來，<strong>咖啡因反而變成最後一個</strong>——和一開始完全相反。</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="note bad">
+  <span class="nt">和第 8 節一模一樣的教訓</span>
+  <p style="margin-bottom:0">
+    你在第 8 節看過 <var>φ</var> ≈ 0.35 的共沖提陷阱。現在 pH 這條軸上<strong>有兩個</strong>。
+    共通點是：<strong>解析度對條件的變化不是單調的，中間會塌陷</strong>，
+    而塌陷的位置完全無法憑直覺猜到——它取決於各成分 p<var>K</var><sub>a</sub> 的細微差距。
+    這正是 <code>iopt</code> 提供 <code>pHmin</code>、<code>pHmax</code>、<code>dpH</code> 這組參數、
+    把整個 pH 範圍掃過一遍的理由。
+  </p>
+</div>
+
+<div class="quiz" data-quiz="q6">
+  <div class="qh">思考題一</div>
+  <div class="qq">
+    你接手一個舊方法，紀錄寫著「pH 6.5，第一個出來的峰是目標防腐劑」。
+    你手上有咖啡因、苯甲酸、己二烯酸三支標準品。<strong>第一個出峰的最可能是哪一個？</strong>
+  </div>
+  <button class="opt" data-ok="0">咖啡因，因為它分子量最小</button>
+  <button class="opt" data-ok="1">苯甲酸，因為在 pH 6.5 它已完全解離帶負電，最不黏管柱</button>
+  <button class="opt" data-ok="0">己二烯酸，因為它的 pK<sub>a</sub> 比較大</button>
+  <button class="opt" data-ok="0">無法判斷，出峰順序和 pH 無關</button>
+  <div class="expl">
+    <strong>pH 6.5 遠高於兩根酸的 pK<sub>a</sub>（4.20 與 4.76），兩者都已幾乎完全解離。</strong>
+    帶負電的離子不親油、不黏 C18，所以都很早出來；而苯甲酸的離子態滯留又比己二烯酸更弱，所以它排第一。<br>
+    咖啡因在這個 pH 仍是中性，反而變成<strong>最後</strong>一個出峰。<br>
+    <span style="color:var(--ink3)">順帶一提：「分子量越小跑越快」在逆相層析裡是錯的直覺——決定順序的是<strong>親油性</strong>（以及帶不帶電），不是大小。</span>
+  </div>
+</div>
+
+<div class="quiz" data-quiz="q7">
+  <div class="qh">思考題二</div>
+  <div class="qq">
+    同學把移動相調到 pH 4.5 跑標準品，結果層析圖上<strong>只看到兩個峰</strong>，
+    但他明明打了三支標準品的混合液。他懷疑是某一支標準品配壞了。
+    <strong>你會建議他先做什麼？</strong>
+  </div>
+  <button class="opt" data-ok="0">重新配製三支標準品，重跑一次</button>
+  <button class="opt" data-ok="0">把偵測波長改掉，可能是某個成分沒吸收</button>
+  <button class="opt" data-ok="1">先把 pH 調到 3.0 再跑一次——很可能是咖啡因和苯甲酸在 pH 4.45 附近共沖提，兩個峰疊成了一個</button>
+  <button class="opt" data-ok="0">把流速調快，讓峰變得比較尖</button>
+  <div class="expl">
+    <strong>pH 4.5 剛好落在第一個共沖提陷阱上。</strong>
+    咖啡因與苯甲酸在此重疊成單一個峰，看起來就像「少了一支」。
+    只要把 pH 調回 3.0，兩者會拉開到 2.60 與 4.05 分鐘，三個峰立刻都回來了。<br>
+    這題的重點是一個實驗室裡的習慣：<strong>看到峰「不見了」，先懷疑重疊，再懷疑樣品。</strong>
+    重配標準品要花半小時，改一個 pH 重跑只要幾分鐘，而且能直接證實或排除這個假設。<br>
+    <span style="color:var(--ink3)">選項二不能算全錯——換波長確實是排查手段之一，但這三個成分在 220–230 nm 都有良好吸收，而且「兩個峰而非三個」的模式高度指向共沖提。</span>
+  </div>
+</div>
+
+<div class="quiz" data-quiz="q8">
+  <div class="qh">思考題三：綜合判斷</div>
+  <div class="qq">
+    根據模擬器，pH 3.0 的最小 R<sub>s</sub> ≈ 3.8（最後出峰 5.7 分鐘），
+    pH 5.0 的最小 R<sub>s</sub> ≈ 2.0（最後出峰 3.3 分鐘）。兩者都遠超過 1.5。
+    <strong>如果你要寫進標準作業程序（SOP）給整個實驗室每天用，你會選哪一個？</strong>
+  </div>
+  <button class="opt" data-ok="0">pH 5.0，因為快了 2.4 分鐘，一天可以多跑很多針</button>
+  <button class="opt" data-ok="1">pH 3.0，因為它離共沖提陷阱夠遠，pH 配製有小誤差時結果仍然穩定</button>
+  <button class="opt" data-ok="0">兩個都可以，隨便挑一個寫進 SOP 即可</button>
+  <div class="expl">
+    <strong>關鍵不是哪個數字漂亮，而是「配錯一點會怎樣」。</strong><br>
+    pH 5.0 的兩側各有一個陷阱（4.45 和 5.42），<strong>左右只有約 0.4 個 pH 單位的緩衝空間</strong>。
+    緩衝液配製誤差 ±0.2、不同批號的試劑、電極沒校正好——任何一個都可能把你推向懸崖，
+    而且失敗的方式是<strong>悄悄地少一個峰</strong>，不是報錯。<br>
+    pH 3.0 距離最近的陷阱有 1.45 個 pH 單位，而且在這個區間 R<sub>s</sub> 對 pH 的變化很平緩（你可以拖滑桿驗證：pH 2.5 到 3.5 之間 R<sub>s</sub> 都在 3.4 以上）。
+    多花 2.4 分鐘換來的是<strong>方法的耐用性（robustness）</strong>。<br>
+    <strong>這就是為什麼文獻方法幾乎清一色使用 pH 3–4</strong>——不是因為那裡最快，
+    而是因為那裡最不容易出錯。真實世界的方法開發，穩定性往往比最佳值更重要。
+  </div>
+</div>
+
+<h3>延伸案例：真實的論文怎麼做同一件事</h3>
+
+<p>
+  你到目前為止做的（拖一個變數、看最小 R<sub>s</sub>、避開陷阱、在時間與解析度之間取捨），
+  就是方法開發的核心工作。這裡看一篇真實的研究，它處理的正是同一批成分。
+</p>
+
+<div class="card">
+  <h4 style="margin-top:0">Aşçı 等人（2016）：軟性飲料中五種添加物與咖啡因的同時定量</h4>
+  <p>
+    這個團隊要一次分開<strong>己二烯酸鉀、苯甲酸鈉、咖啡因</strong>，
+    再加上三種食用色素（carmoisine、allura red、ponceau 4R）——比你的三個成分更難。
+    管柱是 Inertsil ODS-3V（250 × 4.6 mm、5 µm），偵測波長 230 nm。
+  </p>
+  <p>他們同時最佳化<strong>三個</strong>變數：</p>
+  <div class="tw" style="margin:12px 0">
+  <table>
+  <thead><tr><th>變數</th><th>搜尋範圍</th><th>找到的最佳值</th></tr></thead>
+  <tbody>
+  <tr><td>移動相 pH</td><td class="num-col">6.0 – 7.0</td><td class="num-col"><strong>6.0</strong></td></tr>
+  <tr><td>流速（mL/min）</td><td class="num-col">1.0 – 1.4</td><td class="num-col"><strong>1.0</strong></td></tr>
+  <tr><td>醋酸緩衝液比例</td><td class="num-col">85% – 95%</td><td class="num-col"><strong>95%</strong></td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p style="margin-bottom:0">
+    最關鍵的是他們選的<strong>目標函數</strong>：原文寫的是
+    「<em>Resolution values of all peak pairs were used as a response</em>」——
+    <strong>用所有相鄰峰對的解析度當作要最大化的目標</strong>。
+    這和你在第 8 節看到的 <code>iopt</code> 回報「最難分的一對」的 R<sub>s</sub>，
+    是完全相同的思路。
+  </p>
+</div>
+
+<div class="note">
+  <span class="nt">兩種找最佳解的策略</span>
+  <p style="margin-bottom:0">
+    這篇論文用的是<strong>實驗設計法（Box-Behnken design）</strong>：
+    實際做十幾次實驗，用統計模型擬合出反應曲面，再推出最佳點。
+    而 <code>iopt</code>／<code>gopt</code> 走的是另一條路：<strong>先用少數實驗建立滯留模型，
+    再用電腦把整個範圍暴力掃過一遍</strong>。
+    前者不需要懂滯留機制，但每個變數都要花真實的實驗成本；
+    後者要先花力氣建模，但建好之後<strong>模擬幾千種條件是免費的</strong>——
+    也因此才看得到第 8 節那種藏在中間的陷阱。
+  </p>
+</div>
+
+<details>
+  <summary>思考題四：這張表上有一個值得警覺的地方，你看出來了嗎？</summary>
+  <div class="dbody">
+    <p>
+      再看一次上面那張表：<strong>三個最佳值全部都落在搜尋範圍的邊界上</strong>——
+      pH 停在下限 6.0、流速停在下限 1.0、緩衝液比例停在上限 95%。
+    </p>
+    <p>
+      當最佳解<strong>貼在你設定的邊界</strong>時，它通常在告訴你一件事：
+      <strong>真正的最佳點可能在你搜尋的範圍之外。</strong>
+      如果 pH 5.5 或 5.0 表現更好，這個搜尋設計是看不到的，因為它從來沒有去試。
+    </p>
+    <p>
+      這不代表這篇論文做錯了——實務上邊界常常是有理由的：
+      流速有管柱壓力上限、緩衝液比例有溶解度限制、pH 太低可能傷害管柱的鍵結相
+      （傳統矽膠 C18 一般建議 pH 2–8）。
+      <strong>重點是：作者應該說明邊界是「物理限制」還是「隨手設的」，讀者也應該去問這個問題。</strong>
+    </p>
+    <div class="note warn" style="margin-bottom:0">
+      <span class="nt">這件事在 RChromOptim 裡也會發生</span>
+      <p style="margin-bottom:0">
+        完全一樣的陷阱會出現在 <code>ifitk</code>／<code>gfitk</code> 的參數擬合上：
+        如果某個參數的估計值剛好等於你設的 <code>upper</code>（預設 200），
+        代表模型沒有真的收斂，只是<strong>被邊界擋住了</strong>。
+        論文自己的範例資料就有這個現象——模型 4 的 <var>c</var><sub>2</sub> 對某些溶質卡在上限。
+        遇到這種情形的處理方式，請見<a href="#s18">附錄的常見問題排除</a>。
+      </p>
+    </div>
+    <p style="margin-bottom:0">
+      <strong>養成一個習慣：任何最佳化跑完，第一件事是看最佳解是不是貼在邊界上。</strong>
+      是的話，把範圍放寬再跑一次——或者說明為什麼不能放寬。
+    </p>
+  </div>
+</details>
+
+<h2 id="s11"><span class="num">11.</span>架好你的 R 環境<span class="chip a">進階</span></h2>
+<p class="lede">從這一節開始，你會動手用真正的統計軟體 R 來跑 <strong>RChromOptim</strong>——這是 Zisi、Pappa-Louisi 與 Nikitas 三位學者在 2020 年發表於《Journal of Chromatography A》的一套工具，把前面幾節教你手算的滯留模型（例如 lnk = c0 − c1·f）、解析度 Rs、峰形，全部包成十個可以直接呼叫的函數。你不需要自己寫程式，只要照著步驟把資料餵給它。</p>
+
+<div class="card">
+<h3>Step 1：安裝 R</h3>
+<p>到 <span class="kbd">https://www.r-project.org/</span> 下載並安裝 R（Windows 版）。R 是免費、開放原始碼的統計軟體，你可以把它想成「一個看得懂數學公式、也能畫圖的超強計算機」。</p>
+
+<h3>Step 2：安裝四個必要套件（package）</h3>
+<p>套件（package）是別人寫好、可以直接拿來用的功能模組。RChromOptim 需要四個輔助套件才能運作。打開 R，在主控台（console）輸入：</p>
+<pre><div class="plabel">R Console<span>安裝套件</span></div><code><span class="cm"># 一次安裝四個套件，中間用逗號分隔</span>
+<span class="fn">install.packages</span>(<span class="fn">c</span>(<span class="st">"optimx"</span>, <span class="st">"VGAM"</span>, <span class="st">"plot3D"</span>, <span class="st">"numDeriv"</span>))</code></pre>
+
+<h3>Step 3：載入 RChromOptim 的工作空間（workspace）</h3>
+<p>作者把十個函數都存在一個叫 <span class="kbd">RChromOptim.RData</span> 的檔案裡。這種 <span class="kbd">.RData</span> 檔就像一個「打包好的工具箱」，載入後裡面的函數就能直接叫得出來。兩種做法都可以：</p>
+<div class="two">
+<div class="card">
+<h4>用選單（新手推薦）</h4>
+<p>R 視窗上方選單：<strong>File &gt; Load Workspace</strong>（載入工作空間），找到並選取 <span class="kbd">RChromOptim.RData</span>。</p>
+</div>
+<div class="card">
+<h4>用指令</h4>
+<pre><div class="plabel">R Console</div><code><span class="fn">load</span>(<span class="st">"RChromOptim.RData"</span>)</code></pre>
+</div>
+</div>
+
+<h3>Step 4：確認十個函數都在</h3>
+<pre><div class="plabel">R Console<span>檢查</span></div><code><span class="fn">ls</span>()</code></pre>
+<p>執行後應該會列出剛好十個名字：<span class="kbd">ifitk</span>、<span class="kbd">gfitk</span>、<span class="kbd">fitshape</span>、<span class="kbd">ipred</span>、<span class="kbd">gpred</span>、<span class="kbd">mgpred</span>、<span class="kbd">iopt</span>、<span class="kbd">gopt</span>、<span class="kbd">mgopt</span>、<span class="kbd">ifitopt</span>。少一個都代表載入不完整，回頭檢查 Step 3。</p>
+</div>
+
+<div class="note warn">
+<span class="nt">重要警告：這套工具只能在 Windows 上跑，而且是「互動式」的</span>
+<p>十個函數全部都會呼叫 <span class="kbd">choose.files()</span>——這是 Windows 專屬的檔案選取視窗（file-picker dialog），跳出一個小視窗讓你「用滑鼠點檔案」。這代表：</p>
+<ul class="check">
+<li>你<strong>永遠不會</strong>把檔案路徑打成參數塞進函數裡，而是執行後跳出視窗，你再用滑鼠去點選要用的 .txt 檔。</li>
+<li>Mac 或 Linux 使用者：<span class="kbd">choose.files()</span> 在你的系統上不存在，必須自己把原始碼裡的這行改成 <span class="kbd">file.choose()</span> 才能執行。</li>
+<li>有幾個函數（例如畫圖、挑峰）還會開啟 <span class="kbd">windows(record=T)</span> 繪圖視窗，並用 <span class="kbd">locator()</span> 讓你在圖上用滑鼠點兩下（例如標出峰的位置）。</li>
+<li>正因如此，這套工具<strong>無法在沒有畫面的環境跑</strong>（headless）——不能放在 RStudio Server、不能寫進 knitr 報告自動產生，必須有人坐在電腦前面點滑鼠。</li>
+</ul>
+</div>
+
+<div class="note bad">
+<span class="nt">最容易漏看的地方：提示訊息不在主控台，而在繪圖視窗的「標題」上</span>
+<p>很多程式習慣把「請輸入 xxx」這種提示印在主控台（console）文字裡，但 RChromOptim 不是——它把操作提示<strong>寫成繪圖視窗（graphics window）的圖表標題（plot title）</strong>。如果你執行完函數，畫面上的主控台一片安靜，先別慌，切換到跳出來的繪圖視窗看看標題寫什麼，通常是它在等你做下一步（例如「請點選這個峰的起點」）。</p>
+</div>
+
+<h2 id="s12"><span class="num">12.</span>你的資料要長什麼樣子<span class="chip a">進階</span></h2>
+<p class="lede">RChromOptim 只吃一種格式的檔案：<strong>Tab 字元分隔的純文字檔（.txt）</strong>，而且永遠只有<strong>一列標題（header）</strong>。這一節帶你認識四種會用到的檔案長相，之後每個範例都會對照到其中一種。</p>
+
+<h3>(a) 恆溶劑滯留資料（isocratic retention data）——給 ifitk、ifitopt 用</h3>
+<p>第一欄是實驗條件（通常是有機溶劑比例 f），後面每一欄是一個溶質（solute）在該條件下量到的滯留時間 tR（分鐘）。</p>
+<div class="tw"><table>
+<thead><tr><th>f</th><th>A1</th><th>A2</th><th>A3</th><th>A4</th><th>A5</th><th>A6</th><th>A7</th><th>A8</th><th>A9</th></tr></thead>
+<tbody>
+<tr><td class="num-col">0.4</td><td class="num-col">3.735</td><td class="num-col">4.671</td><td class="num-col">6.646</td><td class="num-col">7.662</td><td class="num-col">8.498</td><td class="num-col">10.76</td><td class="num-col">11.09</td><td class="num-col">15.99</td><td class="num-col">19</td></tr>
+<tr><td class="num-col">0.45</td><td class="num-col">3</td><td class="num-col">3.65</td><td class="num-col">5.2</td><td class="num-col">5.6</td><td class="num-col">5.9</td><td class="num-col">6.85</td><td class="num-col">8</td><td class="num-col">10.38</td><td class="num-col">12.69</td></tr>
+<tr><td class="num-col">0.5</td><td class="num-col">2.537</td><td class="num-col">3.01</td><td class="num-col">4.208</td><td class="num-col">4.349</td><td class="num-col">4.43</td><td class="num-col">4.842</td><td class="num-col">6.051</td><td class="num-col">7.239</td><td class="num-col">8.921</td></tr>
+<tr><td class="num-col">0.6</td><td class="num-col">2.013</td><td class="num-col">2.265</td><td class="num-col">3</td><td class="num-col">2.94</td><td class="num-col">2.91</td><td class="num-col">3.061</td><td class="num-col">3.866</td><td class="num-col">4.198</td><td class="num-col">5.085</td></tr>
+</tbody>
+</table></div>
+<p>如果你的滯留模型是 model 7（跟 pH 有關），第一欄就要換成 <span class="kbd">pH</span>；model 8、9、10 則需要<strong>兩欄</strong>條件（例如兩種溶劑或 pH＋f 併用）。</p>
+
+<h3>(b) 梯度滯留資料（gradient retention data）——給 gfitk 用</h3>
+<p>前面固定是<strong>四欄</strong>條件，之後每欄一個溶質。這四欄很容易搞混，務必記住：<span class="kbd">f1、f2</span> 是梯度<strong>起點與終點的有機溶劑比例</strong>，<span class="kbd">t1、t2</span> 是梯度斜坡<strong>開始與結束的時間</strong>——不是兩種溶劑的意思。</p>
+<div class="tw"><table>
+<thead><tr><th>f1</th><th>f2</th><th>t1</th><th>t2</th><th>A1</th><th>A2</th><th>A3</th><th>A4</th><th>A5</th><th>…</th></tr></thead>
+<tbody>
+<tr><td class="num-col">0.2</td><td class="num-col">0.4</td><td class="num-col">0</td><td class="num-col">10</td><td class="num-col">1.63</td><td class="num-col">1.75</td><td class="num-col">1.68</td><td class="num-col">1.55</td><td class="num-col">2.94</td><td class="num-col">…</td></tr>
+<tr><td class="num-col">0.1</td><td class="num-col">0.4</td><td class="num-col">5</td><td class="num-col">10</td><td class="num-col">1.78</td><td class="num-col">2.01</td><td class="num-col">2.13</td><td class="num-col">4.47</td><td class="num-col">9.97</td><td class="num-col">…</td></tr>
+</tbody>
+</table></div>
+
+<h3>(c) 層析圖原始曲線（chromatogram trace）——給 fitshape、以及 ipred/gpred 的 ic=1 用</h3>
+<p>就是一條真實的層析圖曲線，永遠只有<strong>兩欄</strong>：時間、偵測器訊號值。</p>
+<div class="tw"><table>
+<thead><tr><th>t (min)</th><th>y(f = 0.45)</th></tr></thead>
+<tbody>
+<tr><td class="num-col">0.01003</td><td class="num-col">0.001803685</td></tr>
+<tr><td class="num-col">0.02018</td><td class="num-col">0.001784105</td></tr>
+</tbody>
+</table></div>
+
+<h3>(d) 溶質參數檔（solute-parameter file）——ifitk/gfitk 的輸出，也是 pred/opt 的輸入</h3>
+<p>這種檔案是「轉置」的：第一欄是參數名稱，之後每欄是一個溶質。跑完 <span class="kbd">fitshape</span> 之後，峰形參數（h0, h1, h2, s0, s1）會被<strong>附加</strong>在同一個檔案下方。</p>
+<div class="tw"><table>
+<thead><tr><th>solute</th><th>A1</th><th>A2</th><th>A3</th><th>…</th></tr></thead>
+<tbody>
+<tr><td>c0</td><td class="num-col">3.1404</td><td class="num-col">3.4649</td><td class="num-col">3.6690</td><td>…</td></tr>
+<tr><td>c1</td><td class="num-col">6.6413</td><td class="num-col">6.6043</td><td class="num-col">5.9113</td><td>…</td></tr>
+<tr><td>c2</td><td class="num-col">0</td><td class="num-col">0</td><td class="num-col">0</td><td>…</td></tr>
+</tbody>
+</table></div>
+<p>不同模型的參數列名稱不一樣：model 1–6 用 <span class="kbd">c0, c1, c2</span>；model 7 用 <span class="kbd">k0, k1, pK</span>；model 8 用 <span class="kbd">c0, c1, pK, r</span>；model 9 用 <span class="kbd">c0…c5</span>；model 10 用 <span class="kbd">c0, c1, c2, c3, pK</span>。</p>
+
+<div class="note">
+<span class="nt">實用技巧：怎麼從 Excel 存出這種 .txt 檔</span>
+<p>在 Excel 整理好資料後，選<strong>檔案 &gt; 另存新檔</strong>，存檔類型選「<strong>文字檔 (Tab 字元分隔) (*.txt)</strong>」（英文版是 Text (Tab delimited)）。存好之後打開確認一下：欄與欄之間應該是看不見的 Tab 字元，而不是逗號或多個空格。</p>
+</div>
+
+<div class="note warn">
+<span class="nt">小心：範例檔本身的標題列裡藏了多餘的空格</span>
+<p>論文附的範例檔裡，像 <span class="kbd">"&nbsp;&nbsp;t (min)&nbsp;&nbsp;"</span> 這種欄名前後其實多打了空格。R 讀進來會把它自動改寫成一長串像 <span class="kbd">X..t..min..</span> 的欄位名稱（把空格、括號都換成點）。這個現象<strong>沒有壞掉、也不影響計算</strong>，只是看起來很嚇人——你只要知道這是怎麼回事，不用去修正它。</p>
+</div>
+
+<h2 id="s13"><span class="num">13.</span>十個函數怎麼選<span class="chip a">進階</span></h2>
+<p class="lede">十個函數名字看起來很像，但只要抓住命名規則，五秒鐘就能認出每一個在做什麼：字首 <span class="kbd">i</span> = 恆溶劑（isocratic）、<span class="kbd">g</span> = 單線性梯度（gradient）、<span class="kbd">mg</span> = 雙線性梯度（bilinear gradient）；字尾 <span class="kbd">fitk</span> = 擬合滯留模型、<span class="kbd">fitshape</span> = 擬合峰形、<span class="kbd">pred</span> = 預測/模擬層析圖、<span class="kbd">opt</span> = 找最佳條件。</p>
+
+<div class="tw"><table>
+<thead><tr><th>函數</th><th>作用</th></tr></thead>
+<tbody>
+<tr><td><span class="kbd">ifitk</span></td><td>用恆溶劑資料擬合滯留模型（求 c0, c1… 這些參數）</td></tr>
+<tr><td><span class="kbd">gfitk</span></td><td>用梯度資料擬合滯留模型</td></tr>
+<tr><td><span class="kbd">fitshape</span></td><td>從真實層析圖擬合峰形（峰高＋峰寬）</td></tr>
+<tr><td><span class="kbd">ipred</span></td><td>預測並畫出恆溶劑層析圖</td></tr>
+<tr><td><span class="kbd">gpred</span></td><td>預測並畫出單線性梯度層析圖</td></tr>
+<tr><td><span class="kbd">mgpred</span></td><td>預測並畫出雙線性梯度層析圖</td></tr>
+<tr><td><span class="kbd">iopt</span></td><td>找出最佳的恆溶劑分離條件</td></tr>
+<tr><td><span class="kbd">gopt</span></td><td>找出最佳的單線性梯度條件</td></tr>
+<tr><td><span class="kbd">mgopt</span></td><td>找出最佳的雙線性梯度條件</td></tr>
+<tr><td><span class="kbd">ifitopt</span></td><td>懶人包：一次做完「擬合＋峰形＋最佳化」（只支援恆溶劑 model 1–3）</td></tr>
+</tbody>
+</table></div>
+
+<div class="note">
+<span class="nt">文件裡的一個小烏龍</span>
+<p>論文的補充說明檔（docx）寫的是「8 個 R 函數」，但實際附的工作空間裡是<strong>十個</strong>——這是原始文件的筆誤，你不用懷疑自己數錯。</p>
+</div>
+
+<h3>決策流程：我該用哪一個？</h3>
+<p>先問自己兩個問題：<strong>① 你的實驗是恆溶劑還是梯度？</strong>（決定用 i 開頭還是 g/mg 開頭）<strong>② 你現在要做的是「求參數」「模擬」還是「找最佳條件」？</strong>（決定用 fitk、pred 還是 opt）。</p>
+
+<p>不論恆溶劑或梯度，正規的操作永遠是同一套四步驟流程：</p>
+<div class="flow">
+<div class="fstep"><div class="fn2">①</div><div class="fc">ifitk / gfitk</div><div class="ft">求滯留參數</div><div class="fd">用實測的 tR 資料，擬合出每個溶質的模型參數（如 c0, c1）</div></div>
+<div class="farrow">→</div>
+<div class="fstep"><div class="fn2">②</div><div class="fc">fitshape</div><div class="ft">求峰形參數</div><div class="fd">用真實層析圖曲線，擬合出峰高、峰寬相關參數</div></div>
+<div class="farrow">→</div>
+<div class="fstep"><div class="fn2">③</div><div class="fc">ipred / gpred</div><div class="ft">驗證模型準不準</div><div class="fd">把模型畫出來的層析圖疊在真實層析圖上比對</div></div>
+<div class="farrow">→</div>
+<div class="fstep"><div class="fn2">④</div><div class="fc">iopt / gopt</div><div class="ft">找最佳條件</div><div class="fd">在你設定的時間預算內搜尋 Rs 最大的條件</div></div>
+</div>
+
+<div class="note good">
+<span class="nt">為什麼第③步不能跳過</span>
+<p>iopt / gopt 這類最佳化函數，做的事情純粹是「相信你給的模型，去搜尋一個讓 Rs 最大的條件」。如果模型本身就跟真實層析圖對不上——例如峰形參數是亂猜的、或滯留模型擬合得不好——那麼最佳化找出來的「最佳條件」也只是一個<strong>錯誤模型底下的最佳解</strong>，拿去實際跑管柱不會得到一樣的結果。先驗證再最佳化，才不會白做工。</p>
+</div>
+
+<h2 id="s14"><span class="num">14.</span>完整實戰：恆溶劑最佳化<span class="chip a">進階</span></h2>
+<p class="lede">這一節帶你走完整套流程，資料是真實案例：9 個溶質（酚類污染物與芳香烴，跟食品/飲用水安全檢測相關）在 Kinetex 2.6 µm XB-C18 150×4.6 mm 管柱上、乙腈/水（pH 5.7）系統分析，<strong>t0 = 1.4 分鐘</strong>。</p>
+
+<h3>Step 1：準備滯留資料 .txt</h3>
+<p>把第 12 節格式 (a) 的表格存成 tab 分隔的 .txt（例如 <span class="kbd">retention.txt</span>），第一欄是 f，A1–A9 是 9 個溶質。</p>
+
+<h3>Step 2：擬合滯留模型（ifitk）</h3>
+<pre><div class="plabel">R Console<span>擬合 model 1</span></div><code><span class="fn">ifitk</span>(model = <span class="nu">1</span>, t0 = <span class="nu">1.4</span>)
+<span class="cm"># 執行後跳出檔案選取視窗，用滑鼠點選 retention.txt</span></code></pre>
+<p>model 1 就是你在前面章節學過的 <span class="kbd">lnk = c0 − c1·f</span>。輸出會是一張表，欄位大致包含：</p>
+<ul class="check">
+<li><strong>參數估計值</strong>（c0、c1）——每個溶質各一組。</li>
+<li><strong>標準差（standard deviation）</strong>——這個參數估得穩不穩，數字越小代表估計越可靠。</li>
+<li><strong>p 值（p-value）</strong>——白話說：<strong>p 值小（通常小於 0.05）表示這個參數確實有在起作用</strong>，不是雜訊湊出來的巧合；p 值大則代表這個參數可能可有可無。</li>
+<li><strong>SEE（standard error of estimate，估計標準誤）</strong>——代表模型算出來的 tR 跟實際量到的 tR 差多少，<strong>SEE 越小，代表模型跟實驗數據貼合得越好</strong>。</li>
+<li><strong>ssr（sum of squared residuals，殘差平方和）</strong>——所有誤差平方加總，是計算 SEE 的原始材料，越小越好。</li>
+</ul>
+<p>本例用 9 個溶質實際擬合出來的結果（model 1）：</p>
+<div class="tw"><table>
+<thead><tr><th>溶質</th><th>c0</th><th>c1</th></tr></thead>
+<tbody>
+<tr><td>A1</td><td class="num-col">3.1404</td><td class="num-col">6.6413</td></tr>
+<tr><td>A2</td><td class="num-col">3.4649</td><td class="num-col">6.6043</td></tr>
+<tr><td>A3</td><td class="num-col">3.6690</td><td class="num-col">5.9113</td></tr>
+<tr><td>A4</td><td class="num-col">4.2520</td><td class="num-col">6.9596</td></tr>
+<tr><td>A5</td><td class="num-col">4.6463</td><td class="num-col">7.6648</td></tr>
+<tr><td>A6</td><td class="num-col">5.2440</td><td class="num-col">8.5366</td></tr>
+<tr><td>A7</td><td class="num-col">4.6275</td><td class="num-col">6.7991</td></tr>
+<tr><td>A8</td><td class="num-col">5.5706</td><td class="num-col">8.1844</td></tr>
+<tr><td>A9</td><td class="num-col">5.6030</td><td class="num-col">7.7662</td></tr>
+</tbody>
+</table></div>
+<p>ifitk 會另外跳出存檔視窗，讓你把這張參數表存成「格式 (d)」的溶質參數檔（例如 <span class="kbd">param.txt</span>）——之後每一步都要用到它。</p>
+
+<h3>Step 3：擬合峰形（fitshape）</h3>
+<pre><div class="plabel">R Console<span>擬合峰形</span></div><code><span class="fn">fitshape</span>(pd = <span class="nu">1</span>)
+<span class="cm"># 跳出視窗選一個或多個真實層析圖檔（格式 c）</span>
+<span class="cm"># 圖上會提示你用滑鼠點兩下，標出峰的範圍</span></code></pre>
+<div class="note warn">
+<span class="nt">操作眉角</span>
+<ul class="check">
+<li><span class="kbd">pd</span> 是峰高多項式的次方（degree），可設 1 或 2；本例用 1。</li>
+<li>畫面會要求你在層析圖上<strong>用滑鼠點兩下</strong>，標出峰的起訖位置（因為參數 <span class="kbd">w</span> 預設是 <span class="kbd">NULL</span>，靠這兩次點擊估出初始峰寬猜測值）。</li>
+<li><strong>一次最多只能處理 4 個重疊/相鄰的峰</strong>——如果你的層析圖裡擠了超過 4 個峰，需要分批處理。</li>
+<li>峰的底寬是用 <span class="kbd">w = 4s/√2</span> 算出來的，s 是峰形參數之一。</li>
+</ul>
+</div>
+<p>跑完後，h0、h1、h2（峰高相關）與 s0、s1（峰寬相關）這五列參數，會被<strong>附加</strong>到你在 Step 2 存的 <span class="kbd">param.txt</span> 下方，讓這個檔案變成完整的六列以上參數檔。</p>
+
+<h3>Step 4：驗證模型（ipred）</h3>
+<pre><div class="plabel">R Console<span>模擬並比對真實層析圖</span></div><code><span class="fn">ipred</span>(model = <span class="nu">1</span>, t0 = <span class="nu">1.4</span>, fp = <span class="nu">0.45</span>)
+<span class="cm"># 先選 param.txt（含峰形列），再選要比對的真實層析圖檔</span></code></pre>
+<p><span class="kbd">fp = 0.45</span> 代表你要模擬「f = 0.45」這個條件下的層析圖。因為 <span class="kbd">ic=1</span> 是預設值，畫面會把「模型模擬出來的曲線」跟「你手上真實量到的曲線」疊在一起。如果兩條線對得起來，代表模型跟峰形參數都可信，可以放心進入最佳化；如果對不起來，要回頭檢查 Step 2、3 是不是哪裡出了問題。</p>
+
+<h3>Step 5：找最佳分離條件（iopt）</h3>
+<pre><div class="plabel">R Console<span>最佳化</span></div><code><span class="fn">iopt</span>(model = <span class="nu">1</span>, t0 = <span class="nu">1.4</span>, tmin = <span class="nu">2</span>, tmax = <span class="nu">20</span>,
+     fmin = <span class="nu">0.3</span>, fmax = <span class="nu">0.6</span>, df = <span class="nu">0.005</span>)
+<span class="cm"># 選 param.txt；tmax=20 代表你能接受的最長分析時間是 20 分鐘</span></code></pre>
+<p><span class="kbd">tmax</span> 是整個最佳化裡最關鍵的參數——它是你的「時間預算」：不管 Rs 理論上能拉多高，分析時間都不能超過這個上限。<span class="kbd">df</span> 則是搜尋 f 值時的網格步長，越小搜得越細但越慢。</p>
+<pre><div class="plabel">R Console<span>iopt 輸出（數值為本教材以同一演算法重算）</span></div><code><span class="cm">Table for manual selection of the optimum f value</span>
+<span class="cm">     f      Rs   tRmax</span>
+ <span class="nu">0.300</span>   <span class="nu">2.824</span>   <span class="nu">38.35</span>   <span class="cm">&lt;- Rs 很好，但遠超過 tmax</span>
+ <span class="nu">0.305</span>   <span class="nu">2.555</span>   <span class="nu">36.94</span>
+<span class="cm"> ......................</span>
+ <span class="nu">0.350</span>   <span class="nu">0.235</span>   <span class="nu">26.46</span>   <span class="cm">&lt;- 共沖提陷阱（見第 8 節）</span>
+<span class="cm"> ......................</span>
+ <span class="nu">0.410</span>   <span class="nu">2.455</span>   <span class="nu">17.13</span>   <span class="cm">&lt;- 最佳解</span>
+<span class="cm"> ......................</span>
+ <span class="nu">0.595</span>   <span class="nu">0.167</span>    <span class="nu">5.14</span>
+ <span class="nu">0.600</span>   <span class="nu">0.002</span>    <span class="nu">5.00</span>   <span class="cm">&lt;- 全部擠在一起</span>
+
+<span class="cm">Optimum f    :   0.410</span>
+<span class="cm">Optimum Rs   :   2.455</span>
+<span class="cm">Optimum tR values:</span>
+<span class="cm">3.53  4.39  6.26  7.07  7.70  9.41  10.21  14.23  17.13</span></code></pre>
+<p>白話翻譯這個結果：在 f = 0.410（也就是 41% 有機溶劑）這個條件下，9 個溶質裡分得最差的那一對相鄰峰的 Rs = 2.455（遠超過安全門檻 1.5，分離良好），而整批跑完最慢的溶質要 <strong>tRmax = 17.13 分鐘</strong>，還在你設定的 20 分鐘預算之內。</p>
+<div class="note warn">
+<span class="nt">為什麼不直接挑 Rs 最高的那一列？</span>
+<p>掃描表第一列 f = 0.300 的 Rs 是 <strong>2.824</strong>，比最佳解的 2.455 還高。但它的 tRmax = 38.35 分鐘，<strong>遠超過你設的 20 分鐘上限</strong>，所以被淘汰了。<code>iopt</code> 挑的是「<strong>在 tmax 之內</strong> Rs 最大」的那一列，不是全表 Rs 最大的那一列。</p>
+<p style="margin-bottom:0">另外注意 f = 0.350 那一列：Rs 只有 0.235，比它左右兩邊都差很多。這就是第 8 節講的<strong>共沖提陷阱</strong>——<strong>Rs 對 f 並不是單調變化的</strong>，中間會有塌陷。這正是為什麼要把整個範圍掃過一遍，而不是憑幾個點推測趨勢。</p>
+</div>
+
+<h3>時間預算 vs. 解析度：同一組資料，換一個 tmax 會怎樣</h3>
+<p>只改 <span class="kbd">tmax</span>，其他都不變，看看結果怎麼變化：</p>
+<div class="tw"><table>
+<thead><tr><th>tmax（分鐘）</th><th>最佳 f</th><th>最佳 Rs</th><th>結論</th></tr></thead>
+<tbody>
+<tr><td class="num-col">20</td><td class="num-col">0.410</td><td class="num-col">2.455</td><td>時間充裕，分離良好</td></tr>
+<tr><td class="num-col">15</td><td class="num-col">0.430</td><td class="num-col">2.029</td><td>時間變緊，只好用更高的 f 沖快一點，Rs 跟著下降，但仍達標</td></tr>
+<tr><td class="num-col">10</td><td class="num-col">—</td><td class="num-col">0.916</td><td>再怎麼調 f，最好也只有 0.916——<strong>不合格</strong>（未達 1.5）</td></tr>
+</tbody>
+</table></div>
+<div class="note bad">
+<span class="nt">這告訴我們什麼</span>
+<p>對這組 9 個溶質而言，<strong>10 分鐘在恆溶劑模式下根本不夠用</strong>——不是你調錯條件，而是這個時間預算跟這批溶質的分離難度天生衝突。這正是 iopt 這類工具的價值：與其在實驗室裡一次次試錯，不如先用模型算出「這個時間預算做不做得到」，做不到就得考慮拉長分析時間，或改用梯度沖提（gradient elution）。</p>
+</div>
+
+<h2 id="s15"><span class="num">15.</span>一步到位：ifitopt<span class="chip a">進階</span></h2>
+<p class="lede">如果你只是想快速看看「這批資料大概能不能分開、大概要多久」，不想一步步跑 ifitk → fitshape → iopt 三個函數，<span class="kbd">ifitopt</span> 把這三步<strong>合併成一次呼叫</strong>——但代價是它<strong>只支援恆溶劑、且只支援 model 1、2、3</strong>（比較簡單的滯留模型）。</p>
+
+<div class="note">
+<span class="nt">它需要兩種輸入，缺一不可</span>
+<p>ifitopt 除了跟 ifitk 一樣需要滯留資料表（格式 a），還需要<strong>真實層析圖檔</strong>（格式 c）來擬合峰形——這點跟單獨的 ifitk 不一樣。參數 <span class="kbd">blc</span>（block）就是用來告訴函數：滯留資料表裡的<strong>哪幾列（哪幾個條件）</strong>有對應的層析圖檔可以拿來配對。例如 <span class="kbd">blc=c(1,3)</span> 代表第 1 列與第 3 列的條件各自有一張層析圖，函數會依序跳出視窗讓你選這兩張圖。</p>
+</div>
+
+<pre><div class="plabel">R Console<span>ifitopt 一次做完</span></div><code><span class="fn">ifitopt</span>(model = <span class="nu">1</span>, t0 = <span class="nu">1.4</span>, blc = <span class="fn">c</span>(<span class="nu">1</span>, <span class="nu">3</span>), pd = <span class="nu">1</span>,
+        tmax = <span class="nu">20</span>, fmin = <span class="nu">0.3</span>, fmax = <span class="nu">0.6</span>)
+<span class="cm"># 依序跳出視窗：先選滯留資料 .txt，再選 blc 指定列數對應的層析圖檔</span></code></pre>
+
+<h3>什麼時候用 ifitopt，什麼時候乖乖走三步驟</h3>
+<div class="two">
+<div class="card">
+<h4>適合用 ifitopt</h4>
+<p>初步探索（快速探索）——想知道「這批溶質、這根管柱，大概能不能在預算時間內分開」，先抓個大概的答案再決定要不要深入。</p>
+</div>
+<div class="card">
+<h4>適合走 ifitk → fitshape → ipred → iopt</h4>
+<p>需要檢查每一步的中間結果（例如懷疑某個溶質的 p 值很大、擬合不可靠）、資料有缺漏或條件超過 3 種模型範圍、或者本來就要跑梯度（ifitopt 完全不支援梯度）。</p>
+</div>
+</div>
+
+<div class="quiz">
+<div class="qh">小測驗</div>
+<div class="qq">如果你在 ipred 或 iopt 用的溶質參數檔，其實只擬合到 ifitk（Step 2）就存檔了，忘記再跑 fitshape 補上峰形參數（也就是整個檔案只有 c0、c1 這兩列，不到 6 列），程式會發生什麼事？</div>
+<div class="opt" data-ok="0">程式會報錯直接中止，提醒你缺少峰形參數</div>
+<div class="opt" data-ok="1">程式不會報錯，會自動代入預設值 h0=1、h1=0、h2=0、s0=0.002、s1=0，畫出來的是接近直線的「假層析圖」，而且最佳化的判斷標準會從真正的 Rs 悄悄退化成 dt（相鄰峰滯留時間差）</div>
+<div class="opt" data-ok="0">程式會自動幫你叫用 fitshape 補齊參數</div>
+<div class="expl">RChromOptim 在偵測到參數檔不足 6 列（沒有峰形列）時，<strong>不會報錯</strong>，而是靜靜地代入一組預設峰形值，畫出來的峰會又高又窄、幾乎變成一條條垂直線，跟真實峰形完全不像。更容易被忽略的是：這時候最佳化用來判斷「分得開不開」的標準，會從真正考慮峰寬的解析度 Rs，<strong>悄悄換成只算滯留時間差的 dt</strong>。所以每次看最佳化輸出，都要養成習慣確認結果欄位寫的是 <span class="kbd">Rs</span> 還是 <span class="kbd">dt</span>——如果是 dt，代表你的峰形參數八成沒補齊。</div>
+</div>
+<h2 id="s16"><span class="num">16.</span>十個滯留模型完整對照表</h2>
+<p class="lede">大部分食品分析的工作，其實只會用到模型 1 或模型 3。只有當你遇到「可解離的化合物」（例如有機酸、胺類——像乙酸、檸檬酸、生物胺）、或是需要控制 pH 值來調整分離效果時，才需要翻到這張完整清單。</p>
+
+<details>
+<summary>展開：十個滯留模型的完整清單</summary>
+<div class="dbody">
+
+<p>模型 1–6 描述的是「有機修飾劑比例 f」（也就是流動相中甲醇或乙腈的比例 φ）如何影響滯留行為，適用於恆溶劑沖提，以及單線性／雙線性的 f 梯度。模型 7 開始加入 pH 的影響，模型 9 則是處理兩種有機修飾劑同時存在的情況。</p>
+
+<div class="tw">
+<table>
+<thead>
+<tr><th>模型編號</th><th>方程式</th><th>什麼時候用它</th><th>需要的參數</th></tr>
+</thead>
+<tbody>
+<tr>
+<td class="num-col">1</td>
+<td><code>lnk = c0 − c1·f</code></td>
+<td>最簡單的形式，<var>ln k</var> 對 <var>f</var> 畫出來是一條直線。這就是線性溶劑強度理論（LSS）所用的模型。</td>
+<td><var>c0</var>, <var>c1</var></td>
+</tr>
+<tr>
+<td class="num-col">2</td>
+<td><code>lnk = c0 − c1·ln(f)</code></td>
+<td>f 的另一種對數形式，屬於曲線型態的替代選擇。</td>
+<td><var>c0</var>, <var>c1</var></td>
+</tr>
+<tr>
+<td class="num-col">3</td>
+<td><code>lnk = c0 − c1·f + c2·f²</code></td>
+<td>在模型 1 的基礎上加入二次項，能描述曲率，可以擬合比模型 1 更寬的 f 範圍。</td>
+<td><var>c0</var>, <var>c1</var>, <var>c2</var></td>
+</tr>
+<tr>
+<td class="num-col">4</td>
+<td><code>lnk = c0 − c1·ln(1 + c2·f)</code></td>
+<td>另一種帶曲率的 f 相依形式。</td>
+<td><var>c0</var>, <var>c1</var>, <var>c2</var></td>
+</tr>
+<tr>
+<td class="num-col">5</td>
+<td><code>lnk = c0 + 2·ln(1 + c1·f) − c2·f/(1 + c1·f)</code></td>
+<td>較複雜的曲線型態，也是用來處理非線性的 f 相依關係。</td>
+<td><var>c0</var>, <var>c1</var>, <var>c2</var></td>
+</tr>
+<tr>
+<td class="num-col">6</td>
+<td><code>lnk = c0 − c2·f/(1 + c1·f)</code></td>
+<td>模型 5 的簡化版本，同樣描述曲率型態。</td>
+<td><var>c0</var>, <var>c1</var>, <var>c2</var></td>
+</tr>
+<tr>
+<td class="num-col">7</td>
+<td><code>k = (k0 + k1·10^(pH−pK)) / (1 + 10^(pH−pK))</code></td>
+<td>描述 pH 如何影響「可解離化合物」（單質子的酸或鹼）。<var>pK</var> 是解離常數，<var>k0</var>、<var>k1</var> 分別是中性型態與完全解離型態的滯留因子。</td>
+<td><var>k0</var>, <var>k1</var>, <var>pK</var></td>
+</tr>
+<tr>
+<td class="num-col">8</td>
+<td><code>k = k0·(1 + r·10^(pH−pK)) / (1 + 10^(pH−pK))</code>，其中 <code>k0 = exp(c0 − c1·f)</code></td>
+<td>同時處理 f 和 pH 兩個變數——k0 會隨 f 而變。</td>
+<td><var>c0</var>, <var>c1</var>, <var>pK</var>, <var>r</var></td>
+</tr>
+<tr>
+<td class="num-col">9</td>
+<td><code>lnk = c0 + c1·f1 + c2·f2 + c3·f1² + c4·f2² + c5·f1·f2</code></td>
+<td>同時處理「兩種」有機修飾劑（<var>f1</var>、<var>f2</var>），例如三元流動相系統。</td>
+<td><var>c0</var>…<var>c5</var>（共 6 個）</td>
+</tr>
+<tr>
+<td class="num-col">10</td>
+<td><code>k = (k0 + k1·10^(pH−pK)) / (1 + 10^(pH−pK))</code>，其中 <code>k0 = exp(c0−c1·f)</code>，<code>k1 = exp(c2−c3·f)</code></td>
+<td>最一般化的 f + pH 模型——k0 和 k1 都會隨 f 變化。</td>
+<td><var>c0</var>, <var>c1</var>, <var>c2</var>, <var>c3</var>, <var>pK</var></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="note warn">
+<span class="nt">參數越多，需要的實驗越多</span>
+你至少要做出「等於參數個數」的實驗次數，實務上建議抓 2–3 倍會比較保險。用 3 個點去擬合一個有 3 個參數的模型，等於自由度是零——你完全沒有辦法檢查這個擬合到底準不準。具體來說：模型 1、2（2 個參數）至少要 3 組實驗；模型 3–6（3 個參數）至少要 4–5 組實驗。
+</div>
+
+<div class="note">
+<span class="nt">不同 R 函數支援的模型範圍不同</span>
+<code>mgpred</code> 和 <code>mgopt</code>（雙線性梯度函數）只支援模型 1–7；<code>ifitopt</code> 只支援模型 1–3；解析梯度解法中，<code>mode="A"</code>（解析法）涵蓋模型 1、2、3、4、5、8，<code>mode="NP"</code>（數值法）則十個模型全部都支援。
+</div>
+
+</div>
+</details>
+
+<h2 id="s17"><span class="num">17.</span>函數速查表</h2>
+<p class="lede">RChromOptim 套件一共有 10 個函數，命名有規律可循，看懂前綴和字根就能猜出功能。</p>
+
+<div class="tw">
+<table>
+<thead>
+<tr><th>函數</th><th>用途</th><th>輸入檔</th><th>主要輸出</th></tr>
+</thead>
+<tbody>
+<tr><td><code>ifitk</code></td><td>恆溶劑滯留資料擬合</td><td>恆溶劑滯留資料 .txt</td><td>參數表＋標準差＋p 值＋SEE/ssr，可存成 .txt</td></tr>
+<tr><td><code>gfitk</code></td><td>梯度滯留資料擬合</td><td>梯度滯留資料 .txt（4 個條件欄）</td><td>同上</td></tr>
+<tr><td><code>fitshape</code></td><td>峰形建模</td><td>2–3 張層析圖 .txt ＋對應滯留資料</td><td><var>h0</var>, <var>h1</var>, <var>h2</var>, <var>s0</var>, <var>s1</var> 參數表</td></tr>
+<tr><td><code>ipred</code></td><td>恆溶劑層析圖模擬</td><td>參數表 .txt（＋可選實驗層析圖）</td><td>預測滯留時間＋疊圖</td></tr>
+<tr><td><code>gpred</code></td><td>單線性梯度模擬</td><td>同上</td><td>同上＋梯度曲線</td></tr>
+<tr><td><code>mgpred</code></td><td>雙線性梯度模擬</td><td>同上</td><td>同上</td></tr>
+<tr><td><code>iopt</code></td><td>恆溶劑最佳化</td><td>參數表 .txt</td><td>最佳 f、Rs、tR，Rs/tRmax 掃描圖，最佳層析圖</td></tr>
+<tr><td><code>gopt</code></td><td>單線性梯度最佳化</td><td>參數表 .txt</td><td>最佳 tG、Rs、梯度曲線、最佳層析圖</td></tr>
+<tr><td><code>mgopt</code></td><td>雙線性梯度最佳化</td><td>參數表 .txt</td><td>最佳兩段梯度</td></tr>
+<tr><td><code>ifitopt</code></td><td>恆溶劑一步到位</td><td>滯留資料＋層析圖 .txt</td><td>參數表＋最佳 f＋最佳層析圖</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="note">
+<span class="nt">命名口訣</span>
+前綴：<code>i</code> = isocratic 恆溶劑、<code>g</code> = gradient 梯度、<code>mg</code> = 雙線性梯度（bi-linear gradient）。字根：<code>fitk</code> = 擬合滯留（fit retention）、<code>fitshape</code> = 擬合峰形（fit peak shape）、<code>pred</code> = 預測（predict）、<code>opt</code> = 最佳化（optimize）。看到函數名稱，把前綴和字根拆開讀，就知道它在做什麼。
+</div>
+
+<h2 id="s18"><span class="num">18.</span>常見問題排除</h2>
+<p class="lede">這些是使用 RChromOptim 時真實會遇到的狀況，坦白列出來，照著檢查通常就能解決。</p>
+
+<details>
+<summary>函數跑起來沒反應、找不到檔案對話框？</summary>
+<div class="dbody">
+<p>這些函數用的是 <code>choose.files()</code>，這是 Windows 專用的檔案選取視窗。它有可能開在 R 視窗「後面」，先檢查一下工作列或其他視窗，很可能對話框已經開好了，只是被擋住。</p>
+<p>如果你是在 macOS 或 Linux 上執行，<code>choose.files()</code> 根本不存在，會直接報錯。這時必須自己修改函數原始碼，把 <code>choose.files()</code> 換成 <code>file.choose()</code> 才能用。</p>
+</div>
+</details>
+
+<details>
+<summary>它要我點滑鼠，但我不知道要點哪裡？</summary>
+<div class="dbody">
+<p>提示文字是印在「繪圖視窗」的標題上，不是印在 R 主控台（console）裡。所以請看圖形視窗，不要盯著 console 找訊息。</p>
+<p><code>fitshape</code> 會請你用滑鼠點兩下來估計峰寬；如果需要做基線校正，則是每個峰（或每組重疊的峰）都要點兩下，分別標出起點和終點。</p>
+</div>
+</details>
+
+<details>
+<summary>畫出來的層析圖是一根一根的直線，不是山形峰？</summary>
+<div class="dbody">
+<p>這代表你提供的參數檔列數不足 6 列，也就是缺少峰形參數。程式會偷偷用近似「delta 函數」（尖峰狀）的峰形取代，並且回報 <code>dt</code>（最小滯留時間差）而不是真正的 Rs 值。</p>
+<p>解法：先執行 <code>fitshape</code>，把算出來的 <var>h0</var>, <var>h1</var>, <var>h2</var>, <var>s0</var>, <var>s1</var> 這幾列參數，補進參數檔裡。</p>
+</div>
+</details>
+
+<details>
+<summary>錯誤訊息 could not find function？</summary>
+<div class="dbody">
+<p>代表 RChromOptim 的函數沒有被載入到目前的 R 工作環境（session），或是少裝了相依套件。可以先執行 <code>ls()</code> 確認這 10 個函數是否都存在於環境裡；如果缺套件，用以下指令補裝：</p>
+<pre><div class="plabel">R<span>安裝相依套件</span></div><code>install.packages(c("optimx","VGAM","plot3D","numDeriv"))</code></pre>
+</div>
+</details>
+
+<details>
+<summary>讀進來的欄位名稱變成 X..t..min.. 這種怪東西？</summary>
+<div class="dbody">
+<p>原因是 .txt 檔的表頭那一行含有多餘的空格，R 的 <code>read.table</code> 在解析時就會把它們轉成 <code>X..t..min..</code> 這類亂碼欄名。</p>
+<p>這其實不影響程式運作——因為程式是「用欄位位置」而不是「用欄位名稱」在讀資料。如果你想要乾淨的欄名，就手動把 .txt 檔表頭那行多餘的空格刪掉即可。</p>
+</div>
+</details>
+
+<details>
+<summary>擬合結果的 p 值很大、參數卡在 200？</summary>
+<div class="dbody">
+<p>這代表該參數在最佳化過程中「頂到了 <code>upper</code> 上限」，意味著目前選用的模型不適合這筆資料。</p>
+<p>可以試試：換一個 <code>model</code> 編號、放寬 <code>lower</code>／<code>upper</code> 邊界，或是提供更好的初始值（<var>c0</var>, <var>c1</var>…）。附帶一提：連原始論文自己的資料集裡，模型 4 的 <var>c2</var> 參數在某些溶質上也卡在邊界值——這種事連原作者都會遇到，不代表你哪裡做錯了。</p>
+</div>
+</details>
+
+<details>
+<summary>最佳化結果的 Rs 很低，怎麼調都達不到 1.5？</summary>
+<div class="dbody">
+<p>可能是時間預算 <code>tmax</code> 設得太緊，或者這個混合物本身在恆溶劑條件下、合理時間內根本無法分離。</p>
+<p>論文裡有個真實例子：9 種溶質的混合物，<code>tmax=20</code>（分鐘）可以得到 Rs=2.455，但如果把 <code>tmax=10</code>，就只剩 Rs=0.916。如果恆溶劑最佳化已經到了瓶頸，下一步可以考慮改用梯度沖提（<code>gopt</code>），或是換管柱、換 pH 條件。</p>
+</div>
+</details>
+
+<details>
+<summary>可以把恆溶劑的參數檔拿去餵梯度函數嗎？</summary>
+<div class="dbody">
+<div class="note bad">
+<span class="nt">不行，這樣會出錯但不會報錯</span>
+以模型 8 為例，<code>ifitk</code> 寫出的參數列順序是 <var>c0</var>, <var>c1</var>, <var>pK</var>, <var>r</var>；但 <code>gfitk</code> 寫出的順序卻是 <var>c0</var>, <var>c1</var>, <var>r</var>, <var>pK</var>——兩條流程的欄位順序不一樣。如果把恆溶劑的參數檔誤餵給梯度函數（或反過來），數值會被讀進錯誤的位置，而且完全不會跳出任何錯誤訊息，只會默默算出錯的答案。使用前務必確認你手上的參數檔是哪條流程產生的。
+</div>
+</div>
+</details>
+
+<h2 id="s19"><span class="num">19.</span>中英名詞對照與延伸閱讀</h2>
+<p class="lede">整理課程中出現過的關鍵術語中英對照，以及原始論文的補充資源。</p>
+
+<div class="tw">
+<table>
+<thead>
+<tr><th>中文</th><th>English</th><th>一句話說明</th></tr>
+</thead>
+<tbody>
+<tr><td>高效液相層析</td><td>HPLC</td><td>用高壓把樣品推過管柱，依化合物與固定相的作用力差異來分離的分析技術。</td></tr>
+<tr><td>管柱</td><td>column</td><td>裝填固定相的細管，是分離真正發生的地方。</td></tr>
+<tr><td>移動相</td><td>mobile phase</td><td>推動樣品通過管柱的液體，通常是水與有機溶劑的混合物。</td></tr>
+<tr><td>固定相</td><td>stationary phase</td><td>填在管柱裡不會移動的材料，化合物會與它產生不同強弱的作用力。</td></tr>
+<tr><td>溶質／分析物</td><td>solute/analyte</td><td>你想分離、想測定的目標化合物。</td></tr>
+<tr><td>層析圖</td><td>chromatogram</td><td>訊號強度對時間畫出的圖，峰的位置與大小代表化合物的滯留時間與含量。</td></tr>
+<tr><td>死時間</td><td>dead time (t0)</td><td>完全不被固定相滯留的物質通過管柱所需的時間，是所有滯留時間的基準點。</td></tr>
+<tr><td>滯留時間</td><td>retention time (tR)</td><td>某個化合物從注入到訊號出現峰頂所花的時間。</td></tr>
+<tr><td>滯留因子</td><td>retention factor (k)</td><td>化合物在固定相停留時間相對於死時間的倍數，衡量它被「留住」的程度。</td></tr>
+<tr><td>解析度</td><td>resolution (Rs)</td><td>衡量兩個相鄰峰分開程度的數值，越大代表分離越乾淨。</td></tr>
+<tr><td>基線分離</td><td>baseline separation</td><td>兩個峰之間完全沒有重疊，訊號會回到基線再出現下一個峰。</td></tr>
+<tr><td>有機修飾劑</td><td>organic modifier</td><td>加進移動相裡的有機溶劑（如甲醇、乙腈），用來調整沖提強度。</td></tr>
+<tr><td>恆溶劑沖提</td><td>isocratic elution</td><td>整個分析過程中，移動相的組成比例都維持不變。</td></tr>
+<tr><td>梯度沖提</td><td>gradient elution</td><td>分析過程中，有機修飾劑的比例會隨時間逐漸改變（通常是遞增）。</td></tr>
+<tr><td>梯度時間</td><td>gradient duration (tG)</td><td>從梯度開始到結束所經過的時間長度。</td></tr>
+<tr><td>延遲體積／滯留時間</td><td>dwell time (tD)</td><td>梯度訊號從幫浦設定改變，到真正到達管柱入口之間的延遲時間。</td></tr>
+<tr><td>峰寬</td><td>peak width (w)</td><td>層析峰在基線上的寬度，反映峰的擴散程度。</td></tr>
+<tr><td>高斯峰</td><td>Gaussian peak</td><td>形狀對稱、像鐘型曲線的理想層析峰。</td></tr>
+<tr><td>基線校正</td><td>baseline correction (BLC)</td><td>把訊號中飄移或傾斜的基線扣除，讓峰的判讀更準確的處理步驟。</td></tr>
+<tr><td>共沖提</td><td>coelution</td><td>兩個以上的化合物在幾乎相同的時間沖提出來，訊號重疊在一起。</td></tr>
+<tr><td>沖提順序</td><td>elution order</td><td>各化合物依滯留時間先後，從管柱流出的順序。</td></tr>
+<tr><td>選擇性</td><td>selectivity</td><td>系統區分兩種不同化合物的能力，通常以兩者滯留因子的比值表示。</td></tr>
+<tr><td>最佳化</td><td>optimization</td><td>在時間與解析度之間找出最合適的分析條件（如 f、pH、梯度設定）。</td></tr>
+<tr><td>殘差平方和</td><td>sum of squared residuals (ssr)</td><td>模型預測值與實際觀測值差距的平方總和，數值越小代表擬合越好。</td></tr>
+<tr><td>估計標準誤</td><td>standard error of estimate (SEE)</td><td>衡量整體擬合誤差大小的指標，數值越小代表模型描述資料越準確。</td></tr>
+<tr><td>一般沖提問題</td><td>general elution problem</td><td>恆溶劑條件下，早出峰擠在一起、晚出峰又拖得太久太寬的兩難困境，是梯度沖提被發展出來的主因。</td></tr>
+<tr><td>線性溶劑強度理論</td><td>Linear Solvent Strength (LSS) theory</td><td>假設 <var>ln k</var> 與有機修飾劑比例 <var>f</var> 呈線性關係的經典理論，對應本課程的模型 1。</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>延伸閱讀</h3>
+<div class="card">
+<p>本課程內容主要根據以下論文：</p>
+<p>Zisi, Ch., Pappa-Louisi, A., &amp; Nikitas, P. (2020). Separation optimization in HPLC analysis implemented in R programming language. <em>Journal of Chromatography A</em>, 1617, 460823.</p>
+<p>該論文的補充材料（Supplementary Material）包含：<code>R_Instructions.pdf</code>（操作說明）、<code>R_Functions.docx</code>（函數說明文件）、<code>RChromOptim.RData</code>（套件本體）、<code>Data.xlsx</code>（範例資料）、一個 <code>Text files</code> 資料夾（範例輸入檔），以及一段示範操作的教學影片。想更深入了解函數細節或取得範例檔案，可以從這些資源著手。</p>
+</div>
+
+<h4>本教材食品分析情境所依據的文獻</h4>
+<div class="card">
+<p style="margin-top:0">
+  第 1 節的咖啡因＋防腐劑情境、第 10 節的 pH 與出峰順序、以及第 10 節末的延伸案例，
+  分別依據下列研究。想延伸閱讀或當作專題報告題材，建議從第一篇和第四篇入手。
+</p>
+<ol style="margin-bottom:0">
+<li style="margin-bottom:12px">
+  <strong>Kritsunankul, O., &amp; Jakmunee, J. (2011).</strong> Simultaneous determination of some food
+  additives in soft drinks and other liquid foods by flow injection on-line dialysis coupled to high
+  performance liquid chromatography. <em>Talanta</em>, 84(5), 1342–1349.<br>
+  <span style="color:var(--ink3)">明確記載五種添加物的沖提順序為<strong>醋磺內酯鉀 → 糖精 → 咖啡因 → 苯甲酸 → 己二烯酸</strong>，
+  全程約 14 分鐘（逆相 C18、磷酸鹽緩衝液 pH 3.75、UV 230 nm）。<strong>本教材第 1 節出峰順序的主要依據。</strong></span>
+</li>
+<li style="margin-bottom:12px">
+  <strong>Lino, C. M., &amp; Pena, A. (2010).</strong> Occurrence of caffeine, saccharin, benzoic acid and
+  sorbic acid in soft drinks and nectars in Portugal and subsequent exposure assessment.
+  <em>Food Chemistry</em>, 121(2), 503–508.<br>
+  <span style="color:var(--ink3)">同樣四種目標物，條件為 C18（250 × 4.6 mm）、KH₂PO₄ 0.02 M／乙腈（90:10）、
+  磷酸調至 pH 4.2、UV 220 nm。文中同時做了攝取量暴露評估，適合食品營養背景的讀者。</span>
+</li>
+<li style="margin-bottom:12px">
+  <strong>Wong, T. (2008).</strong> Determination of aspartame, benzoic acid and caffeine in soft drinks
+  using high performance liquid chromatography.<br>
+  <span style="color:var(--ink3)">在強酸性條件（乙腈 0.05% TFA／水 0.1% TFA，20:80）下給出具體滯留時間：
+  <strong>咖啡因 2.155 分、阿斯巴甜 2.810 分、苯甲酸 4.139 分</strong>，5 分鐘內完成。
+  再次印證酸性條件下咖啡因先於苯甲酸出峰。</span>
+</li>
+<li>
+  <strong>Aşçı, B., Zor, Ş. D., &amp; Aksu Dönmez, Ö. (2016).</strong> Development and validation of HPLC
+  method for the simultaneous determination of five food additives and caffeine in soft drinks.
+  <em>International Journal of Analytical Chemistry</em>, 2016, 2879406.<br>
+  <span style="color:var(--ink3)">以 Box-Behnken 實驗設計同時最佳化 pH（6.0–7.0）、流速（1.0–1.4 mL/min）
+  與醋酸緩衝液比例（85–95%），並以<strong>「所有相鄰峰對的解析度」為目標函數</strong>——
+  與 <code>iopt</code> 回報「最難分的一對」的邏輯相同。<strong>第 10 節延伸案例的來源。</strong></span>
+</li>
+</ol>
+</div>
+
+<div class="note">
+  <span class="nt">兩個可以直接接手做的專題方向</span>
+  <ul style="margin-bottom:0">
+    <li><strong>把第 10 節的模擬變成真實數據。</strong>用三支標準品在 pH 3.0、4.0、4.5、5.0、6.0、7.0 各跑一次，
+        量出滯留時間，用 <code>ifitk(model=7)</code> 擬合出各自的 <var>k</var><sub>0</sub>、<var>k</var><sub>1</sub>、p<var>K</var>，
+        再用 <code>iopt(model=7)</code> 找最佳 pH。你會得到一張屬於你那台儀器的版本，
+        並可以和文獻的 p<var>K</var><sub>a</sub> 值（4.20、4.76）比對——這是一個完整、可發表等級的小型研究。</li>
+    <li><strong>比較兩種最佳化策略。</strong>對同一組樣品，一邊用 Aşçı 等人的實驗設計法，
+        一邊用本教材的建模＋掃描法，比較兩者<strong>找到的最佳條件是否一致、各花了幾次實驗</strong>。
+        這正好回答第 10 節那個「兩種策略」的問題。</li>
+  </ul>
+</div>
+
+<h3>你學會了什麼</h3>
+<ul class="check">
+<li>能讀懂層析圖的基本結構，認出峰、基線與時間軸代表的意義</li>
+<li>會計算滯留因子 k，並理解它與 t0、tR 的關係</li>
+<li>能判斷兩個相鄰峰的 Rs 是否達到基線分離的標準</li>
+<li>看得懂 ln k 對 f 的直線圖在表達什麼，以及曲率代表的意義</li>
+<li>知道什麼情況該從恆溶劑沖提改用梯度沖提</li>
+<li>能準備符合欄位格式要求的 R 輸入檔（滯留資料、層析圖資料）</li>
+<li>能跑完 <code>ifitk</code> → <code>fitshape</code> → <code>ipred</code> → <code>iopt</code> 這條完整分析流程</li>
+<li>能解讀最佳化功能輸出的最佳條件、Rs 與層析圖模擬結果</li>
+<li>理解分析時間與解析度之間必須取捨，不存在「又快又完美分離」的萬能解</li>
+<li>知道遇到不同的化合物或分離情境時，該去哪裡查十個滯留模型該用哪一個</li>
+</ul>
+</main>
+</div>
+<button id="toTop" aria-label="回到頂端">↑</button>
+
+<script>
+(function(){
+"use strict";
+
+/* ==================================================================
+   資料：來自 Zisi et al. 2020, Data.xlsx 的 i-ret.fit 工作表
+   9 個溶質，以模型 1 (lnk = c0 - c1*f) 擬合，t0 = 1.4 min
+   下列 c0/c1 由該表以線性迴歸求得，與論文 i-optim 工作表公布的
+   模型 1 參數範圍 (c0 3.1404-5.6030, c1 5.9113-8.5366) 完全一致
+   ================================================================== */
+var T0 = 1.4;
+var SOL = [
+  {n:"A1", zh:"2-溴-4-硝基酚",  c0:3.1404, c1:6.6413},
+  {n:"A2", zh:"3-溴酚",         c0:3.4649, c1:6.6043},
+  {n:"A3", zh:"苯",             c0:3.6690, c1:5.9113},
+  {n:"A4", zh:"4-溴-2-硝基酚",  c0:4.2520, c1:6.9596},
+  {n:"A5", zh:"2,4-二溴酚",     c0:4.6463, c1:7.6648},
+  {n:"A6", zh:"五氯酚",         c0:5.2440, c1:8.5366},
+  {n:"A7", zh:"甲苯",           c0:4.6275, c1:6.7991},
+  {n:"A8", zh:"2,4,6-三溴酚",   c0:5.5706, c1:8.1844},
+  {n:"A9", zh:"乙苯",           c0:5.6030, c1:7.7662}
+];
+/* 原始實驗滯留時間表 (供 lnk 圖標出實測點) */
+var FEXP = [0.40, 0.45, 0.50, 0.60];
+var TREXP = [
+ [3.735,3.000,2.537,2.013],[4.671,3.650,3.010,2.265],[6.646,5.200,4.208,3.000],
+ [7.662,5.600,4.349,2.940],[8.498,5.900,4.430,2.910],[10.76,6.850,4.842,3.061],
+ [11.09,8.000,6.051,3.866],[15.99,10.38,7.239,4.198],[19.00,12.69,8.921,5.085]
+];
+/* 峰形參數：取自論文 i-optim 模型 1 區塊的代表值
+   h = h0 + h1*tR  (峰高，pd=1)   s = s0 + s1*tR  (峰寬參數)
+   基底峰寬 w = 4s/sqrt(2)，與 fitshape 內部定義相同 */
+var SH = {h0:0.138, h1:-0.0038, s0:0.013, s1:0.0105};
+
+var kOf   = function(s,f){ return Math.exp(s.c0 - s.c1*f); };
+var tROf  = function(s,f){ return T0*(1 + kOf(s,f)); };
+var sOf   = function(tR){ return SH.s0 + SH.s1*tR; };
+var hOf   = function(tR){ return Math.max(0.014, SH.h0 + SH.h1*tR); };
+var wOf   = function(tR){ return 4*sOf(tR)/Math.SQRT2; };
+
+/* 恆溶劑：算出所有峰，找最小 Rs（相鄰峰對） */
+function isoAnalyze(f){
+  var p = SOL.map(function(s){
+    var tR = tROf(s,f);
+    return {n:s.n, zh:s.zh, tR:tR, s:sOf(tR), w:wOf(tR), h:hOf(tR)};
+  }).sort(function(a,b){ return a.tR-b.tR; });
+  var minRs = Infinity, pi = 0;
+  for(var i=0;i<p.length-1;i++){
+    var rs = 2*(p[i+1].tR - p[i].tR)/(p[i].w + p[i+1].w);
+    if(rs < minRs){ minRs = rs; pi = i; }
+  }
+  return {peaks:p, minRs:minRs, pi:pi, tmax:p[p.length-1].tR};
+}
+
+/* 梯度：數值解基本梯度方程式 ∫dt/(t0*k(t)) = 1
+   φ(t)：溶質在管柱入口看到的組成，已含延遲時間 tD */
+function gradOne(s, f1, f2, tG, tD){
+  var dt = 0.002, acc = 0, t = 0, i, phi, k, d;
+  for(i=0;i<300000;i++){
+    phi = (t<=tD) ? f1 : (((t-tD)/tG >= 1) ? f2 : f1 + (f2-f1)*(t-tD)/tG);
+    k = Math.exp(s.c0 - s.c1*phi);
+    d = dt/(T0*k);
+    if(acc + d >= 1){
+      t += dt*(1-acc)/d;
+      /* 沖提瞬間的 k 值決定峰寬（線性溶劑強度理論）：
+         等效滯留時間 T0*(1+ke) 代入同一組峰形參數。
+         當 f1==f2（恆溶劑）時 ke==k，此式自動還原成 tR，兩種模式完全一致 */
+      return {tR: t + T0, ke: k};
+    }
+    acc += d; t += dt;
+  }
+  return {tR: t + T0, ke: k};
+}
+function gradAnalyze(f1, f2, tG, tD){
+  var p = SOL.map(function(s){
+    var r = gradOne(s, f1, f2, tG, tD);
+    var eq = T0*(1 + r.ke);
+    return {n:s.n, zh:s.zh, tR:r.tR, s:sOf(eq), w:wOf(eq), h:hOf(eq)};
+  }).sort(function(a,b){ return a.tR-b.tR; });
+  var minRs = Infinity, pi = 0;
+  for(var i=0;i<p.length-1;i++){
+    var rs = 2*(p[i+1].tR - p[i].tR)/(p[i].w + p[i+1].w);
+    if(rs < minRs){ minRs = rs; pi = i; }
+  }
+  return {peaks:p, minRs:minRs, pi:pi, tmax:p[p.length-1].tR};
+}
+
+/* ================= 繪圖工具 ================= */
+var CSS = function(v){
+  return getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+};
+var C = {};
+function refreshColors(){
+  ["--ink","--ink2","--ink3","--line","--line2","--bg2","--bg3","--brand","--warm",
+   "--good","--bad","--gold","--peakA","--peakB","--peakC","--peakD","--peakE",
+   "--good-soft","--bad-soft"].forEach(function(k){ C[k] = CSS(k); });
+}
+refreshColors();
+var PEAKC = function(){ return [C["--peakA"],C["--peakB"],C["--peakC"],C["--peakD"],C["--peakE"]]; };
+
+function setup(cv){
+  var dpr = window.devicePixelRatio || 1;
+  var w = cv.clientWidth || cv.parentNode.clientWidth || 900;
+  var ar = cv.dataset.ar ? +cv.dataset.ar : 0.38;
+  if(w < 560) ar *= 1.3;            /* 窄螢幕加高，讓峰標籤有空間 */
+  var h = Math.round(w * ar);
+  cv.width = Math.round(w*dpr); cv.height = Math.round(h*dpr);
+  cv.style.height = h + "px";
+  var g = cv.getContext("2d");
+  g.setTransform(dpr,0,0,dpr,0,0);
+  g.clearRect(0,0,w,h);
+  return {g:g, W:w, H:h};
+}
+function fnt(px, bold){ return (bold?"700 ":"")+px+"px "+CSS("--sans"); }
+
+/* 座標軸 */
+function axes(g, L, R, TT, B, xlab, ylab){
+  g.strokeStyle = C["--line2"]; g.lineWidth = 1;
+  g.beginPath(); g.moveTo(L, TT); g.lineTo(L, B); g.lineTo(R, B); g.stroke();
+  g.fillStyle = C["--ink3"]; g.font = fnt(12);
+  if(xlab){ g.textAlign="center"; g.fillText(xlab, (L+R)/2, B+34); }
+  if(ylab){ g.save(); g.translate(14,(TT+B)/2); g.rotate(-Math.PI/2);
+            g.textAlign="center"; g.fillText(ylab,0,0); g.restore(); }
+}
+function xticks(g, L, R, B, t0, t1, step, fmt){
+  g.font = fnt(11); g.textAlign="center"; g.fillStyle = C["--ink3"];
+  for(var v=t0; v<=t1+1e-9; v+=step){
+    var x = L + (v-t0)/(t1-t0)*(R-L);
+    g.strokeStyle = C["--line"]; g.beginPath(); g.moveTo(x,B); g.lineTo(x,B+4); g.stroke();
+    g.fillText(fmt?fmt(v):(Math.round(v*100)/100), x, B+18);
+  }
+}
+
+/* 畫一張層析圖（共用） */
+function drawChrom(g, W, H, peaks, tSpan, opt){
+  opt = opt || {};
+  var L = 46, R = W-14, TT = opt.top||16, B = H-42;
+  var t0 = 0, t1 = tSpan;
+  var X = function(t){ return L + (t-t0)/(t1-t0)*(R-L); };
+  var maxh = 0.001, i;
+  for(i=0;i<peaks.length;i++) maxh = Math.max(maxh, peaks[i].h);
+  var Y = function(y){ return B - y/(maxh*1.18)*(B-TT); };
+
+  axes(g, L, R, TT, B, opt.xlab||"時間 t / 分鐘", opt.ylab||"偵測器訊號");
+  var step = t1>30?10:(t1>18?5:(t1>9?2:1));
+  xticks(g, L, R, B, 0, t1, step);
+
+  /* 標出最難分的一對 */
+  if(opt.hi != null && peaks[opt.hi] && peaks[opt.hi+1]){
+    var a = peaks[opt.hi], b = peaks[opt.hi+1];
+    g.fillStyle = (opt.hiBad ? C["--bad-soft"] : C["--good-soft"]);
+    var xa = X(a.tR - a.w*0.9), xb = X(b.tR + b.w*0.9);
+    g.fillRect(xa, TT, Math.max(3,xb-xa), B-TT);
+  }
+  /* 死時間 */
+  if(opt.showT0 !== false){
+    g.strokeStyle = C["--line2"]; g.setLineDash([4,4]); g.lineWidth=1;
+    g.beginPath(); g.moveTo(X(T0),TT); g.lineTo(X(T0),B); g.stroke(); g.setLineDash([]);
+    g.fillStyle = C["--ink3"]; g.font = fnt(10.5); g.textAlign="left";
+    g.fillText("t₀", X(T0)+3, TT+11);
+  }
+  /* 訊號曲線 */
+  var cols = PEAKC();
+  g.strokeStyle = C["--brand"]; g.lineWidth = 1.8;
+  g.beginPath();
+  var N = Math.max(700, Math.round(R-L)*2);
+  for(i=0;i<=N;i++){
+    var t = t0 + (t1-t0)*i/N, y = 0;
+    for(var j=0;j<peaks.length;j++){
+      var p = peaks[j], d = (t-p.tR)/p.s;
+      if(d>-6 && d<6) y += p.h*Math.exp(-d*d);
+    }
+    var px = X(t), py = Y(y);
+    if(i===0) g.moveTo(px,py); else g.lineTo(px,py);
+  }
+  g.stroke();
+  /* 峰標籤 */
+  g.textAlign="center"; g.font = fnt(10.5, true);
+  var lastX = -99, tier = 0;
+  for(j=0;j<peaks.length;j++){
+    var q = peaks[j], lx = X(q.tR), ly = Y(q.h)-6;
+    if(lx < L-4 || lx > R+4) continue;
+    tier = (lx - lastX < 26) ? (tier===0?1:0) : 0;   /* 太擠就上下交錯 */
+    lastX = lx;
+    g.fillStyle = (opt.hi!=null && (j===opt.hi||j===opt.hi+1))
+                  ? (opt.hiBad?C["--bad"]:C["--good"]) : C["--ink3"];
+    g.fillText(q.n, lx, Math.max(TT+10, ly - tier*15));
+  }
+  return {X:X, Y:Y, L:L, R:R, TT:TT, B:B};
+}
+
+var renderers = [];
+function reg(fn){ renderers.push(fn); fn(); }
+function redraw(){ refreshColors(); renderers.forEach(function(f){ try{f();}catch(e){} }); }
+
+/* ================= 1. 開場圖 ================= */
+(function(){
+  var cv = document.getElementById("cv-hook"); if(!cv) return;
+  cv.dataset.ar = 0.36;
+  var mode = "bad";
+  var SET = {
+    /* 沖提順序依文獻：逆相 C18、酸性移動相（pH 約 3.5–4.5）下為
+       咖啡因 → 苯甲酸 → 己二烯酸（Kritsunankul & Jakmunee 2011, Talanta 84:1342） */
+    bad:  [{n:"咖啡因",   tR:3.35, h:0.100, s:0.20},
+           {n:"苯甲酸",   tR:3.78, h:0.085, s:0.20},
+           {n:"己二烯酸", tR:5.60, h:0.070, s:0.24}],
+    good: [{n:"咖啡因",   tR:3.10, h:0.100, s:0.15},
+           {n:"苯甲酸",   tR:4.55, h:0.088, s:0.17},
+           {n:"己二烯酸", tR:6.40, h:0.072, s:0.20}]
+  };
+  function draw(){
+    var o = setup(cv), pk = SET[mode].map(function(p){
+      return {n:p.n, tR:p.tR, h:p.h, s:p.s, w:4*p.s/Math.SQRT2};
+    });
+    var rs = 2*(pk[1].tR-pk[0].tR)/(pk[0].w+pk[1].w);
+    drawChrom(o.g, o.W, o.H, pk, 9, {hi:0, hiBad:(mode==="bad"), showT0:false});
+    var v = document.getElementById("hook-verdict");
+    if(mode==="bad"){
+      v.className = "verdict no";
+      v.innerHTML = "❌ 咖啡因與苯甲酸的 R<sub>s</sub> 只有 <strong>"+rs.toFixed(2)+
+        "</strong>——兩個峰疊在一起，面積無法分開計算，<strong>這份數據不能用</strong>。";
+    }else{
+      v.className = "verdict ok";
+      v.innerHTML = "✅ 三個峰都回到基線，最難分的一對 R<sub>s</sub> = <strong>"+rs.toFixed(2)+
+        "</strong>（≥ 1.5）。每個峰的面積都能準確積分，<strong>可以拿來定量</strong>。";
+    }
+  }
+  document.querySelectorAll("[data-hook]").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("[data-hook]").forEach(function(x){ x.classList.remove("on"); });
+      b.classList.add("on"); mode = b.dataset.hook; draw();
+    });
+  });
+  reg(draw);
+})();
+
+/* ================= 2. 解剖圖 ================= */
+(function(){
+  var cv = document.getElementById("cv-anatomy"); if(!cv) return;
+  cv.dataset.ar = 0.40;
+  var show = {t0:true, tr:true, w:true, area:false};
+  function draw(){
+    var o = setup(cv), g = o.g;
+    var pk = [{n:"成分 1", tR:2.6, h:0.075, s:0.13},
+              {n:"成分 2", tR:4.5, h:0.100, s:0.17},
+              {n:"成分 3", tR:7.2, h:0.058, s:0.24}];
+    pk.forEach(function(p){ p.w = 4*p.s/Math.SQRT2; });
+    var ax = drawChrom(g, o.W, o.H, pk, 10, {showT0:false, top:36});
+    var X = ax.X, Y = ax.Y, B = ax.B, TT = ax.TT;
+    var target = pk[1];
+
+    if(show.area){
+      g.fillStyle = C["--brand"]; g.globalAlpha = 0.20; g.beginPath();
+      var s0x = target.tR-4*target.s, s1x = target.tR+4*target.s;
+      g.moveTo(X(s0x), B);
+      for(var t=s0x;t<=s1x;t+=0.01){
+        var y=0; pk.forEach(function(p){ var d=(t-p.tR)/p.s; if(Math.abs(d)<6) y+=p.h*Math.exp(-d*d); });
+        g.lineTo(X(t), Y(y));
+      }
+      g.lineTo(X(s1x), B); g.closePath(); g.fill(); g.globalAlpha = 1;
+      g.fillStyle = C["--brand"]; g.font = fnt(11.5,true); g.textAlign="center";
+      g.fillText("峰面積 ∝ 濃度", X(target.tR), B-16);
+    }
+    if(show.t0){
+      g.strokeStyle = C["--ink3"]; g.setLineDash([4,4]); g.lineWidth=1.2;
+      g.beginPath(); g.moveTo(X(T0),TT-8); g.lineTo(X(T0),B); g.stroke(); g.setLineDash([]);
+      g.fillStyle = C["--ink3"]; g.font = fnt(11.5,true); g.textAlign="center";
+      g.fillText("t₀ 死時間", X(T0), TT-13);
+    }
+    if(show.tr){
+      g.strokeStyle = C["--warm"]; g.setLineDash([3,3]); g.lineWidth=1.4;
+      g.beginPath(); g.moveTo(X(target.tR),Y(target.h)); g.lineTo(X(target.tR),B); g.stroke();
+      g.setLineDash([]);
+      g.fillStyle = C["--warm"]; g.font = fnt(11.5,true); g.textAlign="center";
+      g.fillText("t"+String.fromCharCode(8341)+" 滯留時間", X(target.tR), TT-13);
+      /* tR - t0 箭頭 */
+      var yA = B-11;
+      g.strokeStyle = C["--warm"]; g.lineWidth=1.4;
+      g.beginPath(); g.moveTo(X(T0),yA); g.lineTo(X(target.tR),yA); g.stroke();
+      g.fillStyle = C["--warm"]; g.font = fnt(10.5);
+      g.fillText("黏在管柱上的時間 → k", (X(T0)+X(target.tR))/2, yA-5);
+    }
+    if(show.w){
+      var y0 = Y(0)-1;
+      g.strokeStyle = C["--good"]; g.lineWidth=2.4;
+      g.beginPath(); g.moveTo(X(target.tR-target.w/2), y0);
+      g.lineTo(X(target.tR+target.w/2), y0); g.stroke();
+      g.fillStyle = C["--good"]; g.font = fnt(11,true); g.textAlign="left";
+      g.fillText("w 基底峰寬", X(target.tR+target.w/2)+6, y0-3);
+    }
+  }
+  document.querySelectorAll("[data-anat]").forEach(function(b){
+    b.addEventListener("click", function(){
+      b.classList.toggle("on"); show[b.dataset.anat] = b.classList.contains("on"); draw();
+    });
+  });
+  reg(draw);
+})();
+
+/* ================= 3. Rs 感受器 ================= */
+(function(){
+  var cv = document.getElementById("cv-rs"); if(!cv) return;
+  cv.dataset.ar = 0.36;
+  var rd = document.getElementById("r-rs-d"), rw = document.getElementById("r-rs-w");
+  function draw(){
+    var d = +rd.value/100, w = +rw.value/100;
+    var s = w*Math.SQRT2/4;
+    var pk = [{n:"A", tR:2.4, h:0.09, s:s, w:w},{n:"B", tR:2.4+d, h:0.09, s:s, w:w}];
+    var rs = d>0 ? 2*d/(2*w) : 0;
+    document.getElementById("v-rs-d").textContent = d.toFixed(2)+" 分鐘";
+    document.getElementById("v-rs-w").textContent = w.toFixed(2)+" 分鐘";
+    document.getElementById("v-rs").textContent = rs.toFixed(2);
+    /* 數值積分算重疊比例 */
+    var ov=0, tot=0, t, lo=0, hi=8;
+    for(t=lo;t<hi;t+=0.004){
+      var y1 = Math.exp(-Math.pow((t-pk[0].tR)/s,2)), y2 = Math.exp(-Math.pow((t-pk[1].tR)/s,2));
+      ov += Math.min(y1,y2)*0.004; tot += y1*0.004;
+    }
+    var ovp = tot>0 ? ov/tot*100 : 100;
+    document.getElementById("v-rs-ov").textContent = ovp.toFixed(1)+"%";
+    document.getElementById("v-rs-err").textContent =
+      rs>=1.5 ? "<1%" : (rs>=1.0 ? "2–3%" : (rs>=0.5 ? "5–15%" : ">20%"));
+    var st = document.getElementById("st-rs"), v = document.getElementById("rs-verdict");
+    st.className = "stat " + (rs>=1.5?"ok":(rs>=1.0?"warn":"no"));
+    if(rs>=1.5){ v.className="verdict ok";
+      v.innerHTML="✅ <strong>基線分離</strong>——兩峰之間回到基線，定量準確。這是法規與期刊要求的門檻。"; }
+    else if(rs>=1.0){ v.className="verdict warn";
+      v.innerHTML="⚠️ <strong>勉強分開</strong>——看得出是兩個峰，但谷底沒回到基線，定量會有誤差。"; }
+    else { v.className="verdict no";
+      v.innerHTML="❌ <strong>分離失敗</strong>——兩峰嚴重重疊，面積互相干擾，不能用來定量。"; }
+    var o = setup(cv);
+    drawChrom(o.g, o.W, o.H, pk, 6, {hi:0, hiBad:(rs<1.5), showT0:false});
+  }
+  [rd,rw].forEach(function(e){ e.addEventListener("input", draw); });
+  reg(draw);
+})();
+
+/* ================= 4. lnk 對 φ 直線圖 ================= */
+(function(){
+  var cv = document.getElementById("cv-lnk"); if(!cv) return;
+  cv.dataset.ar = 0.45;
+  var sel = -1;
+  var box = document.getElementById("lnk-btns");
+  var all = document.createElement("button");
+  all.className = "btn on"; all.textContent = "全部"; box.appendChild(all);
+  all.addEventListener("click", function(){ pick(-1); });
+  SOL.forEach(function(s,i){
+    var b = document.createElement("button");
+    b.className = "btn"; b.textContent = s.n; b.title = s.zh;
+    b.addEventListener("click", function(){ pick(i); });
+    box.appendChild(b);
+  });
+  function pick(i){
+    sel = i;
+    var bs = box.querySelectorAll(".btn");
+    bs.forEach(function(b,j){ b.classList.toggle("on", j === i+1); });
+    draw();
+  }
+  function draw(){
+    var o = setup(cv), g = o.g, W = o.W, H = o.H;
+    var L = 52, R = W-16, TT = 16, B = H-44;
+    var f0 = 0.28, f1 = 0.63, y0 = -0.9, y1 = 2.8;
+    var X = function(f){ return L + (f-f0)/(f1-f0)*(R-L); };
+    var Y = function(y){ return B - (y-y0)/(y1-y0)*(B-TT); };
+    axes(g,L,R,TT,B,"有機修飾劑比例 φ","ln k");
+    /* 刻度必須用與資料相同的 X() 對應，否則實測點會落錯位置 */
+    g.font = fnt(11); g.textAlign="center"; g.fillStyle = C["--ink3"];
+    for(var tv=0.30; tv<=0.60+1e-9; tv+=0.05){
+      var tx = X(tv);
+      g.strokeStyle = C["--line"]; g.beginPath(); g.moveTo(tx,B); g.lineTo(tx,B+4); g.stroke();
+      g.fillStyle = C["--ink3"]; g.fillText(tv.toFixed(2), tx, B+18);
+    }
+    g.font = fnt(11); g.textAlign="right"; g.fillStyle = C["--ink3"];
+    for(var yy=0; yy<=2.5; yy+=0.5){
+      g.fillText(yy.toFixed(1), L-7, Y(yy)+4);
+      g.strokeStyle = C["--line"]; g.beginPath(); g.moveTo(L,Y(yy)); g.lineTo(R,Y(yy)); g.stroke();
+    }
+    var cols = PEAKC();
+    SOL.forEach(function(s,i){
+      var on = (sel<0 || sel===i);
+      g.globalAlpha = on ? 1 : 0.13;
+      g.strokeStyle = cols[i%5]; g.lineWidth = on ? 2.2 : 1.2;
+      g.beginPath(); g.moveTo(X(f0), Y(s.c0-s.c1*f0)); g.lineTo(X(f1), Y(s.c0-s.c1*f1)); g.stroke();
+      /* 實測點 */
+      if(on){
+        g.fillStyle = cols[i%5];
+        for(var j=0;j<FEXP.length;j++){
+          var k = (TREXP[i][j]-T0)/T0;
+          g.beginPath(); g.arc(X(FEXP[j]), Y(Math.log(k)), 3.4, 0, 6.2832); g.fill();
+        }
+        g.font = fnt(11,true); g.textAlign="left"; g.fillStyle = cols[i%5];
+        var ly = Y(s.c0-s.c1*f1);
+        if(ly>TT+6 && ly<B-4) g.fillText(s.n, X(f1)+3>R-22 ? R-24 : X(f1)+3, ly+3);
+      }
+      g.globalAlpha = 1;
+    });
+    /* 交叉點提示 */
+    if(sel<0){
+      var a = SOL[5], b = SOL[6]; /* A6 與 A7 */
+      var fx = (a.c0-b.c0)/(a.c1-b.c1);
+      if(fx>f0 && fx<f1){
+        var yx = a.c0-a.c1*fx;
+        g.strokeStyle = C["--bad"]; g.lineWidth = 1.6; g.setLineDash([3,3]);
+        g.beginPath(); g.arc(X(fx), Y(yx), 8, 0, 6.2832); g.stroke(); g.setLineDash([]);
+        g.fillStyle = C["--bad"]; g.font = fnt(11,true); g.textAlign="center";
+        g.fillText("A6 與 A7 在 φ≈"+fx.toFixed(2)+" 交叉", X(fx), Y(yx)-14);
+      }
+    }
+    /* 讀數 */
+    var nm = document.getElementById("v-lnk-n");
+    if(sel<0){
+      nm.textContent = "全部";
+      document.getElementById("v-lnk-c0").textContent = "—";
+      document.getElementById("v-lnk-c1").textContent = "—";
+      document.getElementById("v-lnk-r2").textContent = "—";
+    }else{
+      var s2 = SOL[sel];
+      nm.textContent = s2.n + " " + s2.zh;
+      document.getElementById("v-lnk-c0").textContent = s2.c0.toFixed(4);
+      document.getElementById("v-lnk-c1").textContent = s2.c1.toFixed(4);
+      var lk = TREXP[sel].map(function(t){ return Math.log((t-T0)/T0); });
+      var mean = lk.reduce(function(a2,b2){return a2+b2;},0)/lk.length, ssr=0, sst=0;
+      lk.forEach(function(v,j){
+        var p = s2.c0 - s2.c1*FEXP[j];
+        ssr += (v-p)*(v-p); sst += (v-mean)*(v-mean);
+      });
+      document.getElementById("v-lnk-r2").textContent = (1-ssr/sst).toFixed(4);
+    }
+  }
+  reg(draw);
+})();
+
+/* ================= 5. 恆溶劑主模擬器 + 掃描圖 ================= */
+(function(){
+  var cvI = document.getElementById("cv-iso"), cvS = document.getElementById("cv-scan");
+  if(!cvI) return;
+  cvI.dataset.ar = 0.375; if(cvS) cvS.dataset.ar = 0.42;
+  var rf = document.getElementById("r-iso-f"), rt = document.getElementById("r-iso-tmax");
+  var hoverF = null;
+
+  function current(){ return {f:+rf.value/1000, tmax:+rt.value}; }
+
+  function drawIso(){
+    var c = current(), a = isoAnalyze(c.f), o = setup(cvI);
+    var span = Math.max(c.tmax*1.05, Math.min(a.tmax*1.12, 42));
+    drawChrom(o.g, o.W, o.H, a.peaks, span, {hi:a.pi, hiBad:(a.minRs<1.5)});
+    /* 時間預算線 */
+    var g = o.g, L=46, R=o.W-14, B=o.H-42, TT=16;
+    var x = L + c.tmax/span*(R-L);
+    if(x<R){
+      g.strokeStyle = C["--bad"]; g.lineWidth = 1.6; g.setLineDash([6,4]);
+      g.beginPath(); g.moveTo(x,TT); g.lineTo(x,B); g.stroke(); g.setLineDash([]);
+      g.fillStyle = C["--bad"]; g.font = fnt(11,true); g.textAlign = x>R-70?"right":"left";
+      g.fillText("時間上限 "+c.tmax+" 分", x + (x>R-70?-4:4), TT+11);
+    }
+    document.getElementById("v-iso-f").textContent = c.f.toFixed(3);
+    document.getElementById("v-iso-tmax").textContent = c.tmax + " 分鐘";
+    document.getElementById("v-iso-rs").textContent = a.minRs.toFixed(3);
+    document.getElementById("v-iso-pair").textContent = a.peaks[a.pi].n+" / "+a.peaks[a.pi+1].n;
+    document.getElementById("v-iso-tm").textContent = a.tmax.toFixed(2);
+    document.getElementById("v-iso-ord").textContent = a.peaks.map(function(p){return p.n;}).join(" ");
+    var okT = a.tmax <= c.tmax, okR = a.minRs >= 1.5;
+    document.getElementById("st-iso-rs").className = "stat " + (okR?"ok":(a.minRs>=1?"warn":"no"));
+    document.getElementById("st-iso-tm").className = "stat " + (okT?"ok":"no");
+    var v = document.getElementById("iso-verdict");
+    if(okR && okT){ v.className="verdict ok";
+      v.innerHTML = "✅ <strong>合格</strong>：最難分的 "+a.peaks[a.pi].n+"/"+a.peaks[a.pi+1].n+
+        " 達到 R<sub>s</sub> = "+a.minRs.toFixed(2)+"，且 "+a.tmax.toFixed(1)+" 分鐘內跑完。"; }
+    else if(!okT && okR){ v.className="verdict warn";
+      v.innerHTML = "⚠️ <strong>分得開，但太慢</strong>：R<sub>s</sub> = "+a.minRs.toFixed(2)+
+        " 很好，可是最後一個峰要 "+a.tmax.toFixed(1)+" 分鐘才出來，超過你設的 "+c.tmax+" 分鐘預算。"; }
+    else if(okT && !okR){ v.className="verdict no";
+      v.innerHTML = "❌ <strong>夠快，但分不開</strong>："+a.peaks[a.pi].n+" 和 "+a.peaks[a.pi+1].n+
+        " 只有 R<sub>s</sub> = "+a.minRs.toFixed(2)+"，未達 1.5。"; }
+    else { v.className="verdict no";
+      v.innerHTML = "❌ <strong>兩邊都不合格</strong>：R<sub>s</sub> = "+a.minRs.toFixed(2)+
+        "，而且要跑 "+a.tmax.toFixed(1)+" 分鐘。"; }
+  }
+
+  function drawScan(){
+    if(!cvS) return;
+    var c = current(), o = setup(cvS), g = o.g, W = o.W, H = o.H;
+    var L = 50, R = W-52, TT = 20, B = H-46;
+    var f0 = 0.30, f1 = 0.60;
+    var X = function(f){ return L + (f-f0)/(f1-f0)*(R-L); };
+    var rsMax = 3.2, tMax = 40;
+    var Yr = function(v){ return B - Math.min(v,rsMax)/rsMax*(B-TT); };
+    var Yt = function(v){ return B - Math.min(v,tMax)/tMax*(B-TT); };
+    /* 掃描 */
+    var pts = [], f, best = null;
+    for(f=f0; f<=f1+1e-9; f+=0.0025){
+      var a = isoAnalyze(f);
+      pts.push({f:f, rs:a.minRs, tm:a.tmax});
+      if(a.tmax <= c.tmax && (!best || a.minRs > best.rs)) best = {f:f, rs:a.minRs, tm:a.tmax};
+    }
+    /* 合格區間底色 */
+    g.fillStyle = C["--good-soft"];
+    pts.forEach(function(p,i){
+      if(p.rs>=1.5 && p.tm<=c.tmax && i<pts.length-1)
+        g.fillRect(X(p.f), TT, Math.max(1,X(pts[i+1].f)-X(p.f)+0.6), B-TT);
+    });
+    axes(g,L,R,TT,B,"有機修飾劑比例 φ","");
+    xticks(g,L,R,B,0.30,0.60,0.05,function(v){ return v.toFixed(2); });
+    /* Rs=1.5 門檻 */
+    g.strokeStyle = C["--good"]; g.setLineDash([5,4]); g.lineWidth=1.2;
+    g.beginPath(); g.moveTo(L,Yr(1.5)); g.lineTo(R,Yr(1.5)); g.stroke(); g.setLineDash([]);
+    g.fillStyle = C["--good"]; g.font = fnt(10.5,true); g.textAlign="left";
+    g.fillText("Rs = 1.5", L+4, Yr(1.5)-4);
+    /* 左右軸標 */
+    g.font = fnt(11); g.fillStyle = C["--peakA"]; g.textAlign="right";
+    for(var v1=0; v1<=3; v1++) g.fillText(v1.toFixed(0), L-7, Yr(v1)+4);
+    g.save(); g.translate(15,(TT+B)/2); g.rotate(-Math.PI/2); g.textAlign="center";
+    g.fillText("最小 Rs", 0, 0); g.restore();
+    g.fillStyle = C["--peakB"]; g.textAlign="left";
+    for(var v2=0; v2<=40; v2+=10) g.fillText(String(v2), R+6, Yt(v2)+4);
+    g.save(); g.translate(W-9,(TT+B)/2); g.rotate(Math.PI/2); g.textAlign="center";
+    g.fillText("tRmax / 分鐘", 0, 0); g.restore();
+    /* 曲線 */
+    g.strokeStyle = C["--peakB"]; g.lineWidth=1.8; g.beginPath();
+    pts.forEach(function(p,i){ var x=X(p.f),y=Yt(p.tm); i?g.lineTo(x,y):g.moveTo(x,y); });
+    g.stroke();
+    g.strokeStyle = C["--peakA"]; g.lineWidth=2.2; g.beginPath();
+    pts.forEach(function(p,i){ var x=X(p.f),y=Yr(p.rs); i?g.lineTo(x,y):g.moveTo(x,y); });
+    g.stroke();
+    /* 最佳點 */
+    if(best){
+      g.fillStyle = C["--good"];
+      g.beginPath(); g.arc(X(best.f), Yr(best.rs), 5.5, 0, 6.2832); g.fill();
+      g.strokeStyle = C["--bg2"]; g.lineWidth=1.6; g.stroke();
+      g.fillStyle = C["--good"]; g.font = fnt(11,true); g.textAlign="center";
+      g.fillText("最佳 φ="+best.f.toFixed(3)+"　Rs="+best.rs.toFixed(2),
+                 Math.min(Math.max(X(best.f),L+70),R-70), Math.max(TT+12, Yr(best.rs)-11));
+    }
+    /* 目前位置 */
+    var cf = hoverF!=null ? hoverF : c.f;
+    if(cf>=f0 && cf<=f1){
+      g.strokeStyle = C["--ink3"]; g.lineWidth=1.3; g.setLineDash([3,3]);
+      g.beginPath(); g.moveTo(X(cf),TT); g.lineTo(X(cf),B); g.stroke(); g.setLineDash([]);
+      var aa = isoAnalyze(cf);
+      g.fillStyle = C["--ink"]; g.font = fnt(11,true);
+      g.textAlign = X(cf) > (L+R)/2 ? "right" : "left";
+      var tx = X(cf) + (X(cf)>(L+R)/2 ? -6 : 6);
+      g.fillText("φ="+cf.toFixed(3)+"　Rs="+aa.minRs.toFixed(2)+"　tRmax="+aa.tmax.toFixed(1), tx, B-8);
+    }
+  }
+  function draw(){ drawIso(); drawScan(); }
+  [rf,rt].forEach(function(e){ e.addEventListener("input", function(){ hoverF=null; draw(); }); });
+  document.querySelectorAll("[data-isof]").forEach(function(b){
+    b.addEventListener("click", function(){ rf.value = b.dataset.isof; hoverF=null; draw(); });
+  });
+  if(cvS){
+    cvS.addEventListener("mousemove", function(e){
+      var r = cvS.getBoundingClientRect(), W = r.width;
+      var L = 50, R = W-52, x = e.clientX - r.left;
+      var f = 0.30 + (x-L)/(R-L)*0.30;
+      hoverF = (f>=0.30 && f<=0.60) ? f : null; drawScan();
+    });
+    cvS.addEventListener("mouseleave", function(){ hoverF=null; drawScan(); });
+  }
+  reg(draw);
+})();
+
+/* ================= 6. 梯度模擬器 ================= */
+(function(){
+  var cv = document.getElementById("cv-grad"); if(!cv) return;
+  cv.dataset.ar = 0.48;
+  var TD = 0.7;
+  var rg = document.getElementById("r-g-tg"), r1 = document.getElementById("r-g-f1"),
+      r2 = document.getElementById("r-g-f2");
+  function draw(){
+    var tG = +rg.value/10, f1 = +r1.value/1000, f2 = +r2.value/1000;
+    if(f2 < f1){ f2 = f1; r2.value = Math.round(f1*1000); }
+    var a = gradAnalyze(f1, f2, tG, TD);
+    var o = setup(cv), g = o.g, W = o.W, H = o.H;
+    var span = Math.min(Math.max(a.tmax*1.12, 6), 46);
+    var gh = Math.round(H*0.30);
+    /* --- 上：梯度程式 --- */
+    var L = 46, R = W-14, TT = 14, GB = gh;
+    var X = function(t){ return L + t/span*(R-L); };
+    var Yf = function(v){ return GB - v/1.0*(GB-TT); };
+    g.strokeStyle = C["--line2"]; g.lineWidth=1;
+    g.beginPath(); g.moveTo(L,TT); g.lineTo(L,GB); g.lineTo(R,GB); g.stroke();
+    g.fillStyle = C["--ink3"]; g.font = fnt(10.5); g.textAlign="right";
+    [0,0.5,1].forEach(function(v){ g.fillText(v.toFixed(1), L-6, Yf(v)+3.5); });
+    g.save(); g.translate(13,(TT+GB)/2); g.rotate(-Math.PI/2);
+    g.textAlign="center"; g.fillText("φ", 0, 0); g.restore();
+    g.strokeStyle = C["--warm"]; g.lineWidth=2.2; g.beginPath();
+    g.moveTo(X(0), Yf(f1)); g.lineTo(X(TD), Yf(f1));
+    g.lineTo(X(Math.min(TD+tG,span)), Yf(TD+tG<=span ? f2 : f1+(f2-f1)*(span-TD)/tG));
+    if(TD+tG < span) g.lineTo(X(span), Yf(f2));
+    g.stroke();
+    g.fillStyle = C["--warm"]; g.font = fnt(10.5,true); g.textAlign="left";
+    g.fillText("梯度程式　梯度時間 tG = "+tG.toFixed(1)+" 分　φ "+f1.toFixed(2)+" → "+f2.toFixed(2)+
+               "　（延遲 tD = "+TD+" 分）", L+5, TT+11);
+    /* --- 下：層析圖（平移到梯度圖下方後繪製） --- */
+    g.save(); g.translate(0, gh+10);
+    drawChromIn(g, W, H-gh-10, a.peaks, span, a.pi, a.minRs<1.5);
+    g.restore();
+
+    document.getElementById("v-g-tg").textContent = tG.toFixed(1)+" 分鐘";
+    document.getElementById("v-g-f1").textContent = f1.toFixed(2);
+    document.getElementById("v-g-f2").textContent = f2.toFixed(2);
+    document.getElementById("v-g-rs").textContent = a.minRs.toFixed(3);
+    document.getElementById("v-g-pair").textContent = a.peaks[a.pi].n+" / "+a.peaks[a.pi+1].n;
+    document.getElementById("v-g-tm").textContent = a.tmax.toFixed(2);
+    document.getElementById("v-g-w").textContent =
+      a.peaks[0].w.toFixed(2)+" / "+a.peaks[a.peaks.length-1].w.toFixed(2);
+    document.getElementById("st-g-rs").className = "stat " + (a.minRs>=1.5?"ok":(a.minRs>=1?"warn":"no"));
+    document.getElementById("st-g-tm").className = "stat " + (a.tmax<=20?"ok":"warn");
+    var v = document.getElementById("g-verdict");
+    var wr = a.peaks[a.peaks.length-1].w / a.peaks[0].w;
+    if(a.minRs>=1.5){ v.className="verdict ok";
+      v.innerHTML = "✅ 全部基線分離，R<sub>s</sub> = "+a.minRs.toFixed(2)+
+        "，"+a.tmax.toFixed(1)+" 分鐘跑完。末峰寬 / 首峰寬 = "+wr.toFixed(1)+
+        " 倍——梯度讓峰寬變得平均多了。"; }
+    else if(a.minRs>=1.0){ v.className="verdict warn";
+      v.innerHTML = "⚠️ R<sub>s</sub> = "+a.minRs.toFixed(2)+"，還沒到基線分離。試著把 t<sub>G</sub> 拉長，或把起始 φ 調低。"; }
+    else { v.className="verdict no";
+      v.innerHTML = "❌ R<sub>s</sub> = "+a.minRs.toFixed(2)+"，"+a.peaks[a.pi].n+" 和 "+
+        a.peaks[a.pi+1].n+" 幾乎重疊。梯度太陡或起始 φ 太高，前段成分來不及分開。"; }
+  }
+  /* 在已平移的 context 內畫層析圖 */
+  function drawChromIn(g, W, H, peaks, span, hi, hiBad){
+    var L = 46, R = W-14, TT = 8, B = H-42;
+    var X = function(t){ return L + t/span*(R-L); };
+    var maxh = 0.001, i;
+    for(i=0;i<peaks.length;i++) maxh = Math.max(maxh, peaks[i].h);
+    var Y = function(y){ return B - y/(maxh*1.18)*(B-TT); };
+    g.strokeStyle = C["--line2"]; g.lineWidth=1;
+    g.beginPath(); g.moveTo(L,TT); g.lineTo(L,B); g.lineTo(R,B); g.stroke();
+    g.fillStyle = C["--ink3"]; g.font = fnt(12); g.textAlign="center";
+    g.fillText("時間 t / 分鐘", (L+R)/2, B+34);
+    g.save(); g.translate(14,(TT+B)/2); g.rotate(-Math.PI/2);
+    g.textAlign="center"; g.fillText("偵測器訊號",0,0); g.restore();
+    var step = span>30?10:(span>18?5:(span>9?2:1));
+    xticks(g,L,R,B,0,span,step);
+    if(peaks[hi] && peaks[hi+1]){
+      g.fillStyle = hiBad ? C["--bad-soft"] : C["--good-soft"];
+      var xa = X(peaks[hi].tR - peaks[hi].w*0.9), xb = X(peaks[hi+1].tR + peaks[hi+1].w*0.9);
+      g.fillRect(xa, TT, Math.max(3,xb-xa), B-TT);
+    }
+    g.strokeStyle = C["--line2"]; g.setLineDash([4,4]);
+    g.beginPath(); g.moveTo(X(T0),TT); g.lineTo(X(T0),B); g.stroke(); g.setLineDash([]);
+    g.strokeStyle = C["--brand"]; g.lineWidth=1.8; g.beginPath();
+    var N = Math.max(700, Math.round(R-L)*2);
+    for(i=0;i<=N;i++){
+      var t = span*i/N, y = 0;
+      for(var j=0;j<peaks.length;j++){
+        var p = peaks[j], d = (t-p.tR)/p.s;
+        if(d>-6 && d<6) y += p.h*Math.exp(-d*d);
+      }
+      var px = X(t), py = Y(y);
+      if(i===0) g.moveTo(px,py); else g.lineTo(px,py);
+    }
+    g.stroke();
+    g.textAlign="center"; g.font = fnt(10.5,true);
+    var lastX = -99, tier = 0;
+    for(j=0;j<peaks.length;j++){
+      var q = peaks[j], lx = X(q.tR);
+      if(lx<L-4 || lx>R+4) continue;
+      tier = (lx - lastX < 26) ? (tier===0?1:0) : 0;
+      lastX = lx;
+      g.fillStyle = (j===hi||j===hi+1) ? (hiBad?C["--bad"]:C["--good"]) : C["--ink3"];
+      g.fillText(q.n, lx, Math.max(TT+10, Y(q.h)-6-tier*15));
+    }
+  }
+  [rg,r1,r2].forEach(function(e){ e.addEventListener("input", draw); });
+  var PRE = { iso:{tg:150,f1:450,f2:450}, rescue:{tg:110,f1:350,f2:700},
+              good:{tg:150,f1:200,f2:650}, steep:{tg:25,f1:300,f2:800} };
+  document.querySelectorAll("[data-gpre]").forEach(function(b){
+    b.addEventListener("click", function(){
+      var p = PRE[b.dataset.gpre];
+      rg.value = p.tg; r1.value = p.f1; r2.value = p.f2; draw();
+    });
+  });
+  reg(draw);
+})();
+
+/* ================= 7. pH 模擬器（模型 7） =================
+   k = (k0 + k1*10^(pH-pK)) / (1 + 10^(pH-pK))
+   pKa 為文獻標準值（苯甲酸 4.20、己二烯酸 4.76）；
+   k0/k1 依文獻報告的典型滯留時間反推，t0 = 1.2 min          */
+(function(){
+  var cv = document.getElementById("cv-ph"); if(!cv) return;
+  cv.dataset.ar = 0.53;
+  var TP0 = 1.2, ps0 = 0.05, ps1 = 0.022;
+  var PS = [
+    {n:"咖啡因",   k0:1.170, k1:1.170, pK:null, c:"--ink3"},
+    {n:"苯甲酸",   k0:2.500, k1:0.417, pK:4.20, c:"--peakB"},
+    {n:"己二烯酸", k0:3.833, k1:0.583, pK:4.76, c:"--peakC"}
+  ];
+  var rp = document.getElementById("r-ph");
+  function kp(s,pH){
+    if(s.pK==null) return s.k0;
+    var X = Math.pow(10, pH - s.pK);
+    return (s.k0 + s.k1*X)/(1+X);
+  }
+  function tRp(s,pH){ return TP0*(1+kp(s,pH)); }
+  function anz(pH){
+    var p = PS.map(function(s){ return {n:s.n, tR:tRp(s,pH)}; })
+              .sort(function(a,b){ return a.tR-b.tR; });
+    p.forEach(function(q){ q.s = ps0+ps1*q.tR; q.w = 4*q.s/Math.SQRT2; q.h = 0.10; });
+    var m = Infinity, pi = 0;
+    for(var i=0;i<p.length-1;i++){
+      var r = 2*(p[i+1].tR-p[i].tR)/(p[i].w+p[i+1].w);
+      if(r<m){ m=r; pi=i; }
+    }
+    return {peaks:p, minRs:m, pi:pi, tmax:p[p.length-1].tR};
+  }
+  function draw(){
+    var pH = +rp.value/100, a = anz(pH);
+    var o = setup(cv), g = o.g, W = o.W, H = o.H;
+    var topH = Math.round(H*0.50);
+    /* ---- 上：tR 對 pH ---- */
+    var L = 50, R = W-58, TT = 16, B = topH-30;
+    var p0 = 2.5, p1 = 7.0, y1 = 6.6;
+    var X = function(v){ return L + (v-p0)/(p1-p0)*(R-L); };
+    var Y = function(v){ return B - v/y1*(B-TT); };
+    g.strokeStyle = C["--line2"]; g.lineWidth=1;
+    g.beginPath(); g.moveTo(L,TT); g.lineTo(L,B); g.lineTo(R,B); g.stroke();
+    g.font = fnt(11); g.textAlign="center"; g.fillStyle = C["--ink3"];
+    for(var tv=2.5; tv<=7.01; tv+=0.5){
+      g.strokeStyle=C["--line"]; g.beginPath(); g.moveTo(X(tv),B); g.lineTo(X(tv),B+4); g.stroke();
+      g.fillStyle=C["--ink3"]; g.fillText(tv.toFixed(1), X(tv), B+16);
+    }
+    g.textAlign="right";
+    for(var yv=0; yv<=6; yv+=2){
+      g.fillText(yv.toFixed(0), L-6, Y(yv)+4);
+      g.strokeStyle=C["--line"]; g.beginPath(); g.moveTo(L,Y(yv)); g.lineTo(R,Y(yv)); g.stroke();
+    }
+    g.save(); g.translate(15,(TT+B)/2); g.rotate(-Math.PI/2);
+    g.textAlign="center"; g.fillStyle=C["--ink3"]; g.fillText("tR / 分鐘",0,0); g.restore();
+    g.textAlign="center"; g.fillStyle=C["--ink3"]; g.fillText("移動相 pH",(L+R)/2,B+30);
+    /* 共沖提交叉點 */
+    [[4.45,"陷阱"],[5.42,"陷阱"]].forEach(function(cr){
+      g.strokeStyle = C["--bad"]; g.globalAlpha=.45; g.lineWidth=1; g.setLineDash([2,3]);
+      g.beginPath(); g.moveTo(X(cr[0]),TT); g.lineTo(X(cr[0]),B); g.stroke();
+      g.setLineDash([]); g.globalAlpha=1;
+      g.fillStyle = C["--bad"]; g.font = fnt(9.5,true);
+      g.fillText(cr[0].toFixed(2), X(cr[0]), TT+9);
+    });
+    /* 三條曲線 */
+    PS.forEach(function(s){
+      g.strokeStyle = C[s.c]; g.lineWidth = (s.pK==null)?1.8:2.2;
+      if(s.pK==null) g.setLineDash([5,4]);
+      g.beginPath();
+      for(var i=0;i<=260;i++){
+        var v = p0 + (p1-p0)*i/260, xx = X(v), yy = Y(tRp(s,v));
+        i?g.lineTo(xx,yy):g.moveTo(xx,yy);
+      }
+      g.stroke(); g.setLineDash([]);
+    });
+    /* 右側標籤：曲線在高 pH 會收斂，先把重疊的標籤推開 */
+    var labs = PS.map(function(s){ return {n:s.n, c:s.c, y:Y(tRp(s,p1))}; })
+                 .sort(function(a,b){ return a.y-b.y; });
+    for(var li=1; li<labs.length; li++)
+      if(labs[li].y - labs[li-1].y < 13) labs[li].y = labs[li-1].y + 13;
+    g.font = fnt(10.5,true); g.textAlign="left";
+    labs.forEach(function(lb){
+      g.fillStyle = C[lb.c]; g.fillText(lb.n, R+4, lb.y+3.5);
+    });
+    /* 目前 pH */
+    g.strokeStyle = C["--ink"]; g.lineWidth=1.5;
+    g.beginPath(); g.moveTo(X(pH),TT); g.lineTo(X(pH),B); g.stroke();
+    PS.forEach(function(s){
+      g.fillStyle = C[s.c];
+      g.beginPath(); g.arc(X(pH), Y(tRp(s,pH)), 4, 0, 6.2832); g.fill();
+      g.strokeStyle = C["--bg2"]; g.lineWidth=1.4; g.stroke();
+    });
+    /* ---- 下：層析圖 ---- */
+    g.save(); g.translate(0, topH+6);
+    var span = 7;
+    var ax = drawChrom(g, W, H-topH-6, a.peaks, span,
+                       {hi:a.pi, hiBad:(a.minRs<1.5), showT0:false, top:10});
+    g.strokeStyle = C["--line2"]; g.setLineDash([4,4]); g.lineWidth=1;
+    g.beginPath(); g.moveTo(ax.X(TP0),ax.TT); g.lineTo(ax.X(TP0),ax.B); g.stroke(); g.setLineDash([]);
+    g.fillStyle = C["--ink3"]; g.font = fnt(10); g.textAlign="left";
+    g.fillText("t₀", ax.X(TP0)+3, ax.TT+10);
+    g.restore();
+
+    document.getElementById("v-ph").textContent = pH.toFixed(2);
+    document.getElementById("v-ph-rs").textContent = a.minRs.toFixed(2);
+    document.getElementById("v-ph-pair").textContent = a.peaks[a.pi].n+" / "+a.peaks[a.pi+1].n;
+    document.getElementById("v-ph-tm").textContent = a.tmax.toFixed(2);
+    document.getElementById("v-ph-ord").textContent = a.peaks.map(function(q){return q.n;}).join(" → ");
+    document.getElementById("st-ph-rs").className = "stat " + (a.minRs>=1.5?"ok":(a.minRs>=0.5?"warn":"no"));
+    var v = document.getElementById("ph-verdict");
+    if(a.minRs < 0.5){ v.className="verdict no";
+      v.innerHTML = "❌ <strong>共沖提陷阱！</strong>"+a.peaks[a.pi].n+" 和 "+a.peaks[a.pi+1].n+
+        " 疊成了一個峰（R<sub>s</sub> = "+a.minRs.toFixed(2)+"）——層析圖上看起來只有兩個峰，很容易誤判成「少了一支標準品」。"; }
+    else if(a.minRs < 1.5){
+      var hard = [a.peaks[a.pi].n, a.peaks[a.pi+1].n];
+      var why = (hard.indexOf("咖啡因") >= 0)
+        ? "你正在接近其中一個交叉點——某一根酸正在追上（或超越）咖啡因。"
+        : "此時兩根酸都已幾乎完全解離，滯留行為變得非常接近，光靠 pH 已經拉不開它們了——"
+          + "這時要改調 <var>φ</var> 或換管柱，而不是繼續動 pH。";
+      v.className="verdict warn";
+      v.innerHTML = "⚠️ R<sub>s</sub> = "+a.minRs.toFixed(2)+"，"+hard[0]+" 和 "+hard[1]+
+        " 還沒有基線分離。"+why; }
+    else { v.className="verdict ok";
+      v.innerHTML = "✅ 三個峰都分開了，R<sub>s</sub> = "+a.minRs.toFixed(2)+
+        "，順序是 <strong>"+a.peaks.map(function(q){return q.n;}).join(" → ")+"</strong>，"+
+        a.tmax.toFixed(1)+" 分鐘跑完。"; }
+  }
+  rp.addEventListener("input", draw);
+  document.querySelectorAll("[data-ph]").forEach(function(b){
+    b.addEventListener("click", function(){ rp.value = b.dataset.ph; draw(); });
+  });
+  reg(draw);
+})();
+
+/* ================= 測驗 ================= */
+document.querySelectorAll(".quiz").forEach(function(q){
+  var opts = q.querySelectorAll(".opt"), ex = q.querySelector(".expl");
+  opts.forEach(function(o){
+    o.addEventListener("click", function(){
+      if(o.classList.contains("done")) return;
+      opts.forEach(function(x){
+        x.classList.add("done");
+        if(x.dataset.ok === "1") x.classList.add("right");
+      });
+      if(o.dataset.ok !== "1") o.classList.add("wrong");
+      if(ex) ex.classList.add("show");
+    });
+  });
+});
+
+/* ================= 目錄 ================= */
+(function(){
+  var nav = document.getElementById("nav");
+  var hs = document.querySelectorAll("main h2[id]");
+  var groups = [
+    {t:"入門　讀懂層析圖", ids:["s1","s2","s3","s4","s5"]},
+    {t:"中階　調整與最佳化", ids:["s6","s7","s8","s9","s10"]},
+    {t:"進階　R 實作", ids:["s11","s12","s13","s14","s15"]},
+    {t:"附錄　查詢用", ids:["s16","s17","s18","s19"]}
+  ];
+  var title = document.createElement("div");
+  title.className = "navtitle"; title.textContent = "HPLC 分離最佳化";
+  nav.appendChild(title);
+  var map = {};
+  hs.forEach(function(h){ map[h.id] = h; });
+  groups.forEach(function(gr){
+    var any = gr.ids.some(function(i){ return map[i]; });
+    if(!any) return;
+    var d = document.createElement("div"); d.className = "lvl"; d.textContent = gr.t;
+    nav.appendChild(d);
+    gr.ids.forEach(function(id){
+      var h = map[id]; if(!h) return;
+      var a = document.createElement("a");
+      a.href = "#"+id;
+      a.textContent = h.textContent.replace(/入門|中階|進階/g,"").trim();
+      a.dataset.id = id;
+      nav.appendChild(a);
+    });
+  });
+  var links = nav.querySelectorAll("a");
+  function spy(){
+    var y = window.scrollY + 110, cur = null;
+    hs.forEach(function(h){ if(h.offsetTop <= y) cur = h.id; });
+    links.forEach(function(a){ a.classList.toggle("on", a.dataset.id === cur); });
+    var tt = document.getElementById("toTop");
+    if(tt) tt.classList.toggle("show", window.scrollY > 600);
+  }
+  window.addEventListener("scroll", spy, {passive:true});
+  spy();
+  var tg = document.getElementById("navToggle");
+  tg.addEventListener("click", function(){ nav.classList.toggle("open"); });
+  links.forEach(function(a){
+    a.addEventListener("click", function(){ nav.classList.remove("open"); });
+  });
+  document.getElementById("toTop").addEventListener("click", function(){
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+})();
+
+/* ================= 重繪 ================= */
+var rt2;
+window.addEventListener("resize", function(){
+  clearTimeout(rt2); rt2 = setTimeout(redraw, 140);
+});
+if(window.matchMedia){
+  var mq = window.matchMedia("(prefers-color-scheme: dark)");
+  if(mq.addEventListener) mq.addEventListener("change", redraw);
+}
+new MutationObserver(redraw).observe(document.documentElement, {attributes:true, attributeFilter:["data-theme"]});
+setTimeout(redraw, 60);
+window.addEventListener("load", function(){ setTimeout(redraw, 80); });
+})();
+</script>
+</body>
+</html>
