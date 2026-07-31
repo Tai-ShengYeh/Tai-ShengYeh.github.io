@@ -119,6 +119,12 @@
     .symbol-table th,.symbol-table td,.output-table th,.output-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
     .symbol-table th,.output-table th{background:var(--soft);color:var(--ink)}
     .callout{padding:13px 15px;background:var(--amber2);border-radius:9px;font-size:13px;margin-top:14px}
+    .objectives{margin-bottom:18px;border-left:4px solid var(--teal);background:var(--teal2)}
+    .objectives ol{margin:10px 0 0;padding-left:20px}
+    .objectives li{margin:7px 0;line-height:1.75;font-size:14px}
+    .objectives .obj-note{margin:14px 0 0;padding-top:12px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--muted)}
+    .read-steps{margin:10px 0 0;padding-left:20px}
+    .read-steps li{margin:9px 0;line-height:1.8;font-size:13.5px}
     .quiz-option{display:block;border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;cursor:pointer}
     .quiz-option:hover{background:var(--soft)}.feedback{min-height:52px;padding:13px 15px;background:var(--soft);border-radius:9px;margin-top:12px}
     .lesson-nav{display:flex;justify-content:space-between;gap:12px;margin-top:28px;border-top:1px solid var(--line);padding-top:20px}
@@ -265,6 +271,685 @@ chrom.plot()</pre>
     {title:"可重現專案與報告",level:2,time:70,goal:"保存版本、設定、原始資料、輸出與 QC，產生可重現分析報告。",prereq:"已完成 MOCCA2 批次工作流與方法評估。",func:"serialization / environment",desc:"讓另一位分析者能從 raw data 重建同一份結果。",concept:"完整專案至少保存唯讀 raw、處理腳本、ProcessingSettings、Python 與 mocca2 版本、樣品 metadata、QC 圖、排除理由與結果表；資料輸出不應取代稽核軌跡。",formula:"Reproducible result = data + code + parameters + environment + decisions",symbols:[["to_dict()","物件序列化的一部分"],["settings","完整處理參數"],["environment","Python 與套件版本"]],code:`from importlib.metadata import version\nimport json\n\nmanifest = {\n    "mocca2": version("mocca2"),\n    "settings": settings.__dict__,\n    "raw_files": raw_file_list,\n    "qc_rules": qc_rules,\n}\nwith open("results/manifest.json", "w", encoding="utf-8") as f:\n    json.dump(manifest, f, ensure_ascii=False, indent=2)`,why:["raw data 唯讀且具 checksum。","每次報告連結版本、參數與 QC。","人工排除與重跑原因寫入 log。"],error:"只保存 CSV 或截圖無法重建分析；也不要在未確認相容性前把序列化物件當永久格式。",q:"哪一組最接近可重現分析的最低要求？",opts:["資料、程式、參數、環境與決策紀錄","只有最終 Excel","只有 Python notebook 截圖"],ans:0}
   ];
 
+  // 每章專屬的教學目標、預期輸出與判讀順序。
+  // 依索引與 chapters 對應；分開存放是為了不動到上面既有的長行。
+  const chapterExtras=[
+    {
+      "objectives": [
+        "說出 <code>Data2D.data</code> 兩個維度各代表什麼，以及為什麼順序是 [wavelength, time]。",
+        "從 shape 與取樣間距推算「一個峰有幾個取樣點」，判斷資料密度是否足以描述峰形。",
+        "分辨 Data2D、Chromatogram 與 MoccaDataset 三個層級各自負責什麼。"
+      ],
+      "outputCols": [
+        "檢查項目",
+        "程式呼叫",
+        "本例輸出",
+        "你要確認的事"
+      ],
+      "outputRows": [
+        [
+          "矩陣形狀",
+          "chrom.data.shape",
+          "(501, 2401)",
+          "第一維是波長數，不是時間點數"
+        ],
+        [
+          "時間間距",
+          "chrom.time_step()",
+          "0.00833 min",
+          "約 0.5 秒；峰寬 0.2 min 時約 24 點／峰"
+        ],
+        [
+          "波長間距",
+          "chrom.wavelength_step()",
+          "0.4 nm",
+          "足以描述吸收帶形狀"
+        ],
+        [
+          "時間範圍",
+          "chrom.time[0], chrom.time[-1]",
+          "0.00 – 20.00 min",
+          "與儀器方法設定一致"
+        ],
+        [
+          "物件層級",
+          "type(chrom)",
+          "Chromatogram",
+          "內含 raw、blank 與 peaks"
+        ]
+      ],
+      "readSteps": [
+        "先讀 shape，確認第一個數字是<strong>波長數</strong>而不是時間點數 —— 兩軸搞反，後面每一次裁切都會切錯軸。",
+        "用 time_step() 估「一個峰有幾點」。少於約 10 點時峰面積與峰形都不可靠，這是資料本身的上限，後面任何演算法都補不回來。",
+        "在 heatmap 上找出訊號集中的波長帶與時間帶，這就是下一章裁切範圍的依據。",
+        "確認 blank 是否存在。沒有 blank，後面的基線與純度判讀都會少掉一層獨立證據。"
+      ]
+    },
+    {
+      "objectives": [
+        "用 <code>example_data.example_1()</code> 驗證安裝，並說出這比「pip 沒報錯」多驗證了什麼。",
+        "說明 blank 在 <code>Chromatogram(sample, blank=...)</code> 中的角色，以及 X<sub>net</sub> 扣掉的是什麼。",
+        "匯入真實儀器檔後，列出至少三項必須人工核對的項目。"
+      ],
+      "outputCols": [
+        "驗證步驟",
+        "預期結果",
+        "失敗時的徵兆"
+      ],
+      "outputRows": [
+        [
+          "import mocca2",
+          "無 ImportError",
+          "套件未安裝或 Python 版本不符"
+        ],
+        [
+          "example_data.example_1()",
+          "回傳 Chromatogram 物件",
+          "範例資料未下載（忘了 --download-data）"
+        ],
+        [
+          "chrom.data.shape",
+          "(501, 2401)",
+          "回傳空值或兩軸顛倒"
+        ],
+        [
+          "Chromatogram(sample, blank=blank)",
+          "name 與 shape 皆正確",
+          "解析器不支援該儀器或軟體版本"
+        ],
+        [
+          "扣除 blank 後的無峰區",
+          "在 0 附近上下震盪",
+          "整段系統性為負 → blank 過度扣除"
+        ]
+      ],
+      "readSteps": [
+        "先確認內建範例載得進來。環境沒問題卻讀不進自己的檔，問題就落在解析器，不是安裝。",
+        "比較 sample、blank 與相減後三條線：blank 應該只帶走系統背景，<strong>不應該削掉樣品的峰</strong>。",
+        "看無峰區在相減後是落在零附近還是變成負值。系統性負值代表 blank 過度扣除，或兩者取樣軸沒有對齊。",
+        "核對匯入後的時間範圍、波長範圍與訊號尺度是否與儀器方法一致。shape 對，不代表單位對。"
+      ]
+    },
+    {
+      "objectives": [
+        "依訊號分布決定時間與波長範圍，並說明各自排除了什麼干擾。",
+        "說明為什麼只看 1D trace 不足以決定波長下界。",
+        "在裁切前後比對 shape 與範圍，確認沒有切掉目標峰的裙擺。"
+      ],
+      "outputCols": [
+        "階段",
+        "shape",
+        "時間範圍 (min)",
+        "波長範圍 (nm)",
+        "資料量變化"
+      ],
+      "outputRows": [
+        [
+          "原始",
+          "(501, 2401)",
+          "0.00 – 20.00",
+          "200 – 400",
+          "—"
+        ],
+        [
+          "extract_time(1.4, 3.8)",
+          "(501, 289)",
+          "1.40 – 3.80",
+          "200 – 400",
+          "−88 %"
+        ],
+        [
+          "extract_wavelength(220, 400)",
+          "(451, 289)",
+          "1.40 – 3.80",
+          "220 – 400",
+          "再 −10 %"
+        ]
+      ],
+      "readSteps": [
+        "先在完整 trace 上標出要保留的時間窗，確認溶劑前緣被排除、而目標峰的起點與終點都在窗內。",
+        "檢查窗邊界有沒有切在峰的裙擺上。<strong>切掉裙擺會直接低估面積，而且後面的基線校正完全看不出來。</strong>",
+        "用 heatmap 而不是 1D trace 決定波長下界：低波長端的干擾常常只出現在特定波長，contract 成 1D 之後就被平均掉了。",
+        "把裁切前後的 shape 記下來。之後任何一步出問題，這是最先要回頭核對的數字。"
+      ]
+    },
+    {
+      "objectives": [
+        "說明基線校正的目標是讓峰坐在接近零的局部背景上，而不是讓曲線看起來平。",
+        "用無峰區 RMSE 與加標樣品面積偏差<strong>兩項獨立證據</strong>評估基線品質。",
+        "說出過度校正的徵兆，以及它為什麼先傷害寬峰與拖尾峰。"
+      ],
+      "outputCols": [
+        "方法",
+        "無峰區 RMSE (mAU)",
+        "面積偏差 (%)",
+        "適用情境"
+      ],
+      "outputRows": [
+        [
+          "未校正",
+          "18.4",
+          "+22.7",
+          "—"
+        ],
+        [
+          "flatfit",
+          "4.1",
+          "+6.8",
+          "漂移平緩、雜訊低"
+        ],
+        [
+          "asls",
+          "2.6",
+          "+3.9",
+          "一般情況，需調 p 與 smoothness"
+        ],
+        [
+          "arpls",
+          "1.7",
+          "+2.2",
+          "雜訊較高的資料"
+        ],
+        [
+          "arpls（過度校正）",
+          "1.2",
+          "−8.5",
+          "RMSE 更低，面積卻轉為低估"
+        ]
+      ],
+      "readSteps": [
+        "先看無峰區：校正後應該貼著零上下震盪，而不是整段偏在某一側。",
+        "拉動 α，觀察面積偏差怎麼變。<strong>偏差由正轉負，就是越過了「校正足夠」而進入「過度校正」。</strong>",
+        "盯住畫面上最寬的那個峰。過度校正最先吃掉的是寬峰與拖尾，窄峰反而看不出異狀。",
+        "記錄 method、smoothness、p 與 tol。基線參數沒記下來，這張圖就沒有人能重現。"
+      ]
+    },
+    {
+      "objectives": [
+        "用 TP / FP / FN 而不是「抓到幾個峰」來評估找峰參數。",
+        "說明 min_height、min_rel_height 與 split_threshold 各自控制什麼。",
+        "判斷一個被偵測到的峰，它的邊界是否合理回到局部基線。"
+      ],
+      "outputCols": [
+        "參數組",
+        "候選峰",
+        "TP",
+        "FP",
+        "FN",
+        "Precision",
+        "Recall"
+      ],
+      "outputRows": [
+        [
+          "min_height=0.5",
+          "11",
+          "7",
+          "4",
+          "0",
+          "0.64",
+          "1.00"
+        ],
+        [
+          "min_height=1.0",
+          "8",
+          "7",
+          "1",
+          "0",
+          "0.88",
+          "1.00"
+        ],
+        [
+          "min_height=2.0",
+          "7",
+          "7",
+          "0",
+          "0",
+          "1.00",
+          "1.00"
+        ],
+        [
+          "min_height=4.0",
+          "5",
+          "5",
+          "0",
+          "2",
+          "1.00",
+          "0.71"
+        ]
+      ],
+      "readSteps": [
+        "先數綠點與紅點：綠點是核對集裡的真峰，紅點是這組參數多抓出來的候選。",
+        "把 min_height 往下拉，找出 Recall 停止上升、而 Precision 開始下降的那一點 —— 那就是這份資料的操作點。",
+        "對每個保留下來的峰檢查邊界是否回到局部基線。<strong>邊界錯了面積就錯了，而 Precision 與 Recall 完全反映不出這件事。</strong>",
+        "對只在單一波長出現的小峰保持懷疑。那通常是雜訊或 ghost peak，不是成分。"
+      ]
+    },
+    {
+      "objectives": [
+        "說明峰純度檢查在檢驗什麼假設，以及它為什麼不構成化合物鑑定。",
+        "用峰前、峰頂、峰後三條光譜判斷是否有共洗脫跡象。",
+        "說出 explained_threshold 調高與調低分別會增加哪一類錯誤。"
+      ],
+      "outputCols": [
+        "峰",
+        "峰前相似度",
+        "峰後相似度",
+        "Explained",
+        "判定"
+      ],
+      "outputRows": [
+        [
+          "P1 (3.20)",
+          "0.9998",
+          "0.9997",
+          "0.99942",
+          "支持單一成分"
+        ],
+        [
+          "P2 (5.71)",
+          "0.9991",
+          "0.9989",
+          "0.99910",
+          "支持單一成分"
+        ],
+        [
+          "P3 (8.15)",
+          "0.9903",
+          "0.9721",
+          "0.99510",
+          "可疑：峰後偏移"
+        ],
+        [
+          "P4 (10.80)",
+          "0.9996",
+          "0.9995",
+          "0.99935",
+          "支持單一成分"
+        ]
+      ],
+      "readSteps": [
+        "先看三條光譜是否重合。峰前與峰後分開，代表峰的兩側成分組成不同。",
+        "注意偏移出現在<strong>哪一側</strong>。前緣偏移與後緣偏移對應到共洗脫物的不同洗脫位置。",
+        "把 explained_threshold 調高，數數看有幾個原本判為純的峰變成可疑 —— 這是在量 false negative 的代價。",
+        "高分只代表資料支持單一光譜成分模型。<strong>吸收光譜非常相近的兩個化合物仍然會一起通過。</strong>"
+      ]
+    },
+    {
+      "objectives": [
+        "說明去卷積在解什麼方程式，以及 s<sub>k</sub>(λ) 與 c<sub>k</sub>(t) 各代表什麼。",
+        "用<strong>殘差結構</strong>而不是只用 R² 判斷成分數是否恰當。",
+        "說出過度擬合的徵兆，並用已知混合物檢查面積回收率。"
+      ],
+      "outputCols": [
+        "components",
+        "R²",
+        "殘差 RMSE (mAU)",
+        "C1 面積",
+        "C2 面積",
+        "面積回收率 (%)"
+      ],
+      "outputRows": [
+        [
+          "1",
+          "0.9847",
+          "12.50",
+          "41120",
+          "—",
+          "—"
+        ],
+        [
+          "2",
+          "0.9991",
+          "3.10",
+          "24812",
+          "17835",
+          "99.2"
+        ],
+        [
+          "3",
+          "0.9994",
+          "2.48",
+          "24120",
+          "17310",
+          "96.1"
+        ],
+        [
+          "5",
+          "0.9998",
+          "1.55",
+          "21980",
+          "16040",
+          "88.4"
+        ]
+      ],
+      "readSteps": [
+        "先看殘差有沒有結構。隨機雜訊代表成分數夠了；殘留一個峰形代表還少一個成分。",
+        "比較每增加一個成分 R² 的增幅。增幅一旦變得很小，多出來的成分多半在擬合雜訊。",
+        "檢查每個 component 的光譜長得像不像真實吸收光譜。形狀怪異或出現負值的成分通常是數學產物，不是化學物種。",
+        "用已知混合物核對面積回收率。<strong>R² 上升而回收率下降，就是過度擬合的典型組合</strong>（見上表 5 成分那一列）。"
+      ]
+    },
+    {
+      "objectives": [
+        "說明為什麼只用保留時間配對同一化合物是不安全的。",
+        "結合 ΔRT 與光譜相似度判斷兩個 component 是否為同一 compound。",
+        "辨識一對多與多對一的錯誤配對，並說出該保留什麼稽核紀錄。"
+      ],
+      "outputCols": [
+        "compound",
+        "樣品",
+        "RT (min)",
+        "ΔRT vs 標準",
+        "光譜相似度",
+        "配對判定"
+      ],
+      "outputRows": [
+        [
+          "caffeine",
+          "standard",
+          "8.15",
+          "—",
+          "1.0000",
+          "參考"
+        ],
+        [
+          "caffeine",
+          "sample_01",
+          "8.17",
+          "+0.02",
+          "0.9994",
+          "接受"
+        ],
+        [
+          "caffeine",
+          "sample_02",
+          "8.21",
+          "+0.06",
+          "0.9991",
+          "接受"
+        ],
+        [
+          "?",
+          "sample_03",
+          "8.19",
+          "+0.04",
+          "0.9612",
+          "保留：RT 合、光譜不合"
+        ],
+        [
+          "?",
+          "sample_04",
+          "8.44",
+          "+0.29",
+          "0.9997",
+          "保留：光譜合、RT 漂移過大"
+        ]
+      ],
+      "readSteps": [
+        "先看 ΔRT 的分布。<strong>整批一致的位移是系統漂移，個別樣品的偏離才是配對問題。</strong>",
+        "每個候選都要同時看 RT 與光譜。只滿足其中一項的配對一律標為待確認，不要自動接受 —— 上表最後兩列正是這兩種情況。",
+        "找出一對多與多對一：同一樣品出現兩個相同 compound，或兩個樣品的不同峰被指到同一個 compound。",
+        "把被拒絕的配對與理由記下來。稽核要看的是你排除了什麼，不只是你留下了什麼。"
+      ]
+    },
+    {
+      "objectives": [
+        "說明內標補償了哪些變異，以及它<strong>不能</strong>補償什麼。",
+        "由標準點建立 response factor，並判斷線性範圍的上下界。",
+        "判斷未知樣品是落在校正範圍內還是外插，並說出外插的風險。"
+      ],
+      "outputCols": [
+        "標準",
+        "C/C_IS",
+        "A/A_IS",
+        "回算濃度",
+        "回算偏差 (%)"
+      ],
+      "outputRows": [
+        [
+          "S1",
+          "0.143",
+          "0.150",
+          "0.0102",
+          "+2.0"
+        ],
+        [
+          "S2",
+          "0.357",
+          "0.366",
+          "0.0252",
+          "+0.8"
+        ],
+        [
+          "S3",
+          "0.571",
+          "0.578",
+          "0.0399",
+          "−0.3"
+        ],
+        [
+          "S4",
+          "0.786",
+          "0.790",
+          "0.0551",
+          "+0.2"
+        ],
+        [
+          "S5",
+          "1.000",
+          "0.995",
+          "0.0694",
+          "−0.9"
+        ],
+        [
+          "未知樣品",
+          "—",
+          "0.672",
+          "0.0470",
+          "落在 S3–S4 之間（內插）"
+        ]
+      ],
+      "readSteps": [
+        "先確認未知樣品落在標準點<strong>之間</strong>，而不是外插。外插的結果不論 R² 多高都不可信。",
+        "看回算偏差的正負是否隨濃度系統性變化。單邊漂移代表非線性或截距問題，不是隨機誤差。",
+        "確認內標峰沒有跟任何分析物共洗脫。內標一旦被干擾，所有比值會同時偏移，而且從線性圖上看不出來。",
+        "R² 高不等於方法可用。要同時看回算偏差、涵蓋範圍與重複性三者。"
+      ]
+    },
+    {
+      "objectives": [
+        "依序說出 <code>process_all()</code> 七個 stage 各自在做什麼。",
+        "設計一個小子集驗證流程，並說明為什麼不能直接跑全批。",
+        "從各 stage 的警告與失敗分布判斷問題的真正來源。"
+      ],
+      "outputCols": [
+        "stage",
+        "處理樣品數",
+        "警告",
+        "失敗",
+        "耗時 (s)"
+      ],
+      "outputRows": [
+        [
+          "crop wavelength",
+          "90",
+          "0",
+          "0",
+          "1.8"
+        ],
+        [
+          "correct baseline",
+          "90",
+          "2",
+          "0",
+          "24.6"
+        ],
+        [
+          "find peaks",
+          "90",
+          "5",
+          "0",
+          "31.2"
+        ],
+        [
+          "deconvolve",
+          "90",
+          "7",
+          "1",
+          "96.4"
+        ],
+        [
+          "cluster compounds",
+          "89",
+          "3",
+          "0",
+          "12.9"
+        ],
+        [
+          "refine peaks",
+          "89",
+          "1",
+          "0",
+          "18.7"
+        ],
+        [
+          "name compounds",
+          "89",
+          "0",
+          "0",
+          "2.1"
+        ]
+      ],
+      "readSteps": [
+        "先找失敗發生在哪個 stage。<strong>去卷積失敗多半是前面找峰或基線的問題，不是去卷積本身。</strong>",
+        "比較各 stage 的警告數。警告集中在某一步，代表那一步的參數不適用於整批，而不是個別樣品特別差。",
+        "抽查一個代表性樣品與一個極端樣品，不要只看整批統計數字。",
+        "記錄設定、套件版本、耗時與被排除的樣品。批次處理最常見的災難是「跑完了，但沒人知道是用什麼參數跑的」。"
+      ]
+    },
+    {
+      "objectives": [
+        "為峰偵測、化合物追蹤與定量分別選出合適的性能指標。",
+        "說明允收界線為什麼必須在分析<strong>之前</strong>定義。",
+        "說出「用同一份資料自證」的問題，以及獨立 QC 應該長什麼樣。"
+      ],
+      "outputCols": [
+        "任務",
+        "指標",
+        "本批結果",
+        "預先定義允收",
+        "判定"
+      ],
+      "outputRows": [
+        [
+          "峰偵測",
+          "Precision",
+          "0.96",
+          "≥ 0.90",
+          "通過"
+        ],
+        [
+          "峰偵測",
+          "Recall",
+          "0.92",
+          "≥ 0.90",
+          "通過"
+        ],
+        [
+          "化合物追蹤",
+          "錯配率",
+          "4.2 %",
+          "≤ 5 %",
+          "通過"
+        ],
+        [
+          "定量",
+          "面積 Bias",
+          "+2.1 %",
+          "± 5 %",
+          "通過"
+        ],
+        [
+          "定量",
+          "QC RSD",
+          "3.4 %",
+          "≤ 3 %",
+          "未通過"
+        ]
+      ],
+      "readSteps": [
+        "先確認允收值是分析前寫下來的。<strong>分析後才決定的門檻等於沒有門檻。</strong>",
+        "逐項比對指標與允收值。未通過的項目不能用其他項目通過來抵銷 —— 上表四項通過、一項未通過，結論仍然是不放行。",
+        "檢查 QC 樣品是否獨立於用來調參數的那份資料。同一份資料自證不構成驗證。",
+        "把失敗案例（漏峰、錯配、過度去卷積、外插）一併列出。只報告成功的部分不是方法評估。"
+      ]
+    },
+    {
+      "objectives": [
+        "列出可重現分析的五個組成，並說明缺任一項的後果。",
+        "建立一份 manifest，把版本、參數、資料與 QC 綁在一起。",
+        "說明為什麼保存 CSV 或截圖不等於保存分析。"
+      ],
+      "outputCols": [
+        "項目",
+        "manifest 欄位",
+        "本例內容",
+        "缺少時會發生什麼"
+      ],
+      "outputRows": [
+        [
+          "套件版本",
+          "mocca2",
+          "0.2.3",
+          "同一份程式在新版可能給出不同結果"
+        ],
+        [
+          "處理參數",
+          "settings",
+          "ProcessingSettings(...)",
+          "無法重現同一組峰與成分"
+        ],
+        [
+          "原始資料",
+          "raw_files + checksum",
+          "90 檔，sha256",
+          "無法確認當初分析的是哪一版資料"
+        ],
+        [
+          "QC 規則",
+          "qc_rules",
+          "precision ≥ 0.9, RSD ≤ 3 %",
+          "事後才定門檻，結論不可信"
+        ],
+        [
+          "人工決策",
+          "exclusions + reasons",
+          "3 筆排除紀錄",
+          "看不出哪些樣品被拿掉、為什麼"
+        ]
+      ],
+      "readSteps": [
+        "先問一個問題：<strong>把這個資料夾交給另一個人，他能不能從 raw data 重跑出同一張表？</strong>不能的話，缺的就是要補的。",
+        "檢查 raw data 是否唯讀且有 checksum。原始資料被就地修改，是最難察覺的重現性殺手。",
+        "確認參數是從檔案讀出來的，不是寫死在某個 notebook cell 裡。",
+        "檢查人工排除有沒有留下理由。少了理由，稽核時無法區分「有根據的排除」與「挑好看的結果」。"
+      ]
+    }
+  ];
+  chapterExtras.forEach((e,i)=>Object.assign(chapters[i],e));
+  // 沒有參數滑桿的章節，圖下方改放這一章自己的看圖說明，而不是通用填充句
+  const chartNotes={
+    0:"圖為時間 × 波長 heatmap：橫軸時間、縱軸波長，顏色深淺是吸光度。這就是 data[wavelength, time] 兩個維度實際的樣子。",
+    1:"灰線是 sample、橘色虛線是 blank、綠線是相減後的結果。重點看綠線的無峰區有沒有落在零附近。",
+    2:"灰色區域是被 extract_time(1.4, 3.8) 裁掉的部分，綠色虛線是保留窗的邊界。注意邊界有沒有壓到峰的裙擺。",
+    7:"每個點是一個 component。綠點代表 RT 與光譜都吻合，橘點代表只滿足其中一項、必須人工確認。",
+    8:"五個標準點構成校正線，未知樣品以 A/A_IS 反查濃度。先確認它落在標準點之間而不是外插。",
+    9:"每根柱是該 stage 的警告數，柱頂紅色部分為失敗數。看的是分布集中在哪一步，而不是總數。",
+    10:"每根柱是「實測值 ÷ 允收值」，因此可以互相比較。超過紅色虛線 1.0 就是不通過。",
+    11:"五個來源匯流成一份可重現的結果。缺任一項，另一位分析者就無法從 raw data 重建同一張表。"
+  };
+  Object.keys(chartNotes).forEach(k=>chapters[+k].chartNote=chartNotes[k]);
+
   const funcs=[
     ["Data2D / Chromatogram","核心二維資料與單一層析圖物件","0"],
     ["extract_time()","裁切保留時間範圍","2"],
@@ -325,7 +1010,13 @@ chrom.plot()</pre>
     if(c===5){const score=.994+purityThreshold*.005;return [["Explained",score.toFixed(4),""],["門檻",purityThreshold.toFixed(3),""],["光譜成分",score>=purityThreshold?1:2,"個"],["判讀",score>=purityThreshold?"支持純峰":"可疑混合",""]]}
     if(c===6){const r2=Math.min(.9998,.985+(maxComps-1)*.0042),rmse=(12.5/maxComps).toFixed(2),bias=((minR2-.995)*520).toFixed(2);return [["components",maxComps,"上限"],["重建 R²",r2.toFixed(4),""],["殘差 RMSE",rmse,"mAU"],["面積偏差",(bias>=0?"+":"")+bias,"%"]]}
     if(c===8)return [["標準點","5",""],["校正 R²","0.9992",""],["未知濃度","0.047","mol L⁻¹"],["回算偏差","+2.4","%"]];
-    if(c===9)return [["chromatograms","90","示例規模"],["processing stages","7",""],["parallel cores","4","示例"],["QC gate","每階段","必要"]];
+    if(c===9)return [["chromatograms","90","示例規模"],["失敗樣品","1","去卷積階段"],["警告總數","18",""],["總耗時","187.7","s"]];
+    if(c===0)return [["shape","(501, 2401)",""],["time_step","0.00833","min"],["wavelength_step","0.4","nm"],["取樣點／峰","≈24","足夠"]];
+    if(c===1)return [["範例載入","成功",""],["shape 核對","一致",""],["扣 blank 後無峰區","0.3","mAU"],["待人工核對","3","項"]];
+    if(c===2)return [["裁切後 shape","(451, 289)",""],["時間窗","1.40–3.80","min"],["波長窗","220–400","nm"],["資料量","−89","%"]];
+    if(c===7)return [["候選配對","24",""],["接受","20",""],["待確認","4",""],["最大 ΔRT","0.29","min"]];
+    if(c===10)return [["Precision","0.96","允收 ≥0.90"],["Recall","0.92","允收 ≥0.90"],["面積 Bias","+2.1","允收 ±5 %"],["QC RSD","3.4","允收 ≤3 %"]];
+    if(c===11)return [["manifest 欄位","5","必要"],["raw checksum","sha256",""],["排除紀錄","3","筆"],["可重跑","是",""]];
     return [["資料物件","Chromatogram",""],["時間範圍","0–20","min"],["波長範圍","200–400","nm"],["目前章節",c+1,"/ 12"]];
   }
   function decisionFor(c){
@@ -333,10 +1024,76 @@ chrom.plot()</pre>
     if(c===4){const found=Math.max(2,Math.round(11-minHeight*1.5));return {tone:found===7?"":found>7?"warn":"bad",text:found===7?"示範核對集的 7 個真峰全部命中且無假陽性；仍須檢查峰邊界。":found>7?`min_height 過低，出現 ${found-7} 個疑似假陽性。`:`min_height 過高，漏掉 ${7-found} 個示範真峰。`}}
     if(c===5){const score=.994+purityThreshold*.005;return {tone:score>=purityThreshold?"":"warn",text:score>=purityThreshold?"本頁資料支持單一光譜成分模型；這不是化合物身分證明。":"峰內光譜變化超過門檻，應檢查共洗脫並考慮去卷積。"}}
     if(c===6){const r2=Math.min(.9998,.985+(maxComps-1)*.0042);return {tone:r2>=minR2&&maxComps<=5?"":r2>=minR2?"warn":"bad",text:r2>=minR2&&maxComps<=5?"重建 R² 達標，殘差低；仍須檢查 component 光譜、峰形與面積回收率。":r2>=minR2?"雖達 R² 門檻，但成分上限偏高，需排除過度擬合。":"在目前成分上限下未達 min_r2；不可強行接受結果。"}}
+    if(c===0)return {tone:"",text:"shape 第一維為波長、每個峰約 24 個取樣點，資料密度足以描述峰形。接著要確認 blank 是否齊備 —— 沒有 blank，後面的基線與純度都會少一層證據。"};
+    if(c===1)return {tone:"",text:"環境與範例資料驗證通過，扣除 blank 後無峰區落在零附近而非負值。真實儀器檔仍須人工核對時間範圍、波長範圍與訊號尺度。"};
+    if(c===2)return {tone:"",text:"時間窗排除了溶劑前緣，且兩側邊界都與最近的峰有明顯距離，裙擺沒有被切到。波長下界 220 nm 則必須回到 heatmap 確認 —— 低波長端的干擾只出現在特定波長，contract 成 1D 之後看不出來。"};
+    if(c===7)return {tone:"warn",text:"24 組候選配對中有 4 組只滿足 RT 或光譜其中一項（圖上橘點）。這些不可自動接受，須以標準品或加標確認後才納入結果。"};
+    if(c===8)return {tone:"",text:"未知樣品落在 S3–S4 之間屬內插，五個標準點的回算偏差都在 ±2 % 內。仍須以獨立 QC 樣品確認，並確認內標沒有與任何分析物共洗脫。"};
+    if(c===9)return {tone:"warn",text:"警告與失敗集中在去卷積階段（7 警告、1 失敗）。集中在同一階段代表是那一步的參數不適用於整批，應回頭檢查找峰與基線設定，而不是直接重跑。"};
+    if(c===10)return {tone:"bad",text:"五項指標中 QC RSD 為 3.4 %，超出預先定義的 ≤3 %。其他四項通過不能抵銷這一項 —— 此批定量結果不應直接放行。"};
+    if(c===11)return {tone:"",text:"manifest 五項齊備、raw data 具 checksum 且人工排除留有理由，另一位分析者可從原始資料重建同一份結果。"};
     return {tone:"",text:chapters[c].why[0]+" "+chapters[c].why[1]};
   }
   function drawLessonChart(root=$(".lesson-panel.active")){
     const svg=root?.querySelector("#lessonChart");if(!svg)return;axes(svg,current===0?"響應 / 資料結構":"響應 (mAU)");
+    const frame=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/><path d="M46 222H666M46 160H666M46 98H666" stroke-dasharray="3 5"/></g>`;
+    if(current===0){// 時間 × 波長 heatmap：本章要學生看的是兩個軸，不是一條 trace
+      let cells="";
+      for(let i=0;i<48;i++)for(let j=0;j<20;j++){
+        const t=i/48*20,l=400-j/20*200;
+        const v=Math.exp(-.5*((t-8.15)/1.6)**2)*Math.exp(-.5*((l-272)/38)**2)+.75*Math.exp(-.5*((t-5.7)/1.1)**2)*Math.exp(-.5*((l-250)/30)**2)+.5*Math.exp(-.5*((t-14.05)/1.3)**2)*Math.exp(-.5*((l-296)/34)**2);
+        cells+=`<rect x="${(46+i/48*620).toFixed(1)}" y="${(35+j/20*249).toFixed(1)}" width="${(620/48+.7).toFixed(1)}" height="${(249/20+.7).toFixed(1)}" fill="rgba(7,141,136,${Math.min(1,v*1.15).toFixed(3)})"/>`;
+      }
+      svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#f6fafb"/>${cells}<g fill="none" stroke="#dbe5ed"><path d="M46 35V284H666"/></g><g fill="#61758f" font-size="11"><text x="337" y="318">保留時間 (min)</text><text transform="translate(15 210) rotate(-90)">波長 (nm)</text><text x="24" y="292">200</text><text x="24" y="44">400</text></g><text x="660" y="56" text-anchor="end" fill="#0b2348" font-size="12">data[wavelength, time]</text>`;
+      renderMetrics(root);return;
+    }
+    if(current===1){// sample / blank / 相減後
+      const s=signalData({baseline:1.1,noise:.3});
+      const bl=s.map(p=>({t:p.t,y:8+1.1*(1.5*p.t+.07*p.t*p.t)+3*Math.sin(p.t*.9)}));
+      const net=s.map((p,i)=>({t:p.t,y:p.y-bl[i].y+8}));
+      svg.insertAdjacentHTML("beforeend",`<path d="${linePath(s)}" fill="none" stroke="#61758f" stroke-width="1.7"/><path d="${linePath(bl)}" fill="none" stroke="#e89016" stroke-width="1.7" stroke-dasharray="6 4"/><path d="${linePath(net)}" fill="none" stroke="#078d88" stroke-width="2.4"/><g font-size="11"><text x="662" y="52" text-anchor="end" fill="#61758f">sample</text><text x="662" y="68" text-anchor="end" fill="#e89016">blank</text><text x="662" y="84" text-anchor="end" fill="#078d88">sample − blank</text></g>`);
+      renderMetrics(root);return;
+    }
+    if(current===2){// 裁切窗：窗外變灰，讓學生看見自己丟掉了什麼
+      const d=signalData({noise:.35}),x0=46+1.4/20*620,x1=46+3.8/20*620;
+      svg.insertAdjacentHTML("beforeend",`<rect x="46" y="35" width="${(x0-46).toFixed(1)}" height="249" fill="rgba(97,117,143,.14)"/><rect x="${x1.toFixed(1)}" y="35" width="${(666-x1).toFixed(1)}" height="249" fill="rgba(97,117,143,.14)"/><path d="${linePath(d)}" fill="none" stroke="#1459a6" stroke-width="2.2"/><path d="M${x0.toFixed(1)} 35V284M${x1.toFixed(1)} 35V284" stroke="#078d88" stroke-width="1.8" stroke-dasharray="5 4"/><text x="${(x1+8).toFixed(1)}" y="52" fill="#078d88" font-size="11">保留 1.4–3.8 min</text><text x="${(x1+8).toFixed(1)}" y="70" fill="#61758f" font-size="11">灰色區域被裁掉（−88 %）</text>`);
+      renderMetrics(root);return;
+    }
+    if(current===7){// 跨樣品 RT 群集：橘點是只滿足單一條件的可疑配對
+      const X=s=>110+(s-1)/4*500,Y=r=>284-(r-5.2)/3.8*235;
+      const pts=[[1,8.15,0],[2,8.17,0],[3,8.21,0],[4,8.19,1],[5,8.44,1],[1,5.71,0],[2,5.73,0],[3,5.75,0],[4,5.70,0],[5,5.78,0]];
+      svg.innerHTML=frame+`<rect x="92" y="${Y(8.55).toFixed(1)}" width="536" height="${(Y(8.05)-Y(8.55)).toFixed(1)}" fill="rgba(7,141,136,.10)"/><text x="624" y="${(Y(8.5)).toFixed(1)}" text-anchor="end" fill="#078d88" font-size="11">caffeine 群集</text>`
+        +pts.map(p=>`<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="6.5" fill="${p[2]?"#e89016":"#078d88"}" stroke="#fff" stroke-width="2"/>`).join("")
+        +`<g fill="#61758f" font-size="11"><text x="337" y="318">樣品</text><text transform="translate(15 205) rotate(-90)">保留時間 (min)</text>`
+        +[1,2,3,4,5].map(s=>`<text x="${X(s).toFixed(1)}" y="302" text-anchor="middle">${s===1?"std":"s0"+(s-1)}</text>`).join("")+`</g>`;
+      renderMetrics(root);return;
+    }
+    if(current===9){// 各 stage 的警告與失敗分布
+      const st=[["crop",0,0],["baseline",2,0],["find peaks",5,0],["deconvolve",7,1],["cluster",3,0],["refine",1,0],["naming",0,0]],bw=620/7;
+      svg.innerHTML=frame+st.map((s,i)=>{const h=s[1]/8*180,hf=s[2]?s[2]/8*180:0,x=46+i*bw+11,w=bw-22;
+        return `<rect x="${x.toFixed(1)}" y="${(284-h).toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(0,h).toFixed(1)}" fill="#e89016" opacity=".85"/>`
+          +(hf?`<rect x="${x.toFixed(1)}" y="${(284-h-hf).toFixed(1)}" width="${w.toFixed(1)}" height="${hf.toFixed(1)}" fill="#c74747"/>`:"")
+          +`<text x="${(x+w/2).toFixed(1)}" y="${(284-h-hf-7).toFixed(1)}" text-anchor="middle" fill="#0b2348" font-size="10">${s[1]}${s[2]?" +"+s[2]:""}</text>`
+          +`<text x="${(x+w/2).toFixed(1)}" y="300" text-anchor="middle" fill="#61758f" font-size="9">${s[0]}</text>`}).join("")
+        +`<g font-size="11"><text x="560" y="55" fill="#e89016">警告</text><text x="612" y="55" fill="#c74747">失敗</text></g><text transform="translate(15 190) rotate(-90)" fill="#61758f" font-size="11">件數</text>`;
+      renderMetrics(root);return;
+    }
+    if(current===10){// 每項指標除以自己的允收值：超過 1.0 就是不通過
+      const m=[["Precision",.94],["Recall",.98],["錯配率",.84],["面積 Bias",.42],["QC RSD",1.13]],bw=620/5,base=284,top=68,lim=base-(1/1.3)*(base-top);
+      svg.innerHTML=frame+m.map((s,i)=>{const h=s[1]/1.3*(base-top),x=46+i*bw+17,w=bw-34,ok=s[1]<=1;
+        return `<rect x="${x.toFixed(1)}" y="${(base-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${ok?"#078d88":"#c74747"}" opacity=".9"/><text x="${(x+w/2).toFixed(1)}" y="${(base-h-7).toFixed(1)}" text-anchor="middle" fill="#0b2348" font-size="10">${s[1].toFixed(2)}</text><text x="${(x+w/2).toFixed(1)}" y="300" text-anchor="middle" fill="#61758f" font-size="9">${s[0]}</text>`}).join("")
+        +`<path d="M46 ${lim.toFixed(1)}H666" stroke="#c74747" stroke-width="1.6" stroke-dasharray="6 4"/><text x="662" y="${(lim-7).toFixed(1)}" text-anchor="end" fill="#c74747" font-size="11">允收界線 1.0</text><text transform="translate(15 225) rotate(-90)" fill="#61758f" font-size="11">實測 ÷ 允收</text>`;
+      renderMetrics(root);return;
+    }
+    if(current===11){// 可重現性的五個來源匯流成一份結果
+      const it=[["raw data","唯讀 + checksum"],["code","腳本與版本"],["parameters","ProcessingSettings"],["environment","套件版本"],["decisions","排除與理由"]],bw=118,gap=6,x0=48;
+      svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/>`
+        +it.map((s,i)=>{const x=x0+i*(bw+gap);
+          return `<rect x="${x}" y="58" width="${bw}" height="58" rx="10" fill="#eef6f7" stroke="#078d88"/><text x="${x+bw/2}" y="81" text-anchor="middle" fill="#0b2348" font-size="12" font-weight="600">${s[0]}</text><text x="${x+bw/2}" y="100" text-anchor="middle" fill="#61758f" font-size="10">${s[1]}</text><path d="M${x+bw/2} 116V148" stroke="#9fb6c9" stroke-width="1.5"/>`}).join("")
+        +`<path d="M${x0+bw/2} 148H${x0+4*(bw+gap)+bw/2}" stroke="#9fb6c9" stroke-width="1.5"/><path d="M355 148V184" stroke="#078d88" stroke-width="2.2"/><polygon points="355,195 349,182 361,182" fill="#078d88"/>`
+        +`<rect x="195" y="197" width="320" height="62" rx="12" fill="#078d88"/><text x="355" y="223" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">可重現的分析結果</text><text x="355" y="244" text-anchor="middle" fill="#d9f2f0" font-size="11">缺任一項，別人就重跑不出同一張表</text>`;
+      renderMetrics(root);return;
+    }
     if(current===6){
       const total=[],a=[],b=[];for(let i=0;i<=260;i++){const t=i/13,g=(m,s,h)=>h*Math.exp(-.5*((t-m)/s)**2),ya=g(8.55,.72,96),yb=g(9.55,.62,78);a.push({t,y:ya});b.push({t,y:yb});total.push({t,y:8+ya+yb+.9*Math.sin(i*.8)})}
       svg.insertAdjacentHTML("beforeend",`<path d="${linePath(total)}" fill="none" stroke="#0b2348" stroke-width="2.8"/><path d="${linePath(a)}" fill="none" stroke="#078d88" stroke-width="2.1"/><path d="${linePath(b)}" fill="none" stroke="#c74747" stroke-width="2.1"/><text x="450" y="55" fill="#61758f" font-size="12">總訊號＋2 個候選 components</text>`);
@@ -362,15 +1119,15 @@ chrom.plot()</pre>
     if(current===4)return `<div class="control"><label>min_height <span id="heightOut">${minHeight.toFixed(1)}</span></label><input id="heightSlider" type="range" min="5" max="50" value="${minHeight*10}" aria-label="minimum peak height"></div><div class="parameter-note">正式參數：最小 prominence。請同時觀察真峰、假陽性、漏峰與峰邊界。</div>`;
     if(current===5)return `<div class="control"><label>explained_threshold <span id="purityOut">${purityThreshold.toFixed(3)}</span></label><input id="puritySlider" type="range" min="990" max="1000" value="${purityThreshold*1000}" aria-label="explained threshold"></div><div class="parameter-note">門檻越高越嚴格，但仍需用已知純峰與混合峰驗證 false positive / false negative。</div>`;
     if(current===6)return `<div class="control"><label>min_r2 <span id="r2Out">${minR2.toFixed(3)}</span></label><input id="r2Slider" type="range" min="980" max="1000" value="${minR2*1000}" aria-label="minimum R squared"></div><div class="control"><label>max_comps <span id="compsOut">${maxComps}</span></label><input id="compsSlider" type="range" min="1" max="7" value="${maxComps}" aria-label="maximum components"></div>`;
-    return `<div class="parameter-note">本章先檢查物件、單位與輸出，再進入下一個分析步驟。圖形是教學模擬；程式碼使用套件內建資料，可在 Python 中重跑。</div>`;
+    return `<div class="parameter-note">${chapters[current].chartNote||"本章先檢查物件、單位與輸出，再進入下一個分析步驟。"}<br>圖形為教學模擬；程式碼使用套件內建資料，可在 Python 中重跑。</div>`;
   }
   function renderLesson(){
     const c=chapters[current];$("#lessonTitle").textContent=`第 ${current+1} 章｜${c.title}`;$("#lessonGoal").textContent=c.goal;$("#lessonPrereq").textContent=c.prereq;renderSidebar();
-    $("#conceptPanel").innerHTML=`<div class="explain-grid"><div class="content-card"><h3>先建立概念</h3><p>${c.concept}</p><div class="formula">${c.formula}</div><div class="callout"><strong>本章問題：</strong>${c.desc}</div></div><div class="content-card"><h3>符號與分析量</h3><table class="symbol-table"><thead><tr><th>符號／參數</th><th>定義</th></tr></thead><tbody>${c.symbols.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td></tr>`).join("")}</tbody></table><div class="callout"><strong>方法限制：</strong>${c.error}</div></div></div>`;
+    $("#conceptPanel").innerHTML=`<div class="content-card objectives"><h3>本章教學目標</h3><ol>${c.objectives.map(o=>`<li>${o}</li>`).join("")}</ol><p class="obj-note">後面五個步驟依序服務這些目標：<strong>概念</strong>建立判斷依據 → <strong>程式碼</strong>產生證據 → <strong>輸出</strong>確認拿到的是什麼物件 → <strong>判讀</strong>做出決定 → <strong>練習</strong>檢查你是否真的能判斷。</p></div><div class="explain-grid"><div class="content-card"><h3>先建立概念</h3><p>${c.concept}</p><div class="formula">${c.formula}</div><div class="callout"><strong>本章問題：</strong>${c.desc}</div></div><div class="content-card"><h3>符號與分析量</h3><table class="symbol-table"><thead><tr><th>符號／參數</th><th>定義</th></tr></thead><tbody>${c.symbols.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td></tr>`).join("")}</tbody></table><div class="callout"><strong>方法限制：</strong>${c.error}</div></div></div>`;
     $("#codePanel").innerHTML=`<div class="workspace"><div class="panel"><div class="panel-head"><span>Python 程式碼｜${c.func}</span><button class="copy" data-copy>複製</button></div><div class="codebox"><pre id="lessonCode">${esc(c.code)}</pre></div><div class="parameter-note">程式碼依據官方 manual / vignette；第一次執行可能需要安裝 dependencies。</div></div><div class="panel"><div class="panel-head"><span>輸出預覽與參數實驗</span><span class="legend"><span><i style="background:#078d88"></i>保留／處理後</span><span><i style="background:#c74747"></i>疑似錯誤</span></span></div><div class="chart-wrap"><svg id="lessonChart" viewBox="0 0 700 330" role="img" aria-label="${c.title}教學圖"></svg></div><div class="controls">${conceptControls()}</div></div></div><div class="metrics" id="liveMetrics"></div><div class="decision" id="decisionBox"></div>`;
-    const rows=current===6?[["sample_01","C1","8.55","24812","58.2"],["sample_01","C2","9.55","17835","41.8"],["sample_02","C1","8.57","23110","57.6"],["sample_02","C2","9.58","16996","42.4"]]:[["sample_01","3.20","48.2","322","0.24"],["sample_01","5.71","78.5","604","0.31"],["sample_01","8.15","127.8","846","0.27"],["sample_01","10.80","95.9","731","0.34"]];
-    $("#outputPanel").innerHTML=`<div class="explain-grid"><div class="content-card"><h3>預期輸出：先問物件代表什麼</h3><table class="output-table"><thead><tr>${(current===6?["sample","component","RT (min)","integral","area %"]:["sample","RT (min)","height","integral","width"]).map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table><div class="callout">數字為教學預覽；真正數值以你的 Python 執行結果為準。</div></div><div class="content-card"><h3>輸出檢查清單</h3><ol>${c.why.map(x=>`<li>${x}</li>`).join("")}</ol><h4>常見錯誤</h4><p>${c.error}</p></div></div>`;
-    $("#interpretPanel").innerHTML=`<div class="workspace"><div class="panel"><div class="panel-head"><span>圖形證據</span><span class="legend"><span><i style="background:#078d88"></i>可接受</span><span><i style="background:#e89016"></i>需檢查</span></span></div><div class="chart-wrap"><svg id="lessonChart" viewBox="0 0 700 330" role="img" aria-label="${c.title}判讀圖"></svg></div><div class="controls">${conceptControls()}</div></div><div class="content-card"><h3>判讀順序</h3><ol><li>先確認資料物件、單位與分析範圍。</li><li>再比較圖形與即時數字證據。</li><li>檢查參數改變是否改善目標指標，同時造成副作用。</li><li>最後才決定保留、調整或停止分析。</li></ol><div class="metrics" id="liveMetrics"></div><div class="decision" id="decisionBox"></div><div class="callout"><strong>不能跳過：</strong>${c.error}</div></div></div>`;
+    const cols=c.outputCols,rows=c.outputRows;
+    $("#outputPanel").innerHTML=`<div class="explain-grid"><div class="content-card"><h3>預期輸出：先問物件代表什麼</h3><table class="output-table"><thead><tr>${cols.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table><div class="callout">本表是教學預覽，用途是讓你知道<strong>應該拿到什麼樣的東西</strong>；實際數值與內容以你自己的 Python 執行結果為準。</div></div><div class="content-card"><h3>確認你拿到的是對的東西</h3><p class="obj-note" style="margin-top:0">這一步只回答一個問題：<strong>輸出的物件、單位與範圍對不對。</strong>「該怎麼辦」留到下一頁的判讀。</p><ol>${c.why.map(x=>`<li>${x}</li>`).join("")}</ol><h4>常見錯誤</h4><p>${c.error}</p></div></div>`;
+    $("#interpretPanel").innerHTML=`<div class="workspace"><div class="panel"><div class="panel-head"><span>圖形證據</span><span class="legend"><span><i style="background:#078d88"></i>可接受</span><span><i style="background:#e89016"></i>需檢查</span></span></div><div class="chart-wrap"><svg id="lessonChart" viewBox="0 0 700 330" role="img" aria-label="${c.title}判讀圖"></svg></div><div class="controls">${conceptControls()}</div></div><div class="content-card"><h3>本章判讀順序</h3><p class="obj-note" style="margin-top:0">輸出頁確認的是「東西對不對」；這一頁要做的是<strong>看著圖與數字決定下一步：保留、調參數，還是停下來。</strong></p><ol class="read-steps">${c.readSteps.map(s=>`<li>${s}</li>`).join("")}</ol><div class="metrics" id="liveMetrics"></div><div class="decision" id="decisionBox"></div></div></div>`;
     $("#practicePanel").innerHTML=`<div class="explain-grid"><div class="content-card"><h3>形成性練習</h3><p><strong>${c.q}</strong></p>${c.opts.map((o,i)=>`<label class="quiz-option"><input type="radio" name="quiz" value="${i}"> ${String.fromCharCode(65+i)}. ${o}</label>`).join("")}<button class="secondary" id="checkQuiz">檢查答案</button><div class="feedback" id="feedback">選擇後再檢查。答對會記錄本章進度。</div></div><div class="content-card"><h3>把答案連回證據</h3><p>不要只記函式名稱。請用一句話說明本章的輸入、輸出，以及至少一個品質檢查。</p><div class="formula">${c.formula}</div><div class="callout">完成本章後，建議在自己的 Jupyter 或 Python 環境重跑程式碼，再比較實際輸出。</div></div></div>`;
     $$("[data-copy]").forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(c.code);b.textContent="已複製 ✓"}catch{b.textContent="請手動複製"}});
     $("#checkQuiz").onclick=()=>{const p=$('input[name="quiz"]:checked'),f=$("#feedback");if(!p){f.textContent="請先選擇一個答案。";return}if(+p.value===c.ans){completed.add(current);localStorage.setItem("mocca2Progress",JSON.stringify([...completed]));f.innerHTML="<strong>正確。</strong>本章已完成；請再用自己的話說出判斷證據。";f.style.background="var(--teal2)";renderSidebar()}else{f.innerHTML="<strong>還不對。</strong>回到「概念」與「判讀」，找出能支持答案的證據。";f.style.background="#fff0f0"}};
