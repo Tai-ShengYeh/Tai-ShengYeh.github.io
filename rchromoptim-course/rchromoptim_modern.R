@@ -149,21 +149,38 @@ simulate_chromatogram <- function(peaks, t_max = NULL, dt = 0.002) {
 #' @param df 步長
 #' @param t_max 可接受的最長滯留時間（時間預算）
 #' @return list(scan = 掃描表, best = 最佳列)
+#' 掃描時把所有條件一次算成矩陣
+#'
+#' tR 是一個 (溶質 x f) 矩陣，一行算完；解析度用矩陣位移相減求得。
+#' 這比「對每個 f 各建一個資料框」快 2-3 個數量級，
+#' 在 df 變小或要做二維掃描（f x pH、tG x f）時差別非常明顯。
+scan_isocratic <- function(params, f, t0 = T0, shape = SHAPE) {
+  tR  <- t0 * (1 + exp(params$c0 - outer(params$c1, f)))   # n_solute x n_f
+  ord <- apply(tR, 2, order)                               # 每欄的沖提順序
+  S   <- apply(tR, 2, sort)
+  W   <- 4 * (shape$s0 + shape$s1 * S) / sqrt(2)
+  n   <- nrow(S)
+  Rs  <- 2 * (S[-1, , drop = FALSE] - S[-n, , drop = FALSE]) /
+             (W[-1, , drop = FALSE] + W[-n, , drop = FALSE])
+  i   <- apply(Rs, 2, which.min)                           # 最難分的那一對
+  sol <- as.character(params$solute)
+  tibble::tibble(
+    f      = f,
+    Rs     = Rs[cbind(i, seq_along(f))],
+    pair   = paste(sol[ord[cbind(i, seq_along(f))]],
+                   sol[ord[cbind(i + 1L, seq_along(f))]], sep = "/"),
+    tR_max = S[n, ]
+  )
+}
+
 optimise_isocratic <- function(params, f_range = c(0.30, 0.60), df = 0.005,
                                t_max = 20, t0 = T0) {
-  scan <- tibble::tibble(f = seq(f_range[1], f_range[2], by = df)) |>
-    dplyr::mutate(
-      peaks = purrr::map(f, \(x) predict_isocratic(params, x, t0)),
-      worst = purrr::map(peaks, min_resolution),
-      Rs    = purrr::map_dbl(worst, "Rs"),
-      pair  = purrr::map_chr(worst, "pair"),
-      tR_max = purrr::map_dbl(peaks, \(p) max(p$tR)),
-      feasible = tR_max <= t_max
-    )
+  scan <- scan_isocratic(params, seq(f_range[1], f_range[2], by = df), t0) |>
+    dplyr::mutate(feasible = tR_max <= t_max)
   best <- scan |>
     dplyr::filter(feasible) |>
     dplyr::slice_max(Rs, n = 1, with_ties = FALSE)
-  list(scan = dplyr::select(scan, f, Rs, pair, tR_max, feasible), best = best)
+  list(scan = scan, best = best)
 }
 
 # ---- 梯度沖提 ---------------------------------------------------------------
@@ -193,19 +210,36 @@ predict_gradient_one <- function(c0, c1, f_start, f_end, tG, tD, t0 = T0,
   tibble::tibble(tR = te + t0, k_elute = k[i])
 }
 
-predict_gradient <- function(params, f_start, f_end, tG, tD = 0.7, t0 = T0) {
+#' 一次算完所有溶質的梯度滯留時間
+#'
+#' 三個效能重點：
+#'  1. 梯度曲線 phi(t) 對所有溶質都一樣，只算一次（原本每個溶質重算一遍）
+#'  2. k 做成 (溶質 x 時間) 矩陣，cumsum 以 vapply 逐列向量化
+#'  3. 時間格點上限由 f_end 的恆溶劑滯留時間估出，不再固定配置 400 分鐘
+#' 數值結果與逐一呼叫 predict_gradient_one() 完全相同。
+predict_gradient <- function(params, f_start, f_end, tG, tD = 0.7, t0 = T0,
+                             dt = 0.002, shape = SHAPE) {
+  n     <- nrow(params)
+  limit <- max(4, 3 * max(t0 * (1 + exp(params$c0 - params$c1 * f_end))) + tD + tG)
+  repeat {
+    tt   <- seq(0, limit, by = dt)
+    phi  <- pmin(pmax((tt - tD) / tG, 0), 1) * (f_end - f_start) + f_start
+    K    <- exp(params$c0 - outer(params$c1, phi))                 # n x T
+    prog <- vapply(seq_len(n), \(i) cumsum(dt / (t0 * K[i, ])), numeric(length(tt)))  # T x n
+    if (all(prog[nrow(prog), ] >= 1) || limit > 1000) break
+    limit <- limit * 3
+  }
+  idx    <- apply(prog >= 1, 2, \(v) which(v)[1])
+  before <- vapply(seq_len(n), \(i) if (idx[i] > 1) prog[idx[i] - 1, i] else 0, numeric(1))
+  cur    <- vapply(seq_len(n), \(i) prog[idx[i], i], numeric(1))
+  ke     <- vapply(seq_len(n), \(i) K[i, idx[i]], numeric(1))
+  te     <- tt[idx] + dt * (1 - before) / (cur - before)
+  t_equiv <- t0 * (1 + ke)          # 峰寬由沖提瞬間的 k 決定（LSS 理論）
   params |>
-    dplyr::mutate(
-      res = purrr::map2(c0, c1, \(a, b) predict_gradient_one(a, b, f_start, f_end, tG, tD, t0))
-    ) |>
-    tidyr::unnest(res) |>
-    dplyr::mutate(
-      # 峰寬由沖提瞬間的 k 決定：等效滯留時間 t0*(1+k_elute)
-      t_equiv = t0 * (1 + k_elute),
-      s = peak_sigma(t_equiv),
-      w = peak_width(t_equiv),
-      h = peak_height(t_equiv)
-    ) |>
+    dplyr::mutate(tR = te + t0, k_elute = ke,
+                  s = peak_sigma(t_equiv),
+                  w = peak_width(t_equiv),
+                  h = peak_height(t_equiv)) |>
     dplyr::arrange(tR)
 }
 

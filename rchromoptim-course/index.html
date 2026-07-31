@@ -477,7 +477,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
     就會<strong>大幅提早沖出來</strong>。咖啡因則幾乎不受影響（它在 pH 2 以上都是中性）。
     所以<strong>把 pH 調高，這兩根酸的峰會往左跑，順序真的可能翻轉</strong>——
     這正是文獻方法幾乎都刻意把 pH 壓在 4 以下的原因：不是習慣，是為了讓滯留穩定、順序可重現。
-    <span style="color:var(--ink3)">（想控制 pH 來分離可解離化合物？那就要用<a href="#s18">附錄</a>的模型 7、8、10，而不是模型 1。）</span>
+    <span style="color:var(--ink3)">（想控制 pH 來分離可解離化合物？那就要用<a href="#s19">附錄</a>的模型 7、8、10，而不是模型 1。）</span>
   </p>
 </div>
 
@@ -845,7 +845,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
 <p>
   這就是論文 Table 2 的<strong>模型 1</strong>，在 R 程式裡寫作 <code>model=1</code>。
   它是整個套件裡最簡單的一個，也是我們整份教材的主角。
-  （另外還有九個模型，處理 pH、雙溶劑等更複雜的情況——放在 <a href="#s18">附錄</a>，你現在不需要它們。）
+  （另外還有九個模型，處理 pH、雙溶劑等更複雜的情況——放在 <a href="#s19">附錄</a>，你現在不需要它們。）
 </p>
 
 <div class="note good">
@@ -1366,7 +1366,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
 <p>
   這就是論文 Table 2 的<strong>模型 7</strong>（<code>model=7</code>）。
   它和模型 1 的角色完全對稱：模型 1 描述 <var>φ</var> 怎麼影響 <var>k</var>，模型 7 描述 pH 怎麼影響 <var>k</var>。
-  <a href="#s18">附錄</a>裡的模型 8 和 10 則是把兩者合起來，同時處理 <var>φ</var> 和 pH。
+  <a href="#s19">附錄</a>裡的模型 8 和 10 則是把兩者合起來，同時處理 <var>φ</var> 和 pH。
 </p>
 
 <div class="sim" id="sim-ph">
@@ -1582,7 +1582,7 @@ details[open]>summary{border-bottom:1px solid var(--line); background:var(--bg3)
         如果某個參數的估計值剛好等於你設的 <code>upper</code>（預設 200），
         代表模型沒有真的收斂，只是<strong>被邊界擋住了</strong>。
         論文自己的範例資料就有這個現象——模型 4 的 <var>c</var><sub>2</sub> 對某些溶質卡在上限。
-        遇到這種情形的處理方式，請見<a href="#s20">附錄的常見問題排除</a>。
+        遇到這種情形的處理方式，請見<a href="#s21">附錄的常見問題排除</a>。
       </p>
     </div>
     <p style="margin-bottom:0">
@@ -2080,6 +2080,119 @@ c1 範圍 5.9113 - 8.5366
   </figcaption>
 </figure>
 
+<h3>還能再快嗎：從「跑得動」到「跑得動大的」</h3>
+
+<p>
+  上面的腳本跑示範資料只要零點幾秒，看起來沒有優化的必要。
+  但<strong>真正的最佳化很少只掃一個變數</strong>——論文的 <code>iopt</code> 對模型 8、10 要掃 <var>φ</var> × pH 的二維網格，
+  <code>gopt</code> 要掃 <var>t</var><sub>G</sub> × pH。條件數從幾十跳到幾千，
+  原本沒感覺的成本就會變成好幾分鐘的等待。
+</p>
+
+<div class="note">
+  <span class="nt">第一步永遠是量測，不是猜</span>
+  <p style="margin-bottom:0">
+    在動手改任何一行之前，先量出時間花在哪裡。實測結果是：
+    <code>fit_model1</code> 只佔 0.006 秒，<strong>瓶頸完全在掃描與梯度預測</strong>。
+    如果憑直覺去優化擬合那段，會白費力氣。
+  </p>
+</div>
+
+<h4>優化一：把 61 個資料框變成 1 個矩陣</h4>
+
+<p>
+  原本的寫法對<strong>每一個 <var>φ</var> 都建一個 tibble</strong>，再從中取最小 <var>R</var><sub>s</sub>。
+  61 個 <var>φ</var> 就配置 61 次記憶體、跑 61 次排序與資料框運算。
+  但這件事的本質只是一個矩陣：<strong>9 個溶質 × 61 個條件</strong>。
+</p>
+
+<pre><div class="plabel">R<span>優化後：整張表一次算完</span></div><code><span class="fn">scan_isocratic</span> &lt;- <span class="kw">function</span>(params, f, t0 = T0, shape = SHAPE) {
+  tR  &lt;- t0 * (<span class="nu">1</span> + <span class="fn">exp</span>(params$c0 - <span class="fn">outer</span>(params$c1, f)))   <span class="cm"># n_solute x n_f，一行算完</span>
+  ord &lt;- <span class="fn">apply</span>(tR, <span class="nu">2</span>, order)                               <span class="cm"># 每欄的沖提順序</span>
+  S   &lt;- <span class="fn">apply</span>(tR, <span class="nu">2</span>, sort)
+  W   &lt;- <span class="nu">4</span> * (shape$s0 + shape$s1 * S) / <span class="fn">sqrt</span>(<span class="nu">2</span>)
+  n   &lt;- <span class="fn">nrow</span>(S)
+  Rs  &lt;- <span class="nu">2</span> * (S[-<span class="nu">1</span>, , drop = <span class="kw">FALSE</span>] - S[-n, , drop = <span class="kw">FALSE</span>]) /   <span class="cm"># 矩陣位移相減</span>
+             (W[-<span class="nu">1</span>, , drop = <span class="kw">FALSE</span>] + W[-n, , drop = <span class="kw">FALSE</span>])
+  <span class="fn">tibble</span>(f = f, Rs = <span class="fn">apply</span>(Rs, <span class="nu">2</span>, min), tR_max = S[n, ], ...)
+}</code></pre>
+
+<p>
+  <code>outer(c1, f)</code> 一次產生所有「<var>c</var><sub>1</sub> × <var>φ</var>」的組合；
+  <code>S[-1,] - S[-n,]</code> 就是「每一欄裡相鄰兩個峰相減」。
+  <strong>迴圈消失了，因為問題本來就是矩陣形狀的。</strong>
+</p>
+
+<h4>優化二：梯度的三個浪費</h4>
+
+<p>原本每個溶質各呼叫一次數值求解器，裡面藏了三筆重複成本：</p>
+
+<ul>
+  <li><strong>梯度曲線 <var>φ</var>(<var>t</var>) 被重算 9 次</strong>，但它對所有溶質<strong>完全相同</strong>——只算一次就好。</li>
+  <li><strong>每個溶質都配置 200,001 個時間格點</strong>（固定算到 400 分鐘），
+      但實際上所有成分 10 分鐘內就出完了。改成<strong>由 <var>φ</var><sub>max</sub> 的恆溶劑滯留時間估一個合理上限</strong>，
+      不夠再放大，格點數降到約 1 萬。</li>
+  <li><strong><var>k</var> 逐溶質算</strong>，可以合併成一個 (溶質 × 時間) 矩陣。</li>
+</ul>
+
+<h4>實測結果</h4>
+
+<div class="tw">
+<table>
+<thead><tr><th>工作負載</th><th>優化前</th><th>優化後</th><th>加速</th></tr></thead>
+<tbody>
+<tr><td>恆溶劑掃描（61 個 <var>φ</var>，示範規模）</td>
+    <td class="num-col">0.461 s</td><td class="num-col">0.011 s</td>
+    <td class="num-col" style="color:var(--good)"><strong>42×</strong></td></tr>
+<tr><td>恆溶劑掃描（601 個 <var>φ</var>，<code>df</code>=0.0005）</td>
+    <td class="num-col">5.07 s</td><td class="num-col">0.033 s</td>
+    <td class="num-col" style="color:var(--good)"><strong>152×</strong></td></tr>
+<tr><td>單次梯度預測（9 溶質）</td>
+    <td class="num-col">0.196 s</td><td class="num-col">0.016 s</td>
+    <td class="num-col" style="color:var(--good)"><strong>12×</strong></td></tr>
+<tr><td>梯度二維掃描 <var>t</var><sub>G</sub> × <var>φ</var><sub>start</sub>（120 組）</td>
+    <td class="num-col">25.2 s</td><td class="num-col">2.17 s</td>
+    <td class="num-col" style="color:var(--good)"><strong>11.6×</strong></td></tr>
+</tbody>
+</table>
+</div>
+
+<p>
+  注意第二列：<strong>掃描越細，優化的效益越大</strong>（42× → 152×）。
+  這正是重點——優化真正的價值不在於讓示範跑得快一點，
+  而在於<strong>讓原本做不到的規模變得做得到</strong>。
+  Python 版做了完全相同的兩項優化。
+</p>
+
+<div class="note good">
+  <span class="nt">優化的鐵律：數字必須一模一樣</span>
+  <p>
+    效能改寫最危險的地方，是<strong>順手改變了計算結果卻沒發現</strong>。
+    所以每一次優化後都要拿舊版跑一次，逐項比對：
+  </p>
+  <pre style="margin-bottom:0"><div class="plabel">R<span>新舊對照</span></div><code>o &lt;- <span class="fn">opt_old</span>(p)$best;  nw &lt;- <span class="fn">optimise_isocratic</span>(p)$best
+<span class="fn">cat</span>(<span class="fn">abs</span>(o$Rs - nw$Rs))              <span class="cm"># -> 0.00e+00</span>
+<span class="fn">cat</span>(<span class="fn">max</span>(<span class="fn">abs</span>(<span class="fn">sort</span>(<span class="fn">grad_old</span>(...)$tR) - <span class="fn">sort</span>(<span class="fn">predict_gradient</span>(...)$tR))))
+                                       <span class="cm"># -> 0.00e+00 min</span></code></pre>
+  <p style="margin-bottom:0;margin-top:12px">
+    本次兩項優化的差異都是<strong>精確的 0</strong>——不是「小到可以忽略」，是完全相同的浮點數。
+    加上第 17 節的退化檢查仍然通過，才能說優化是安全的。
+  </p>
+</div>
+
+<div class="note warn">
+  <span class="nt">順帶一提：連量測本身都可能出錯</span>
+  <p style="margin-bottom:0">
+    製作這份教材時，第一版的計時程式寫成
+    <code>system.time(for (i in 1:n) force(expr))</code>——看起來很合理，其實是錯的。
+    R 的<strong>惰性求值（lazy evaluation）</strong>讓 <code>expr</code> 只在第一次 <code>force()</code> 時真的執行，
+    後面幾次都直接拿快取值，等於「跑一次的時間除以 n」，把耗時嚴重低估。
+    正確做法是<strong>傳入函式再呼叫</strong>：<code>system.time(for (i in 1:n) fn())</code>。
+    本頁表格中的數字都是用修正後的方法量的。
+    <strong>效能數據和實驗數據一樣，測量方法錯了，結論就沒有意義。</strong>
+  </p>
+</div>
+
 <div class="note good">
   <span class="nt">下載完整腳本</span>
   <p style="margin-bottom:0">
@@ -2289,7 +2402,125 @@ c1 範圍 5.9113 - 8.5366
   </p>
 </div>
 
-<h2 id="s18"><span class="num">18.</span>十個滯留模型完整對照表</h2>
+<hr>
+
+<h2 id="s18"><span class="num">18.</span>互動筆記本：Quarto 與 Jupyter<span class="chip a">進階</span></h2>
+
+<p class="lede">
+  第 16、17 節的腳本是「跑完看結果」。這一節提供兩份<strong>邊讀邊改</strong>的筆記本——
+  文字說明和程式碼交錯排列，你可以隨時改一個數字、按下執行，馬上看到差別。
+</p>
+
+<div class="note">
+  <span class="nt">兩份筆記本，選一份就好</span>
+  <div class="tw" style="margin:12px 0">
+  <table>
+  <thead><tr><th></th><th>Quarto（R）</th><th>Jupyter（Python）</th></tr></thead>
+  <tbody>
+  <tr><td><strong>檔案</strong></td><td><code>rchromoptim_tutorial.qmd</code></td><td><code>rchromoptim_tutorial.ipynb</code></td></tr>
+  <tr><td><strong>語言</strong></td><td>R 4.1+ ／ tidyverse</td><td>Python 3.9+ ／ pandas</td></tr>
+  <tr><td><strong>怎麼開</strong></td><td>RStudio 直接開（已內建 Quarto），或裝 <a href="https://quarto.org">Quarto CLI</a> 後 <code>quarto render</code></td>
+      <td>Jupyter Lab、VS Code，或上傳到 Google Colab</td></tr>
+  <tr><td><strong>要不要裝東西</strong></td><td>要裝 R 與 tidyverse</td><td>Colab 完全不用裝，開瀏覽器就能跑</td></tr>
+  <tr><td><strong>適合誰</strong></td><td>已經在用 R 做統計的人</td><td>沒有安裝環境、想立刻開始的人</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p style="margin-bottom:0">
+    <strong>如果你完全沒有安裝過任何東西，建議走 Jupyter + Google Colab 這條路</strong>——
+    上傳 <code>.ipynb</code>、按執行，五分鐘內就能看到第一張圖。
+  </p>
+</div>
+
+<h3>筆記本裡有什麼</h3>
+
+<p>兩份的結構刻意做成一樣，方便對照：</p>
+
+<div class="flow">
+  <div class="fstep"><div class="fn2">1</div><div class="fc">
+    <div class="ft">資料</div>
+    <div class="fd">9 個溶質 × 4 個 <var>φ</var> 的滯留時間表，<strong>已內嵌在檔案裡</strong>，不需要另外準備資料。</div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">2</div><div class="fc">
+    <div class="ft">算 k 值</div>
+    <div class="fd"><var>k</var> = (<var>t</var><sub>R</sub> − <var>t</var><sub>0</sub>)/<var>t</var><sub>0</sub>。
+      附一個小練習：把 <var>t</var><sub>0</sub> 改成 1.2 再跑一次，看 <var>k</var> 怎麼變。</div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">3</div><div class="fc">
+    <div class="ft">擬合模型 1 並自我檢查</div>
+    <div class="fd">算出 <var>c</var><sub>0</sub>、<var>c</var><sub>1</sub>，並<strong>當場比對論文公布的參數範圍</strong>
+      （3.1404–5.6030 與 5.9113–8.5366）——你會親眼看到自己算的數字和論文一致。</div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">4</div><div class="fc">
+    <div class="ft">畫圖與模擬層析圖</div>
+    <div class="fd">ln <var>k</var>–<var>φ</var> 診斷圖，以及模擬層析圖。
+      這裡有一行 <code>f_choice &lt;- 0.45</code>（Python 是 <code>f_choice = 0.45</code>），
+      <strong>改這個數字再執行，就能看到波峰移動</strong>。</div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">5</div><div class="fc">
+    <div class="ft">掃描最佳化</div>
+    <div class="fd">畫出 <var>R</var><sub>s</sub> 與 <var>t</var><sub>Rmax</sub> 對 <var>φ</var> 的曲線、找出最佳解，
+      並標出 <var>φ</var> ≈ 0.35 的共沖提塌陷。</div></div></div>
+  <div class="farrow">↓</div>
+  <div class="fstep"><div class="fn2">6</div><div class="fc">
+    <div class="ft">三道練習（留空白給你寫）</div>
+    <div class="fd">① 把時間預算改成 12 分鐘，最佳解跑到哪裡去？
+      ② 把 A6 從混合物裡拿掉，最佳 <var>φ</var> 會不會改變？
+      ③ 調大峰寬參數 <var>s</var><sub>1</sub>（相當於管柱變差），<var>R</var><sub>s</sub> 怎麼反應？
+      每題都有提示，程式格子留空白讓你自己動手。</div></div></div>
+</div>
+
+<div class="note good">
+  <span class="nt">為什麼「留空白」很重要</span>
+  <p style="margin-bottom:0">
+    看懂別人的程式和自己寫得出來，中間差距很大。
+    這三題都<strong>只需要改動已經出現過的程式碼</strong>——不用發明新東西，
+    但你必須知道要改哪一行。這是從「讀者」變成「使用者」最短的一段路。
+  </p>
+</div>
+
+<h3>一個做中文教材一定會遇到的坑</h3>
+
+<div class="note warn">
+  <span class="nt">圖上的中文變成一個個空白方框（俗稱「豆腐」）</span>
+  <p>
+    這在 Windows 上用 R 畫圖幾乎必然發生：預設的繪圖裝置找不到中文字型，
+    就把每個中文字畫成 □。製作這份教材時實測，同一段程式碼
+    <strong>在預設裝置下產生 46 個字型轉換警告、中文全變方框；改用 <code>ragg</code> 裝置並指定中文字型後，警告 0 個、中文正常顯示</strong>。
+  </p>
+  <p>Quarto 版的筆記本已經內建這段修正，你不必自己處理：</p>
+  <pre style="margin-bottom:0"><div class="plabel">R<span>自動挑一個系統上存在的中文字型</span></div><code>cjk_font &lt;- <span class="fn">local</span>({
+  cands &lt;- <span class="fn">c</span>(<span class="st">"Microsoft JhengHei"</span>, <span class="st">"Noto Sans TC"</span>, <span class="st">"PingFang TC"</span>,
+              <span class="st">"Heiti TC"</span>, <span class="st">"Noto Sans CJK TC"</span>, <span class="st">"SimSun"</span>)
+  avail &lt;- <span class="kw">if</span> (<span class="fn">requireNamespace</span>(<span class="st">"systemfonts"</span>, quietly = <span class="kw">TRUE</span>))
+    systemfonts::<span class="fn">system_fonts</span>()$family <span class="kw">else</span> <span class="fn">character</span>(<span class="nu">0</span>)
+  hit &lt;- cands[cands %in% avail]
+  <span class="kw">if</span> (<span class="fn">length</span>(hit)) hit[<span class="nu">1</span>] <span class="kw">else</span> <span class="st">""</span>       <span class="cm"># 找不到就用預設值</span>
+})
+<span class="fn">theme_set</span>(<span class="fn">theme_minimal</span>(base_family = cjk_font))</code></pre>
+  <p style="margin-bottom:0;margin-top:12px">
+    搭配 YAML 裡的 <code>knitr: opts_chunk: dev: ragg_png</code>。
+    這段程式會<strong>自動偵測</strong>：Windows 用微軟正黑體、macOS 用蘋方、Linux 用 Noto，
+    都找不到就退回預設值而不會報錯。<strong>以後你自己做中文圖表，把這段複製過去就能用。</strong>
+  </p>
+</div>
+
+<div class="note good">
+  <span class="nt">下載</span>
+  <p style="margin-bottom:0">
+    <a href="rchromoptim_tutorial.qmd" download><strong>rchromoptim_tutorial.qmd</strong></a>
+    　（R ／ Quarto，15 個程式區塊）<br>
+    <a href="rchromoptim_tutorial.ipynb" download><strong>rchromoptim_tutorial.ipynb</strong></a>
+    　（Python ／ Jupyter，21 個 cell，輸出已清空讓你從頭跑一次）<br>
+    <span style="font-size:14px;color:var(--ink3)">
+      兩份都經過實際執行驗證：R 版 15 個區塊全部無誤跑完、Python 版以
+      <code>nbconvert --execute</code> 從頭執行到尾 0 錯誤，最佳化結果都是
+      <var>φ</var> = 0.410、<var>R</var><sub>s</sub> = 2.4535、<var>t</var><sub>Rmax</sub> = 17.13。
+    </span>
+  </p>
+</div>
+
+<h2 id="s19"><span class="num">19.</span>十個滯留模型完整對照表</h2>
 <p class="lede">大部分食品分析的工作，其實只會用到模型 1 或模型 3。只有當你遇到「可解離的化合物」（例如有機酸、胺類——像乙酸、檸檬酸、生物胺）、或是需要控制 pH 值來調整分離效果時，才需要翻到這張完整清單。</p>
 
 <details>
@@ -2381,7 +2612,7 @@ c1 範圍 5.9113 - 8.5366
 </div>
 </details>
 
-<h2 id="s19"><span class="num">19.</span>函數速查表</h2>
+<h2 id="s20"><span class="num">20.</span>函數速查表</h2>
 <p class="lede">RChromOptim 套件一共有 10 個函數，命名有規律可循，看懂前綴和字根就能猜出功能。</p>
 
 <div class="tw">
@@ -2409,7 +2640,7 @@ c1 範圍 5.9113 - 8.5366
 前綴：<code>i</code> = isocratic 恆溶劑、<code>g</code> = gradient 梯度、<code>mg</code> = 雙線性梯度（bi-linear gradient）。字根：<code>fitk</code> = 擬合滯留（fit retention）、<code>fitshape</code> = 擬合峰形（fit peak shape）、<code>pred</code> = 預測（predict）、<code>opt</code> = 最佳化（optimize）。看到函數名稱，把前綴和字根拆開讀，就知道它在做什麼。
 </div>
 
-<h2 id="s20"><span class="num">20.</span>常見問題排除</h2>
+<h2 id="s21"><span class="num">21.</span>常見問題排除</h2>
 <p class="lede">這些是使用 RChromOptim 時真實會遇到的狀況，坦白列出來，照著檢查通常就能解決。</p>
 
 <details>
@@ -2478,7 +2709,7 @@ c1 範圍 5.9113 - 8.5366
 </div>
 </details>
 
-<h2 id="s21"><span class="num">21.</span>中英名詞對照與延伸閱讀</h2>
+<h2 id="s22"><span class="num">22.</span>中英名詞對照與延伸閱讀</h2>
 <p class="lede">整理課程中出現過的關鍵術語中英對照，以及原始論文的補充資源。</p>
 
 <div class="tw">
@@ -3484,8 +3715,8 @@ document.querySelectorAll(".quiz").forEach(function(q){
   var groups = [
     {t:"入門　讀懂層析圖", ids:["s1","s2","s3","s4","s5"]},
     {t:"中階　調整與最佳化", ids:["s6","s7","s8","s9","s10"]},
-    {t:"進階　R 實作", ids:["s11","s12","s13","s14","s15","s16","s17"]},
-    {t:"附錄　查詢用", ids:["s18","s19","s20","s21"]}
+    {t:"進階　R 實作", ids:["s11","s12","s13","s14","s15","s16","s17","s18"]},
+    {t:"附錄　查詢用", ids:["s19","s20","s21","s22"]}
   ];
   var title = document.createElement("div");
   title.className = "navtitle"; title.textContent = "HPLC 分離最佳化";

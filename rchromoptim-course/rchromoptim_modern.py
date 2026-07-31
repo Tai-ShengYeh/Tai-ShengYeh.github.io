@@ -252,6 +252,46 @@ class OptimisationResult:
     best: pd.Series | None
 
 
+def scan_isocratic(
+    params: pd.DataFrame,
+    f: np.ndarray,
+    t0: float = T0,
+    shape: dict = SHAPE,
+) -> pd.DataFrame:
+    """一次算完整個 f 掃描的矩陣版本（對應 R 版的 scan_isocratic）。
+
+    把每個 f 各建一個 DataFrame 再逐一呼叫 predict_isocratic + min_resolution
+    的巢狀迴圈，改成單一 (溶質 x f) 矩陣運算：tR 一次算完，逐欄排序，
+    解析度用矩陣位移相減求得。比逐一建立 DataFrame 快 1-2 個數量級。
+
+    Args:
+        params: fit_model1() 的輸出。
+        f: 1-D numpy 陣列，欲掃描的有機修飾劑比例。
+        t0: 管柱死時間。
+        shape: 峰形參數。
+
+    Returns:
+        DataFrame，欄位為 f, Rs, pair, tR_max（每個 f 一列，最難分那對的 Rs）。
+    """
+    c0 = params["c0"].to_numpy(dtype=float)
+    c1 = params["c1"].to_numpy(dtype=float)
+    solute = params["solute"].astype(str).to_numpy()
+
+    tR = t0 * (1 + np.exp(c0[:, None] - c1[:, None] * f[None, :]))  # n_solute x n_f
+    ord_ = np.argsort(tR, axis=0)                                    # 每欄的沖提順序
+    S = np.take_along_axis(tR, ord_, axis=0)
+    W = 4 * (shape["s0"] + shape["s1"] * S) / np.sqrt(2)
+    Rs = 2 * np.diff(S, axis=0) / (W[1:] + W[:-1])                   # 相鄰峰對解析度
+    i = Rs.argmin(axis=0)                                             # 最難分的那一對
+    Rs_min = Rs.min(axis=0)
+
+    n_f = f.shape[0]
+    pair = [f"{solute[ord_[i[j], j]]}/{solute[ord_[i[j] + 1, j]]}" for j in range(n_f)]
+    tR_max = S[-1, :]
+
+    return pd.DataFrame({"f": f, "Rs": Rs_min, "pair": pair, "tR_max": tR_max})
+
+
 def optimise_isocratic(
     params: pd.DataFrame,
     f_range: tuple[float, float] = (0.30, 0.60),
@@ -273,19 +313,7 @@ def optimise_isocratic(
         掃描表欄位為 f, Rs, pair, tR_max, feasible。
     """
     f_grid = np.arange(f_range[0], f_range[1] + df / 2, df)
-    rows = []
-    for f in f_grid:
-        peaks = predict_isocratic(params, float(f), t0)
-        worst = min_resolution(peaks)
-        rows.append(
-            dict(
-                f=float(f),
-                Rs=worst["Rs"],
-                pair=worst["pair"],
-                tR_max=float(peaks["tR"].max()),
-            )
-        )
-    scan = pd.DataFrame(rows)
+    scan = scan_isocratic(params, f_grid, t0)
     scan["feasible"] = scan["tR_max"] <= t_max
 
     feasible = scan[scan["feasible"]]
@@ -352,8 +380,18 @@ def predict_gradient(
     tG: float,
     tD: float = 0.7,
     t0: float = T0,
+    dt: float = 0.002,
+    shape: dict = SHAPE,
 ) -> pd.DataFrame:
-    """對每個溶質求解梯度沖提的滯留時間與峰形。
+    """對每個溶質求解梯度沖提的滯留時間與峰形（向量化版本，對應 R 版 predict_gradient）。
+
+    三個效能重點（與 R 版一致）：
+      1. 梯度曲線 phi(t) 對所有溶質都一樣，只算一次（不再每個溶質各自重建
+         一份 t_limit=400、200001 點的時間格點）。
+      2. K = exp(c0 - c1*phi) 做成 (溶質 x 時間) 矩陣，cumsum 沿時間軸一次算完。
+      3. 時間格點上限由 f_end 的恆溶劑滯留時間估出（而非固定配置 400 分鐘），
+         若仍有溶質在格點內未沖提，則把上限乘以 3 重算，直到全部沖提或
+         上限超過 1000（此時未沖提的溶質回傳 NaN，與原本失敗時的行為一致）。
 
     峰寬由沖提瞬間的 k 決定（線性溶劑強度理論，LSS）：
     等效滯留時間 t_equiv = t0 * (1 + k_elute)，以此（而非 tR 本身）
@@ -365,19 +403,48 @@ def predict_gradient(
         tG: 梯度斜坡歷時（分鐘）。
         tD: 延遲時間（分鐘）。
         t0: 管柱死時間。
+        dt: 時間步階。
+        shape: 峰形參數。
 
     Returns:
         DataFrame（依 tR 排序），欄位為 solute, tR, k_elute, t_equiv, s, w, h。
     """
-    rows = []
-    for _, row in params.iterrows():
-        tR, k_elute = predict_gradient_one(row["c0"], row["c1"], f_start, f_end, tG, tD, t0)
-        rows.append(dict(solute=row["solute"], tR=tR, k_elute=k_elute))
-    out = pd.DataFrame(rows)
+    c0 = params["c0"].to_numpy(dtype=float)
+    c1 = params["c1"].to_numpy(dtype=float)
+    n = len(c0)
+
+    limit = max(4.0, 3 * np.max(t0 * (1 + np.exp(c0 - c1 * f_end))) + tD + tG)
+
+    while True:
+        tt = np.arange(0, limit + dt, dt)
+        phi = np.clip((tt - tD) / tG, 0.0, 1.0) * (f_end - f_start) + f_start
+        K = np.exp(c0[:, None] - c1[:, None] * phi[None, :])  # n_solute x T
+        prog = np.cumsum(dt / (t0 * K), axis=1)  # n_solute x T
+        crossed = (prog >= 1).any(axis=1)
+        if crossed.all() or limit > 1000:
+            break
+        limit *= 3
+
+    idx = (prog >= 1).argmax(axis=1)  # 只在 crossed[i] 為真時才有意義
+    tR = np.full(n, np.nan)
+    k_elute = np.full(n, np.nan)
+    for i in range(n):
+        if not crossed[i]:
+            continue
+        j = idx[i]
+        before = prog[i, j - 1] if j > 0 else 0.0
+        frac = (1.0 - before) / (prog[i, j] - before)
+        te = tt[j] + frac * dt
+        tR[i] = te + t0
+        k_elute[i] = K[i, j]
+
+    out = params[["solute"]].copy()
+    out["tR"] = tR
+    out["k_elute"] = k_elute
     out["t_equiv"] = t0 * (1 + out["k_elute"])
-    out["s"] = peak_sigma(out["t_equiv"])
-    out["w"] = peak_width(out["t_equiv"])
-    out["h"] = peak_height(out["t_equiv"])
+    out["s"] = peak_sigma(out["t_equiv"], shape)
+    out["w"] = peak_width(out["t_equiv"], shape)
+    out["h"] = peak_height(out["t_equiv"], shape)
     return out.sort_values("tR").reset_index(drop=True)
 
 
