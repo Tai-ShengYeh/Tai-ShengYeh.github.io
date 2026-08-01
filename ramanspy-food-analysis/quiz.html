@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>線上測驗｜RamanSPy × 食品分析</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RamanSPy × 食品分析
+   視覺系統沿用 tai-shengyeh.github.io/raman-food-analysis/teaching.html
+   （湖綠封面 / 米色卡片 / coral · gold 強調 / 圓角 14–16px）
+   ============================================================ */
+:root{
+  --paper:#FFFFFF; --paper2:#F5F2E9; --ink:#1A1A1A; --ink-soft:#52493b;
+  --teal:#0E7C7B; --coral:#E36414; --gold:#C8941F; --line:#E4DECC;
+  --cover:#119C9A;
+  --violet:#6A4C93;   /* 第四分類色：判讀單元 */
+  --mono:'JetBrains Mono','Fira Code',Consolas,ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Noto Sans TC',system-ui,sans-serif;
+  color:var(--ink);background:var(--paper);line-height:1.65;font-size:18px;}
+h1,h2,h3{font-weight:900;line-height:1.2;letter-spacing:.01em}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+code,pre,kbd{font-family:var(--mono)}
+img{max-width:100%}
+
+/* ---------- 導覽 ---------- */
+nav{position:sticky;top:0;z-index:50;background:rgba(26,26,26,.96);backdrop-filter:blur(6px);
+  display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:10px 22px;}
+nav .brand{color:#fff;font-weight:900;font-size:18px;margin-right:auto}
+nav .brand b{color:var(--gold)}
+nav a{color:#e9e4d6;font-weight:700;font-size:14.5px;padding:6px 11px;border-radius:8px}
+nav a:hover{background:rgba(255,255,255,.12);text-decoration:none;color:#fff}
+nav a.on{background:rgba(255,255,255,.16);color:#fff}
+
+/* ---------- 封面 ---------- */
+.hero{background:var(--cover);color:#fff;padding:78px 22px 64px;text-align:center}
+.hero h1{font-size:clamp(32px,6vw,62px);margin:0 0 14px}
+.hero h1 .accent{color:#FFDE7A}
+.hero p.sub{font-size:clamp(17px,2.4vw,23px);color:rgba(255,255,255,.9);font-weight:700;
+  max-width:820px;margin:0 auto 28px}
+.hero .facts{display:flex;gap:30px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.hero .fact b{display:block;font-size:30px;color:#FFDE7A;font-weight:900;line-height:1.2}
+.hero .fact span{font-size:13px;color:rgba(255,255,255,.85);font-weight:500}
+.hero .btnrow{justify-content:center}
+
+/* ---------- 版面 ---------- */
+main{max-width:1080px;margin:0 auto;padding:0 22px}
+section{padding:64px 0 8px;scroll-margin-top:70px;border-top:1px solid var(--line)}
+section:first-of-type{border-top:none}
+.kicker{color:var(--coral);font-weight:900;font-size:15px;letter-spacing:.14em;text-transform:uppercase}
+section h2{font-size:clamp(27px,4vw,40px);margin:6px 0 8px}
+section h3{font-size:22px;margin:34px 0 10px;color:var(--teal)}
+section h4{font-size:18px;margin:24px 0 6px;font-weight:900}
+p{margin:14px 0}
+.lead{font-size:20px;color:var(--ink-soft)}
+ul,ol{padding-left:1.25em}
+li{margin:6px 0}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin:24px 0}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:22px 24px;
+  display:flex;flex-direction:column;transition:transform .15s ease,box-shadow .15s ease}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.08)}
+.card .tag{display:inline-block;align-self:flex-start;font-size:12px;font-weight:900;color:#fff;
+  background:var(--teal);border-radius:999px;padding:3px 11px;margin-bottom:10px}
+.card .tag.coral{background:var(--coral)} .card .tag.gold{background:var(--gold)}
+.card .tag.violet{background:var(--violet)}
+.card h3{font-size:22px;margin:0 0 6px}
+.card .links{margin-top:14px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.card .go{font-weight:900;color:var(--coral)}
+.card .repo{font-size:13px;color:var(--ink-soft)}
+.card h4{margin:0 0 8px;font-size:19px;font-weight:900;color:var(--teal)}
+.card.coral h4{color:var(--coral)}
+.card.gold h4{color:var(--gold)}
+.card.violet h4{color:var(--violet)}
+.card .icon{font-size:1.9rem;line-height:1;margin-bottom:8px}
+.card ul{margin:8px 0 0;padding-left:1.1em}
+.card li{margin:4px 0;font-size:16px}
+.card .big{font-size:38px;font-weight:900;color:var(--coral);line-height:1;margin:4px 0 6px}
+.card .note{font-size:14px;color:var(--ink-soft);margin-top:10px}
+a.card{display:block;color:inherit;transition:transform .16s ease, box-shadow .16s ease}
+a.card:hover{text-decoration:none;transform:translateY(-3px);box-shadow:0 14px 30px -20px rgba(26,26,26,.6)}
+
+figure{margin:26px 0;background:var(--paper2);border:1px solid var(--line);border-radius:16px;
+  padding:14px;text-align:center}
+figure img{max-width:100%;height:auto;border-radius:8px;display:block;margin:0 auto;background:#fff}
+figure svg{max-width:100%;height:auto;display:block;margin:0 auto}
+figcaption{font-size:15px;color:var(--ink-soft);font-weight:700;margin-top:10px;text-align:left}
+figcaption b{color:var(--coral)}
+
+.callout{border-left:6px solid var(--teal);background:var(--paper2);border-radius:0 14px 14px 0;
+  padding:18px 22px;margin:24px 0;font-size:18px}
+.callout.coral{border-color:var(--coral)}
+.callout.gold{border-color:var(--gold)}
+.callout .tag{font-weight:900;color:var(--teal)}
+.callout.coral .tag{color:var(--coral)}
+.callout.gold .tag{color:var(--gold)}
+.callout p:first-child{margin-top:0}
+.callout p:last-child{margin-bottom:0}
+
+pre{background:#1f2329;border-radius:14px;padding:0;margin:18px 0;overflow:auto;border:1px solid #2c313a}
+pre code{display:block;padding:20px 22px;font-size:14.5px;line-height:1.6;background:transparent}
+.codecap{font-size:14px;font-weight:700;color:var(--ink-soft);margin:20px 0 -8px}
+.codecap b{color:var(--teal)}
+details{background:var(--paper2);border:1px solid var(--line);border-radius:14px;padding:6px 18px;margin:14px 0}
+summary{font-weight:900;cursor:pointer;padding:10px 0;color:var(--teal)}
+
+table{width:100%;border-collapse:collapse;margin:24px 0;font-size:16.5px;background:var(--paper2);
+  border-radius:14px;overflow:hidden}
+th,td{padding:12px 15px;text-align:left;border-bottom:1px solid var(--line)}
+th{background:var(--teal);color:#fff;font-weight:900}
+tr:last-child td{border-bottom:none}
+td b.teal{color:var(--teal)} td b.coral{color:var(--coral)} td b.gold{color:var(--gold)}
+td.yes{color:var(--teal);font-weight:900} td.no{color:var(--coral);font-weight:900}
+td .wn{font-family:var(--mono);font-weight:700}
+.tablewrap{overflow-x:auto}
+
+.btnrow{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}
+.btn{background:var(--teal);color:#fff;font-weight:900;padding:12px 20px;border-radius:12px;
+  font-size:15px;display:inline-block;border:none;cursor:pointer;font-family:inherit}
+.btn.coral{background:var(--coral)}
+.btn.gold{background:var(--gold)}
+.btn.ghost{background:transparent;color:var(--teal);border:2px solid var(--teal)}
+.btn:hover{text-decoration:none;opacity:.92}
+.hero .btn{background:#fff;color:var(--cover)}
+.hero .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.7)}
+
+.eq{background:var(--paper2);border:1px dashed var(--teal);border-radius:12px;padding:14px 18px;
+  margin:18px 0;text-align:center;font-size:20px}
+.steps{counter-reset:s;list-style:none;padding:0}
+.steps li{position:relative;padding:10px 0 10px 46px;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:none}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:8px;
+  width:30px;height:30px;background:var(--teal);color:#fff;border-radius:50%;font-weight:900;
+  display:flex;align-items:center;justify-content:center;font-size:15px}
+
+footer{background:var(--ink);color:#cfc8b6;text-align:center;padding:34px 22px;margin-top:56px;font-size:13.5px}
+footer b{color:var(--gold)}
+footer a{color:#9fd3d2}
+
+/* ============================================================
+   互動元件
+   ============================================================ */
+.lab{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:26px 0}
+.lab-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.lab-head .chip{background:var(--coral);color:#fff;font-weight:900;font-size:13px;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:8px}
+.lab-head h4{margin:0;font-size:19px;font-weight:900}
+.lab .hint{font-size:15px;color:var(--ink-soft);margin:4px 0 14px}
+.lab-body{display:grid;grid-template-columns:250px 1fr;gap:20px;align-items:start}
+.lab-body.wide{grid-template-columns:1fr}
+.controls{display:flex;flex-direction:column;gap:12px}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:14.5px;font-weight:700;gap:8px}
+.ctl label .val{font-family:var(--mono);font-weight:700;color:var(--coral);font-size:14px}
+.ctl input[type=range]{width:100%;accent-color:var(--teal);margin-top:2px}
+.ctl.switch{display:flex;align-items:center;gap:9px;font-size:14.5px;font-weight:700}
+.ctl.switch input{accent-color:var(--teal);width:17px;height:17px}
+.canvas-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:250px}
+.readout{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.readout div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 14px;flex:1;min-width:120px}
+.readout b{display:block;font-family:var(--mono);font-size:19px;font-weight:700;line-height:1.3}
+.readout span{font-size:12.5px;color:var(--ink-soft);font-weight:700}
+.readout .t-teal b{color:var(--teal)} .readout .t-coral b{color:var(--coral)} .readout .t-gold b{color:var(--gold)}
+.verdict-box{margin-top:12px;padding:13px 17px;border-radius:12px;font-weight:900;font-size:16.5px;
+  border:2px solid var(--line);background:#fff}
+.verdict-box.hit{border-color:var(--coral);color:var(--coral);background:#fdf1e9}
+.verdict-box.miss{border-color:var(--teal);color:var(--teal);background:#e9f4f4}
+.choices{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.choices button{background:#fff;border:2px solid var(--line);border-radius:11px;padding:9px 15px;
+  font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;color:var(--ink);transition:border-color .14s}
+.choices button:hover{border-color:var(--teal)}
+.choices button.right{border-color:var(--teal);background:#e9f4f4;color:var(--teal)}
+.choices button.wrong{border-color:var(--coral);background:#fdf1e9;color:var(--coral)}
+.feedback{margin-top:12px;font-size:15.5px;background:#fff;border:1px solid var(--line);
+  border-radius:11px;padding:12px 16px;display:none}
+.feedback.show{display:block}
+
+/* ---------- 測驗 ---------- */
+.q{background:var(--paper2);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:16px}
+.q .qn{font-family:var(--mono);font-size:13px;color:var(--ink-soft);font-weight:700;letter-spacing:.1em}
+.q .qt{font-weight:700;margin:6px 0 12px;font-size:17px}
+.q .qt:empty{display:none}
+.q pre{margin:6px 0 12px}
+.opt{display:block;background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px 15px;
+  margin:8px 0;cursor:pointer;font-size:16px;transition:border-color .14s}
+.opt:hover{border-color:var(--teal)}
+.opt input{margin-right:10px;accent-color:var(--teal)}
+.opt.right{border-color:var(--teal);background:#e9f4f4}
+.opt.wrong{border-color:var(--coral);background:#fdf1e9}
+.q.done .opt{cursor:default}
+.fb{display:none;margin-top:12px;background:#fff;border:1px solid var(--line);
+  border-left:5px solid var(--teal);border-radius:0 12px 12px 0;padding:13px 17px;font-size:16px}
+.q.done .fb{display:block}
+.fb.no{border-left-color:var(--coral)}
+.fb b{font-weight:900;color:var(--teal)}
+.fb.no b{color:var(--coral)}
+.stage-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 18px}
+.stage-head .badge{background:var(--teal);color:#fff;font-weight:900;font-size:13px;
+  letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border-radius:9px}
+.stage-head .badge.coral{background:var(--coral)}
+.stage-head .badge.gold{background:var(--gold)}
+.stage-head .badge.violet{background:var(--violet)}
+.stage-head h3{margin:0;color:var(--ink);font-size:22px}
+.stage-head .from{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--ink-soft);font-weight:700}
+.submitbar{position:sticky;bottom:0;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);padding:13px 22px;z-index:40;margin-top:26px}
+.submitbar .inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.progress{flex:1;min-width:130px;height:9px;background:var(--line);border-radius:5px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--teal);transition:width .35s}
+.pcount{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink-soft)}
+.result{display:none;background:var(--paper2);border:1px solid var(--line);border-radius:16px;
+  padding:28px;margin:30px 0}
+.result.show{display:block}
+.score{font-family:var(--mono);font-size:clamp(44px,9vw,68px);font-weight:700;line-height:1;color:var(--teal)}
+.verdict{font-weight:900;font-size:21px;margin:12px 0 20px}
+.bar{display:grid;grid-template-columns:160px 1fr 64px;gap:13px;align-items:center;margin:11px 0;font-size:16px}
+.bar .track{height:11px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--teal);border-radius:6px;transition:width .7s ease}
+.bar .num{font-family:var(--mono);font-size:15px;text-align:right;font-weight:700}
+
+@media(max-width:860px){
+  .lab-body{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  .g4,.g3,.g2{grid-template-columns:1fr}
+  body{font-size:17px}
+  .bar{grid-template-columns:1fr 58px}
+  .bar .track{grid-column:1/-1;order:3}
+  nav{padding:8px 14px}
+  nav .brand{font-size:16px;width:100%;margin-bottom:4px}
+}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.001ms!important;animation-duration:.001ms!important}}
+
+/* 文獻引註上標 */
+a.ref{font-size:.72em;font-weight:900;color:var(--coral);vertical-align:super;
+  text-decoration:none;padding:0 1px}
+a.ref:hover{text-decoration:underline}
+#refs ol{padding-left:1.6em}
+#refs ol li{margin:10px 0;line-height:1.6}
+#refs ol li i{color:var(--ink-soft)}
+
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">RamanSPy × 食品分析 <b>·</b> 線上測驗</span>
+  <a href="index.html">課程入口</a>
+  <a href="teaching.html">線上教材</a>
+  <a href="https://tai-shengyeh.github.io/">↖ 總站</a>
+</nav>
+
+<header class="hero">
+  <h1>你真的<span class="accent">看懂那條光譜</span>了嗎</h1>
+  <p class="sub">
+    30 題，分四個關卡。選了就立刻告訴你對不對、為什麼。
+    全部作答後按「看成績」，會依關卡算分，並指出你該回去複習哪一段。
+  </p>
+  <div class="facts">
+    <div class="fact"><b>30</b><span>題數</span></div>
+    <div class="fact"><b>70</b><span>通過分數</span></div>
+    <div class="fact"><b>25</b><span>建議作答分鐘</span></div>
+    <div class="fact"><b>∞</b><span>可重複作答</span></div>
+  </div>
+</header>
+
+<main>
+  <div id="quiz"></div>
+
+  <section class="result" id="result" style="border-top:none">
+    <div class="kicker">作答結果</div>
+    <div class="score" id="score">—</div>
+    <div class="verdict" id="verdict"></div>
+    <div id="bars"></div>
+    <div class="callout coral" id="advice"></div>
+    <p style="font-size:15px;color:var(--ink-soft)">把這一頁截圖，連同 Notebook 執行畫面一起繳交。</p>
+    <div class="btnrow"><a class="btn" href="teaching.html">回線上教材複習</a></div>
+  </section>
+</main>
+
+<div class="submitbar">
+  <div class="inner">
+    <span class="pcount" id="pcount">已作答 0 / 30</span>
+    <span class="progress"><i id="pbar"></i></span>
+    <button class="btn" id="submit">看成績</button>
+    <button class="btn ghost" id="reset">重新作答</button>
+  </div>
+</div>
+
+<footer>
+  <b>RamanSPy × 食品分析</b>　食品營養系 · 食品分析課程<br>
+  <a href="index.html">課程入口</a>　·　<a href="teaching.html">線上教材</a>　·　
+  <a href="https://tai-shengyeh.github.io/">↖ 回課程總站</a>
+</footer>
+
+<script>
+const STAGES = [
+  {id:"s1", cls:"", badge:"關卡一", title:"原理與第一條光譜", from:"教材：原理 · 合成光譜", nb:"NB1_intro_spectrum.ipynb", link:"teaching.html#principle", qs:[
+    {q:"拉曼位移（Raman shift）的數值，會不會隨著使用的雷射波長改變？",
+     o:["會，換雷射就要重新查表","不會，因為它是入射光與散射光的能量差","只有在 785 nm 以上才會改變","跟雷射無關，但跟樣品溫度成正比"],a:1,
+     e:"拉曼位移是「能量差」，所以同一物質用 532 nm 或 785 nm 測，峰位相同。這正是拉曼光譜能建立通用資料庫的原因。"},
+    {q:"相較於紅外光譜，拉曼光譜特別適合分析高含水食品（如乳品、飲料），主要原因是什麼？",
+     o:["水的拉曼散射非常弱，幾乎不干擾","水會把拉曼訊號放大","拉曼可以先把水蒸發掉","拉曼的雷射不會被水吸收，所以能穿透無限深"],a:0,
+     e:"水是強極性分子，在 IR 上吸收極強會蓋掉樣品；但它對稱性高、極化率變化小，拉曼訊號很弱，因此含水樣品可直接測。"},
+    {q:"某同學說：「A 樣品的 1085 峰高 3200，B 樣品只有 1800，所以 A 的醣類比較多。」這句話的問題在哪？",
+     o:["1085 不是醣類的峰","峰高本來就跟濃度無關，永遠不能用","Y 軸是任意單位，受雷射功率與對焦影響，未歸一化不能比","應該比較峰的位置而不是高度"],a:2,
+     e:"強度單位是 a.u.（任意單位）。要比較必須先做歸一化，最好再用一個穩定的內標峰（例如 1441 或 1003）做比值。"},
+    {q:"下列哪一個特徵最能判斷某個尖銳訊號是「宇宙射線」而不是真正的拉曼峰？",
+     o:["它出現在 1000 cm⁻¹ 以下","它只有 1–2 個資料點寬，且重測一次位置會變","它的強度特別低","它出現在光譜的正中央"],a:1,
+     e:"真拉曼峰有物理寬度（數個資料點），位置在重複量測時固定；宇宙射線是偵測器被粒子打到，極窄且隨機出現。"},
+    {q:"下面這行程式碼有什麼問題？<CODE>spectrum = rp.Spectrum(x, y)   # x 是波數，y 是強度</CODE>",
+     o:["缺少 import","參數順序反了，應該是 rp.Spectrum(y, x)","Spectrum 不能接受兩個參數","波數必須先轉成 numpy 陣列才行"],a:1,
+     e:"rp.Spectrum(spectral_data, spectral_axis)：第一個放強度，第二個放波數軸。寫反不一定報錯，但畫出來的圖會完全錯亂。"},
+    {q:"食品分析最常使用的「指紋區」大約是哪個範圍？",
+     o:["100–400 cm⁻¹","400–1800 cm⁻¹","1800–2500 cm⁻¹","2800–3600 cm⁻¹"],a:1,
+     e:"400–1800 cm⁻¹ 包含大部分骨架振動與官能基特徵峰。2800–3000 是 C–H 伸縮區，看油脂時會另外納入。"},
+    {q:"同一個油脂樣品，C=C 雙鍵的訊號在拉曼上很強、在紅外光譜上卻很弱。原因是什麼？",
+     o:["紅外光譜偵測器比較差","C=C 對稱性高、偶極矩變化小，但極化率變化大","拉曼的雷射功率比較高","油脂會吸收紅外光"],a:1,
+     e:"這是選擇律的差異：IR 需要偶極矩改變，拉曼需要極化率改變。對稱、非極性的鍵在拉曼上強、在 IR 上弱 —— 兩者互補。"}
+  ]},
+
+  {id:"s2", cls:"", badge:"關卡二", title:"前處理", from:"教材：前處理", nb:"NB2_preprocessing.ipynb", link:"teaching.html#prep", qs:[
+    {q:"標準前處理流程的正確順序是？",
+     o:["歸一化 → 平滑 → 基線校正 → 去尖峰 → 裁切","裁切 → 去尖峰 → 平滑 → 基線校正 → 歸一化","基線校正 → 裁切 → 歸一化 → 平滑 → 去尖峰","平滑 → 去尖峰 → 裁切 → 歸一化 → 基線校正"],a:1,
+     e:"順序有物理理由：去尖峰要在平滑前（否則尖峰被抹成小丘刪不掉），歸一化必須最後（否則尺度又被改變）。"},
+    {q:"為什麼「去尖峰」一定要排在「平滑」之前？",
+     o:["平滑比較花時間，先做比較快","平滑會把 1–2 點寬的尖峰抹成小丘，外形變得像真峰就刪不掉了","去尖峰會產生新的雜訊，需要平滑收尾","兩者順序其實無所謂"],a:1,
+     e:"去尖峰演算法靠「異常窄」來辨識假訊號。一旦被平滑抹開，這個辨識特徵就消失了。"},
+    {q:"為什麼「歸一化」一定要放在最後一步？",
+     o:["因為它最花時間","因為它會把資料變成 0–1，其他步驟不能處理","因為後續的基線校正或平滑會再度改變強度尺度，等於白做","因為 RamanSPy 規定必須這樣寫"],a:2,
+     e:"歸一化的目的是把強度尺度固定下來，好讓不同樣品可比較。後面若還有改變強度的步驟，這個目的就失效了。"},
+    {q:"執行下面這段程式碼會發生什麼事？<CODE>rp.preprocessing.denoise.SavGol(window_length=10, polyorder=3)</CODE>",
+     o:["正常執行，視窗為 10 點","報錯，因為 window_length 必須是奇數","報錯，因為 polyorder 必須大於 window_length","正常執行，但會自動改成 11"],a:1,
+     e:"Savitzky–Golay 濾波需要對稱視窗，所以 window_length 必須是奇數。改成 9 或 11 即可。"},
+    {q:"你要偵測一個半高寬只有 8 cm⁻¹ 的窄峰，資料點間隔 2 cm⁻¹。下列哪個平滑設定最危險？",
+     o:["window_length=5","window_length=9","window_length=11","window_length=71"],a:3,
+     e:"71 點 × 2 cm⁻¹ = 142 cm⁻¹ 的視窗，遠寬於 8 cm⁻¹ 的峰，會把它完全抹平 —— 你用自己的前處理刪掉了要找的訊號。"},
+    {q:"執行 <C>rp.preprocessing.normalise.AUC()</C> 時出現 <C>AttributeError: module 'numpy' has no attribute 'trapz'</C>，正確的處理方式是？",
+     o:["重新安裝 ramanspy 就會好","NumPy 2.0 已移除 np.trapz，改用 MinMax() 或 Vector()，或降版 numpy&lt;2","把光譜先轉成 list 再傳進去","這是 Colab 的暫時性錯誤，重跑一次即可"],a:1,
+     e:"這是套件與 NumPy 版本相依造成的真實問題。看到 AttributeError 提到某個函式「不存在」，八成是版本差異，不是你的程式寫錯。"},
+    {q:"基線校正做得太「貼緊」光譜，最可能誤傷哪一種峰？",
+     o:["很窄很尖的峰，例如 676 cm⁻¹","很寬的真實峰，例如蛋白質的醯胺 I（約 1655 cm⁻¹）","位於光譜正中央的峰","強度最高的那個峰"],a:1,
+     e:"寬帶峰的形狀跟螢光背景相似，演算法容易把它當成背景一起減掉。判讀蛋白質二級結構時要特別小心這一點。"},
+    {q:"<C>processed.spectral_data.shape</C> 印出 <C>(60, 676)</C>，這代表什麼？",
+     o:["60 個波數點、676 個樣品","60 個樣品、每個樣品 676 個波數點","光譜範圍是 60 到 676 cm⁻¹","模型有 60 個參數、676 次迭代"],a:1,
+     e:"光譜矩陣的慣例是「列 = 樣品，欄 = 變數（波數）」。裁切到 450–1800、間隔 2 cm⁻¹ 就是 676 個點。"}
+  ]},
+
+  {id:"s3", cls:"violet", badge:"關卡三", title:"峰位判讀", from:"教材：峰位判讀", nb:"NB3_peak_assignment.ipynb", link:"teaching.html#peaks", qs:[
+    {q:"某未知粉末在 478 cm⁻¹ 有強峰，1745 cm⁻¹ 幾乎沒有訊號。最可能是什麼？",
+     o:["食用油","澱粉類","純蛋白質","三聚氰胺"],a:1,
+     e:"478 是澱粉的診斷峰；1745（酯基 C=O）缺席，排除油脂。判讀時「哪個峰不在」跟「哪個峰在」同樣重要。"},
+    {q:"奶粉樣品在 676 cm⁻¹ 出現明顯的峰，最可能代表什麼？",
+     o:["蛋白質含量偏高","乳糖結晶型改變","檢出三聚氰胺","樣品受潮"],a:2,
+     e:"676 cm⁻¹ 是三聚氰胺三嗪環呼吸振動的診斷峰，而奶粉基質在此處沒有峰 —— 這是一個乾淨的分析視窗。"},
+    {q:"1003 cm⁻¹ 這個峰在食品拉曼光譜裡常被拿來當「內標」，原因是什麼？",
+     o:["它是所有峰裡最強的","它來自苯丙胺酸的苯環呼吸，位置與強度都很穩定","它剛好在光譜正中央","它只在摻偽樣品中出現"],a:1,
+     e:"苯環呼吸振動受環境影響小，蛋白質樣品中位置與強度穩定，適合當比值的分母。油脂樣品則常用 1441（CH₂）。"},
+    {q:"一份報告只寫「樣品在 1655 cm⁻¹ 有強峰，故含大量不飽和脂肪」。這個推論的問題是？",
+     o:["1655 應該寫成 1656","1655 也可能是蛋白質的醯胺 I，必須先確認基質是什麼","不飽和脂肪應該看 1745","1655 是雜訊區，不能判讀"],a:1,
+     e:"同一波數在不同基質有不同歸屬 —— 這是判讀最常見的陷阱。永遠要看整張光譜的組合，不能只查一個峰。"},
+    {q:"油品 A 的 1265/1441 比值是 0.62，油品 B 是 0.28。哪一個不飽和度較高？",
+     o:["A","B","一樣","無法判斷，因為沒給 1745 的數值"],a:0,
+     e:"1265 對應順式 =C–H 面內變形，隨不飽和度上升；1441（CH₂）當內標。比值越高越不飽和。椰子油這類飽和油比值最低。"},
+    {q:"類胡蘿蔔素在橄欖油中只佔百萬分之幾，1523 cm⁻¹ 卻常是整張圖最強的峰。原因是？",
+     o:["類胡蘿蔔素分子特別大","共振拉曼增強：雷射波長接近它的電子吸收帶，散射截面放大 10³–10⁵ 倍","儀器在該波數靈敏度特別高","其他成分在該處都沒有訊號，所以顯得強"],a:1,
+     e:"這是「強度 ≠ 含量」最經典的例子。訊號強度同時取決於含量與散射截面，兩者可差好幾個數量級 —— 所以定量一定要做檢量線。"},
+    {q:"用 <C>rp.plot.peaks(spectrum, prominence=0.5)</C> 找峰，結果只找到 2 個峰。最合理的處理是？",
+     o:["換一台儀器重測","把 prominence 調小，例如 0.05，因為門檻設太高會漏掉小峰","把 prominence 調大到 1.0","改用 rp.plot.spectra() 就好"],a:1,
+     e:"prominence 是「多凸才算峰」的門檻。實務做法：先看你關心的診斷峰有多高，把門檻設在它的一半以下。"}
+  ]},
+
+  {id:"s4", cls:"coral", badge:"關卡四", title:"應用、定量與方法評估", from:"教材：摻偽篩檢 · 定量", nb:"NB4_melamine_screening.ipynb、NB5_oil_authentication.ipynb", link:"teaching.html#melamine", qs:[
+    {q:"判定閾值訂為「空白樣品平均值 + 3 × 標準差」，這對應的偽陽性率大約是多少？",
+     o:["約 5%","約 0.1%","約 50%","0%，不可能有偽陽性"],a:1,
+     e:"常態分佈下超過 +3SD 的機率約 0.13%。3SD 一般對應偵測極限 LOD；定量極限 LOQ 通常取 10SD。"},
+    {q:"我們算出的拉曼法 LOD ≈ 0.5%（約 5000 mg/kg），而 Codex 對三聚氰胺的限量是 2.5 mg/kg。正確結論是？",
+     o:["拉曼可以完全取代 LC-MS/MS","拉曼可作現場快篩抓大量摻假，但無法達到法規限值，需 SERS 或確認方法","把 LOD 的定義改成 1SD 就能符合法規","限量標準訂得太嚴格，不切實際"],a:1,
+     e:"差距超過兩千倍。認清方法的能力邊界，是分析化學專業判斷的核心 —— 這比會不會寫程式重要得多。"},
+    {q:"看到檢驗報告寫「三聚氰胺未檢出」，一位稱職的食品分析師應該追問什麼？",
+     o:["是誰簽名的","用的是哪一台儀器的廠牌","這個方法的偵測極限是多少，是否低於法規限量","樣品是幾點鐘送來的"],a:2,
+     e:"「未檢出」永遠只相對於某個偵測極限而言。沒有標示 LOD 的「未檢出」，在科學上等於沒有講話。"},
+    {q:"KMeans 分成兩群後，正常品和低濃度（0.2–0.45%）摻偽品被分在同一群。最合理的解釋是？",
+     o:["KMeans 演算法有 bug","應該改成 n_clusters=3","這些低濃度樣品的光譜差異低於偵測極限，在訊號上本來就分不開","前處理一定做錯了"],a:2,
+     e:"KMeans 是無監督的，它只照光譜相似度分堆，不知道你的標籤定義。分群對不上標籤，往往是在告訴你「這兩類在你量的訊號上分不開」——這是有價值的資訊。"},
+    {q:"PCA 分數圖把兩組樣品分得很開。下列哪一項是「還不能下結論」的最強理由？",
+     o:["分數圖的顏色不夠明顯","還沒檢查負荷量，無法確認模型抓的是化學訊號而非量測批次等假相關","PCA 只能用在光譜以外的資料","主成分數量必須大於 10 才有效"],a:1,
+     e:"分數圖分得開很容易，過度配適與假相關也很容易。必須（a）看負荷量確認化學合理性、（b）用交叉驗證或獨立驗證集。"},
+    {q:"PLS 模型的 LV 從 4 增加到 10 後，訓練誤差持續下降，但 RMSECV 反而上升。這是什麼現象？",
+     o:["配適不足（underfitting）","過度配適（overfitting）","基線漂移","偽陽性"],a:1,
+     e:"模型開始把雜訊也背下來。所以選 LV 要看 RMSECV 曲線的最低點，而不是訓練誤差。"},
+    {q:"橄欖油摻葵花油的 PLS 模型 RMSECV = 3.3%。這個方法能不能可靠偵測 2% 的摻混？",
+     o:["可以，因為 R² 高達 0.95","不能，2% 完全落在 ±3.3 個百分點的誤差範圍內","可以，只要多測幾次取平均","無法判斷，需要知道樣品重量"],a:1,
+     e:"R² 高不代表誤差小。要判斷方法能不能用，看的是 RMSECV 與你要求的偵測水準的關係；實用偵測下限大約落在 RMSECV 的 3 倍。"},
+    {q:"把一個奶粉樣品丟進「四種食用油」的分類模型，會發生什麼？實務上該怎麼防？",
+     o:["模型會回報「無法辨識」，不需額外處理","模型會硬歸到四類油之一且可能給出高信心值，需加上適用範圍（applicability domain）檢查","模型會直接報錯中斷","模型會自動新增第五類"],a:1,
+     e:"分類模型只會在學過的類別裡挑一個 —— 它不會說「我不知道」。實務上要用光譜殘差或馬氏距離判斷樣品是否落在訓練集範圍內。"}
+  ]}
+];
+
+
+const TOTAL = STAGES.reduce((n,s)=>n+s.qs.length,0);
+let answers = {};
+
+function esc(t){
+  return t.replace(/<C>([\s\S]*?)<\/C>/g, (m,c)=>'<code>'+c+'</code>')
+          .replace(/<CODE>([\s\S]*?)<\/CODE>/g, (m,c)=>'</p><pre><code class="language-python">'+c.trim()+'</code></pre><p class="qt">');
+}
+
+function render(){
+  const root = document.getElementById('quiz');
+  root.innerHTML = '';
+  let n = 0;
+  STAGES.forEach(st=>{
+    const sec = document.createElement('section');
+    sec.innerHTML = '<div class="stage-head"><span class="badge '+(st.cls||'')+'">'+st.badge+'</span>'+
+      '<h3>'+st.title+'</h3><span class="from">'+st.from+'</span></div>';
+    st.qs.forEach((item, i)=>{
+      n++;
+      const key = st.id+'_'+i;
+      const div = document.createElement('div');
+      div.className = 'q';
+      div.dataset.key = key; div.dataset.stage = st.id;
+      let html = '<div class="qn">Q'+String(n).padStart(2,'0')+'</div><p class="qt">'+esc(item.q)+'</p>';
+      item.o.forEach((opt, j)=>{
+        html += '<label class="opt" data-i="'+j+'"><input type="radio" name="'+key+'" value="'+j+'">'+opt+'</label>';
+      });
+      html += '<div class="fb"></div>';
+      div.innerHTML = html;
+      div.querySelectorAll('input').forEach(inp=>{
+        inp.addEventListener('change', ()=>choose(div, item, parseInt(inp.value)));
+      });
+      sec.appendChild(div);
+    });
+    root.appendChild(sec);
+  });
+  if (window.hljs) hljs.highlightAll();
+  updateProgress();
+}
+
+function choose(div, item, picked){
+  if(div.classList.contains('done')) return;
+  div.classList.add('done');
+  answers[div.dataset.key] = {stage: div.dataset.stage, ok: picked === item.a};
+  div.querySelectorAll('.opt').forEach(l=>{
+    const i = parseInt(l.dataset.i);
+    if(i === item.a) l.classList.add('right');
+    else if(i === picked) l.classList.add('wrong');
+    l.querySelectorAll('input').forEach(x=>x.disabled = true);
+  });
+  const fb = div.querySelector('.fb');
+  fb.className = 'fb ' + (picked === item.a ? '' : 'no');
+  fb.innerHTML = '<b>'+(picked === item.a ? '答對了' : '再想一下')+'</b><br>'+item.e;
+  updateProgress();
+}
+
+function updateProgress(){
+  const done = Object.keys(answers).length;
+  document.getElementById('pcount').textContent = '已作答 '+done+' / '+TOTAL;
+  document.getElementById('pbar').style.width = (done/TOTAL*100)+'%';
+}
+
+document.getElementById('submit').addEventListener('click', ()=>{
+  const done = Object.keys(answers).length;
+  if(done < TOTAL){
+    alert('還有 '+(TOTAL-done)+' 題沒作答。全部答完才能計分。');
+    const first = document.querySelector('.q:not(.done)');
+    if(first) first.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  const per = {};
+  STAGES.forEach(s=> per[s.id] = {right:0, total:s.qs.length});
+  let right = 0;
+  Object.values(answers).forEach(a=>{ if(a.ok){ right++; per[a.stage].right++; } });
+  const score = Math.round(right/TOTAL*100);
+
+  document.getElementById('score').textContent = score + ' 分';
+  const v = document.getElementById('verdict');
+  if(score >= 90) v.textContent = '通過 —— 你已經可以獨立判讀一份食品拉曼報告了。';
+  else if(score >= 70) v.textContent = '通過 —— 觀念站穩了，把下面標示的關卡再看一次會更紮實。';
+  else v.textContent = '尚未通過（門檻 70 分）—— 回去複習下面列出的段落，再重做一次。';
+
+  document.getElementById('bars').innerHTML = STAGES.map(s=>{
+    const p = per[s.id], pct = Math.round(p.right/p.total*100);
+    return '<div class="bar"><span>'+s.title+'</span>'+
+      '<span class="track"><i style="width:'+pct+'%"></i></span>'+
+      '<span class="num">'+p.right+'/'+p.total+'</span></div>';
+  }).join('');
+
+  const weak = STAGES.filter(s=> per[s.id].right/per[s.id].total < 0.7);
+  document.getElementById('advice').innerHTML = weak.length === 0
+    ? '<span class="tag">下一步</span>　每一關都在 70% 以上。拿 <code>unknown_samples.csv</code> 的六個未知樣品寫一份書面判讀報告，每個結論都要指出你倚靠的是哪一個波數、以及你怎麼排除其他可能。'
+    : '<span class="tag">建議優先複習</span><ul>' + weak.map(s=>
+        '<li>「'+s.title+'」→ <a href="'+s.link+'">回教材對應段落</a>，並重跑 <code>'+s.nb+'</code></li>').join('') + '</ul>';
+
+  const r = document.getElementById('result');
+  r.classList.add('show');
+  r.scrollIntoView({behavior:'smooth'});
+});
+
+document.getElementById('reset').addEventListener('click', ()=>{
+  answers = {};
+  document.getElementById('result').classList.remove('show');
+  render();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+render();
+</script>
+</body>
+</html>

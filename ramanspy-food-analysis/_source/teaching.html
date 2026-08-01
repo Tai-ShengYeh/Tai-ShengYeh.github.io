@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RamanSPy × 食品分析 — 從分子指紋到摻偽鑑別</title>
+<meta name="description" content="給零程式基礎的食品營養系學生：拉曼光譜原理、前處理、峰位判讀、奶粉三聚氰胺篩檢與橄欖油摻混定量。含五個互動實驗台、完整程式碼與線上測驗。">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+
+<nav>
+  <span class="brand">RamanSPy × 食品分析 <b>·</b> 摻偽鑑別</span>
+  <a href="#why">為什麼</a>
+  <a href="#principle">原理</a>
+  <a href="#mix">合成光譜</a>
+  <a href="#prep">前處理</a>
+  <a href="#peaks">峰位判讀</a>
+  <a href="#melamine">摻偽篩檢</a>
+  <a href="#quant">定量</a>
+  <a href="#code">完整程式碼</a>
+  <a href="#data">數據來源</a>
+  <a href="#notebook">Notebook</a>
+  <a href="quiz.html">測驗</a>
+</nav>
+
+<header class="hero">
+  <h1>看懂一條光譜，<br>就能抓出<span class="accent">一次食品詐欺</span></h1>
+  <p class="sub">
+    這門課從零開始教你用 RamanSPy 讀懂食品的拉曼光譜。不需要程式基礎 ——
+    整頁的五個互動實驗台可以直接拉滑桿玩，每一段都附上對應的 Python 程式碼，
+    想動手再打開 Notebook。
+  </p>
+  <div class="facts">
+    <div class="fact"><b>5</b><span>互動實驗台</span></div>
+    <div class="fact"><b>5</b><span>Jupyter Notebook</span></div>
+    <div class="fact"><b>6</b><span>光譜資料集</span></div>
+    <div class="fact"><b>30</b><span>題自動計分測驗</span></div>
+  </div>
+  <div class="btnrow">
+    <a class="btn" href="#mix">先玩玩看 ↓</a>
+    <a class="btn ghost" href="#notebook">下載 Notebook</a>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================== WHY ============================== -->
+<section id="why">
+  <div class="kicker">Big picture</div>
+  <h2>食品分析為什麼要用拉曼光譜</h2>
+  <p class="lead">
+    拉曼光譜把食品裡的分子振動轉成一條「指紋」。不同成分 —— 脂肪、蛋白質、醣類、色素、添加物 ——
+    會讓特定波數區域變強或變弱，因此可用於快速篩檢、摻偽判別、品質監測與異物鑑別。
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <span class="tag">spectrum</span>
+      <h3>🧬 像食品的條碼</h3>
+      <p>每個樣品得到一條 intensity 對 Raman shift 的曲線。峰的位置對應分子的振動模式，跟雷射波長無關。</p>
+    </div>
+    <div class="card">
+      <span class="tag coral">水干擾小</span>
+      <h3>💧 不怕水</h3>
+      <p>水的拉曼訊號極弱，乳品、飲料、生鮮可以直接測，不用乾燥或萃取。這是它勝過紅外光譜的最大優勢。</p>
+    </div>
+    <div class="card">
+      <span class="tag gold">reproducible</span>
+      <h3>🔁 流程可重現</h3>
+      <p>RamanSPy 把讀檔、前處理、分析、繪圖整合成一致的介面，整套流程可以寫成一份能重跑的 Notebook。</p>
+    </div>
+  </div>
+
+  <h3>跟紅外光譜比，該怎麼選</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th></th><th>拉曼</th><th>紅外（IR / NIR）</th></tr></thead>
+    <tbody>
+      <tr><td><b class="teal">選擇律</b></td><td>需<b>極化率</b>改變</td><td>需<b>偶極矩</b>改變</td></tr>
+      <tr><td><b class="teal">強訊號來自</b></td><td>非極性、對稱鍵：C=C、C–C、S–S、環呼吸</td><td>極性鍵：O–H、C=O、N–H</td></tr>
+      <tr><td><b class="teal">水的干擾</b></td><td class="yes">極小</td><td class="no">很大</td></tr>
+      <tr><td><b class="teal">樣品前處理</b></td><td class="yes">幾乎不用，可隔玻璃或塑膠袋測</td><td>常需研磨、壓片或 ATR 貼合</td></tr>
+      <tr><td><b class="teal">最大缺點</b></td><td class="no">螢光背景；訊號本身很弱</td><td class="no">水干擾；穿透深度淺</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout">
+    <p><span class="tag">結論</span>　拉曼與 IR 是<b>互補</b>的。IR 上很弱的 C=C（不飽和度）在拉曼上很強，
+    這正是拉曼特別適合<b>油脂</b>分析的原因；而不怕水讓它適合<b>乳品、飲料、生鮮</b>的現場快篩。</p>
+  </div>
+</section>
+
+<!-- ============================== PRINCIPLE ============================== -->
+<section id="principle">
+  <div class="kicker">Principle</div>
+  <h2>分子指紋是怎麼來的</h2>
+  <p>
+    用單一波長的雷射照樣品，絕大多數光子被<b>彈性散射</b>（Rayleigh），能量沒變。
+    但每一千萬個光子裡大約有一個會跟分子的振動交換能量，散射出來的光子能量變了 —— 這就是<b>拉曼散射</b>。
+  </p>
+  <div class="eq">拉曼位移 (cm⁻¹) = 1/λ<sub>雷射</sub> − 1/λ<sub>散射</sub></div>
+  <p>
+    因為它是「差值」，所以<b>與雷射波長無關</b>：同一物質用 532 nm 或 785 nm 測，峰的位置一樣。
+    這也是拉曼光譜能建立通用資料庫、能跨儀器比對的原因。
+  </p>
+
+  <figure>
+    <img src="img/fig04_fingerprints.png" alt="六種食品常見成分的純物質拉曼參考光譜疊圖">
+    <figcaption>六種食品常見成分的拉曼指紋。判讀未知樣品時，就是拿它跟這些參考光譜比對。<b>478</b> 是澱粉、<b>676</b> 是三聚氰胺、<b>1523</b> 是類胡蘿蔔素。</figcaption>
+  </figure>
+
+  <h3>兩個軸各代表什麼</h3>
+  <ul>
+    <li><b>X 軸：拉曼位移（cm⁻¹）</b> —— 對應「哪一種鍵在振動」。這是分子的身分證，位置固定。</li>
+    <li><b>Y 軸：強度（a.u.）</b> —— 大致對應「有多少」，但單位是<b>任意單位</b>。雷射功率、曝光時間、對焦深度都會改變它，所以<b>不同次量測的絕對強度不能直接比較</b>。</li>
+  </ul>
+  <div class="callout gold">
+    <p><span class="tag">常見誤解</span>　「A 樣品的 1085 峰高 3200，B 只有 1800，所以 A 的醣類比較多。」——
+    錯。沒有歸一化、沒有內標，這兩個數字不能比。</p>
+  </div>
+</section>
+
+<!-- ============================== 互動 1 ============================== -->
+<section id="mix">
+  <div class="kicker">互動實驗台 01</div>
+  <h2>混合物的光譜＝各成分的疊加</h2>
+  <p class="lead">
+    食品是複雜混合物。把下面六種成分的比例拉一拉，看混出來的光譜長什麼樣，
+    以及程式自動找到的峰對應到哪一個分子。
+  </p>
+
+  <div class="lab">
+    <div class="lab-head"><span class="chip">拉滑桿</span><h4>合成光譜實驗室</h4></div>
+    <p class="hint">試試看：先只留乳糖，再慢慢加入三聚氰胺 —— 注意 676 cm⁻¹ 什麼時候開始被偵測到。</p>
+    <div class="lab-body">
+      <div class="controls">
+        <div class="ctl"><label>乳糖（醣類）<span class="val" id="mLacv">80%</span></label><input type="range" id="mLac" min="0" max="100" value="80"></div>
+        <div class="ctl"><label>酪蛋白（蛋白質）<span class="val" id="mCasv">35%</span></label><input type="range" id="mCas" min="0" max="100" value="35"></div>
+        <div class="ctl"><label>澱粉<span class="val" id="mStav">0%</span></label><input type="range" id="mSta" min="0" max="100" value="0"></div>
+        <div class="ctl"><label>油脂<span class="val" id="mOilv">0%</span></label><input type="range" id="mOil" min="0" max="100" value="0"></div>
+        <div class="ctl"><label>類胡蘿蔔素<span class="val" id="mCarv">0%</span></label><input type="range" id="mCar" min="0" max="100" value="0"></div>
+        <div class="ctl"><label>三聚氰胺<span class="val" id="mMelv">0%</span></label><input type="range" id="mMel" min="0" max="100" value="0"></div>
+      </div>
+      <div>
+        <div class="canvas-box" style="height:300px"><canvas id="cvMix"></canvas></div>
+        <div class="readout" id="mixPeaks"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout coral">
+    <p><span class="tag">注意</span>　把「類胡蘿蔔素」只拉到 5%，1523 cm⁻¹ 就已經很明顯了。
+    這是<b>共振拉曼增強（resonance Raman scattering, RRS）</b> —— 當雷射波長落在分子的電子吸收帶內，散射截面會放大數個數量級。類胡蘿蔔素是這個現象最經典的例子，1970 年就有人在完整的植物組織裡直接測到<a href="#refs" class="ref">[1]</a>。<br><b>沒有一個放諸四海的倍率</b>：增強程度取決於雷射與吸收帶的接近程度。有研究用 488、514、532、633 nm 分別激發 β-胡蘿蔔素，發現 488／514 nm 的共振增強最強，但 <b>532 nm 才是最佳選擇</b> —— 增強適中，同時螢光與自吸收都比較低<a href="#refs" class="ref">[2]</a>。這正是食品拉曼常用 532 nm 的原因。
+    所以<b>峰很強不等於含量很多</b>，要講濃度就一定得做檢量線。</p>
+  </div>
+
+  <p class="codecap">對應程式碼　<b>NB1 · 建立光譜物件並畫出來</b></p>
+<pre><code class="language-python">import pandas as pd
+import ramanspy as rp
+
+raw = pd.read_csv("data/milk_powder_raw_single.csv")
+x = raw["raman_shift_cm-1"].values     # X 軸：拉曼位移
+y = raw["intensity"].values            # Y 軸：強度
+
+spectrum = rp.Spectrum(y, x)           # ⚠ 先強度、後波數，順序別寫反
+rp.plot.spectra(spectrum, title="奶粉（原始光譜）")
+rp.plot.show()</code></pre>
+</section>
+
+<!-- ============================== 互動 2 ============================== -->
+<section id="prep">
+  <div class="kicker">互動實驗台 02</div>
+  <h2>前處理：五個步驟，順序不能亂</h2>
+  <p class="lead">
+    儀器直接吐出來的光譜有三個問題：螢光背景、宇宙射線尖峰、隨機雜訊。
+    <b>前處理沒做好，後面所有統計結果都是精美的垃圾。</b>
+  </p>
+
+  <figure>
+    <img src="img/fig01_raw.png" alt="原始奶粉拉曼光譜，標示螢光背景、宇宙射線尖峰與真實拉曼峰">
+    <figcaption>儀器直接輸出的光譜。真正的化學資訊只佔其中一小部分，其餘三個都是必須先處理掉的干擾。</figcaption>
+  </figure>
+
+  <ol class="steps">
+    <li><b>裁切 Cropper</b>　切掉兩端只有雜訊的區段，食品分析慣例留 400–1800 cm⁻¹ 的指紋區。</li>
+    <li><b>去尖峰 WhitakerHayes</b>　真峰有寬度，宇宙射線只有 1–2 點寬。<b>必須排在平滑之前</b> —— 一旦被平滑抹成小丘，就再也刪不掉了。</li>
+    <li><b>平滑 SavGol</b>　壓低雜訊。視窗開太大會把窄峰抹平，這是最常見的自傷。</li>
+    <li><b>基線校正 IModPoly</b>　扣掉螢光背景。做過頭會把寬帶的真實峰（例如醯胺 I）也當背景減掉。</li>
+    <li><b>歸一化 MinMax</b>　讓不同樣品可比較。<b>一定要放最後</b>，否則尺度又被後面的步驟改掉。</li>
+  </ol>
+
+  <div class="lab">
+    <div class="lab-head"><span class="chip">拉滑桿</span><h4>前處理實驗台</h4></div>
+    <p class="hint">灰色虛線是處理前、湖綠是處理後。試試看：把平滑視窗拉到 41 點以上，盯著 676 cm⁻¹ 那個峰。</p>
+    <div class="lab-body">
+      <div class="controls">
+        <div class="ctl"><label>螢光背景強度<span class="val" id="pFluorv">1.8×</span></label><input type="range" id="pFluor" min="0" max="30" value="18"></div>
+        <div class="ctl"><label>雜訊<span class="val" id="pNoisev">0.020</span></label><input type="range" id="pNoise" min="0" max="50" value="20"></div>
+        <div class="ctl"><label>平滑視窗<span class="val" id="pSmoothv">9 點</span></label>
+          <input type="range" id="pSmooth" min="0" max="5" value="1" step="1"></div>
+        <div class="ctl switch">
+          <input type="checkbox" id="pBase" checked>
+          <label for="pBase">基線校正（去螢光）</label>
+        </div>
+        <div class="ctl switch">
+          <input type="checkbox" id="pNorm" checked>
+          <label for="pNorm">歸一化 MinMax</label>
+        </div>
+      </div>
+      <div>
+        <div class="canvas-box" style="height:300px"><canvas id="cvPrep"></canvas></div>
+        <div class="readout">
+          <div class="t-teal"><b id="pOut1085">—</b><span>1085 cm⁻¹ 乳糖峰</span></div>
+          <div class="t-coral"><b id="pOut676">—</b><span>676 cm⁻¹ 三聚氰胺峰</span></div>
+          <div class="t-gold"><b id="pOutRatio">—</b><span>676 峰的半高寬</span></div>
+        </div>
+        <div class="verdict-box" id="pWarn"></div>
+      </div>
+    </div>
+  </div>
+
+  <figure>
+    <img src="img/fig03_oversmooth.png" alt="不同平滑視窗下 676 波數峰的變化">
+    <figcaption>平滑的災難現場。<code>window_length</code> 從 9 加到 71，三聚氰胺的 676 cm⁻¹ 診斷峰幾乎消失 —— <b>你用自己的前處理刪掉了要找的東西</b>。</figcaption>
+  </figure>
+
+  <div class="callout coral">
+    <p><span class="tag">實用原則</span>　平滑視窗涵蓋的波數範圍，要<b>明顯小於你要偵測的峰的半高寬</b>。
+    寧可留一點雜訊 —— 雜訊還能靠平均多條光譜壓下去，抹掉的峰救不回來。</p>
+  </div>
+
+  <p class="codecap">對應程式碼　<b>NB2 · 把五個步驟串成一條 Pipeline</b></p>
+<pre><code class="language-python">pipeline = rp.preprocessing.Pipeline([
+    rp.preprocessing.misc.Cropper(region=(450, 1800)),               # ① 裁切
+    rp.preprocessing.despike.WhitakerHayes(),                        # ② 去宇宙射線
+    rp.preprocessing.denoise.SavGol(window_length=9, polyorder=3),   # ③ 平滑
+    rp.preprocessing.baseline.IModPoly(),                            # ④ 基線校正
+    rp.preprocessing.normalise.MinMax(),                             # ⑤ 歸一化
+])
+
+processed = pipeline.apply(spectra)   # 同一條 pipeline 直接套整批 60 個樣品
+print(processed.spectral_data.shape)  # (60, 676) → (樣品數, 波數點數)</code></pre>
+
+  <details>
+    <summary>基線校正方法怎麼挑？</summary>
+    <table>
+      <thead><tr><th>方法</th><th>特性</th><th>適用</th></tr></thead>
+      <tbody>
+        <tr><td><code>IModPoly()</code></td><td>多項式迭代，穩定、快、參數少</td><td>一般食品樣品（本課程預設）</td></tr>
+        <tr><td><code>ASLS()</code> / <code>ASPLS()</code></td><td>懲罰最小平方，彈性大</td><td>背景形狀複雜、不像多項式時</td></tr>
+        <tr><td><code>AIRPLS()</code></td><td>自適應加權迭代</td><td>螢光極強、背景起伏大時</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:16px"><b>已知地雷：</b><code>normalise.AUC()</code> 在 NumPy 2.0 以上會拋出
+    <code>AttributeError: module 'numpy' has no attribute 'trapz'</code>，因為 <code>np.trapz</code> 已被移除。
+    本課程改用 <code>MinMax()</code> 或 <code>Vector()</code>。</p>
+  </details>
+</section>
+
+<!-- ============================== 互動 3 ============================== -->
+<section id="peaks">
+  <div class="kicker">互動實驗台 03</div>
+  <h2>峰位判讀：食品分析師真正的價值</h2>
+  <p class="lead">
+    會跑程式的人很多，看得懂峰位代表什麼分子的人才值錢。這一段把光譜接回化學。
+  </p>
+
+  <h3>必背的食品特徵峰</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>波數 (cm⁻¹)</th><th>振動歸屬</th><th>在食品裡代表</th></tr></thead>
+    <tbody>
+      <tr><td><span class="wn">478</span></td><td>C–C–O / 環變形</td><td><b class="coral">澱粉</b>（診斷峰）</td></tr>
+      <tr><td><span class="wn">676</span></td><td>三嗪環呼吸</td><td><b class="coral">三聚氰胺</b> — 三嗪環 ring breathing II <a href="#refs" class="ref">[8,12]</a></td></tr>
+      <tr><td><span class="wn">850 / 1085 / 1125</span></td><td>C–C、C–O 伸縮</td><td>醣類（乳糖、蔗糖）</td></tr>
+      <tr><td><span class="wn">1003</span></td><td>苯環呼吸（苯丙胺酸）</td><td><b class="teal">蛋白質</b> — 強度穩定，常當內標</td></tr>
+      <tr><td><span class="wn">1156 / 1523</span></td><td>C–C / C=C 共軛鏈</td><td><b class="gold">類胡蘿蔔素</b> — ν₂ / ν₁ 共振增強帶 <a href="#refs" class="ref">[3,4]</a></td></tr>
+      <tr><td><span class="wn">1265</span></td><td>=C–H 面內變形（順式）</td><td>油脂<b>不飽和度</b></td></tr>
+      <tr><td><span class="wn">1301</span></td><td>CH₂ 扭曲</td><td>油脂飽和鏈</td></tr>
+      <tr><td><span class="wn">1441</span></td><td>CH₂ 剪式變形</td><td>油脂總量 — 常當內標</td></tr>
+      <tr><td><span class="wn">1655</span></td><td>C=C 伸縮 <b>或</b> 醯胺 I</td><td>不飽和脂肪 <b>或</b> 蛋白質二級結構</td></tr>
+      <tr><td><span class="wn">1745</span></td><td>C=O 伸縮（酯）</td><td>三酸甘油酯</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout gold">
+    <p><span class="tag">陷阱</span>　<b>1655 cm⁻¹</b> 在油脂樣品裡是 C=C，在蛋白質樣品裡是醯胺 I。
+    同一個波數、兩種完全不同的歸屬 —— <b>不先確認基質是什麼，就不能判讀單一波數</b>。</p>
+  </div>
+
+  <div class="lab">
+    <div class="lab-head"><span class="chip">動手判讀</span><h4>未知樣品判讀器</h4></div>
+    <p class="hint" id="unkId"></p>
+    <div class="lab-body wide">
+      <div>
+        <div class="canvas-box" style="height:290px"><canvas id="cvUnk"></canvas></div>
+        <div class="choices" id="unkChoices"></div>
+        <div class="feedback" id="unkFb"></div>
+        <div class="btnrow"><button class="btn ghost" id="unkNext">換下一個樣品 →</button></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="codecap">對應程式碼　<b>NB3 · 讓程式自動找峰</b></p>
+<pre><code class="language-python">ax, peaks, props = rp.plot.peaks(one_spectrum, prominence=0.05, return_peaks=True)
+rp.plot.show()
+print(peaks)      # → [ 676. 1003. 1085. 1441. ...]
+
+# prominence 是「多凸才算一個峰」的門檻：
+#   設太小 → 雜訊全被當成峰
+#   設太大 → 小而重要的摻偽物峰被漏掉
+# 實務做法：先看你關心的診斷峰有多高，把門檻設在它的一半以下。</code></pre>
+</section>
+
+<!-- ============================== 互動 4 ============================== -->
+<section id="melamine">
+  <div class="kicker">互動實驗台 04</div>
+  <h2>奶粉三聚氰胺篩檢：以及這個方法的極限</h2>
+  <p class="lead">
+    2008 年毒奶粉事件中，不肖業者加入三聚氰胺以虛增凱氏定氮法測到的「蛋白質」。
+    拉曼能不能當快篩？我們用 60 個樣品實際檢驗，並誠實回答它夠不夠格。
+  </p>
+
+  <h3>為什麼選 676 cm⁻¹</h3>
+  <p>
+    好的診斷峰要同時滿足兩個條件：<b>（一）它是目標物最強的峰；（二）基質在那裡沒有峰。</b>
+    三聚氰胺的三嗪環呼吸（ring breathing II）在 676 cm⁻¹，而奶粉基質（乳糖、酪蛋白）在此處剛好空白 ——
+    這叫<b>乾淨的分析視窗</b>。文獻上這個峰報導在 <b>674–685 cm⁻¹</b> 之間，指認為三嗪環的面內變形<a href="#refs" class="ref">[11,12]</a>；在 SERS 條件下會位移到 ~697–707 cm⁻¹，因為分子是以環上的氮吸附在銀表面、且吸附角度隨濃度改變<a href="#refs" class="ref">[13]</a>。比對資料庫時務必確認激發條件與是否用了增強基材。
+  </p>
+
+  <div class="lab">
+    <div class="lab-head"><span class="chip">拉滑桿</span><h4>摻偽偵測模擬器</h4></div>
+    <p class="hint">左圖是 676 cm⁻¹ 附近的放大光譜，右圖的黑點是 60 個真實樣品的實測值。拉動濃度看什麼時候才會被判定「檢出」。</p>
+    <div class="lab-body wide">
+      <div class="ctl" style="max-width:420px">
+        <label>加入的三聚氰胺濃度<span class="val" id="melPctv">0.00 %</span></label>
+        <input type="range" id="melPct" min="0" max="500" value="0" step="5">
+      </div>
+      <div class="grid g2" style="margin:16px 0 0">
+        <div class="canvas-box" style="height:270px"><canvas id="cvMel"></canvas></div>
+        <div class="canvas-box" style="height:270px"><canvas id="cvDose"></canvas></div>
+      </div>
+      <div class="readout">
+        <div class="t-coral"><b id="melPeak">—</b><span>676 cm⁻¹ 峰強度</span></div>
+        <div class="t-teal"><b id="melTh">—</b><span>判定閾值（空白＋3SD）</span></div>
+        <div class="t-gold"><b id="melLod">—</b><span>本方法偵測極限 LOD</span></div>
+        <div><b id="melPpm">—</b><span>換算濃度</span></div>
+      </div>
+      <div class="verdict-box" id="melVerdict"></div>
+    </div>
+  </div>
+
+  <p class="codecap">對應程式碼　<b>NB4 · 用空白樣品訂判定閾值</b></p>
+<pre><code class="language-python">i676   = np.argmin(abs(axis - 676))
+peak676 = X[:, i676]
+
+blank     = peak676[meta.label == "normal"]      # 20 個空白樣品
+threshold = blank.mean() + 3 * blank.std()       # 分析化學的標準做法
+detected  = peak676 > threshold
+
+lod = meta.melamine_pct[detected & (meta.melamine_pct > 0)].min()
+print(f"判定閾值 = {threshold:.4f}")
+print(f"實務偵測極限 LOD ≈ {lod:.2f} %")</code></pre>
+
+  <div class="callout coral">
+    <p><span class="tag">這門課最重要的一段</span>　我們算出 <b>LOD ≈ 0.5%</b>，也就是約 <b>5,000 mg/kg</b>。
+    而 Codex 對三聚氰胺的限量是：<b>粉狀嬰兒配方 1 mg/kg</b>、液態嬰兒配方 <b>0.15 mg/kg</b>、其他食品與飼料 <b>2.5 mg/kg</b><a href="#refs" class="ref">[14]</a>。
+    <b>差距超過兩千倍。</b></p>
+    <p>所以正確結論是：一般拉曼可以當<b>現場快篩</b>，抓出明目張膽的大量摻假；
+    但它<b>不能</b>取代 LC-MS/MS 這類法規確認方法。要逼近法規限值需要 <b>SERS（表面增強拉曼）</b>，
+    銀膠可達 10⁵ 倍以上的增強<a href="#refs" class="ref">[9]</a>，實測已能把牛奶中三聚氰胺的定量極限壓到 <b>0.5 µg/mL</b><a href="#refs" class="ref">[9]</a>；用金奈米指狀基材甚至可在嬰兒配方中達到 <b>100 ppb（0.1 mg/kg）</b>，低於 FDA 的 1 ppm 容許值<a href="#refs" class="ref">[10]</a>。換句話說，<b>要達到法規限值，需要的不是更好的資料處理，而是換一種量測方式</b>。</p>
+    <p><b>「未檢出」不等於「沒有」。</b>任何檢驗報告都必須同時標示方法的偵測極限，否則這句話沒有意義。</p>
+  </div>
+
+  <h3>PCA：不給答案，機器能自己看出什麼</h3>
+  <figure>
+    <img src="img/fig07_pca.png" alt="PCA 分數圖與 PC1 負荷量">
+    <figcaption>左：分數圖，樣品自動排成一條濃度軸（PC1 與濃度相關係數 0.99）。右：PC1 負荷量 —— <b>模型盯的正是 676 cm⁻¹</b>，化學上說得通。</figcaption>
+  </figure>
+  <div class="callout">
+    <p><span class="tag">專家第一個會問</span>　分數圖分得開，不代表模型是對的 ——
+    它有可能抓到的是「兩組樣品在不同天量測」這種假訊號。<b>一定要看負荷量</b>，確認模型倚重的波數在化學上說得通。</p>
+  </div>
+
+  <p class="codecap">對應程式碼　<b>NB4 · PCA 與分群</b></p>
+<pre><code class="language-python">pca = rp.analysis.decompose.PCA(n_components=3)
+projections, components = pca.apply(processed)
+pc1, pc2, pc3 = projections          # ⚠ 回傳的是 list，projections[0] 才是 PC1 分數
+
+# KMeans 回傳的是「到各群中心的距離」，不是標籤
+distances, centers = rp.analysis.cluster.KMeans(n_clusters=2).apply(processed)
+labels = np.argmin(np.array(distances), axis=0)</code></pre>
+  <p>
+    分群結果會把「正常品＋低濃度摻偽品」歸成一群，跟標籤對不起來。這不是演算法壞掉 ——
+    KMeans 是<b>無監督</b>的，它只照光譜相似度分堆，而 0.2% 的樣品光譜本來就跟正常品幾乎一樣。
+    <b>分群對不上標籤，通常是在告訴你：這兩類在你量的訊號上本來就分不開。</b>
+  </p>
+</section>
+
+<!-- ============================== 互動 5 ============================== -->
+<section id="quant">
+  <div class="kicker">互動實驗台 05</div>
+  <h2>定量：橄欖油裡摻了多少葵花油</h2>
+  <p class="lead">
+    橄欖油摻便宜油是全球最常見的食品詐欺之一。50 個樣品、摻入比例 0–50%，
+    這是典型的<b>多變量校正</b>問題，標準工具是 PLS 迴歸。
+  </p>
+
+  <figure>
+    <img src="img/fig08_oils.png" alt="四種食用油的平均光譜與 PCA 分數圖">
+    <figcaption>左：四種油的平均光譜，差異集中在 1265、1523、1656。右：PCA 分數圖，椰子油（飽和度最高）離群最遠。PCA-LDA 五折交叉驗證正確率 <b>96.7%</b>。</figcaption>
+  </figure>
+
+  <div class="callout gold">
+    <p><span class="tag">先試最簡單的</span>　不動用任何機器學習，光是 <b>1265 / 1441 比值</b>（不飽和度指標）
+    就能分開大部分油品。簡單方法有效時，它更好解釋、更好轉移到別台儀器、也更好通過查核。</p>
+  </div>
+
+  <div class="lab">
+    <div class="lab-head"><span class="chip">拉滑桿</span><h4>PLS 潛在變數選擇器</h4></div>
+    <p class="hint">PLS 只有一個關鍵決策：用幾個潛在變數。太少配適不足、太多過度配適。拉拉看，找 RMSECV 的最低點。</p>
+    <div class="lab-body wide">
+      <div class="ctl" style="max-width:420px">
+        <label>潛在變數個數<span class="val" id="plsLvv">LV = 4</span></label>
+        <input type="range" id="plsLv" min="1" max="10" value="4" step="1">
+      </div>
+      <div class="grid g2" style="margin:16px 0 0">
+        <div class="canvas-box" style="height:270px"><canvas id="cvRms"></canvas></div>
+        <div class="canvas-box" style="height:270px"><canvas id="cvScat"></canvas></div>
+      </div>
+      <div class="readout">
+        <div class="t-coral"><b id="plsRmse">—</b><span>RMSECV（交叉驗證誤差）</span></div>
+        <div class="t-teal"><b id="plsR2">—</b><span>R²</span></div>
+        <div class="t-gold"><b id="plsLimit">—</b><span>實用偵測下限（≈3×RMSECV）</span></div>
+      </div>
+      <div class="verdict-box" id="plsVerdict"></div>
+    </div>
+  </div>
+
+  <div class="callout coral">
+    <p><span class="tag">把數字翻譯成人話</span>　RMSECV = 3.3% 代表誤差約 ±3.3 個百分點，
+    這個方法<b>無法可靠偵測 2% 的摻混</b>。實用偵測下限大約落在 RMSECV 的 3 倍，也就是 10% 左右 ——
+    抓得到大額摻假，抓不到少量摻混。這與文獻上一般拉曼（非 SERS）的表現是同一個數量級。</p>
+  </div>
+
+  <p class="codecap">對應程式碼　<b>NB5 · 選 LV、建模、評估</b></p>
+<pre><code class="language-python">from sklearn.cross_decomposition import PLSRegression
+from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import mean_squared_error, r2_score
+
+rmsecv = []
+for n in range(1, 11):
+    pred = cross_val_predict(PLSRegression(n_components=n), Xa, ya, cv=5).ravel()
+    rmsecv.append(mean_squared_error(ya, pred) ** 0.5)
+
+best_lv = int(np.argmin(rmsecv)) + 1      # → 4
+pls = PLSRegression(n_components=best_lv).fit(Xa, ya)
+
+# 絕對不能跳過：看模型倚重哪些波數
+coef = pls.coef_.ravel()   # 大值應落在 1265 / 1523 / 1656 —— 真正的化學差異</code></pre>
+
+  <div class="callout">
+    <p><span class="tag">模型不會說「我不知道」</span>　把一個奶粉樣品丟進油品分類器，它一樣會硬選一種油，
+    而且可能給出很高的信心值。實務上必須加上<b>適用範圍（applicability domain）</b>檢查 ——
+    光譜殘差過大或馬氏距離超出訓練集範圍時，回報「超出模型適用範圍」而不是給答案。</p>
+  </div>
+</section>
+
+<!-- ============================== 完整程式碼 ============================== -->
+<section id="code">
+  <div class="kicker">Full script</div>
+  <h2>完整程式碼：不開 Colab 也能讀完</h2>
+  <p class="lead">
+    上面每一段都附了片段。這裡把整條流程接起來 —— 從讀檔到出結果，共 40 行。
+    看懂這 40 行，這門課的技術部分就結束了。
+  </p>
+
+<pre><code class="language-python">import numpy as np
+import pandas as pd
+import ramanspy as rp
+from sklearn.cross_decomposition import PLSRegression
+from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import mean_squared_error
+
+# ---------- 1. 讀檔 ----------
+def load_spectra(path):
+    """CSV：每列一個樣品，欄名就是波數 → (樣品資訊, 光譜物件)"""
+    df = pd.read_csv(path)
+    meta_cols = [c for c in df.columns if not c.replace(".", "", 1).isdigit()]
+    axis = np.array([float(c) for c in df.columns if c not in meta_cols])
+    return df[meta_cols], rp.SpectralContainer(df.drop(columns=meta_cols).values, axis)
+
+meta, spectra = load_spectra("data/milk_powder_melamine.csv")
+
+# ---------- 2. 前處理 ----------
+pipeline = rp.preprocessing.Pipeline([
+    rp.preprocessing.misc.Cropper(region=(450, 1800)),
+    rp.preprocessing.despike.WhitakerHayes(),
+    rp.preprocessing.denoise.SavGol(window_length=9, polyorder=3),
+    rp.preprocessing.baseline.IModPoly(),
+    rp.preprocessing.normalise.MinMax(),
+])
+processed = pipeline.apply(spectra)
+X, axis = processed.spectral_data, processed.spectral_axis
+
+# ---------- 3. 定性：診斷峰 + 判定閾值 ----------
+peak676   = X[:, np.argmin(abs(axis - 676))]
+blank     = peak676[meta.label == "normal"]
+threshold = blank.mean() + 3 * blank.std()
+print("檢出樣品數：", int((peak676 > threshold).sum()))
+
+# ---------- 4. 探索：PCA ----------
+projections, components = rp.analysis.decompose.PCA(n_components=2).apply(processed)
+pc1, pc2 = projections
+
+# ---------- 5. 定量：PLS ----------
+ameta, aspectra = load_spectra("data/olive_adulteration.csv")
+Xa = pipeline.apply(aspectra).spectral_data
+ya = ameta.sunflower_pct.values
+
+pred  = cross_val_predict(PLSRegression(n_components=4), Xa, ya, cv=5).ravel()
+rmsecv = mean_squared_error(ya, pred) ** 0.5
+print(f"RMSECV = {rmsecv:.2f} %")</code></pre>
+
+  <div class="grid">
+    <div class="card">
+      <span class="tag">step 1</span>
+      <h3>讀懂就好</h3>
+      <p>第一次讀不用每行都懂。先抓住五個區塊的名字：讀檔、前處理、定性、探索、定量。</p>
+    </div>
+    <div class="card">
+      <span class="tag coral">step 2</span>
+      <h3>再動手改</h3>
+      <p>打開 Notebook，把 <code>window_length</code>、<code>n_components</code> 改一個數字再跑，看結果怎麼變。</p>
+    </div>
+    <div class="card">
+      <span class="tag gold">step 3</span>
+      <h3>最後自己寫</h3>
+      <p>換一組資料、換一個診斷峰，重跑同一條流程。能做到這一步就算學會了。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== NOTEBOOK ============================== -->
+<section id="notebook">
+  <div class="kicker">Hands-on</div>
+  <h2>五本 Notebook 與課程資料</h2>
+  <p class="lead">
+    每一本約 50–70 分鐘，採「逐格執行」設計，每格只做一件事，程式碼旁邊用中文說明為什麼要做。
+    遇到 <code>👉 換你做</code> 就停下來改一個參數再跑一次。結尾都有自我檢核題與參考答案。
+  </p>
+
+  <div class="grid">
+    <a class="card" href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/ramanspy-food-analysis/notebooks/NB1_intro_spectrum.ipynb" target="_blank" rel="noopener">
+      <span class="tag ">NB1</span>
+      <h3>第一條光譜</h3>
+      <p>從完全不會 Python 開始，把一條奶粉光譜讀進來、畫出來，並看懂它為什麼「很醜」。</p>
+      <div class="links"><span class="go">在 Colab 開啟 ↗</span><span class="repo">NB1_intro_spectrum.ipynb</span></div>
+    </a>
+    <a class="card" href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/ramanspy-food-analysis/notebooks/NB2_preprocessing.ipynb" target="_blank" rel="noopener">
+      <span class="tag ">NB2</span>
+      <h3>前處理</h3>
+      <p>五個步驟逐一拆解，示範做過頭會怎樣，最後用 Pipeline 一次處理 60 個樣品。</p>
+      <div class="links"><span class="go">在 Colab 開啟 ↗</span><span class="repo">NB2_preprocessing.ipynb</span></div>
+    </a>
+    <a class="card" href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/ramanspy-food-analysis/notebooks/NB3_peak_assignment.ipynb" target="_blank" rel="noopener">
+      <span class="tag violet">NB3</span>
+      <h3>峰位判讀</h3>
+      <p>特徵峰對照表、自動找峰、共振增強，以及六個未知樣品的判讀實作。</p>
+      <div class="links"><span class="go">在 Colab 開啟 ↗</span><span class="repo">NB3_peak_assignment.ipynb</span></div>
+    </a>
+    <a class="card" href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/ramanspy-food-analysis/notebooks/NB4_melamine_screening.ipynb" target="_blank" rel="noopener">
+      <span class="tag coral">NB4</span>
+      <h3>奶粉摻偽篩檢</h3>
+      <p>判定閾值、偵測極限、PCA 與 KMeans，以及與法規限量的落差討論。</p>
+      <div class="links"><span class="go">在 Colab 開啟 ↗</span><span class="repo">NB4_melamine_screening.ipynb</span></div>
+    </a>
+    <a class="card" href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/ramanspy-food-analysis/notebooks/NB5_oil_authentication.ipynb" target="_blank" rel="noopener">
+      <span class="tag coral">NB5</span>
+      <h3>油品鑑別與定量</h3>
+      <p>PCA-LDA 分類、PLS 定量、交叉驗證，以及模型適用範圍的檢查。</p>
+      <div class="links"><span class="go">在 Colab 開啟 ↗</span><span class="repo">NB5_oil_authentication.ipynb</span></div>
+    </a>
+    <a class="card" href="https://colab.research.google.com/github/Tai-ShengYeh/Tai-ShengYeh.github.io/blob/main/ramanspy-food-analysis/notebooks/ramanspy_food_beginner.ipynb" target="_blank" rel="noopener">
+      <span class="tag gold">暖身</span>
+      <h3>入門暖身本（舊版保留）</h3>
+      <p>用模擬的澱粉型／高蛋白型／摻脂型光譜快速走一遍 PCA 分群，適合第一堂課暖身。</p>
+      <div class="links"><span class="go">在 Colab 開啟 ↗</span><span class="repo">ramanspy_food_beginner.ipynb</span></div>
+    </a>
+  </div>
+
+  <h3>課程資料集</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>檔名</th><th>內容</th><th>用在</th></tr></thead>
+    <tbody>
+      <tr><td><code>milk_powder_raw_single.csv</code></td><td>一條未處理的奶粉光譜（含螢光、尖峰、雜訊）</td><td>NB1、NB2</td></tr>
+      <tr><td><code>reference_spectra.csv</code></td><td>六種純物質參考光譜</td><td>NB3</td></tr>
+      <tr><td><code>milk_powder_melamine.csv</code></td><td>60 個奶粉樣品，三聚氰胺 0–5%</td><td>NB2、NB4</td></tr>
+      <tr><td><code>edible_oils.csv</code></td><td>60 個油品樣品：橄欖、葵花、大豆、椰子各 15</td><td>NB3、NB5</td></tr>
+      <tr><td><code>olive_adulteration.csv</code></td><td>50 個橄欖油摻葵花油樣品，0–50%</td><td>NB5</td></tr>
+      <tr><td><code>unknown_samples.csv</code></td><td>6 個未知樣品（期末判讀用）</td><td>NB3、NB5、期末</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout">
+    <p><span class="tag">關於資料</span>　這些是<b>依文獻峰位建立的模擬光譜</b>，刻意加入螢光背景、宇宙射線與雜訊，
+    讓你在教室裡就能遇到真實儀器會出的狀況，同時濃度與答案完全可控、方便驗算。
+    課程結論（偵測極限、模型誤差）與真實文獻報告的數量級一致。</p>
+  </div>
+
+  <div class="btnrow">
+    <a class="btn" href="quiz.html">去做線上測驗 →</a>
+    <a class="btn ghost" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/tree/main/ramanspy-food-analysis">GitHub 原始檔</a>
+  </div>
+</section>
+
+<!-- ============================== REFS ============================== -->
+<section id="data">
+  <div class="kicker">Data provenance</div>
+  <h2>數據從哪裡來</h2>
+  <p class="lead">
+    這一節必須講清楚，因為它決定你能用這些數字說到什麼程度。
+  </p>
+
+  <div class="callout coral">
+    <p><span class="tag">最重要的一句</span>　本課程 <code>data/</code> 裡的六組光譜<b>全部是依文獻峰位建立的模擬資料，
+    不是實測光譜</b>。它們用來教流程與判讀邏輯；<b>不可以引用為實驗證據</b>，也不能拿來寫報告的數據來源。</p>
+  </div>
+
+  <h3>怎麼生成的</h3>
+  <ol class="steps">
+    <li><b>純物質骨架</b>　每個成分用一組 Lorentzian 峰疊出來，峰位取自下表的文獻值，半高寬 8–25 cm⁻¹、
+        相對強度依文獻描述的強弱關係設定。</li>
+    <li><b>混合</b>　按濃度線性疊加（拉曼在稀薄混合物中對濃度近似線性），三聚氰胺另乘上一個散射截面係數。</li>
+    <li><b>加上儀器的毛病</b>　螢光背景用 <code>0.9·e<sup>−2.2t</sup> + 0.5t² + 0.25</code> 的經驗式，
+        再隨機插入 0–2 根寬度 1–2 點的宇宙射線尖峰，最後加高斯雜訊（σ ≈ 0.012–0.02）。</li>
+    <li><b>樣品間變異</b>　每個樣品的成分係數再乘上一個小的隨機擾動，模擬批次差異。</li>
+  </ol>
+  <p>
+    完整程式在 <code>make_data.py</code>，亂數種子固定（<code>20260801</code>），任何人重跑都會得到同一組資料。
+  </p>
+
+  <h3>峰位的文獻依據</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>成分</th><th>使用的峰位 (cm⁻¹)</th><th>依據</th></tr></thead>
+    <tbody>
+      <tr><td><b class="teal">類胡蘿蔔素</b></td><td>1008 (ν₃)、1156 (ν₂)、1523 (ν₁)</td><td>[3][4][6]</td></tr>
+      <tr><td><b class="teal">油脂骨架</b></td><td>1063、1080、1301、1441、1745</td><td>[6]</td></tr>
+      <tr><td><b class="teal">不飽和度</b></td><td>1265 (=C–H)、1656 (C=C)</td><td>[6][7]</td></tr>
+      <tr><td><b class="coral">三聚氰胺</b></td><td>583、676、984、1435</td><td>[8][11][12]</td></tr>
+      <tr><td><b class="teal">乳糖 / 醣類</b></td><td>355、440、850、1085、1125、1265、1460</td><td>[16]</td></tr>
+      <tr><td><b class="teal">酪蛋白 / 蛋白質</b></td><td>1003 (Phe)、1240 (醯胺 III)、1450、1655 (醯胺 I)</td><td>[16]</td></tr>
+      <tr><td><b class="teal">澱粉</b></td><td>478、865、940、1082、1126、1260、1380、1460</td><td>[16]</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>結果對得上文獻嗎</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>本課程算出的</th><th>數值</th><th>文獻上同類方法的量級</th></tr></thead>
+    <tbody>
+      <tr><td>三聚氰胺 LOD（一般拉曼）</td><td><b class="coral">≈ 0.5%（5,000 mg/kg）</b></td>
+          <td>一般拉曼可在奶粉中辨識 1% 的三聚氰胺 [8]；要到 mg/kg 級需 SERS [9][10][11]</td></tr>
+      <tr><td>四種食用油分類正確率</td><td><b class="teal">96.7%</b>（PCA-LDA，5 折 CV）</td>
+          <td>橄欖油品種／種類判別常報 90–100% [6]</td></tr>
+      <tr><td>橄欖油摻混定量</td><td><b class="teal">RMSECV 3.26%、R² 0.952</b>（PLS, LV=4）</td>
+          <td>拉曼＋PLS 對摻混比例的預測誤差多在數個百分點 [7]</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    量級一致，但這是<b>設計出來的一致</b> —— 因為模擬時就把雜訊與變異調到那個範圍。
+    它證明的是「這條流程會給出合理的數字」，不是「拉曼真的能做到這個數字」。
+  </p>
+
+  <div class="callout gold">
+    <p><span class="tag">想用真資料</span>　RamanSPy 內建了幾組公開資料集可以直接呼叫，例如
+    <code>rp.datasets.rruff()</code>（RRUFF 礦物拉曼資料庫）與 <code>rp.datasets.bacteria()</code>；
+    食品類的公開光譜可查 Mendeley Data、Zenodo 與各校的 open data 平台。
+    做專題時請改用實測或公開實測資料，本課程資料僅供教學演練。</p>
+  </div>
+</section>
+
+<section id="refs">
+  <div class="kicker">References</div>
+  <h2>參考文獻</h2>
+
+  <h3>共振拉曼增強</h3>
+  <ol style="font-size:16.5px">
+    <li id="r1">Gill, D.; Kilponen, R. G.; Rimai, L. <i>Resonance Raman Scattering of Laser Radiation by Vibrational Modes of Carotenoid Pigment Molecules in Intact Plant Tissues</i>. <b>Nature</b> 1970, 227(5259), 743–744. <a href="https://doi.org/10.1038/227743a0">doi:10.1038/227743a0</a> —— 最早在完整植物組織中直接觀測到類胡蘿蔔素的共振拉曼訊號；激發波長落在電子吸收帶內時，散射效率大幅提升到足以克服吸收損失。</li>
+    <li id="r2">Lu, L.; Shi, L.; Secor, J.; Alfano, R. <i>Resonance Raman scattering of β-carotene solution excited by visible laser beams into second singlet state</i>. <b>J. Photochem. Photobiol. B</b> 2018, 179, 18–22. <a href="https://doi.org/10.1016/j.jphotobiol.2017.12.022">doi:10.1016/j.jphotobiol.2017.12.022</a> —— 以 488／514／532／633 nm 比較 β-胡蘿蔔素的共振增強並校正自吸收；488／514 nm 增強最強，但 <b>532 nm 為最佳折衷</b>（螢光與自吸收較低）。本課程採 532 nm 的依據。</li>
+    <li id="r3">Withnall, R.; Chowdhry, B. Z.; Silver, J.; Edwards, H. G. M.; de Oliveira, L. F. C. <i>Raman spectra of carotenoids in natural products</i>. <b>Spectrochim. Acta A</b> 2003, 59(10), 2207–2212. <a href="https://doi.org/10.1016/S1386-1425(03)00064-7">doi:10.1016/S1386-1425(03)00064-7</a> —— ν₁（C=C，1400–1600）與 ν₃ 強烈增強；ν₁ 位置隨共軛雙鍵數增加而往低波數移動，可用來推估共軛鏈長。</li>
+    <li id="r4">de Oliveira, V. E.; Castro, H. V.; Edwards, H. G. M.; de Oliveira, L. F. C. <i>Carotenes and carotenoids in natural biological samples: a Raman spectroscopic analysis</i>. <b>J. Raman Spectrosc.</b> 2010, 41(6), 642–650. <a href="https://doi.org/10.1002/jrs.2493">doi:10.1002/jrs.2493</a> —— β-胡蘿蔔素三個特徵帶 1515、1156、1008 cm⁻¹。<b>特別注意</b>：作者明確警告，類胡蘿蔔素與基質的分子交互作用會使 C=C 帶明顯位移，因此「拿標準品光譜直接比對就下結論」在真實生物樣品上是危險的 —— 這正是本課程反覆強調「先確認基質」的文獻依據。</li>
+    <li id="r5">Le Ru, E. C.; Auguié, B. <i>Enhancement Factors: A Central Concept during 50 Years of Surface-Enhanced Raman Spectroscopy</i>. <b>ACS Nano</b> 2024, 18(14), 9773–9783. <a href="https://doi.org/10.1021/acsnano.4c01474">doi:10.1021/acsnano.4c01474</a> —— 增強因子的定義、平均值與最大值的差異、熱點分布與量測方式。引用任何「增強幾倍」的數字前建議先讀這一篇。</li>
+  </ol>
+
+  <h3>食用油與橄欖油</h3>
+  <ol start="6" style="font-size:16.5px">
+    <li id="r6">Portarena, S.; Anselmi, C.; Zadra, C.; Farinelli, D.; Famiani, F.; Baldacchini, C.; Brugnoli, E. <i>Cultivar discrimination, fatty acid profile and carotenoid characterization of monovarietal olive oils by Raman spectroscopy at a single glance</i>. <b>Food Control</b> 2019, 96, 137–145. <a href="https://doi.org/10.1016/j.foodcont.2018.09.011">doi:10.1016/j.foodcont.2018.09.011</a> —— 特級初榨橄欖油特徵帶：965、1004、1081、1156、1301、1440、1523、1656、1748 cm⁻¹（514.5 nm 激發，與類胡蘿蔔素共振）。</li>
+    <li id="r7">Chen, Y.; Yang, Z.; Zeng, S.; Tian, H.; Cheng, Q.; Lv, S.; Li, H. <i>Quantitative analysis of β-carotene and unsaturated fatty acids in blended olive oil via Raman spectroscopy combined with model prediction</i>. <b>Food Chemistry</b> 2025, 470, 142621. <a href="https://doi.org/10.1016/j.foodchem.2024.142621">doi:10.1016/j.foodchem.2024.142621</a> —— 以 1156、1265、1526、1658 cm⁻¹ 配合模型預測橄欖油／葵花油摻混比例。與本課程 NB5 的作法相同，可作為 PLS 迴歸係數落點的對照。</li>
+  </ol>
+
+  <h3>三聚氰胺：一般拉曼、SERS 與法規</h3>
+  <ol start="8" style="font-size:16.5px">
+    <li id="r8">Schmidt, W.; Broadhurst, C. L.; Qin, J.; et al. <i>Continuous Temperature-Dependent Raman Spectroscopy of Melamine and Structural Analog Detection in Milk Powder</i>. <b>Appl. Spectrosc.</b> 2015, 69(3), 398–406. <a href="https://doi.org/10.1366/14-07600">doi:10.1366/14-07600</a> —— <b>不用 SERS</b>，以一般拉曼在奶粉中辨識 1% 的三聚氰胺（及尿素、縮二脲、三聚氰酸）。本課程算出的 LOD ≈ 0.5% 與這個量級相符。</li>
+    <li id="r9">Zhang, X.; Zou, M.; Qi, X.; et al. <i>Detection of melamine in liquid milk using surface-enhanced Raman scattering spectroscopy</i>. <b>J. Raman Spectrosc.</b> 2010, 41(12), 1655–1660. <a href="https://doi.org/10.1002/jrs.2629">doi:10.1002/jrs.2629</a> —— 銀膠達 10⁵ 倍以上增強；標準品 LOD 0.01 µg/mL，牛奶中定量極限 0.5 µg/mL，結果與 LC-MS/MS 相當。</li>
+    <li id="r10">Kim, A.; Barcelo, S. J.; Williams, R. S.; Li, Z. <i>Melamine Sensing in Milk Products by Using Surface Enhanced Raman Scattering</i>. <b>Anal. Chem.</b> 2012, 84(21), 9303–9309. <a href="https://doi.org/10.1021/ac302025q">doi:10.1021/ac302025q</a> —— 金奈米指狀基材配可攜式拉曼儀，水中 LOD 120 ppt、嬰兒配方中 100 ppb，<b>低於 FDA 的 1 ppm 容許值</b>。</li>
+    <li id="r11">Wang, S.; Zhao, Y.; Wei, X.; et al. <i>Facile SERS screening of melamine in bovine milk with 2D printed AgNPs/glass fabric filter paper as the flexible substrate</i>. <b>Food Sci. Hum. Wellness</b> 2024, 13(5), 2595–2600. <a href="https://doi.org/10.26599/fshw.2022.9250208">doi:10.26599/fshw.2022.9250208</a> —— 診斷訊號在 <b>674 cm⁻¹</b>，LOD 1.95×10⁻⁵ mg/mL，遠低於歐美 2.5×10⁻³ mg/mL 的安全限值。（開放取用）</li>
+    <li id="r12">Cheng, J.; Wang, S.; Su, X. <i>Detection of Melamine in Feed Using Liquid-Liquid Extraction Treatment Combined with Surface-Enhanced Raman Scattering Spectroscopy</i>. <b>PLoS ONE</b> 2014, 9(9), e107770. <a href="https://doi.org/10.1371/journal.pone.0107770">doi:10.1371/journal.pone.0107770</a> —— 明確指認 ring breathing II 模式為三嗪環的面內變形。（開放取用）</li>
+    <li id="r13">Chen, X.; Hu, Y.; Gao, J.; et al. <i>Interaction of Melamine Molecules with Silver Nanoparticles Explored by SERS and Density Functional Theory Calculations</i>. <b>Appl. Spectrosc.</b> 2013, 67(5), 491–497. <a href="https://doi.org/10.1366/12-06838">doi:10.1366/12-06838</a> —— 三聚氰胺以環上氮吸附於銀表面，且傾角隨濃度改變 —— 這是 SERS 條件下峰位會位移的原因。</li>
+    <li id="r14">FAO / WHO Codex Alimentarius Commission. <i>General Standard for Contaminants and Toxins in Food and Feed</i>, <b>CXS 193-1995</b>. —— 三聚氰胺最大限量：粉狀嬰兒配方 1 mg/kg、其他食品與飼料 2.5 mg/kg（2010 年通過）；液態嬰兒配方 0.15 mg/kg（2012 年通過）。</li>
+  </ol>
+
+  <h3>方法與工具</h3>
+  <ol start="15" style="font-size:16.5px">
+    <li id="r15">Georgiev, D.; Pedersen, S. V.; Xie, R.; Fernández-Galiana, Á.; Stevens, M. M.; Barahona, M. <i>RamanSPy: An Open-Source Python Package for Integrative Raman Spectroscopy Data Analysis</i>. <b>Anal. Chem.</b> 2024, 96(21), 8492–8500. <a href="https://doi.org/10.1021/acs.analchem.4c00383">doi:10.1021/acs.analchem.4c00383</a> · <a href="https://github.com/barahona-research-group/RamanSPy">GitHub</a>（開放取用，CC-BY）</li>
+    <li id="r16">一般食品成分的拉曼歸屬（醣類 C–C／C–O 伸縮、蛋白質苯丙胺酸 1003 與醯胺 I／III、澱粉 478）採用食品拉曼光譜教科書與綜述的常用歸屬表。授課時建議請學生自行比對 RRUFF 或儀器廠商的標準品資料庫，確認自己手上儀器的實際峰位。</li>
+    <li id="r17">前處理演算法：Savitzky–Golay 平滑；Whitaker–Hayes 去尖峰；ModPoly / asPLS / airPLS 基線校正。實作與參數說明見 RamanSPy 文件。</li>
+  </ol>
+
+  <div class="callout gold">
+    <p><span class="tag">核對方式</span>　本頁 [1]–[15] 的書目資料於 2026 年 8 月以 <b>scite</b> 逐筆查核（DOI、期刊、卷期、頁碼、作者），並以 <b>Consensus</b> 搜尋補齊共振拉曼增強的原始文獻。凡查不到同儕審查來源的說法（例如原先引用的專書章節與雜誌專欄）已改引可查核的期刊論文。</p>
+  </div>
+
+  <div class="callout">
+    <p><span class="tag">給學生的提醒</span>　寫報告引用峰位時，<b>要引原始文獻，不要引這一頁</b>。
+    同一個官能基在不同基質、不同激發波長下的峰位會有數個 cm⁻¹ 的差異，
+    務必確認你引的文獻用的是什麼樣品、什麼雷射。</p>
+  </div>
+
+  <div class="callout gold">
+    <p><span class="tag">教師備註</span>　建議三週進度：第 1 週原理＋NB1、NB2；第 2 週峰位判讀＋NB3＋未知樣品分組討論；
+    第 3 週 NB4、NB5，以 LOD 與法規限量的落差做結論討論。評量建議：Notebook 執行截圖 30%、線上測驗 30%、
+    未知樣品判讀報告 40%（推理過程重於答對與否）。</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <b>RamanSPy × 食品分析</b>　食品營養系 · 食品分析課程 · 零程式基礎<br>
+  <a href="https://tai-shengyeh.github.io/">↖ 回課程總站</a>　·　
+  <a href="quiz.html">線上測驗</a>　·　
+  <a href="https://github.com/barahona-research-group/RamanSPy">RamanSPy（BSD-3-Clause）</a>
+</footer>
+
+<script src="data.js"></script>
+<script src="interactive.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

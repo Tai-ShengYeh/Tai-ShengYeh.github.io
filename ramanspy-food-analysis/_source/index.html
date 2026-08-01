@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RamanSPy × 食品分析：零程式基礎入門</title>
+<meta name="description" content="給食品營養系大學生的拉曼光譜資料分析課程：五個互動實驗台、五本 Jupyter Notebook、六組光譜資料集與 30 題自動計分測驗。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="course.css">
+</head>
+<body>
+
+<nav>
+  <span class="brand">RamanSPy × 食品分析 <b>·</b> 課程入口</span>
+  <a href="teaching.html">線上教材</a>
+  <a href="#map">課程地圖</a>
+  <a href="#nb">Notebook</a>
+  <a href="quiz.html">測驗</a>
+  <a href="https://tai-shengyeh.github.io/">↖ 總站</a>
+</nav>
+
+<header class="hero">
+  <h1>用 RamanSPy 讀懂<br><span class="accent">食品的拉曼光譜指紋</span></h1>
+  <p class="sub">
+    食品營養系 · 食品分析課程 · 零程式基礎。
+    先在網頁上拉滑桿建立直覺，再打開 Notebook 逐格執行 ——
+    最後你會親手完成奶粉三聚氰胺篩檢與橄欖油摻混定量。
+  </p>
+  <div class="facts">
+    <div class="fact"><b>0</b><span>程式基礎也能開始</span></div>
+    <div class="fact"><b>5</b><span>互動實驗台</span></div>
+    <div class="fact"><b>5</b><span>Jupyter Notebook</span></div>
+    <div class="fact"><b>30</b><span>題即時回饋測驗</span></div>
+  </div>
+  <div class="btnrow">
+    <a class="btn" href="teaching.html">開始上課 →</a>
+    <a class="btn ghost" href="quiz.html">先看看測驗</a>
+  </div>
+</header>
+
+<main>
+
+<section id="how">
+  <div class="kicker">How it works</div>
+  <h2>這門課怎麼上</h2>
+  <p class="lead">
+    三個層次，一層比一層動手。看不懂程式沒關係 —— 第一層完全不用寫任何東西。
+  </p>
+  <div class="grid g3">
+    <div class="card">
+      <span class="tag">層次一</span>
+      <h3>🎚️ 在網頁上玩</h3>
+      <p style="font-size:16px;margin:0">線上教材裡有五個互動實驗台：混合成分、調前處理參數、判讀未知樣品、模擬摻偽偵測、選 PLS 潛在變數。全部拉滑桿就好。</p>
+    </div>
+    <div class="card">
+      <span class="tag coral">層次二</span>
+      <h3>📄 讀程式碼片段</h3>
+      <p style="font-size:16px;margin:0">每一段互動旁邊都附上對應的 Python 程式碼，並在最後給一份 40 行的完整腳本。不開 Colab 也能讀完整條流程。</p>
+    </div>
+    <div class="card">
+      <span class="tag gold">層次三</span>
+      <h3>▶️ 動手跑 Notebook</h3>
+      <p style="font-size:16px;margin:0">五本 Colab Notebook 逐格執行，遇到 <code>👉 換你做</code> 就改一個參數再跑，看結果怎麼變。</p>
+    </div>
+  </div>
+  <div class="callout">
+    <p><span class="tag">不用安裝任何東西</span>　Notebook 在 Google Colab 上跑，資料自動從課程網站載入，
+    不需下載 CSV、不需設定 Python 環境。有 Google 帳號就能開始。</p>
+  </div>
+</section>
+
+<section id="map">
+  <div class="kicker">Course map</div>
+  <h2>課程地圖</h2>
+  <p class="lead">整條分析流程只有一句話：<b>讀資料 → 前處理 → 峰位判讀 → 定性篩檢 → 定量校正 → 檢查模型合理性</b>。</p>
+
+  <div class="grid">
+    <a class="card" href="teaching.html#why">
+      <span class="tag ">單元 0</span>
+      <h3>為什麼用拉曼</h3>
+      <p>選擇律、與紅外光譜的互補關係，以及它為什麼特別適合高含水食品與油脂。</p>
+      <div class="links"><span class="go">前往教材 →</span></div>
+    </a>
+    <a class="card" href="teaching.html#mix">
+      <span class="tag ">單元 1</span>
+      <h3>混合物光譜的疊加</h3>
+      <p>互動實驗台：拉六種成分的比例，看程式自動找到的峰對應哪一個分子。</p>
+      <div class="links"><span class="go">前往教材 →</span></div>
+    </a>
+    <a class="card" href="teaching.html#prep">
+      <span class="tag ">單元 2</span>
+      <h3>前處理五步驟</h3>
+      <p>互動實驗台：調螢光、雜訊、平滑視窗，親眼看窄峰被自己的前處理抹掉。</p>
+      <div class="links"><span class="go">前往教材 →</span></div>
+    </a>
+    <a class="card" href="teaching.html#peaks">
+      <span class="tag violet">單元 3</span>
+      <h3>峰位判讀</h3>
+      <p>十個必背特徵峰、1655 cm⁻¹ 的陷阱，以及六個未知樣品的判讀器。</p>
+      <div class="links"><span class="go">前往教材 →</span></div>
+    </a>
+    <a class="card" href="teaching.html#melamine">
+      <span class="tag coral">單元 4</span>
+      <h3>奶粉三聚氰胺篩檢</h3>
+      <p>互動實驗台：拉濃度看什麼時候才判定「檢出」，以及 LOD 與法規限量差了幾倍。</p>
+      <div class="links"><span class="go">前往教材 →</span></div>
+    </a>
+    <a class="card" href="teaching.html#quant">
+      <span class="tag coral">單元 5</span>
+      <h3>油品鑑別與摻混定量</h3>
+      <p>互動實驗台：拉 PLS 潛在變數，親眼看配適不足與過度配適的分界。</p>
+      <div class="links"><span class="go">前往教材 →</span></div>
+    </a>
+  </div>
+</section>
+
+<section id="nb">
+  <div class="kicker">Notebook</div>
+  <h2>Notebook 與資料</h2>
+  <p class="lead">六本 Notebook（含一本暖身）、六組光譜資料集。全部在 Colab 直接開，不用下載。</p>
+  <ol class="steps">
+    <li><b>NB1 · 第一條光譜</b>　讀進來、畫出來，看懂兩個軸與原始光譜的三個問題。</li>
+    <li><b>NB2 · 前處理</b>　五步驟逐一拆解，最後用 Pipeline 一次處理 60 個樣品。</li>
+    <li><b>NB3 · 峰位判讀</b>　特徵峰對照表、自動找峰、共振增強、未知樣品實作。</li>
+    <li><b>NB4 · 奶粉摻偽篩檢</b>　判定閾值、偵測極限、PCA 與 KMeans。</li>
+    <li><b>NB5 · 油品鑑別與定量</b>　PCA-LDA 分類、PLS 定量、模型適用範圍檢查。</li>
+    <li><b>暖身本（舊版保留）</b>　用模擬光譜快速走一遍 PCA 分群，適合第一堂課。</li>
+  </ol>
+  <div class="btnrow">
+    <a class="btn" href="teaching.html#notebook">前往 Notebook 專區 →</a>
+    <a class="btn ghost" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/tree/main/ramanspy-food-analysis">GitHub 原始檔</a>
+  </div>
+</section>
+
+<section id="point">
+  <div class="kicker">The point</div>
+  <h2>這門課真正想教會的一件事</h2>
+  <div class="callout coral">
+    <p><span class="tag">不是 Python</span>　是<b>知道自己的方法測不到什麼</b>。</p>
+    <p>課程算出的拉曼法偵測極限約 <b>0.5%（5,000 mg/kg）</b>，而 Codex 對三聚氰胺的限量是 <b>2.5 mg/kg</b> ——
+    差了兩千倍以上。學生若能自己講出「<b>未檢出不等於沒有，要先問方法的偵測極限</b>」，這門課就成功了。</p>
+  </div>
+  <div class="btnrow">
+    <a class="btn" href="teaching.html">開始上課 →</a>
+    <a class="btn gold" href="quiz.html">線上測驗（30 題）</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <b>RamanSPy × 食品分析</b>　食品營養系 · 食品分析課程 · 零程式基礎<br>
+  <a href="https://tai-shengyeh.github.io/">↖ 回課程總站</a>　·　
+  <a href="https://github.com/barahona-research-group/RamanSPy">RamanSPy（BSD-3-Clause）</a>　·　
+  Georgiev et al., <i>Anal. Chem.</i> 2024, 96, 8492
+</footer>
+
+</body>
+</html>
