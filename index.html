@@ -47,7 +47,7 @@
   <h1>教學<span class="accent">課程</span></h1>
   <p>葉泰聖（Tai-Sheng Yeh）｜ 互動教材 · 教學影片 · Python + Orange 可重現工作流</p>
   <div class="stats">
-    <div><b>49</b><span>線上課程</span></div>
+    <div><b>53</b><span>線上課程</span></div>
     <div><b>19</b><span>光譜/感測化學計量學</span></div>
     <div><b>40+</b><span>教學影片</span></div>
   </div>
@@ -120,6 +120,23 @@
       <div class="card"><span class="tag">GC</span><h3>氣相層析 · 咖啡品種</h3>
         <p>PCA 探索 + PLS-DA 鑑別，14 支咖啡 Arabica vs Robusta；GC 層析指紋，留一驗證 92.9%。</p>
         <div class="links"><a class="go" href="https://tai-shengyeh.github.io/coffee-gc-analysis/teaching.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/coffee-gc-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">XRF</span><h3>X 射線螢光</h3>
+        <p>PCA 探索 + PLS-DA 分類，元素指紋；以開放蜂蜜元素表（CC0）即時實算真假與摻假鑑別。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/xrf-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/xrf-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">LIBS</span><h3>雷射誘導擊穿光譜</h3>
+        <p>PCA 探索 + PLS 定量 + PLS-DA 分類，原子發射光譜；咖啡品種過擬合教訓、蜂蜜摻假定量。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/libs-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/libs-food-analysis">GitHub</a></div></div>
+      <div class="card"><span class="tag">ML</span><h3>五種機器學習分類法 · 茶葉產地</h3>
+        <p>LDA／Ridge／RF／Boosting／SVM 以 14 元素指紋判別產地；Python(scikit-learn) × Orange 雙路線，真實留一法 LOO-CV、反直覺結果（小資料線性模型勝集成樹），深色主題、手機友善。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/ml_five_models_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+    </div>
+  </section>
+
+  <section>
+    <span class="kicker">Chromatography · Quantitation</span>
+    <h2>層析 × 定量</h2>
+    <p class="lead">HPLC 與層析資料的完整處理鏈：讀懂層析圖、峰偵測與積分、峰對齊、檢量線與加權迴歸，到分離條件最佳化。R 與 Python 皆有，多數附真實儀器資料與可重現腳本。</p>
+    <div class="grid">
       <div class="card"><span class="tag coral">R 套件 · Chromatography</span><h3>ChromatographyR · 從入門到進階</h3>
         <p>以官方 <code>chromatographR</code> 套件學習 HPLC-DAD/UV 與 GC-FID 資料分析；12 章涵蓋匯入、前處理、保留時間校正、找峰與 EGH 擬合、peak table、DAD 光譜、批次工作流與方法驗證。每章以概念、可執行 R 程式、預期輸出、判讀證據與形成性練習串成完整學習循環。</p>
         <div class="links"><a class="go" href="https://tai-shengyeh.github.io/chromatographr-course/">開始課程 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/tree/main/chromatographr-course">原始檔</a></div></div>
@@ -138,15 +155,18 @@
       <div class="card"><span class="tag gold">HPLC · 定量</span><h3>高效液相層析 · 咖啡因定量</h3>
         <p>外標法定量完整流程：峰面積積分 → 檢量線 → 樣品濃度，6 個標準品 + 4 個未知樣品的真實層析資料。<b>入門版</b>五步驟零背景知識，含計算練習與小測驗；<b>進階版</b>再談基線校正（airPLS）、滯留時間對齊（alignDE）、殘差診斷與 LOD/LOQ，並示範儀器自動判峰為何會算出負濃度。附 R / Python 程式與原始資料可重跑。</p>
         <div class="links"><a class="go" href="https://tai-shengyeh.github.io/hplc-caffeine/">入門版 →</a><a class="repo" href="https://tai-shengyeh.github.io/hplc-caffeine/advanced.html">進階版 ↗</a><a class="repo" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/tree/main/hplc-caffeine">GitHub</a></div></div>
-      <div class="card"><span class="tag">XRF</span><h3>X 射線螢光</h3>
-        <p>PCA 探索 + PLS-DA 分類，元素指紋；以開放蜂蜜元素表（CC0）即時實算真假與摻假鑑別。</p>
-        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/xrf-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/xrf-food-analysis">GitHub</a></div></div>
-      <div class="card"><span class="tag">LIBS</span><h3>雷射誘導擊穿光譜</h3>
-        <p>PCA 探索 + PLS 定量 + PLS-DA 分類，原子發射光譜；咖啡品種過擬合教訓、蜂蜜摻假定量。</p>
-        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/libs-food-analysis/">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/libs-food-analysis">GitHub</a></div></div>
-      <div class="card"><span class="tag">ML</span><h3>五種機器學習分類法 · 茶葉產地</h3>
-        <p>LDA／Ridge／RF／Boosting／SVM 以 14 元素指紋判別產地；Python(scikit-learn) × Orange 雙路線，真實留一法 LOO-CV、反直覺結果（小資料線性模型勝集成樹），深色主題、手機友善。</p>
-        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/food-analysis-decks/ml_five_models_soil/index.html">課程頁 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/food-analysis-decks">GitHub</a></div></div>
+      <div class="card"><span class="tag coral">R 套件 · 峰對齊</span><h3>alignDE · 層析峰對齊套件</h3>
+        <p>用連續小波轉換找峰、差分演化搜尋位移量，把滯留時間漂移的層析圖對回參考圖；只平移峰、峰間線性內插，所以峰高與峰面積都保留。本分支為針對現行 R 的現代化維護版（v3.0.1，LGPL），修掉舊版在單峰資料上的崩潰並改用 C 實作的 DEoptim。</p>
+        <div class="links"><a class="go" href="https://github.com/Tai-ShengYeh/alignDE">GitHub →</a><a class="repo" href="https://github.com/zmzhang/alignDE">上游原始版</a></div></div>
+      <div class="card"><span class="tag">峰對齊 · 教學</span><h3>alignDE 峰對齊教學</h3>
+        <p>從「為什麼滯留時間會漂移」講到差分演化怎麼搜尋位移量：自包含教學網頁、27 張投影片、三支可執行 R 腳本（base R 與 tidyverse/ggplot2 兩種畫法）。模擬資料相關係數 0.119→0.782，實際樣品 0.787→0.919。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/alignDE-tutorial/">開始課程 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/alignDE-tutorial">GitHub</a></div></div>
+      <div class="card"><span class="tag">真實資料 · 定量</span><h3>HPLC 咖啡因檢量線與樣品定量</h3>
+        <p>用真實的 Shimadzu 匯出檔（6 標準品 + 4 樣品）走完檢量線到定量，R 與 Python 兩套獨立實作互相驗證，另含 alignDE 峰對齊與 airPLS 基線校正的可行性測試。附「這裡為什麼不加權」的判準說明。想先建立觀念的人請看上面的入門版。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/caffeine-hplc/">開始課程 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/caffeine-hplc">GitHub</a></div></div>
+      <div class="card"><span class="tag gold">防腐劑 · 加權檢量線</span><h3>HPLC 苯甲酸與己二烯酸定量</h3>
+        <p>兩套獨立流程互相驗證：直接採用儀器峰表，以及自行做小波峰偵測、對位與梯形積分。標準品跨 400 倍，完整說明為什麼必須用 1/x² 加權（未加權時最低點回收率高達 842%）。三段式學習路徑：觀念入門 → alignDE 上手 → 進階原理。</p>
+        <div class="links"><a class="go" href="https://tai-shengyeh.github.io/basa-hplc/">開始課程 →</a><a class="repo" href="https://github.com/Tai-ShengYeh/basa-hplc">GitHub</a></div></div>
     </div>
   </section>
 
