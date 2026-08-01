@@ -1,0 +1,54 @@
+MIT License
+
+Copyright (c) 2026 Tai-Sheng Yeh (葉泰聖)
+
+This license applies to the SOURCE CODE in this directory, namely:
+
+    rchromoptim_modern.R
+    rchromoptim_modern.py
+    rchromoptim_tutorial.qmd        (the R code chunks)
+    rchromoptim_tutorial.ipynb      (the Python code cells)
+
+The prose teaching material (index.html and the narrative text of the two
+notebooks) is licensed separately under CC BY-NC 4.0 — see LICENSE-CONTENT.md.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+NOTE ON THIRD-PARTY MATERIAL
+
+The MIT grant above covers the code written by the copyright holder. It does
+NOT and cannot grant rights over third-party material referenced by that code.
+
+The scripts embed a small factual data excerpt (a 4 x 9 table of retention
+times, 36 numeric values) taken from the supplementary material of:
+
+    Zisi, Ch., Pappa-Louisi, A., & Nikitas, P. (2020). Separation optimization
+    in HPLC analysis implemented in R programming language.
+    Journal of Chromatography A, 1617, 460823.
+    https://doi.org/10.1016/j.chroma.2019.460823
+
+That excerpt is included with attribution as a de minimis quotation so the
+published results can be reproduced for teaching. It represents roughly 0.014%
+of the cells in the original supplementary workbook. Rights in the article and
+its supplementary material remain with the original authors and publisher; they
+are not redistributed here. If you reuse this code, keep the attribution and
+cite the original paper — the retention models and the optimisation method are
+their scientific contribution, not the copyright holder's.

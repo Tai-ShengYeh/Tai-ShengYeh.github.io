@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="libPLS R 套件從入門到進階的互動式繁體中文課程">
+  <title>libPLS 實作課程</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#lesson">跳到課程內容</a>
+
+  <header class="topbar">
+    <a class="brand" href="#lesson-1" aria-label="libPLS 實作課程首頁">
+      <svg class="brand-spectrum" viewBox="0 0 82 34" aria-hidden="true">
+        <path d="M1 25 C10 25 10 6 18 6 S25 30 33 19 S40 11 46 23 S53 14 59 24 S67 19 81 27"/>
+      </svg>
+      <span>libPLS 實作課程</span>
+    </a>
+
+    <nav class="course-categories" aria-label="課程分類">
+      <button data-jump="1">課程地圖</button>
+      <button data-jump="2">基礎</button>
+      <button data-jump="3">建模</button>
+      <button data-jump="5">分類</button>
+      <button data-jump="7">變數選擇</button>
+      <button data-jump="6">評估</button>
+      <button data-jump="10">完整案例</button>
+    </nav>
+
+    <div class="reader-tools" aria-label="閱讀工具">
+      <button id="theme-toggle" class="icon-button" type="button"
+              aria-label="切換深色模式" title="切換深色模式">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20 15.3A8.5 8.5 0 0 1 8.7 4a8.5 8.5 0 1 0 11.3 11.3Z"/>
+        </svg>
+      </button>
+      <div class="font-controls" role="group" aria-label="調整字級">
+        <button id="font-smaller" type="button" aria-label="縮小字級">A−</button>
+        <button id="font-reset" type="button" aria-label="恢復字級">A</button>
+        <button id="font-larger" type="button" aria-label="放大字級">A＋</button>
+      </div>
+      <button id="menu-toggle" class="menu-toggle" type="button"
+              aria-controls="curriculum" aria-expanded="false">
+        <span></span><span></span><span></span>
+        <span class="sr-only">開啟課程目錄</span>
+      </button>
+      <div class="overall-progress" aria-label="總課程進度">
+        <span>課程進度</span>
+        <strong id="progress-percent">0%</strong>
+        <div class="progress-track">
+          <span id="progress-bar"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-shell">
+    <aside id="curriculum" class="curriculum" aria-label="課程內容">
+      <div class="curriculum-header">
+        <h2>課程內容</h2>
+        <button id="drawer-close" class="drawer-close" type="button"
+                aria-label="關閉課程目錄">×</button>
+      </div>
+      <ol id="lesson-list" class="lesson-list"></ol>
+      <div class="legend" aria-label="進度圖例">
+        <span><i class="current-dot"></i>目前章節</span>
+        <span><i></i>未完成</span>
+        <span><i class="done-dot">✓</i>已完成</span>
+      </div>
+    </aside>
+
+    <div id="drawer-scrim" class="drawer-scrim" hidden></div>
+
+    <main id="lesson" class="lesson" tabindex="-1">
+      <div class="lesson-meta">
+        <span id="lesson-kicker"></span>
+        <span id="lesson-position"></span>
+      </div>
+      <h1 id="lesson-title"></h1>
+      <div id="lesson-level" class="lesson-level"></div>
+
+      <section class="objective" aria-labelledby="objective-title">
+        <div class="objective-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32">
+            <circle cx="16" cy="16" r="12"/>
+            <circle cx="16" cy="16" r="7"/>
+            <circle cx="16" cy="16" r="2"/>
+            <path d="M18 14 27 5M23 5h4v4"/>
+          </svg>
+        </div>
+        <div>
+          <h2 id="objective-title">學習目標</h2>
+          <p id="objective-text"></p>
+        </div>
+      </section>
+
+      <article id="lesson-body" class="lesson-body"></article>
+
+      <section class="lesson-actions" aria-label="章節操作">
+        <button id="start-button" class="primary-button" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7Z"/></svg>
+          開始學習
+        </button>
+        <button id="complete-button" class="secondary-button" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+          <span>標記完成</span>
+        </button>
+      </section>
+
+      <nav class="lesson-pagination" aria-label="章節切換">
+        <button id="prev-lesson" type="button">← <span>上一章</span></button>
+        <button id="next-lesson" type="button"><span>下一章</span> →</button>
+      </nav>
+    </main>
+
+    <aside class="outline" aria-label="本頁大綱">
+      <h2>本頁大綱</h2>
+      <ol id="outline-list"></ol>
+      <section class="key-points">
+        <h2>學習重點</h2>
+        <ul id="key-point-list"></ul>
+      </section>
+      <section class="tip">
+        <strong>小提示</strong>
+        <p>程式碼區塊可一鍵複製。建議在自己的 R 工作階段逐段執行。</p>
+      </section>
+      <section class="chapter-progress">
+        <h2>章節進度</h2>
+        <strong id="chapter-progress-label">0 / 10</strong>
+        <div class="progress-track"><span id="chapter-progress-bar"></span></div>
+      </section>
+    </aside>
+  </div>
+
+  <footer>
+    <p>libPLS 1.95.0 教學課程 · 所有範例均使用固定亂數種子 ·
+      <a href="course_examples.R" download>下載完整範例 R 程式</a>
+    </p>
+  </footer>
+
+  <noscript>
+    <div class="noscript">本教材需要 JavaScript 才能切換章節。請啟用 JavaScript。</div>
+  </noscript>
+
+  <script src="course-content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,429 @@
+---
+title: "HPLC 分離最佳化：從滯留資料到最佳條件"
+subtitle: "R 互動教學（Quarto 版）"
+lang: zh-Hant
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-fold: false
+    code-tools: true
+    theme: cosmo
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  message: false
+knitr:
+  opts_chunk:
+    dev: ragg_png
+    dpi: 130
+---
+
+## 開場
+
+這份教學會帶你走過一次完整的 HPLC（高效液相層析，High-Performance Liquid
+Chromatography）分離最佳化流程：從一張「滯留時間」實驗表格出發，建立數學模型、
+模擬層析圖、計算「解析度」（resolution），最後掃過整個實驗範圍找出最佳的移動相
+比例。讀完並跑過所有程式碼之後，你會能夠：
+
+- 說明為什麼分析化學家用「滯留因子 k」而不是直接用滯留時間 $t_R$ 來建模；
+- 用 `nest()` + `map()` 對多個化合物同時擬合線性模型，並用 `broom::tidy()`
+  整理結果；
+- 畫出模擬層析圖，理解波峰的高度、寬度怎麼隨滯留時間改變；
+- 計算相鄰兩個波峰之間的解析度 $R_s$，並找出「最難分開的一對」；
+- 掃描一個實驗參數（此處是有機溶劑比例 f），畫出解析度與最後滯留時間的關係，
+  在時間預算內選出最佳條件。
+
+本教學重現的方法出自：
+
+> Zisi, Ch., Pappa-Louisi, A., & Nikitas, P. (2020). Separation optimization
+> in HPLC analysis implemented in R programming language. *Journal of
+> Chromatography A*, 1617, 460823.
+
+**版權說明**：上述論文本文與其補充材料（`Data.xlsx`、`RChromOptim.RData` 等）
+皆受著作權保護，**並未**隨本教學檔案附上或散布。本文件僅嵌入一小段具明確
+出處標註的事實性數據摘錄（滯留時間表），目的僅在於讓讀者能夠自行重現計算
+結果；若你需要完整資料集或原始程式碼，請直接向原期刊或原作者取得。
+
+```{r}
+#| label: setup
+library(tidyverse)
+
+# 讓圖上的中文正確顯示：自動挑一個系統上真的存在的中文字型。
+# 沒有這一步，Windows 的預設繪圖裝置會把中文畫成空白方框（俗稱「豆腐」）。
+cjk_font <- local({
+  cands <- c("Microsoft JhengHei", "Noto Sans TC", "PingFang TC",
+             "Heiti TC", "Noto Sans CJK TC", "SimSun")
+  avail <- if (requireNamespace("systemfonts", quietly = TRUE))
+    systemfonts::system_fonts()$family else character(0)
+  hit <- cands[cands %in% avail]
+  if (length(hit)) hit[1] else ""      # 找不到就用預設值
+})
+theme_set(theme_minimal(base_size = 12, base_family = cjk_font))
+```
+
+## 資料 {#sec-data}
+
+下表是九個化合物（以 A1–A9 標示）在四種有機溶劑比例 f（acetonitrile 的體積
+分率）下量測到的滯留時間 $t_R$（單位：分鐘）。層析管柱是 Kinetex 2.6 µm
+XB-C18，150 x 4.6 mm；移動相為 acetonitrile / 水（pH 5.7）；已知的無滯留
+時間（死時間）$t_0 = 1.4$ 分鐘。
+
+資料出處：Zisi et al. (2020) 補充材料 `Data.xlsx`，工作表 `i-ret.fit`
+（僅摘錄用於教學重現，非完整資料集）。
+
+```{r}
+#| label: data
+t0 <- 1.4
+
+dat <- tribble(
+  ~f,    ~A1,    ~A2,    ~A3,    ~A4,    ~A5,    ~A6,     ~A7,     ~A8,     ~A9,
+  0.40,  3.735,  4.671,  6.646,  7.662,  8.498,  10.760,  11.090,  15.990,  19.000,
+  0.45,  3.000,  3.650,  5.200,  5.600,  5.900,   6.850,   8.000,  10.380,  12.690,
+  0.50,  2.537,  3.010,  4.208,  4.349,  4.430,   4.842,   6.051,   7.239,   8.921,
+  0.60,  2.013,  2.265,  3.000,  2.940,  2.910,   3.061,   3.866,   4.198,   5.085
+)
+
+dat
+```
+
+每一列是一次實驗（固定 f），每一欄（A1–A9）是該次實驗中，某個化合物從進樣
+到偵測器出現訊號的時間。f 越大，代表移動相中「洗提能力較強」的有機溶劑比例
+越高，通常會讓化合物更快沖出管柱（$t_R$ 變小）——你可以在表格中看到，
+f 從 0.40 增加到 0.60 時，每一欄的數字都在下降。
+
+## 滯留因子 k {#sec-k}
+
+在層析學裡，我們很少直接對滯留時間 $t_R$ 建模，而是先換算成**滯留因子**
+（retention factor）：
+
+$$k = \frac{t_R - t_0}{t_0}$$
+
+為什麼要多做這一步轉換？因為 $t_R$ 本身包含了「化合物在管柱裡待多久」與
+「化合物根本沒有跟固定相作用、純粹被流動相帶著走要花多久」（也就是 $t_0$）
+兩部分。$t_0$ 會隨管柱長度、內徑、流速等儀器設定而改變，跟化合物本身的
+化學性質無關。扣掉 $t_0$ 並除以 $t_0$ 之後得到的 k，去除了管柱長度與流速的
+影響，只反映化合物與固定相之間真正的作用強弱，因此不同實驗室、不同管柱量到
+的 k 值才具有可比較性、也才適合拿來建立化學模型。
+
+```{r}
+#| label: add-k
+long <- dat |>
+  pivot_longer(-f, names_to = "solute", values_to = "tR") |>
+  mutate(
+    k   = (tR - t0) / t0,
+    lnk = log(k)
+  )
+
+long
+```
+
+## 模型 1：ln k 對 f 的線性關係 {#sec-model1}
+
+Zisi et al. (2020) 使用的第一個模型非常簡單：對每個化合物，$\ln k$ 與有機
+溶劑比例 f 呈線性關係：
+
+$$\ln k = c_0 - c_1 f$$
+
+$c_0$ 可以理解為「f 趨近於 0 時的 $\ln k$」（即化合物在幾乎純水的移動相下
+理論上有多強的滯留），$c_1$ 則描述滯留因子對 f 的敏感程度——$c_1$ 越大，
+代表這個化合物的滯留隨溶劑比例改變得越劇烈。
+
+我們用 `nest(.by = solute)` 把資料依化合物分組、each 組收成一個小表格，
+再用 `map()` 對每組各自跑一次線性迴歸 `lm(lnk ~ f)`，最後用
+`broom::tidy()` 把每個模型的係數整理成規整的表格。
+
+```{r}
+#| label: fit-model1
+fits <- long |>
+  nest(.by = solute) |>
+  mutate(
+    model = map(data, \(d) lm(lnk ~ f, data = d)),
+    tidy  = map(model, broom::tidy)
+  )
+
+params <- fits |>
+  select(solute, tidy) |>
+  unnest(tidy) |>
+  select(solute, term, estimate) |>
+  pivot_wider(names_from = term, values_from = estimate) |>
+  rename(c0 = `(Intercept)`, slope = f) |>
+  mutate(c1 = -slope) |>
+  select(solute, c0, c1)
+
+params
+```
+
+自己動手檢查一下：`c0` 欄位的範圍應該落在約 **3.1404 到 5.6030** 之間，
+`c1` 欄位的範圍應該落在約 **5.9113 到 8.5366** 之間。這兩個範圍剛好對應
+原論文補充材料 `i-optim` 工作表中發表的擬合參數——代表我們這裡用 R 從頭
+重新擬合出來的模型，跟原作者用他們自己的軟體算出來的結果是一致的。這是一個
+你可以自己驗證正確性的檢查點，不需要相信任何人說的話，跑一次程式碼就能
+看到答案。
+
+```{r}
+#| label: check-ranges
+range(params$c0)
+range(params$c1)
+```
+
+## 診斷圖：ln k 對 f {#sec-diagnostic}
+
+把實驗點（散點）跟擬合出來的直線畫在一起，可以直觀檢查模型合不合理——如果
+每個化合物的點都乖乖落在自己的直線附近，代表線性模型是合理的近似。
+
+```{r}
+#| label: fig-diagnostic
+#| fig-cap: "ln k 對 f 的實驗點與模型 1 擬合直線"
+f_grid <- tibble(f = seq(0.30, 0.60, by = 0.01))
+
+pred_lines <- params |>
+  cross_join(f_grid) |>
+  mutate(lnk = c0 - c1 * f)
+
+ggplot() +
+  geom_line(
+    data = pred_lines,
+    aes(x = f, y = lnk, color = solute),
+    linewidth = 0.8
+  ) +
+  geom_point(
+    data = long,
+    aes(x = f, y = lnk, color = solute),
+    size = 2
+  ) +
+  labs(
+    x = "f（acetonitrile 體積分率）",
+    y = "ln k",
+    color = "化合物",
+    title = "模型 1：ln k = c0 - c1 f"
+  ) +
+  theme_minimal()
+```
+
+## 模擬層析圖 {#sec-sim}
+
+有了每個化合物在任意 f 下的滯留時間，我們就可以模擬出一整張層析圖：每個
+化合物在圖上是一個波峰（peak），中心位置在它的 $t_R$，高度和寬度則跟它的
+$t_R$ 有關（滯留越久的化合物，波峰通常會更寬、更矮，這是層析學裡常見的
+「波峰擴散」現象）。
+
+我們用以下簡化的波峰模型：
+
+- 波峰高度：$h = \max(0.014,\ h_0 + h_1 t_R)$（設一個最低高度，避免高度變成
+  負值或太小以致無法辨識）
+- 波峰標準差：$s = s_0 + s_1 t_R$
+- 波峰底寬：$w = 4s / \sqrt{2}$
+- 波峰形狀：高斯函數 $y = h \exp\!\left(-\dfrac{(t - t_R)^2}{s^2}\right)$
+
+```{r}
+#| label: shape-constants
+SHAPE <- list(h0 = 0.138, h1 = -0.0038, s0 = 0.013, s1 = 0.0105)
+
+predict_tR <- function(f, c0, c1) {
+  lnk <- c0 - c1 * f
+  k <- exp(lnk)
+  t0 * (1 + k)
+}
+
+peak_height <- function(tR) {
+  pmax(0.014, SHAPE$h0 + SHAPE$h1 * tR)
+}
+
+peak_sigma <- function(tR) {
+  SHAPE$s0 + SHAPE$s1 * tR
+}
+
+peak_width <- function(tR) {
+  4 * peak_sigma(tR) / sqrt(2)
+}
+```
+
+現在選一個 f 值，算出每個化合物的滯留時間，再畫出模擬層析圖。
+
+```{r}
+#| label: fig-chromatogram
+#| fig-cap: "模擬層析圖"
+f_choice <- 0.45  # 練習：改這個數字（例如 0.40、0.50、0.55），再重新 render 看層析圖怎麼變
+
+solutes_at_f <- params |>
+  mutate(
+    tR = predict_tR(f_choice, c0, c1),
+    h  = peak_height(tR),
+    s  = peak_sigma(tR)
+  )
+
+t_axis <- tibble(t = seq(0, max(solutes_at_f$tR) * 1.2, length.out = 2000))
+
+curves <- solutes_at_f |>
+  select(solute, tR, h, s) |>
+  cross_join(t_axis) |>
+  mutate(y = h * exp(-((t - tR) / s)^2))
+
+ggplot(curves, aes(x = t, y = y, color = solute)) +
+  geom_line(linewidth = 0.7) +
+  labs(
+    x = "時間（分鐘）",
+    y = "訊號強度（模擬）",
+    color = "化合物",
+    title = paste0("模擬層析圖（f = ", f_choice, "）")
+  ) +
+  theme_minimal()
+```
+
+## 解析度 Rs {#sec-rs}
+
+有了波峰之後,我們最關心的是:**相鄰兩個波峰有沒有分開?** 這件事用
+「解析度」（resolution）$R_s$ 來量化。對相鄰的兩個波峰（依滯留時間排序後
+彼此相鄰的一對）：
+
+$$R_s = \frac{2 (t_{R2} - t_{R1})}{w_1 + w_2}$$
+
+其中 $w_1, w_2$ 是兩個波峰各自的底寬。$R_s$ 越大代表兩個波峰分得越開；
+業界慣用的「基線分離」（baseline separation）門檻是 $R_s \geq 1.5$——
+低於這個值，兩個波峰的訊號會有肉眼可見的重疊。
+
+要注意的是：一張層析圖裡通常有很多個波峰，我們真正在乎的不是「平均解析度」
+或「隨便哪一對的解析度」，而是**所有相鄰對之中最小的那個 $R_s$**——因為
+只要有一對分不開，這個分離條件就不合格。這一對就是「最難分的一對」。
+
+```{r}
+#| label: compute-rs
+compute_min_rs <- function(f, params) {
+  sol <- params |>
+    mutate(tR = predict_tR(f, c0, c1)) |>
+    arrange(tR)
+
+  w <- peak_width(sol$tR)
+  n <- nrow(sol)
+
+  tibble(
+    f    = f,
+    pair = paste0(sol$solute[-n], "/", sol$solute[-1]),
+    Rs   = 2 * (sol$tR[-1] - sol$tR[-n]) / (w[-1] + w[-n])
+  ) |>
+    mutate(tR_max = max(sol$tR))
+}
+
+rs_table <- compute_min_rs(f_choice, params)
+rs_table
+```
+
+在上面這張表裡，找出 `Rs` 最小的那一列，就是目前這個 f 值下「最難分的
+一對」化合物。
+
+## 掃描最佳化 {#sec-scan}
+
+只看單一個 f 值不夠——我們想知道在哪一個 f 之下，最難分的一對也能達到
+$R_s \geq 1.5$，同時整張層析圖跑完的時間（最後一個波峰的滯留時間
+$t_{R,\max}$）還在可接受的時間預算內。做法是把 f 從 0.30 掃到 0.60，
+每隔 0.005 算一次「最小 $R_s$」與「$t_{R,\max}$」。
+
+```{r}
+#| label: scan-f
+t_max <- 20  # 時間預算（分鐘）：層析圖跑完不能超過這個時間
+
+f_seq <- seq(0.30, 0.60, by = 0.005)
+
+scan <- map(f_seq, \(f) compute_min_rs(f, params)) |>
+  list_rbind() |>
+  slice_min(Rs, by = f, n = 1)
+
+scan
+```
+
+把最小解析度與最後滯留時間都對 f 畫圖，並加上 $R_s = 1.5$ 的參考虛線：
+
+```{r}
+#| label: fig-scan
+#| fig-cap: "最小解析度與最後滯留時間隨 f 的變化"
+p1 <- ggplot(scan, aes(x = f, y = Rs)) +
+  geom_line(linewidth = 0.8, color = "steelblue") +
+  geom_hline(yintercept = 1.5, linetype = "dashed", color = "firebrick") +
+  labs(x = "f", y = "最小解析度 Rs（最難分的一對）") +
+  theme_minimal()
+
+p2 <- ggplot(scan, aes(x = f, y = tR_max)) +
+  geom_line(linewidth = 0.8, color = "darkgreen") +
+  labs(x = "f", y = "最後滯留時間 tR_max（分鐘）") +
+  theme_minimal()
+
+library(patchwork)
+p1 / p2
+```
+
+留意曲線在 **f ≈ 0.35 附近有一個明顯的凹陷**：這裡最小 $R_s$ 掉到只有約
+**0.235**，代表在這個 f 值下有兩個化合物幾乎完全重疊（共流出，
+co-elution）。這正是為什麼我們要對整個範圍逐點掃描，而不是只憑經驗挑
+三、五個 f 值去試——如果剛好沒試到 0.35 附近，你可能完全不會發現這個
+危險區域，誤以為分離狀況一路平順。
+
+最後，在時間預算 `t_max` 之內，找出讓最小解析度最大的 f：
+
+```{r}
+#| label: find-optimum
+optimum <- scan |>
+  filter(Rs >= 1.5, tR_max <= t_max) |>
+  slice_max(Rs, n = 1)
+
+optimum
+```
+
+在預設的 `t_max <- 20` 之下，最佳條件是 **f = 0.410**，此時最小解析度
+**$R_s$ = 2.4535**、最後滯留時間 **tR_max = 17.13** 分鐘，最難分的一對是
+**A4/A5**。你可以在 @sec-scan 的程式碼與圖中確認：f 再往下（更接近 0.35
+的凹陷區）雖然某幾個 f 值理論上 $R_s$ 更大，但對應的 $t_{R,\max}$ 超過了
+20 分鐘的時間預算，因此被排除；f = 0.410 是「合乎時間限制」的條件中，
+解析度最好的一個。
+
+## 練習 {#sec-exercises}
+
+以下三個練習，請直接修改對應的空白程式碼區塊。修改完後重新 render 整份
+文件，觀察結果如何改變。
+
+**練習 (a)**：把時間預算 `t_max` 從 20 改成 12，重新跑一次最佳化，
+新的最佳 f 是多少？此時的最小解析度和最後滯留時間各是多少？
+
+*提示：你只需要複製 @sec-scan 裡「找出最佳條件」那段程式碼，把
+`t_max <- 20` 改成 `t_max <- 12`，其餘不用動。*
+
+```{r}
+#| label: exercise-a
+# 你的程式碼：
+```
+
+**練習 (b)**：從 `params` 裡把化合物 A6 移除，重新掃描 f，看看最佳的 f
+是否改變。為什麼移除一個化合物可能會（或不會）影響最佳條件？
+
+*提示：用 `params |> filter(solute != "A6")` 得到新的參數表，再把它傳入
+`compute_min_rs()` 重新掃描一次。*
+
+```{r}
+#| label: exercise-b
+# 你的程式碼：
+```
+
+**練習 (c)**：把 `SHAPE` 裡的 `s1`（波峰隨滯留時間變寬的速率）改大或改小
+（例如從 0.0105 改成 0.02 或 0.005），重新計算 @sec-scan 的掃描結果，
+描述 $R_s$ 曲線發生了什麼變化。
+
+*提示：`s1` 越大，波峰越寬，同樣的滯留時間差距換算出來的 $R_s$ 就會越小；
+留意這對「最佳 f」的位置有沒有影響，還是只影響 $R_s$ 的數值大小。*
+
+```{r}
+#| label: exercise-c
+# 你的程式碼：
+```
+
+## 延伸閱讀 {#sec-further}
+
+> Zisi, Ch., Pappa-Louisi, A., & Nikitas, P. (2020). Separation optimization
+> in HPLC analysis implemented in R programming language. *Journal of
+> Chromatography A*, 1617, 460823.
+
+本教學檔案旁邊還提供了完整的腳本版本，涵蓋更完整的功能（例如更多模型、
+更完整的最佳化流程）：`rchromoptim_modern.R`（R 版）、
+`rchromoptim_modern.py`（Python 版），以及對應的 Python notebook 版本。
+若你想深入研究原始方法的完整實作細節，可以參考這些檔案。

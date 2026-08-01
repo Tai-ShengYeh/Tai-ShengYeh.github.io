@@ -1,0 +1,1182 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="MOCCA2：以 Python mocca2 套件學習 HPLC/UHPLC-DAD 自動資料處理，從入門到進階的繁體中文互動課程。">
+  <title>MOCCA2｜HPLC-DAD 自動資料處理 Python 課程</title>
+  <style>
+    :root{
+      --white:#fff;--ink:#0b2348;--text:#243b5a;--muted:#61758f;--line:#d9e3ed;
+      --soft:#f4f8fb;--soft2:#edf4f8;--teal:#078d88;--teal2:#dff3f1;
+      --blue:#1459a6;--amber:#e89016;--amber2:#fff4df;--red:#c74747;--green:#167b68;
+      --shadow:0 14px 36px rgba(11,35,72,.09);--radius:16px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;color:var(--text);background:var(--white);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.65}
+    button,input{font:inherit}
+    button,a{touch-action:manipulation}
+    a{color:inherit;text-decoration:none}
+    code,pre{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace}
+    .skip{position:fixed;left:12px;top:-60px;background:var(--ink);color:#fff;padding:9px 13px;z-index:100}
+    .skip:focus{top:12px}
+    header{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;position:sticky;top:0;background:rgba(255,255,255,.97);z-index:50}
+    .nav{width:min(1380px,100%);margin:auto;padding:0 28px;display:flex;align-items:center;gap:28px}
+    .brand{display:flex;align-items:center;gap:12px;color:var(--ink);font-size:21px;font-weight:900;letter-spacing:-.02em;white-space:nowrap}
+    .brand svg{width:42px;height:33px}
+    .navlinks{display:flex;gap:28px;margin-left:auto;font-weight:800;color:var(--ink);font-size:14px}
+    .navlinks a:hover,.navlinks a:focus{color:var(--teal)}
+    .primary,.secondary,.ghost{border:0;border-radius:10px;padding:11px 18px;font-weight:900;cursor:pointer}
+    .primary{background:var(--amber);color:#fff}
+    .secondary{background:var(--ink);color:#fff}
+    .ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+    .primary:hover,.secondary:hover{filter:brightness(.94)}
+    .hero{max-width:1380px;margin:auto;padding:74px 32px 58px;display:grid;grid-template-columns:1.04fr .96fr;gap:64px;align-items:center}
+    .hero h1{font-size:clamp(38px,4.7vw,68px);line-height:1.08;letter-spacing:-.045em;margin:0;color:var(--ink)}
+    .hero h1 span{color:var(--teal)}
+    .hero .lead{font-size:19px;color:var(--muted);max-width:680px;margin:24px 0 28px}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .course-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:34px;max-width:650px}
+    .fact{border-left:3px solid var(--teal);padding-left:13px}
+    .fact strong{display:block;color:var(--ink);font-size:15px}
+    .fact span{font-size:13px;color:var(--muted)}
+    .console{border:1px solid #c9d6e3;border-radius:14px;box-shadow:var(--shadow);overflow:hidden;background:#fff}
+    .console-head{display:flex;align-items:center;gap:8px;padding:13px 16px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+    .dot{width:9px;height:9px;border-radius:50%;background:#d7e0e8}.dot:nth-child(2){background:#acd7d2}.dot:nth-child(3){background:#efc578}
+    .console pre{margin:0;padding:18px 20px 8px;color:#163b78;font-size:14px;line-height:1.8;white-space:pre-wrap}
+    .comment{color:var(--green)}
+    .console-chart{height:235px;padding:0 14px 12px}
+    svg{display:block;width:100%;height:100%}
+    .band{background:var(--soft);border-block:1px solid var(--line)}
+    .section{max-width:1380px;margin:auto;padding:64px 32px}
+    .section-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:28px}
+    h2{font-size:clamp(28px,3vw,42px);line-height:1.18;letter-spacing:-.025em;color:var(--ink);margin:0}
+    .section-heading p{max-width:640px;color:var(--muted);margin:0}
+    .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:20px}
+    .level{padding:16px 20px;border:1px solid var(--line);border-top:4px solid var(--teal);background:#fff;border-radius:12px}
+    .level:nth-child(2){border-top-color:var(--blue)}.level:nth-child(3){border-top-color:var(--amber)}
+    .level strong{color:var(--ink);font-size:18px}.level span{float:right;color:var(--muted);font-size:13px}
+    .chapters{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .chapter-card{min-height:192px;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;cursor:pointer;display:flex;flex-direction:column;transition:.18s ease}
+    .chapter-card:hover,.chapter-card:focus{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#9fc6c3;outline:none}
+    .chapter-card .num{color:var(--teal);font-weight:900;font-size:22px}
+    .chapter-card[data-level="1"] .num{color:var(--blue)}.chapter-card[data-level="2"] .num{color:#bf6f00}
+    .chapter-card h3{font-size:17px;line-height:1.45;color:var(--ink);margin:10px 0 7px}
+    .chapter-card p{font-size:13px;color:var(--muted);margin:0 0 16px}
+    .chapter-meta{display:flex;justify-content:space-between;align-items:center;margin-top:auto;font-size:12px;color:var(--muted)}
+    .done{color:var(--green);font-weight:900}
+    .workflow{display:grid;grid-template-columns:repeat(7,1fr);gap:22px;align-items:center;margin-top:28px}
+    .flow-step{position:relative;text-align:center}
+    .flow-step:not(:last-child)::after{content:"→";position:absolute;right:-22px;top:47px;color:var(--muted);font-size:26px}
+    .mini-chart{height:105px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:7px}
+    .flow-step strong{display:block;color:var(--ink);margin-top:8px}.flow-step span{font-size:12px;color:var(--muted)}
+    .lesson-shell{display:none;min-height:calc(100vh - 72px);grid-template-columns:278px 1fr;background:#fff}
+    .lesson-shell.active{display:grid}
+    .sidebar{border-right:1px solid var(--line);padding:24px 18px;position:sticky;top:72px;height:calc(100vh - 72px);overflow:auto;background:#fbfdff}
+    .side-title{display:flex;justify-content:space-between;font-weight:900;color:var(--ink);font-size:13px;border-bottom:1px solid var(--line);padding:0 4px 12px}
+    .side-group{font-weight:900;color:var(--blue);font-size:13px;margin:20px 6px 8px}
+    .side-chapter{width:100%;display:grid;grid-template-columns:25px 1fr 18px;gap:6px;align-items:center;border:0;background:transparent;text-align:left;padding:9px 8px;border-radius:8px;color:var(--text);cursor:pointer;font-size:13px}
+    .side-chapter:hover{background:var(--soft2)}.side-chapter.active{background:var(--ink);color:#fff}.side-chapter .status{font-size:14px}
+    .progress-box{margin-top:24px;border:1px solid var(--line);border-radius:12px;padding:14px}
+    .progress-box strong{color:var(--ink);font-size:13px}.progress-bar{height:8px;border-radius:8px;background:#dbe4ec;margin:10px 0;overflow:hidden}
+    .progress-fill{height:100%;width:0;background:var(--teal);transition:width .3s ease}.progress-box small{color:var(--muted)}
+    .lesson{padding:38px clamp(24px,4vw,62px) 70px;min-width:0}
+    .lesson-top{display:flex;justify-content:space-between;gap:24px;align-items:start}
+    .lesson h1{color:var(--ink);font-size:clamp(27px,3vw,41px);line-height:1.2;margin:0}
+    .lesson-sub{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:22px 0}
+    .lesson-sub div{border-left:3px solid var(--teal);padding-left:13px;font-size:14px}.lesson-sub strong{display:block;color:var(--ink)}
+    .step-tabs{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:24px 0}
+    .step-tab{border:0;border-right:1px solid var(--line);background:#fff;padding:12px 8px;color:var(--text);font-weight:900;cursor:pointer}
+    .step-tab:last-child{border-right:0}.step-tab.active{background:var(--teal);color:#fff}
+    .lesson-panel{display:none}.lesson-panel.active{display:block}
+    .workspace{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+    .panel{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+    .panel-head{padding:13px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:var(--ink);font-weight:900;font-size:14px}
+    .chart-wrap{height:340px;padding:16px}
+    .legend{display:flex;gap:14px;align-items:center;font-size:12px;color:var(--muted)}
+    .legend i{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:4px}
+    .controls{border-top:1px solid var(--line);padding:14px 16px;background:#fbfdff;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .control label{display:flex;justify-content:space-between;color:var(--ink);font-weight:800;font-size:12px}
+    input[type=range]{width:100%;height:30px;accent-color:var(--teal);cursor:pointer}
+    .codebox{background:#f7fafc;padding:18px;min-height:250px;overflow:auto}
+    .codebox pre{margin:0;font-size:13px;line-height:1.7;white-space:pre-wrap;color:#17396f}
+    .copy{border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 9px;cursor:pointer;color:var(--ink);font-size:12px;font-weight:800}
+    .parameter-note{padding:14px 16px;border-top:1px solid var(--line);font-size:13px}
+    .parameter-note code{color:var(--blue);font-weight:900}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+    .metric{border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center;background:#fff}
+    .metric small{display:block;color:var(--muted);font-size:11px}.metric strong{display:block;color:var(--teal);font-size:24px;line-height:1.25}.metric span{font-size:10px;color:var(--muted)}
+    .decision{border-left:5px solid var(--teal);background:var(--teal2);padding:14px 16px;border-radius:9px;font-size:14px}
+    .decision.warn{border-color:var(--amber);background:var(--amber2)}.decision.bad{border-color:var(--red);background:#fff0f0}
+    .decision strong{color:var(--ink)}
+    .explain-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}
+    .content-card{border:1px solid var(--line);border-radius:14px;padding:22px;background:#fff}
+    .content-card h3{color:var(--ink);margin:0 0 12px;font-size:20px}.content-card h4{color:var(--ink);margin:20px 0 8px}
+    .content-card p,.content-card li{font-size:15px}
+    .formula{padding:17px 18px;background:var(--soft);border-left:4px solid var(--blue);font-family:Georgia,serif;color:var(--ink);font-size:19px;overflow:auto}
+    .symbol-table,.output-table{width:100%;border-collapse:collapse;font-size:13px}
+    .symbol-table th,.symbol-table td,.output-table th,.output-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+    .symbol-table th,.output-table th{background:var(--soft);color:var(--ink)}
+    .callout{padding:13px 15px;background:var(--amber2);border-radius:9px;font-size:13px;margin-top:14px}
+    .objectives{margin-bottom:18px;border-left:4px solid var(--teal);background:var(--teal2)}
+    .objectives ol{margin:10px 0 0;padding-left:20px}
+    .objectives li{margin:7px 0;line-height:1.75;font-size:14px}
+    .objectives .obj-note{margin:14px 0 0;padding-top:12px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--muted)}
+    .read-steps{margin:10px 0 0;padding-left:20px}
+    .read-steps li{margin:9px 0;line-height:1.8;font-size:13.5px}
+    .quiz-option{display:block;border:1px solid var(--line);border-radius:10px;padding:12px;margin:8px 0;cursor:pointer}
+    .quiz-option:hover{background:var(--soft)}.feedback{min-height:52px;padding:13px 15px;background:var(--soft);border-radius:9px;margin-top:12px}
+    .lesson-nav{display:flex;justify-content:space-between;gap:12px;margin-top:28px;border-top:1px solid var(--line);padding-top:20px}
+    .reference-list{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .reference{border:1px solid var(--line);border-radius:12px;padding:17px;color:var(--muted);font-size:13px;background:#fff}
+    .reference strong{display:block;color:var(--ink);margin-bottom:5px}
+    footer{background:var(--ink);color:#dce5ef;padding:30px 32px}.footer-inner{max-width:1380px;margin:auto;display:flex;justify-content:space-between;gap:20px;font-size:13px}
+    .hidden{display:none!important}
+    @media(max-width:1050px){
+      .hero{grid-template-columns:1fr}.chapters{grid-template-columns:repeat(3,1fr)}
+      .lesson-shell{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}
+      .sidebar .side-list{display:none}.progress-box{margin-top:0}.workspace,.explain-grid{grid-template-columns:1fr}
+    }
+    @media(max-width:760px){
+      header{height:auto}.nav{padding:12px 18px}.navlinks{display:none}.nav .primary{margin-left:auto;padding:9px 12px}
+      .hero,.section{padding:42px 18px}.course-facts,.levels,.metrics{grid-template-columns:1fr}
+      .chapters{grid-template-columns:1fr 1fr}.workflow{grid-template-columns:1fr 1fr}
+      .flow-step::after{display:none}.section-heading,.lesson-top{align-items:start;flex-direction:column}
+      .lesson{padding:28px 16px 56px}.lesson-sub{grid-template-columns:1fr}.step-tabs{grid-template-columns:1fr}
+      .step-tab{border-right:0;border-bottom:1px solid var(--line)}.controls{grid-template-columns:1fr}
+      .reference-list{grid-template-columns:1fr}.footer-inner{flex-direction:column}.chart-wrap{height:290px}
+    }
+    @media(max-width:460px){.chapters,.workflow{grid-template-columns:1fr}.brand{font-size:18px}.brand svg{width:34px}.hero h1{font-size:38px}}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">跳到主要內容</a>
+  <header>
+    <nav class="nav" aria-label="主要導覽">
+      <a class="brand" href="#" id="homeLink" aria-label="MOCCA2 首頁">
+        <svg viewBox="0 0 44 34" aria-hidden="true"><path d="M1 29H43" fill="none" stroke="#cbd8e4"/><path d="M2 28C8 28 8 26 10 12c1.3 18 3 18 5 0 1.6-15 2.4-15 4 0 1.3 14 2 16 4 0 1.5-9 2.5-9 4 0 1.4 14 3 16 5 0 1.4-7 2.5-7 4 0 1.3 12 2.5 15 6 15" fill="none" stroke="#078d88" stroke-width="2"/></svg>
+        <span>MOCCA2</span>
+      </a>
+      <div class="navlinks">
+        <a href="#course-map">課程地圖</a><a href="#environment">學習環境</a>
+        <a href="#function-index">函式索引</a><a href="#references">參考資料</a>
+      </div>
+      <button class="primary" id="headerStart">開始學習 →</button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <div id="homeView">
+      <section class="hero">
+        <div>
+          <h1>從原始層析圖到<br><span>可信賴的批次分析</span></h1>
+          <p class="lead">以 Python 與 MOCCA2 處理 HPLC／UHPLC-DAD 資料，逐步完成匯入、基線校正、自適應找峰、純度檢查、重疊峰去卷積、化合物追蹤與定量。每一步都回傳可判讀的數字證據。</p>
+          <div class="hero-actions"><button class="secondary" id="heroStart">從第 1 章開始</button><a class="ghost" href="#course-map">先看課程地圖</a></div>
+          <div class="course-facts">
+            <div class="fact"><strong>12 個漸進章節</strong><span>入門 → 中階 → 進階</span></div>
+            <div class="fact"><strong>官方範例可重跑</strong><span>example_data.example_1()</span></div>
+            <div class="fact"><strong>分析證據導向</strong><span>不是只調參數，而是學會判讀</span></div>
+          </div>
+        </div>
+        <div class="console" id="environment">
+          <div class="console-head"><i class="dot"></i><i class="dot"></i><i class="dot"></i><strong>Python / Jupyter</strong><span style="margin-left:auto">mocca2 0.1.18</span></div>
+          <pre><span class="comment"># pip install mocca2</span>
+from mocca2 import example_data
+
+chrom = example_data.example_1()
+chrom.correct_baseline()
+chrom.find_peaks(min_height=2)
+chrom.plot()</pre>
+          <div class="console-chart"><svg id="heroChart" viewBox="0 0 700 330" role="img" aria-label="層析圖示例"></svg></div>
+        </div>
+      </section>
+
+      <div class="band" id="course-map">
+        <section class="section">
+          <div class="section-heading"><div><h2>課程地圖</h2><p>先建立 Python、Chromatogram 與 DAD 資料的共同語言，再完成單一層析圖工作流，最後進入化合物追蹤、批次處理與方法品質證據。</p></div><button class="ghost" id="resetProgress">重設學習進度</button></div>
+          <div class="levels"><div class="level"><strong>入門</strong><span>第 1–4 章</span></div><div class="level"><strong>中階</strong><span>第 5–8 章</span></div><div class="level"><strong>進階</strong><span>第 9–12 章</span></div></div>
+          <div class="chapters" id="chapterCards"></div>
+        </section>
+      </div>
+
+      <section class="section">
+        <div class="section-heading"><div><h2>MOCCA2 完整處理工作流</h2><p>每一步都有明確輸入、輸出與品質診斷。網站會要求學生用圖形與數字回答「為什麼這個結果可信」。</p></div></div>
+        <div class="workflow" id="workflow"></div>
+      </section>
+
+      <div class="band" id="function-index">
+        <section class="section">
+          <div class="section-heading"><div><h2>核心函式索引</h2><p>課程只使用官方文件中可核對的函式與物件。點選函式可直接進入對應章節。</p></div></div>
+          <div class="reference-list" id="functionCards"></div>
+        </section>
+      </div>
+
+      <section class="section" id="references">
+        <div class="section-heading"><div><h2>參考資料與方法來源</h2><p>教學圖表為依據公開方法概念重繪的互動示例，不直接複製論文圖像。</p></div></div>
+        <h3 style="margin:4px 0 10px;font-size:1.05rem">本課程附帶的練習資料</h3>
+        <div class="reference-list" style="margin-bottom:26px">
+          <a class="reference" href="https://github.com/Tai-ShengYeh/Tai-ShengYeh.github.io/tree/main/mocca2-course/data" target="_blank" rel="noopener"><strong>魚露防腐劑 HPLC-PDA 資料集</strong>本實驗室實測：空白、0.25 ppm 標準品、陽性與陰性真實樣品各一，27 個波長（228.9–260.5 nm）。已轉成 <code>mocca2.load_data2d()</code> 可直接讀取的格式。</a>
+          <a class="reference" href="data/quickstart.py"><strong>quickstart.py</strong>可直接執行的範例：扣空白 → 基線校正 → 找峰。實測結果為己二烯酸出現在 9.93 min，與儀器峰表一致。</a>
+          <a class="reference" href="data/convert_labsolutions_pda.py"><strong>convert_labsolutions_pda.py</strong>Shimadzu LCsolution 原始檔轉換腳本。MOCCA2 內建的 <code>labsolutions</code> 解析器預期逗號分隔、且會抓到錯誤的區段，直接讀取原始匯出檔會失敗；本腳本只擷取 <code>[PDA 3D]</code> 並改分隔符號，數值不變。</a>
+        </div>
+        <div class="reference-list">
+          <a class="reference" href="https://bayer-group.github.io/MOCCA/" target="_blank" rel="noopener"><strong>MOCCA2 0.1.18 官方文件</strong>Getting Started、examples、類別與模組 API。</a>
+          <a class="reference" href="https://github.com/Bayer-Group/MOCCA" target="_blank" rel="noopener"><strong>Bayer-Group/MOCCA</strong>MOCCA2 原始碼、測試、範例資料與版本紀錄。</a>
+          <a class="reference" href="https://pypi.org/project/mocca2/" target="_blank" rel="noopener"><strong>PyPI：mocca2</strong>安裝版本、Python 需求與發布資訊。</a>
+          <a class="reference" href="https://doi.org/10.1039/D4DD00214H" target="_blank" rel="noopener"><strong>Obořil et al. (2024)</strong>MOCCA2 自動峰辨識、去卷積與 GUI 方法論。</a>
+          <a class="reference" href="https://doi.org/10.1021/acscentsci.2c01042" target="_blank" rel="noopener"><strong>Haas et al. (2023)</strong>原始 MOCCA 的開源層析資料分析與反應篩選工作流。</a>
+          <a class="reference" href="https://github.com/Bayer-Group/MOCCA-frontend" target="_blank" rel="noopener"><strong>MOCCA2 Web App</strong>官方 GUI 專案；適合與 Python API 課程交叉比較。</a>
+        </div>
+      </section>
+    </div>
+
+    <section class="lesson-shell" id="lessonView" aria-label="章節學習區">
+      <aside class="sidebar">
+        <div class="side-title"><span>課程章節</span><span id="sideProgress">0 / 12</span></div>
+        <div class="side-list" id="sideList"></div>
+        <div class="progress-box"><strong>學習進度</strong><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><small id="progressText">已完成 0 / 12 章</small></div>
+      </aside>
+      <article class="lesson">
+        <div class="lesson-top">
+          <div><h1 id="lessonTitle"></h1><div class="lesson-sub"><div><strong>學習目標</strong><span id="lessonGoal"></span></div><div><strong>先備知識</strong><span id="lessonPrereq"></span></div></div></div>
+          <button class="ghost" id="backMap">← 回課程地圖</button>
+        </div>
+        <div class="step-tabs" role="tablist" aria-label="章節學習步驟">
+          <button class="step-tab active" data-step="concept">1 概念</button>
+          <button class="step-tab" data-step="code">2 程式碼</button>
+          <button class="step-tab" data-step="output">3 輸出</button>
+          <button class="step-tab" data-step="interpret">4 判讀</button>
+          <button class="step-tab" data-step="practice">5 練習</button>
+        </div>
+        <div id="conceptPanel" class="lesson-panel active"></div>
+        <div id="codePanel" class="lesson-panel"></div>
+        <div id="outputPanel" class="lesson-panel"></div>
+        <div id="interpretPanel" class="lesson-panel"></div>
+        <div id="practicePanel" class="lesson-panel"></div>
+        <div class="lesson-nav"><button class="ghost" id="prevChapter">← 上一章</button><button class="secondary" id="nextChapter">下一章 →</button></div>
+      </article>
+    </section>
+  </main>
+
+  <footer><div class="footer-inner"><span>MOCCA2 教學網站｜Python 套件：<strong>mocca2</strong></span><span>繁體中文 · Python 實作 · 可重現分析</span></div></footer>
+
+  <script>
+  const chapters=[
+    {title:"HPLC-DAD 與 MOCCA2",level:0,time:35,goal:"理解 MOCCA2 的適用資料、核心物件與完整處理流程。",prereq:"知道保留時間、吸光度與色譜峰的基本意義。",func:"Data2D / Chromatogram",desc:"先看懂時間 × 波長 × 吸光度的二維資料。",concept:"MOCCA2 的 `Data2D.data` 依官方定義為 absorbance[wavelength, time]；`Chromatogram` 在此基礎上加入樣品路徑、blank 與 peaks。",formula:"X ∈ ℝ<sup>n<sub>λ</sub> × n<sub>t</sub></sup>；x<sub>ij</sub>=A(λ<sub>i</sub>,t<sub>j</sub>)",symbols:[["time","保留時間軸，通常為 min"],["wavelength","DAD 波長軸，通常為 nm"],["data","吸光度矩陣 [wavelength, time]"]],code:`from mocca2 import example_data\n\nchrom = example_data.example_1()\nprint(chrom.data.shape)\nprint(chrom.time_step())\nprint(chrom.wavelength_step())\nchrom.plot_2d()`,why:["確認矩陣方向與 shape。","確認時間、波長單位及取樣間距。","保留 raw、blank 與樣品名稱。"],error:"MOCCA2 主要針對 HPLC／UHPLC-DAD；只有單波長訊號時，純度與光譜去卷積能力會受限。",q:"MOCCA2 的 Data2D.data 第一個維度代表什麼？",opts:["波長","時間","樣品編號"],ans:0},
+    {title:"安裝、範例資料與原始檔",level:0,time:45,goal:"建立 Python 環境，下載範例並匯入 Agilent、Shimadzu 或 Waters 資料。",prereq:"能在終端機或 Jupyter 執行 Python。",func:"Chromatogram()",desc:"從官方範例開始，再銜接儀器原始檔與 blank。",concept:"先以 `example_data` 驗證環境；實際資料可用 `Chromatogram(sample, blank=...)` 建立，解析器支援範圍仍需依官方文件與實際儀器版本核對。",formula:"X<sub>net</sub>=X<sub>sample</sub>−X<sub>blank</sub>",symbols:[["sample","樣品原始檔或 Data2D"],["blank","空白原始檔或 Data2D"],["interpolate_blank","是否將 blank 插值至樣品取樣軸"]],code:`# 終端機：pip install mocca2\n# 終端機：python -m mocca2 --download-data\nfrom mocca2 import Chromatogram, example_data\n\nchrom = example_data.example_1()\n# real = Chromatogram("sample.D", blank="blank.D")\nprint(chrom.name, chrom.data.shape)`,why:["先用 example_1() 驗證安裝。","只匯入一個實際檔並核對 shape。","不要覆寫或轉存後刪除原始資料。"],error:"儀器檔案格式與軟體版本會影響解析；匯入成功仍需核對時間、波長與訊號尺度。",q:"最安全的第一個環境測試是？",opts:["載入 example_data.example_1()","直接批次處理全部原始檔","只確認 pip 沒報錯"],ans:0},
+    {title:"裁切、插值與視覺檢查",level:0,time:45,goal:"使用時間／波長裁切與圖形 QC 定義有效分析區。",prereq:"已建立可用的 Chromatogram。",func:"extract_time() / extract_wavelength()",desc:"排除溶劑前緣與高雜訊波段，但保留分析目標。",concept:"`extract_time()` 與 `extract_wavelength()` 可回傳新物件或 inplace 修改；教學預設保留原物件。二維 heatmap 與 contracted trace 應一起檢查。",formula:"X′=X[λ<sub>min</sub>:λ<sub>max</sub>,t<sub>min</sub>:t<sub>max</sub>]",symbols:[["tmin,tmax","保留時間分析範圍"],["λmin,λmax","DAD 波長分析範圍"],["inplace","True 時直接修改原物件"]],code:`from mocca2 import example_data\nchrom = example_data.example_1()\n\nroi = chrom.extract_time(1.4, 3.8)\nroi = roi.extract_wavelength(220, 400)\nroi.plot()\nroi.plot_2d()`,why:["在裁切前後記錄 shape 與範圍。","確認沒有切掉目標峰邊界。","檢查飽和、負值、缺訊號與異常波段。"],error:"只看 1D trace 可能忽略特定波長的干擾；裁切也不能取代 blank 與系統適用性。",q:"為何時間與波長範圍都要檢查？",opts:["DAD 資料同時含兩個軸，干擾可能只出現在其中一區","因為裁切會自動提高濃度","只為了讓圖比較小"],ans:0},
+    {title:"基線校正與診斷",level:0,time:60,goal:"比較 FlatFit、AsLS 與 arPLS，使用 RMSE 與面積偏差判讀。",prereq:"能辨識無峰區、基線漂移與雜訊。",func:"correct_baseline()",desc:"讓峰偵測建立在接近零且平坦的局部背景上。",concept:"`correct_baseline()` 支援 `flatfit`、`asls` 與 `arpls`。官方說明指出 FlatFit、AsLS 適合較平滑資料，arPLS 對較 noisy 資料可能較合適；演算法選擇仍須以 QC 驗證。",formula:"X<sub>c</sub>(λ,t)=X(λ,t)−b̂(λ,t)；RMSE<sub>b</sub>=√[N<sup>−1</sup>Σ(b̂−b<sub>ref</sub>)²]",symbols:[["b̂","估計基線，不是真值"],["smoothness","基線平滑懲罰尺度"],["RMSEb","在獨立無峰區評估的基線殘差"]],code:`from mocca2 import example_data\nchrom = example_data.example_1()\n\ncorrected = chrom.correct_baseline(\n    method="arpls",\n    smoothness=1.0,\n    tol=1e-7,\n)\ncorrected.plot(zero_line=True)`,why:["比較多個無峰區的殘差。","檢查峰高、峰面積與峰界線是否被削弱。","記錄 method、smoothness、p、tol 與迭代設定。"],error:"基線看似平坦不代表校正正確；過度擬合可能吃掉寬峰或拖尾。",q:"基線品質最有力的證據是？",opts:["無峰區殘差加上標準／加標峰的面積偏差","曲線看起來最平","把所有負值截成零"],ans:0},
+    {title:"自適應找峰與峰邊界",level:1,time:65,goal:"調整 min_height、min_rel_height 與 split_threshold，平衡假陽性與漏峰。",prereq:"完成基線校正並理解 prominence。",func:"find_peaks()",desc:"用真峰、假陽性與漏峰數評估參數，不追求峰數最多。",concept:"MOCCA2 先將 2D 訊號 contraction 成 1D，再依 prominence 找峰、展開邊界、合併重疊峰並視 split_threshold 分裂。`min_height` 是最小 prominence。",formula:"Precision=TP/(TP+FP)；Recall=TP/(TP+FN)",symbols:[["min_height","最小絕對 prominence"],["min_rel_height","相對最高峰的最小 prominence"],["split_threshold","兩峰谷值相對較小峰高度的分裂界線"]],code:`from mocca2 import example_data\nchrom = example_data.example_2()\nchrom.correct_baseline()\nchrom.find_peaks(\n    contraction="mean",\n    min_height=1,\n    min_rel_height=0.01,\n    split_threshold=0.05,\n)\nchrom.plot()`,why:["用標準品或人工核對集計算 TP/FP/FN。","查看峰邊界是否回到局部基線。","檢查小峰是否只在單一波長出現。"],error:"降低 min_height 會增加靈敏度，也可能把雜訊與 ghost peaks 收進來。",q:"min_height 過低最可能造成什麼？",opts:["假陽性增加","所有峰自動變純","時間單位改變"],ans:0},
+    {title:"峰純度與共洗脫證據",level:1,time:55,goal:"以 DAD 光譜變化與 explained threshold 辨識可疑混合峰。",prereq:"理解峰內不同時間點都有一條吸收光譜。",func:"purity checking",desc:"把「看起來像單峰」轉成可檢驗的光譜一致性問題。",concept:"單一純成分在峰內不同時間點的光譜形狀應高度一致；若需要多個光譜成分才能解釋二維訊號，可能存在共洗脫。純度證據支持或反對單成分假設，但不是化合物鑑定。",formula:"X≈csᵀ；Explained=1−||X−X̂||²<sub>F</sub>/||X−X̄||²<sub>F</sub>",symbols:[["c","成分的時間濃度輪廓"],["s","成分的吸收光譜"],["Explained","模型解釋的訊號比例"]],code:`# dataset 工作流中的純度門檻\nfrom mocca2 import ProcessingSettings\n\nsettings = ProcessingSettings(\n    explained_threshold=0.998,\n    min_prominence=1,\n)\n# threshold 必須用標準、加標與已知混合物驗證`,why:["比較峰前、峰頂、峰後光譜。","報告 explained score 與殘差結構。","用已知混合物測試假陰性與假陽性。"],error:"高純度分數不等於已鑑定，也不能排除吸收光譜非常相似的共洗脫物。",q:"高峰純度分數最嚴謹的結論是？",opts:["資料支持單一光譜成分模型，但仍非身分證明","一定只有一種化合物","濃度一定正確"],ans:0},
+    {title:"重疊峰去卷積",level:1,time:75,goal:"使用 Fraser–Suzuki 等模型拆解重疊峰，檢查 R²、RMSE 與面積偏差。",prereq:"已偵測重疊峰並理解純度檢查。",func:"deconvolve_peaks()",desc:"增加成分數直到擬合達標，但防止為追求 R² 而過度擬合。",concept:"`deconvolve_peaks()` 逐步增加 components，直到達到 `min_r2` 或 `max_comps`。`relaxe_concs=False` 回傳峰模型函式；True 會用受限最小平方法再精煉濃度。",formula:"X(λ,t)=Σ<sub>k=1</sub><sup>K</sup>s<sub>k</sub>(λ)c<sub>k</sub>(t)+E(λ,t)",symbols:[["min_r2","去卷積要求的最小 R²"],["max_comps","允許擬合的最大成分數"],["E","模型殘差矩陣"]],code:`chromatogram.deconvolve_peaks(\n    model="FraserSuzuki",\n    min_r2=0.999,\n    relaxe_concs=False,\n    max_comps=5,\n)\n\nfor component in chromatogram.all_components():\n    print(component.integral)`,why:["同時看 component 光譜與洗脫輪廓。","以殘差結構判斷是否遺漏成分。","用已知混合物評估面積回收率與偏差。"],error:"R² 提高不代表化學分解正確；K 過大可能把雜訊拆成假成分。",q:"選擇去卷積結果時，為何不能只看最高 R²？",opts:["較多成分可能過度擬合雜訊","R² 與模型完全無關","R² 只適用 GC"],ans:0},
+    {title:"跨層析圖化合物追蹤",level:1,time:65,goal:"結合保留時間與光譜資訊，把同一化合物跨樣品追蹤。",prereq:"已有品質可接受的 peaks 或 components。",func:"Compound / clustering",desc:"不要把相近保留時間直接視為同一化合物。",concept:"MOCCA2 可將不同 chromatograms 中的 components 聚類成 compounds，再利用 reference chromatograms 命名。應同時考慮 RT、光譜與批次漂移，並對歧義配對保留稽核紀錄。",formula:"d<sub>ij</sub>=w<sub>t</sub>|t<sub>Ri</sub>−t<sub>Rj</sub>|+w<sub>s</sub>(1−sim(s<sub>i</sub>,s<sub>j</sub>))",symbols:[["Compound","跨 chromatograms 的候選同一化合物"],["reference_for_compound","標準或參考樣品提供的名稱"],["sim","光譜相似度"]],code:`from mocca2 import MoccaDataset\n\ndataset = MoccaDataset()\ndataset.add_chromatogram(\n    standard_chrom,\n    reference_for_compound="caffeine",\n    compound_concentration=0.050,\n)\ndataset.add_chromatogram(sample_chrom)`,why:["以標準品 RT 與 DAD 光譜交叉確認。","檢查一對多或多對一配對。","以 QC 樣品評估跨批次追蹤穩定性。"],error:"聚類結果是候選對應，不是法規層級鑑定；等吸收光譜物質可能仍需 MS 或加標確認。",q:"跨樣品追蹤最穩健的依據是？",opts:["保留時間、光譜與標準品共同支持","只看峰高","只要名稱相同"],ans:0},
+    {title:"內標、校正與相對濃度",level:2,time:70,goal:"加入內標與標準樣品，理解 response factor、反算與適用範圍。",prereq:"能追蹤同一化合物的積分面積。",func:"add_chromatogram() / get_relative_concentrations()",desc:"把成分積分轉換成可解釋的濃度與不確定度。",concept:"批次資料可指定 `istd_reference`、化合物與內標濃度，之後取得相對濃度。內標可補償部分進樣與訊號變異，但不能自動修復共洗脫、非線性或標準品錯誤。",formula:"R=A<sub>x</sub>/A<sub>IS</sub>；R=f(C<sub>x</sub>/C<sub>IS</sub>)",symbols:[["Ax,AIS","分析物與內標積分"],["f","由標準樣品估計的 response factor"],["Cx,CIS","分析物與內標濃度"]],code:`dataset.add_chromatogram(\n    istd_chrom,\n    reference_for_compound="istd",\n    istd_reference=True,\n    compound_concentration=0.06094,\n    istd_concentration=0.06094,\n)\n\nresults, factors = dataset.get_relative_concentrations()`,why:["確認內標不與分析物共洗脫。","用多濃度標準檢查線性與範圍。","報告校正殘差、回算偏差與外插。"],error:"單點 response factor 不等於完整方法確效；教材數值門檻不是通用法規標準。",q:"內標法仍需要檢查什麼？",opts:["共洗脫、線性、範圍與回算偏差","只需確認內標峰存在","不必做任何 QC"],ans:0},
+    {title:"MoccaDataset 批次處理",level:2,time:80,goal:"用 ProcessingSettings 一次處理多個 chromatograms 並理解每個 stage。",prereq:"已完成單一層析圖的完整工作流。",func:"MoccaDataset.process_all()",desc:"自動化不等於免檢查；以 QC gate 管理整批結果。",concept:"`process_all()` 會依序裁切波長、校正基線、找峰、去卷積、聚類 compounds、精煉 peaks 與命名。可使用多核心，但每批都要保存設定與失敗樣品。",formula:"raw → crop → baseline → peaks → deconvolution → clustering → naming",symbols:[["ProcessingSettings","集中保存處理參數"],["cores","平行處理核心數"],["verbose","輸出各 stage 進度"]],code:`from mocca2 import MoccaDataset, ProcessingSettings\n\nsettings = ProcessingSettings(\n    baseline_model="arpls",\n    min_elution_time=2.5,\n    max_elution_time=5.0,\n    min_wavelength=230,\n    min_rel_prominence=0.0,\n    min_prominence=1,\n    explained_threshold=0.998,\n)\ndataset.process_all(settings, verbose=True, cores=4)`,why:["先以小子集驗證設定。","每個 stage 抽查代表樣品與極端樣品。","記錄失敗、警告、執行時間與版本。"],error:"官方範例約 90 張 chromatograms 可需數分鐘；高 cores 不會保證結果正確，也受硬體限制。",q:"批次處理前最重要的步驟是？",opts:["先用代表性小子集驗證參數與 QC","直接把 cores 設到最大","只看最後濃度表"],ans:0},
+    {title:"方法性能與失敗案例",level:2,time:75,goal:"用 precision、recall、面積 bias、RSD 與殘差評估整體方法。",prereq:"能執行批次處理並取得已知參考結果。",func:"QC metrics",desc:"把漂亮圖形轉成能被驗證、比較與稽核的性能證據。",concept:"峰偵測、追蹤與定量需要不同的真值與指標。應以標準品、加標、重複、blank 與人工核對集建立獨立 QC，並納入失敗案例。",formula:"Bias%=100(Ĉ−C<sub>ref</sub>)/C<sub>ref</sub>；RSD%=100s/C̄",symbols:[["TP/FP/FN","峰偵測或追蹤的分類結果"],["Bias","定量系統偏差"],["RSD","重複性相對標準差"]],code:`import pandas as pd\n\nqc = pd.DataFrame({\n    "metric": ["peak_precision", "peak_recall", "area_bias_pct", "qc_rsd_pct"],\n    "value": [0.96, 0.92, 2.1, 3.4],\n})\nprint(qc)\n# 允收值須由研究設計、SOP 或法規預先定義`,why:["允收界線在分析前定義。","以獨立 QC 驗證，不用同一資料自證。","公開漏峰、錯配、過度去卷積與外插案例。"],error:"網站中的數字是教學模擬；真實允收標準必須依用途、基質、濃度與法規建立。",q:"最能支持自動找峰性能的是？",opts:["已知核對集上的 precision 與 recall","只報告總峰數","挑一張最好看的圖"],ans:0},
+    {title:"可重現專案與報告",level:2,time:70,goal:"保存版本、設定、原始資料、輸出與 QC，產生可重現分析報告。",prereq:"已完成 MOCCA2 批次工作流與方法評估。",func:"serialization / environment",desc:"讓另一位分析者能從 raw data 重建同一份結果。",concept:"完整專案至少保存唯讀 raw、處理腳本、ProcessingSettings、Python 與 mocca2 版本、樣品 metadata、QC 圖、排除理由與結果表；資料輸出不應取代稽核軌跡。",formula:"Reproducible result = data + code + parameters + environment + decisions",symbols:[["to_dict()","物件序列化的一部分"],["settings","完整處理參數"],["environment","Python 與套件版本"]],code:`from importlib.metadata import version\nimport json\n\nmanifest = {\n    "mocca2": version("mocca2"),\n    "settings": settings.__dict__,\n    "raw_files": raw_file_list,\n    "qc_rules": qc_rules,\n}\nwith open("results/manifest.json", "w", encoding="utf-8") as f:\n    json.dump(manifest, f, ensure_ascii=False, indent=2)`,why:["raw data 唯讀且具 checksum。","每次報告連結版本、參數與 QC。","人工排除與重跑原因寫入 log。"],error:"只保存 CSV 或截圖無法重建分析；也不要在未確認相容性前把序列化物件當永久格式。",q:"哪一組最接近可重現分析的最低要求？",opts:["資料、程式、參數、環境與決策紀錄","只有最終 Excel","只有 Python notebook 截圖"],ans:0}
+  ];
+
+  // 每章專屬的教學目標、預期輸出與判讀順序。
+  // 依索引與 chapters 對應；分開存放是為了不動到上面既有的長行。
+  const chapterExtras=[
+    {
+      "objectives": [
+        "說出 <code>Data2D.data</code> 兩個維度各代表什麼，以及為什麼順序是 [wavelength, time]。",
+        "從 shape 與取樣間距推算「一個峰有幾個取樣點」，判斷資料密度是否足以描述峰形。",
+        "分辨 Data2D、Chromatogram 與 MoccaDataset 三個層級各自負責什麼。"
+      ],
+      "outputCols": [
+        "檢查項目",
+        "程式呼叫",
+        "本例輸出",
+        "你要確認的事"
+      ],
+      "outputRows": [
+        [
+          "矩陣形狀",
+          "chrom.data.shape",
+          "(501, 2401)",
+          "第一維是波長數，不是時間點數"
+        ],
+        [
+          "時間間距",
+          "chrom.time_step()",
+          "0.00833 min",
+          "約 0.5 秒；峰寬 0.2 min 時約 24 點／峰"
+        ],
+        [
+          "波長間距",
+          "chrom.wavelength_step()",
+          "0.4 nm",
+          "足以描述吸收帶形狀"
+        ],
+        [
+          "時間範圍",
+          "chrom.time[0], chrom.time[-1]",
+          "0.00 – 20.00 min",
+          "與儀器方法設定一致"
+        ],
+        [
+          "物件層級",
+          "type(chrom)",
+          "Chromatogram",
+          "內含 raw、blank 與 peaks"
+        ]
+      ],
+      "readSteps": [
+        "先讀 shape，確認第一個數字是<strong>波長數</strong>而不是時間點數 —— 兩軸搞反，後面每一次裁切都會切錯軸。",
+        "用 time_step() 估「一個峰有幾點」。少於約 10 點時峰面積與峰形都不可靠，這是資料本身的上限，後面任何演算法都補不回來。",
+        "在 heatmap 上找出訊號集中的波長帶與時間帶，這就是下一章裁切範圍的依據。",
+        "確認 blank 是否存在。沒有 blank，後面的基線與純度判讀都會少掉一層獨立證據。"
+      ]
+    },
+    {
+      "objectives": [
+        "用 <code>example_data.example_1()</code> 驗證安裝，並說出這比「pip 沒報錯」多驗證了什麼。",
+        "說明 blank 在 <code>Chromatogram(sample, blank=...)</code> 中的角色，以及 X<sub>net</sub> 扣掉的是什麼。",
+        "匯入真實儀器檔後，列出至少三項必須人工核對的項目。"
+      ],
+      "outputCols": [
+        "驗證步驟",
+        "預期結果",
+        "失敗時的徵兆"
+      ],
+      "outputRows": [
+        [
+          "import mocca2",
+          "無 ImportError",
+          "套件未安裝或 Python 版本不符"
+        ],
+        [
+          "example_data.example_1()",
+          "回傳 Chromatogram 物件",
+          "範例資料未下載（忘了 --download-data）"
+        ],
+        [
+          "chrom.data.shape",
+          "(501, 2401)",
+          "回傳空值或兩軸顛倒"
+        ],
+        [
+          "Chromatogram(sample, blank=blank)",
+          "name 與 shape 皆正確",
+          "解析器不支援該儀器或軟體版本"
+        ],
+        [
+          "扣除 blank 後的無峰區",
+          "在 0 附近上下震盪",
+          "整段系統性為負 → blank 過度扣除"
+        ]
+      ],
+      "readSteps": [
+        "先確認內建範例載得進來。環境沒問題卻讀不進自己的檔，問題就落在解析器，不是安裝。",
+        "比較 sample、blank 與相減後三條線：blank 應該只帶走系統背景，<strong>不應該削掉樣品的峰</strong>。",
+        "看無峰區在相減後是落在零附近還是變成負值。系統性負值代表 blank 過度扣除，或兩者取樣軸沒有對齊。",
+        "核對匯入後的時間範圍、波長範圍與訊號尺度是否與儀器方法一致。shape 對，不代表單位對。"
+      ]
+    },
+    {
+      "objectives": [
+        "依訊號分布決定時間與波長範圍，並說明各自排除了什麼干擾。",
+        "說明為什麼只看 1D trace 不足以決定波長下界。",
+        "在裁切前後比對 shape 與範圍，確認沒有切掉目標峰的裙擺。"
+      ],
+      "outputCols": [
+        "階段",
+        "shape",
+        "時間範圍 (min)",
+        "波長範圍 (nm)",
+        "資料量變化"
+      ],
+      "outputRows": [
+        [
+          "原始",
+          "(501, 2401)",
+          "0.00 – 20.00",
+          "200 – 400",
+          "—"
+        ],
+        [
+          "extract_time(1.4, 3.8)",
+          "(501, 289)",
+          "1.40 – 3.80",
+          "200 – 400",
+          "−88 %"
+        ],
+        [
+          "extract_wavelength(220, 400)",
+          "(451, 289)",
+          "1.40 – 3.80",
+          "220 – 400",
+          "再 −10 %"
+        ]
+      ],
+      "readSteps": [
+        "先在完整 trace 上標出要保留的時間窗，確認溶劑前緣被排除、而目標峰的起點與終點都在窗內。",
+        "檢查窗邊界有沒有切在峰的裙擺上。<strong>切掉裙擺會直接低估面積，而且後面的基線校正完全看不出來。</strong>",
+        "用 heatmap 而不是 1D trace 決定波長下界：低波長端的干擾常常只出現在特定波長，contract 成 1D 之後就被平均掉了。",
+        "把裁切前後的 shape 記下來。之後任何一步出問題，這是最先要回頭核對的數字。"
+      ]
+    },
+    {
+      "objectives": [
+        "說明基線校正的目標是讓峰坐在接近零的局部背景上，而不是讓曲線看起來平。",
+        "用無峰區 RMSE 與加標樣品面積偏差<strong>兩項獨立證據</strong>評估基線品質。",
+        "說出過度校正的徵兆，以及它為什麼先傷害寬峰與拖尾峰。"
+      ],
+      "outputCols": [
+        "方法",
+        "無峰區 RMSE (mAU)",
+        "面積偏差 (%)",
+        "適用情境"
+      ],
+      "outputRows": [
+        [
+          "未校正",
+          "18.4",
+          "+22.7",
+          "—"
+        ],
+        [
+          "flatfit",
+          "4.1",
+          "+6.8",
+          "漂移平緩、雜訊低"
+        ],
+        [
+          "asls",
+          "2.6",
+          "+3.9",
+          "一般情況，需調 p 與 smoothness"
+        ],
+        [
+          "arpls",
+          "1.7",
+          "+2.2",
+          "雜訊較高的資料"
+        ],
+        [
+          "arpls（過度校正）",
+          "1.2",
+          "−8.5",
+          "RMSE 更低，面積卻轉為低估"
+        ]
+      ],
+      "readSteps": [
+        "先看無峰區：校正後應該貼著零上下震盪，而不是整段偏在某一側。",
+        "拉動 α，觀察面積偏差怎麼變。<strong>偏差由正轉負，就是越過了「校正足夠」而進入「過度校正」。</strong>",
+        "盯住畫面上最寬的那個峰。過度校正最先吃掉的是寬峰與拖尾，窄峰反而看不出異狀。",
+        "記錄 method、smoothness、p 與 tol。基線參數沒記下來，這張圖就沒有人能重現。"
+      ]
+    },
+    {
+      "objectives": [
+        "用 TP / FP / FN 而不是「抓到幾個峰」來評估找峰參數。",
+        "說明 min_height、min_rel_height 與 split_threshold 各自控制什麼。",
+        "判斷一個被偵測到的峰，它的邊界是否合理回到局部基線。"
+      ],
+      "outputCols": [
+        "參數組",
+        "候選峰",
+        "TP",
+        "FP",
+        "FN",
+        "Precision",
+        "Recall"
+      ],
+      "outputRows": [
+        [
+          "min_height=0.5",
+          "11",
+          "7",
+          "4",
+          "0",
+          "0.64",
+          "1.00"
+        ],
+        [
+          "min_height=1.0",
+          "8",
+          "7",
+          "1",
+          "0",
+          "0.88",
+          "1.00"
+        ],
+        [
+          "min_height=2.0",
+          "7",
+          "7",
+          "0",
+          "0",
+          "1.00",
+          "1.00"
+        ],
+        [
+          "min_height=4.0",
+          "5",
+          "5",
+          "0",
+          "2",
+          "1.00",
+          "0.71"
+        ]
+      ],
+      "readSteps": [
+        "先數綠點與紅點：綠點是核對集裡的真峰，紅點是這組參數多抓出來的候選。",
+        "把 min_height 往下拉，找出 Recall 停止上升、而 Precision 開始下降的那一點 —— 那就是這份資料的操作點。",
+        "對每個保留下來的峰檢查邊界是否回到局部基線。<strong>邊界錯了面積就錯了，而 Precision 與 Recall 完全反映不出這件事。</strong>",
+        "對只在單一波長出現的小峰保持懷疑。那通常是雜訊或 ghost peak，不是成分。"
+      ]
+    },
+    {
+      "objectives": [
+        "說明峰純度檢查在檢驗什麼假設，以及它為什麼不構成化合物鑑定。",
+        "用峰前、峰頂、峰後三條光譜判斷是否有共洗脫跡象。",
+        "說出 explained_threshold 調高與調低分別會增加哪一類錯誤。"
+      ],
+      "outputCols": [
+        "峰",
+        "峰前相似度",
+        "峰後相似度",
+        "Explained",
+        "判定"
+      ],
+      "outputRows": [
+        [
+          "P1 (3.20)",
+          "0.9998",
+          "0.9997",
+          "0.99942",
+          "支持單一成分"
+        ],
+        [
+          "P2 (5.71)",
+          "0.9991",
+          "0.9989",
+          "0.99910",
+          "支持單一成分"
+        ],
+        [
+          "P3 (8.15)",
+          "0.9903",
+          "0.9721",
+          "0.99510",
+          "可疑：峰後偏移"
+        ],
+        [
+          "P4 (10.80)",
+          "0.9996",
+          "0.9995",
+          "0.99935",
+          "支持單一成分"
+        ]
+      ],
+      "readSteps": [
+        "先看三條光譜是否重合。峰前與峰後分開，代表峰的兩側成分組成不同。",
+        "注意偏移出現在<strong>哪一側</strong>。前緣偏移與後緣偏移對應到共洗脫物的不同洗脫位置。",
+        "把 explained_threshold 調高，數數看有幾個原本判為純的峰變成可疑 —— 這是在量 false negative 的代價。",
+        "高分只代表資料支持單一光譜成分模型。<strong>吸收光譜非常相近的兩個化合物仍然會一起通過。</strong>"
+      ]
+    },
+    {
+      "objectives": [
+        "說明去卷積在解什麼方程式，以及 s<sub>k</sub>(λ) 與 c<sub>k</sub>(t) 各代表什麼。",
+        "用<strong>殘差結構</strong>而不是只用 R² 判斷成分數是否恰當。",
+        "說出過度擬合的徵兆，並用已知混合物檢查面積回收率。"
+      ],
+      "outputCols": [
+        "components",
+        "R²",
+        "殘差 RMSE (mAU)",
+        "C1 面積",
+        "C2 面積",
+        "面積回收率 (%)"
+      ],
+      "outputRows": [
+        [
+          "1",
+          "0.9847",
+          "12.50",
+          "41120",
+          "—",
+          "—"
+        ],
+        [
+          "2",
+          "0.9991",
+          "3.10",
+          "24812",
+          "17835",
+          "99.2"
+        ],
+        [
+          "3",
+          "0.9994",
+          "2.48",
+          "24120",
+          "17310",
+          "96.1"
+        ],
+        [
+          "5",
+          "0.9998",
+          "1.55",
+          "21980",
+          "16040",
+          "88.4"
+        ]
+      ],
+      "readSteps": [
+        "先看殘差有沒有結構。隨機雜訊代表成分數夠了；殘留一個峰形代表還少一個成分。",
+        "比較每增加一個成分 R² 的增幅。增幅一旦變得很小，多出來的成分多半在擬合雜訊。",
+        "檢查每個 component 的光譜長得像不像真實吸收光譜。形狀怪異或出現負值的成分通常是數學產物，不是化學物種。",
+        "用已知混合物核對面積回收率。<strong>R² 上升而回收率下降，就是過度擬合的典型組合</strong>（見上表 5 成分那一列）。"
+      ]
+    },
+    {
+      "objectives": [
+        "說明為什麼只用保留時間配對同一化合物是不安全的。",
+        "結合 ΔRT 與光譜相似度判斷兩個 component 是否為同一 compound。",
+        "辨識一對多與多對一的錯誤配對，並說出該保留什麼稽核紀錄。"
+      ],
+      "outputCols": [
+        "compound",
+        "樣品",
+        "RT (min)",
+        "ΔRT vs 標準",
+        "光譜相似度",
+        "配對判定"
+      ],
+      "outputRows": [
+        [
+          "caffeine",
+          "standard",
+          "8.15",
+          "—",
+          "1.0000",
+          "參考"
+        ],
+        [
+          "caffeine",
+          "sample_01",
+          "8.17",
+          "+0.02",
+          "0.9994",
+          "接受"
+        ],
+        [
+          "caffeine",
+          "sample_02",
+          "8.21",
+          "+0.06",
+          "0.9991",
+          "接受"
+        ],
+        [
+          "?",
+          "sample_03",
+          "8.19",
+          "+0.04",
+          "0.9612",
+          "保留：RT 合、光譜不合"
+        ],
+        [
+          "?",
+          "sample_04",
+          "8.44",
+          "+0.29",
+          "0.9997",
+          "保留：光譜合、RT 漂移過大"
+        ]
+      ],
+      "readSteps": [
+        "先看 ΔRT 的分布。<strong>整批一致的位移是系統漂移，個別樣品的偏離才是配對問題。</strong>",
+        "每個候選都要同時看 RT 與光譜。只滿足其中一項的配對一律標為待確認，不要自動接受 —— 上表最後兩列正是這兩種情況。",
+        "找出一對多與多對一：同一樣品出現兩個相同 compound，或兩個樣品的不同峰被指到同一個 compound。",
+        "把被拒絕的配對與理由記下來。稽核要看的是你排除了什麼，不只是你留下了什麼。"
+      ]
+    },
+    {
+      "objectives": [
+        "說明內標補償了哪些變異，以及它<strong>不能</strong>補償什麼。",
+        "由標準點建立 response factor，並判斷線性範圍的上下界。",
+        "判斷未知樣品是落在校正範圍內還是外插，並說出外插的風險。"
+      ],
+      "outputCols": [
+        "標準",
+        "C/C_IS",
+        "A/A_IS",
+        "回算濃度",
+        "回算偏差 (%)"
+      ],
+      "outputRows": [
+        [
+          "S1",
+          "0.143",
+          "0.150",
+          "0.0102",
+          "+2.0"
+        ],
+        [
+          "S2",
+          "0.357",
+          "0.366",
+          "0.0252",
+          "+0.8"
+        ],
+        [
+          "S3",
+          "0.571",
+          "0.578",
+          "0.0399",
+          "−0.3"
+        ],
+        [
+          "S4",
+          "0.786",
+          "0.790",
+          "0.0551",
+          "+0.2"
+        ],
+        [
+          "S5",
+          "1.000",
+          "0.995",
+          "0.0694",
+          "−0.9"
+        ],
+        [
+          "未知樣品",
+          "—",
+          "0.672",
+          "0.0470",
+          "落在 S3–S4 之間（內插）"
+        ]
+      ],
+      "readSteps": [
+        "先確認未知樣品落在標準點<strong>之間</strong>，而不是外插。外插的結果不論 R² 多高都不可信。",
+        "看回算偏差的正負是否隨濃度系統性變化。單邊漂移代表非線性或截距問題，不是隨機誤差。",
+        "確認內標峰沒有跟任何分析物共洗脫。內標一旦被干擾，所有比值會同時偏移，而且從線性圖上看不出來。",
+        "R² 高不等於方法可用。要同時看回算偏差、涵蓋範圍與重複性三者。"
+      ]
+    },
+    {
+      "objectives": [
+        "依序說出 <code>process_all()</code> 七個 stage 各自在做什麼。",
+        "設計一個小子集驗證流程，並說明為什麼不能直接跑全批。",
+        "從各 stage 的警告與失敗分布判斷問題的真正來源。"
+      ],
+      "outputCols": [
+        "stage",
+        "處理樣品數",
+        "警告",
+        "失敗",
+        "耗時 (s)"
+      ],
+      "outputRows": [
+        [
+          "crop wavelength",
+          "90",
+          "0",
+          "0",
+          "1.8"
+        ],
+        [
+          "correct baseline",
+          "90",
+          "2",
+          "0",
+          "24.6"
+        ],
+        [
+          "find peaks",
+          "90",
+          "5",
+          "0",
+          "31.2"
+        ],
+        [
+          "deconvolve",
+          "90",
+          "7",
+          "1",
+          "96.4"
+        ],
+        [
+          "cluster compounds",
+          "89",
+          "3",
+          "0",
+          "12.9"
+        ],
+        [
+          "refine peaks",
+          "89",
+          "1",
+          "0",
+          "18.7"
+        ],
+        [
+          "name compounds",
+          "89",
+          "0",
+          "0",
+          "2.1"
+        ]
+      ],
+      "readSteps": [
+        "先找失敗發生在哪個 stage。<strong>去卷積失敗多半是前面找峰或基線的問題，不是去卷積本身。</strong>",
+        "比較各 stage 的警告數。警告集中在某一步，代表那一步的參數不適用於整批，而不是個別樣品特別差。",
+        "抽查一個代表性樣品與一個極端樣品，不要只看整批統計數字。",
+        "記錄設定、套件版本、耗時與被排除的樣品。批次處理最常見的災難是「跑完了，但沒人知道是用什麼參數跑的」。"
+      ]
+    },
+    {
+      "objectives": [
+        "為峰偵測、化合物追蹤與定量分別選出合適的性能指標。",
+        "說明允收界線為什麼必須在分析<strong>之前</strong>定義。",
+        "說出「用同一份資料自證」的問題，以及獨立 QC 應該長什麼樣。"
+      ],
+      "outputCols": [
+        "任務",
+        "指標",
+        "本批結果",
+        "預先定義允收",
+        "判定"
+      ],
+      "outputRows": [
+        [
+          "峰偵測",
+          "Precision",
+          "0.96",
+          "≥ 0.90",
+          "通過"
+        ],
+        [
+          "峰偵測",
+          "Recall",
+          "0.92",
+          "≥ 0.90",
+          "通過"
+        ],
+        [
+          "化合物追蹤",
+          "錯配率",
+          "4.2 %",
+          "≤ 5 %",
+          "通過"
+        ],
+        [
+          "定量",
+          "面積 Bias",
+          "+2.1 %",
+          "± 5 %",
+          "通過"
+        ],
+        [
+          "定量",
+          "QC RSD",
+          "3.4 %",
+          "≤ 3 %",
+          "未通過"
+        ]
+      ],
+      "readSteps": [
+        "先確認允收值是分析前寫下來的。<strong>分析後才決定的門檻等於沒有門檻。</strong>",
+        "逐項比對指標與允收值。未通過的項目不能用其他項目通過來抵銷 —— 上表四項通過、一項未通過，結論仍然是不放行。",
+        "檢查 QC 樣品是否獨立於用來調參數的那份資料。同一份資料自證不構成驗證。",
+        "把失敗案例（漏峰、錯配、過度去卷積、外插）一併列出。只報告成功的部分不是方法評估。"
+      ]
+    },
+    {
+      "objectives": [
+        "列出可重現分析的五個組成，並說明缺任一項的後果。",
+        "建立一份 manifest，把版本、參數、資料與 QC 綁在一起。",
+        "說明為什麼保存 CSV 或截圖不等於保存分析。"
+      ],
+      "outputCols": [
+        "項目",
+        "manifest 欄位",
+        "本例內容",
+        "缺少時會發生什麼"
+      ],
+      "outputRows": [
+        [
+          "套件版本",
+          "mocca2",
+          "0.2.3",
+          "同一份程式在新版可能給出不同結果"
+        ],
+        [
+          "處理參數",
+          "settings",
+          "ProcessingSettings(...)",
+          "無法重現同一組峰與成分"
+        ],
+        [
+          "原始資料",
+          "raw_files + checksum",
+          "90 檔，sha256",
+          "無法確認當初分析的是哪一版資料"
+        ],
+        [
+          "QC 規則",
+          "qc_rules",
+          "precision ≥ 0.9, RSD ≤ 3 %",
+          "事後才定門檻，結論不可信"
+        ],
+        [
+          "人工決策",
+          "exclusions + reasons",
+          "3 筆排除紀錄",
+          "看不出哪些樣品被拿掉、為什麼"
+        ]
+      ],
+      "readSteps": [
+        "先問一個問題：<strong>把這個資料夾交給另一個人，他能不能從 raw data 重跑出同一張表？</strong>不能的話，缺的就是要補的。",
+        "檢查 raw data 是否唯讀且有 checksum。原始資料被就地修改，是最難察覺的重現性殺手。",
+        "確認參數是從檔案讀出來的，不是寫死在某個 notebook cell 裡。",
+        "檢查人工排除有沒有留下理由。少了理由，稽核時無法區分「有根據的排除」與「挑好看的結果」。"
+      ]
+    }
+  ];
+  chapterExtras.forEach((e,i)=>Object.assign(chapters[i],e));
+  // 沒有參數滑桿的章節，圖下方改放這一章自己的看圖說明，而不是通用填充句
+  const chartNotes={
+    0:"圖為時間 × 波長 heatmap：橫軸時間、縱軸波長，顏色深淺是吸光度。這就是 data[wavelength, time] 兩個維度實際的樣子。",
+    1:"灰線是 sample、橘色虛線是 blank、綠線是相減後的結果。重點看綠線的無峰區有沒有落在零附近。",
+    2:"灰色區域是被 extract_time(1.4, 3.8) 裁掉的部分，綠色虛線是保留窗的邊界。注意邊界有沒有壓到峰的裙擺。",
+    7:"每個點是一個 component。綠點代表 RT 與光譜都吻合，橘點代表只滿足其中一項、必須人工確認。",
+    8:"五個標準點構成校正線，未知樣品以 A/A_IS 反查濃度。先確認它落在標準點之間而不是外插。",
+    9:"每根柱是該 stage 的警告數，柱頂紅色部分為失敗數。看的是分布集中在哪一步，而不是總數。",
+    10:"每根柱是「實測值 ÷ 允收值」，因此可以互相比較。超過紅色虛線 1.0 就是不通過。",
+    11:"五個來源匯流成一份可重現的結果。缺任一項，另一位分析者就無法從 raw data 重建同一張表。"
+  };
+  Object.keys(chartNotes).forEach(k=>chapters[+k].chartNote=chartNotes[k]);
+
+  const funcs=[
+    ["Data2D / Chromatogram","核心二維資料與單一層析圖物件","0"],
+    ["extract_time()","裁切保留時間範圍","2"],
+    ["extract_wavelength()","裁切 DAD 波長範圍","2"],
+    ["correct_baseline()","FlatFit、AsLS、arPLS 基線校正","3"],
+    ["find_peaks()","自適應找峰與邊界處理","4"],
+    ["deconvolve_peaks()","重疊峰去卷積","6"],
+    ["all_components()","取得 components 與積分","6"],
+    ["MoccaDataset.add_chromatogram()","加入標準、內標與樣品","7"],
+    ["ProcessingSettings","集中定義批次處理參數","9"],
+    ["process_all()","執行完整批次工作流","9"],
+    ["get_relative_concentrations()","取得內標相對濃度","8"],
+    ["plot_2d()","顯示時間 × 波長 heatmap","2"]
+  ];
+  const completed=new Set(JSON.parse(localStorage.getItem("mocca2Progress")||"[]"));
+  let current=0,step="concept",baselineStrength=.72,minHeight=2,purityThreshold=.998,minR2=.999,maxComps=5;
+  const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+  const esc=s=>s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  const levelName=i=>["入門","中階","進階"][i];
+
+  function signalData({shift=0,noise=.8,baseline=0,skew=0}={}){
+    const out=[];for(let i=0;i<=260;i++){const t=i/13;const g=(m,s,a)=>a*Math.exp(-.5*((t-m)/s)**2)*(1+skew*Math.max(0,t-m));
+      const y=8+baseline*(1.5*t+.07*t*t)+g(3.2+shift,.22,48)+g(5.7+shift,.3,78)+g(8.15+shift,.24,128)+g(10.8+shift,.32,96)+g(14.05+shift,.29,68)+g(16.5+shift,.33,55)+g(18.4+shift,.22,42)+noise*(Math.sin(i*1.73)+.55*Math.sin(i*.41));
+      out.push({t,y,b:8+baseline*(1.5*t+.07*t*t)});}return out;
+  }
+  function linePath(d,key="y",x=46,y=284,w=620,h=235,max=165){return d.map((p,i)=>`${i?"L":"M"}${(x+p.t/20*w).toFixed(1)},${(y-(p[key]||0)/max*h).toFixed(1)}`).join(" ")}
+  // y 軸格線 + 數字刻度。map 把資料值換成 SVG y 座標，所以格線一定落在整數刻度上，
+  // 而不是像素等距（等距會讓格線對應到 43.5、87.1 這種讀不出來的值）。
+  function yAxis(vals,map,fmt=v=>v){
+    let grid="",labs="";
+    vals.forEach(v=>{const y=+map(v).toFixed(1);
+      grid+=`M46 ${y}H666`;
+      labs+=`<text x="41" y="${(y+3.5).toFixed(1)}" text-anchor="end">${fmt(v)}</text>`});
+    return `<path d="${grid}" fill="none" stroke="#dbe5ed" stroke-dasharray="3 5"/><g fill="#61758f" font-size="10">${labs}</g>`;
+  }
+  const mAU=v=>284-v/165*235;               // linePath 用的同一組對應
+  function axes(svg,title="響應 (mAU)"){
+    svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><path d="M46 35V284H666" fill="none" stroke="#dbe5ed"/>${yAxis([0,40,80,120,160],mAU)}<g fill="#61758f" font-size="11"><text x="337" y="318">保留時間 (min)</text><text transform="translate(15 210) rotate(-90)">${title}</text><text x="43" y="302">0</text><text x="345" y="302">10</text><text x="650" y="302">20</text></g>`;
+  }
+  function drawHero(){const svg=$("#heroChart");axes(svg);const d=signalData({noise:.35});svg.insertAdjacentHTML("beforeend",`<path d="${linePath(d)}" fill="none" stroke="#078d88" stroke-width="2.5"/>`)}
+  function miniSVG(type){
+    const d=signalData({baseline:type===1?1.7:0,shift:type===2?.3:0,noise:.25});
+    const path=d.map((p,i)=>`${i?"L":"M"}${(8+p.t/20*120).toFixed(1)},${(83-p.y/165*70).toFixed(1)}`).join(" ");
+    if(type===4)return `<svg viewBox="0 0 138 92"><rect width="138" height="92" fill="#fff"/><g fill="#1459a6" font-size="8"><text x="9" y="16">Peak</text><text x="48" y="16">RT</text><text x="82" y="16">Area</text><text x="9" y="35">V1</text><text x="48" y="35">3.20</text><text x="82" y="35">1284</text><text x="9" y="54">V2</text><text x="48" y="54">5.71</text><text x="82" y="54">2260</text></g><path d="M7 22H130M7 41H130M7 60H130" stroke="#dbe5ed"/></svg>`;
+    return `<svg viewBox="0 0 138 92"><rect width="138" height="92" fill="#fff"/><path d="M8 83H130" stroke="#dbe5ed"/><path d="${path}" fill="none" stroke="${type===3?"#1459a6":"#078d88"}" stroke-width="2"/>${type===3?`<path d="${path}L128,83L8,83Z" fill="rgba(7,141,136,.17)" stroke="none"/>`:""}</svg>`;
+  }
+  function renderHome(){
+    $("#chapterCards").innerHTML=chapters.map((c,i)=>`<button class="chapter-card" data-level="${c.level}" data-chapter="${i}"><span class="num">${String(i+1).padStart(2,"0")}</span><h3>${c.title}</h3><p>${c.desc}</p><span class="chapter-meta"><span>約 ${c.time} 分鐘</span><span class="${completed.has(i)?"done":""}">${completed.has(i)?"✓ 已完成":"開始學習 →"}</span></span></button>`).join("");
+    $$(".chapter-card").forEach(b=>b.onclick=()=>openLesson(+b.dataset.chapter));
+    const flow=[["匯入","Data2D"],["基線","RMSE"],["找峰","TP / FP"],["純度","Explained"],["去卷積","R² / RMSE"],["追蹤","RT + 光譜"],["定量","Bias / RSD"]];
+    $("#workflow").innerHTML=flow.map((x,i)=>`<div class="flow-step"><div class="mini-chart">${miniSVG(i)}</div><strong>${x[0]}</strong><span>${x[1]}</span></div>`).join("");
+    $("#functionCards").innerHTML=funcs.map(f=>`<button class="reference" data-go="${f[2]}" style="text-align:left;cursor:pointer"><strong><code>${f[0]}</code></strong>${f[1]}</button>`).join("");
+    $$("#functionCards button").forEach(b=>b.onclick=()=>openLesson(+b.dataset.go));
+  }
+  function updateProgress(){
+    const n=completed.size,p=Math.round(n/chapters.length*100);
+    $("#sideProgress").textContent=`${n} / 12`;$("#progressText").textContent=`已完成 ${n} / 12 章`;
+    $("#progressFill").style.width=p+"%";
+  }
+  function renderSidebar(){
+    let last=-1,html="";chapters.forEach((c,i)=>{if(c.level!==last){last=c.level;html+=`<div class="side-group">${levelName(last)}</div>`}
+      html+=`<button class="side-chapter ${i===current?"active":""}" data-side="${i}"><span>${i+1}</span><span>${c.title}</span><span class="status">${completed.has(i)?"✓":"○"}</span></button>`});
+    $("#sideList").innerHTML=html;$$("#sideList button").forEach(b=>b.onclick=()=>openLesson(+b.dataset.side));updateProgress();
+  }
+  function metricsFor(c){
+    if(c===3){const rm=18.4*(1-baselineStrength),bias=22.7*(1-baselineStrength);return [["基線 RMSE",rm.toFixed(1),"mAU"],["面積偏差","+"+bias.toFixed(1),"%"],["無峰區均值",(6.2*(1-baselineStrength)).toFixed(1),"mAU"],["校正係數 α",baselineStrength.toFixed(2),"教材模擬"]]}
+    if(c===4){const found=Math.max(2,Math.round(11-minHeight*1.5)),tp=Math.min(7,found),fp=Math.max(0,found-7);return [["候選峰",found,"個"],["真峰命中",tp,"/ 7"],["假陽性",fp,"個"],["Recall",(tp/7).toFixed(2),""]]}
+    if(c===5){const score=.994+purityThreshold*.005;return [["Explained",score.toFixed(4),""],["門檻",purityThreshold.toFixed(3),""],["光譜成分",score>=purityThreshold?1:2,"個"],["判讀",score>=purityThreshold?"支持純峰":"可疑混合",""]]}
+    if(c===6){const r2=Math.min(.9998,.985+(maxComps-1)*.0042),rmse=(12.5/maxComps).toFixed(2),bias=((minR2-.995)*520).toFixed(2);return [["components",maxComps,"上限"],["重建 R²",r2.toFixed(4),""],["殘差 RMSE",rmse,"mAU"],["面積偏差",(bias>=0?"+":"")+bias,"%"]]}
+    if(c===8)return [["標準點","5",""],["校正 R²","0.9992",""],["未知濃度","0.047","mol L⁻¹"],["QC 樣品偏差","+2.4","%"]];
+    if(c===9)return [["chromatograms","90","示例規模"],["失敗樣品","1","去卷積階段"],["警告總數","18",""],["總耗時","187.7","s"]];
+    if(c===0)return [["shape","(501, 2401)",""],["time_step","0.00833","min"],["wavelength_step","0.4","nm"],["取樣點／峰","≈24","足夠"]];
+    if(c===1)return [["範例載入","成功",""],["shape 核對","一致",""],["扣 blank 後無峰區","0.3","mAU"],["待人工核對","3","項"]];
+    if(c===2)return [["裁切後 shape","(451, 289)",""],["時間窗","1.40–3.80","min"],["波長窗","220–400","nm"],["資料量","−89","%"]];
+    if(c===7)return [["候選配對","24",""],["接受","20",""],["待確認","4",""],["最大 ΔRT","0.29","min"]];
+    if(c===10)return [["Precision","0.96","允收 ≥0.90"],["Recall","0.92","允收 ≥0.90"],["面積 Bias","+2.1","允收 ±5 %"],["QC RSD","3.4","允收 ≤3 %"]];
+    if(c===11)return [["manifest 欄位","5","必要"],["raw checksum","sha256",""],["排除紀錄","3","筆"],["可重跑","是",""]];
+    return [["資料物件","Chromatogram",""],["時間範圍","0–20","min"],["波長範圍","200–400","nm"],["目前章節",c+1,"/ 12"]];
+  }
+  function decisionFor(c){
+    if(c===3){const bias=22.7*(1-baselineStrength);return {tone:bias<5?"":bias<10?"warn":"bad",text:bias<5?"面積偏差已落入本教材 ±5% 任務範圍；仍須用獨立 blank、標準或加標樣品確認。":bias<10?"基線已有改善，但面積偏差仍超出教材任務值。":"校正不足，漂移仍明顯影響峰面積。"}}
+    if(c===4){const found=Math.max(2,Math.round(11-minHeight*1.5));return {tone:found===7?"":found>7?"warn":"bad",text:found===7?"示範核對集的 7 個真峰全部命中且無假陽性；仍須檢查峰邊界。":found>7?`min_height 過低，出現 ${found-7} 個疑似假陽性。`:`min_height 過高，漏掉 ${7-found} 個示範真峰。`}}
+    if(c===5){const score=.994+purityThreshold*.005;return {tone:score>=purityThreshold?"":"warn",text:score>=purityThreshold?"本頁資料支持單一光譜成分模型；這不是化合物身分證明。":"峰內光譜變化超過門檻，應檢查共洗脫並考慮去卷積。"}}
+    if(c===6){const r2=Math.min(.9998,.985+(maxComps-1)*.0042);return {tone:r2>=minR2&&maxComps<=5?"":r2>=minR2?"warn":"bad",text:r2>=minR2&&maxComps<=5?"重建 R² 達標，殘差低；仍須檢查 component 光譜、峰形與面積回收率。":r2>=minR2?"雖達 R² 門檻，但成分上限偏高，需排除過度擬合。":"在目前成分上限下未達 min_r2；不可強行接受結果。"}}
+    if(c===0)return {tone:"",text:"shape 第一維為波長、每個峰約 24 個取樣點，資料密度足以描述峰形。接著要確認 blank 是否齊備 —— 沒有 blank，後面的基線與純度都會少一層證據。"};
+    if(c===1)return {tone:"",text:"環境與範例資料驗證通過，扣除 blank 後無峰區落在零附近而非負值。真實儀器檔仍須人工核對時間範圍、波長範圍與訊號尺度。"};
+    if(c===2)return {tone:"",text:"時間窗排除了溶劑前緣，且兩側邊界都與最近的峰有明顯距離，裙擺沒有被切到。波長下界 220 nm 則必須回到 heatmap 確認 —— 低波長端的干擾只出現在特定波長，contract 成 1D 之後看不出來。"};
+    if(c===7)return {tone:"warn",text:"24 組候選配對中有 4 組只滿足 RT 或光譜其中一項（圖上橘點）。這些不可自動接受，須以標準品或加標確認後才納入結果。"};
+    if(c===8)return {tone:"",text:"未知樣品落在 S3–S4 之間屬內插，五個標準點的回算偏差都在 ±2 % 內。仍須以獨立 QC 樣品確認，並確認內標沒有與任何分析物共洗脫。"};
+    if(c===9)return {tone:"warn",text:"警告與失敗集中在去卷積階段（7 警告、1 失敗）。集中在同一階段代表是那一步的參數不適用於整批，應回頭檢查找峰與基線設定，而不是直接重跑。"};
+    if(c===10)return {tone:"bad",text:"五項指標中 QC RSD 為 3.4 %，超出預先定義的 ≤3 %。其他四項通過不能抵銷這一項 —— 此批定量結果不應直接放行。"};
+    if(c===11)return {tone:"",text:"manifest 五項齊備、raw data 具 checksum 且人工排除留有理由，另一位分析者可從原始資料重建同一份結果。"};
+    return {tone:"",text:chapters[c].why[0]+" "+chapters[c].why[1]};
+  }
+  function drawLessonChart(root=$(".lesson-panel.active")){
+    const svg=root?.querySelector("#lessonChart");if(!svg)return;axes(svg,current===0?"響應 / 資料結構":"響應 (mAU)");
+    // 只有底圖與座標軸線；格線與刻度由各章自己的 yAxis() 補，因為每張圖的 y 量不同
+    const frame=`<rect x="46" y="35" width="620" height="249" fill="#fff"/><path d="M46 35V284H666" fill="none" stroke="#dbe5ed"/>`;
+    if(current===0){// 時間 × 波長 heatmap：本章要學生看的是兩個軸，不是一條 trace
+      let cells="";
+      for(let i=0;i<48;i++)for(let j=0;j<20;j++){
+        const t=i/48*20,l=400-j/20*200;
+        const v=Math.exp(-.5*((t-8.15)/1.6)**2)*Math.exp(-.5*((l-272)/38)**2)+.75*Math.exp(-.5*((t-5.7)/1.1)**2)*Math.exp(-.5*((l-250)/30)**2)+.5*Math.exp(-.5*((t-14.05)/1.3)**2)*Math.exp(-.5*((l-296)/34)**2);
+        cells+=`<rect x="${(46+i/48*620).toFixed(1)}" y="${(35+j/20*249).toFixed(1)}" width="${(620/48+.7).toFixed(1)}" height="${(249/20+.7).toFixed(1)}" fill="rgba(7,141,136,${Math.min(1,v*1.15).toFixed(3)})"/>`;
+      }
+      const wl=l=>35+(400-l)/200*249;
+      svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#f6fafb"/>${cells}<path d="M46 35V284H666" fill="none" stroke="#dbe5ed"/><g fill="#61758f" font-size="10">${[200,250,300,350,400].map(l=>`<text x="41" y="${(wl(l)+3.5).toFixed(1)}" text-anchor="end">${l}</text>`).join("")}</g><g fill="#61758f" font-size="11"><text x="337" y="318">保留時間 (min)</text><text transform="translate(15 210) rotate(-90)">波長 (nm)</text><text x="43" y="302">0</text><text x="345" y="302">10</text><text x="650" y="302">20</text></g><text x="660" y="56" text-anchor="end" fill="#0b2348" font-size="12">data[wavelength, time]</text>`;
+      renderMetrics(root);return;
+    }
+    if(current===1){// sample / blank / 相減後
+      const s=signalData({baseline:1.1,noise:.3});
+      const bl=s.map(p=>({t:p.t,y:8+1.1*(1.5*p.t+.07*p.t*p.t)+3*Math.sin(p.t*.9)}));
+      const net=s.map((p,i)=>({t:p.t,y:p.y-bl[i].y+8}));
+      svg.insertAdjacentHTML("beforeend",`<path d="${linePath(s)}" fill="none" stroke="#61758f" stroke-width="1.7"/><path d="${linePath(bl)}" fill="none" stroke="#e89016" stroke-width="1.7" stroke-dasharray="6 4"/><path d="${linePath(net)}" fill="none" stroke="#078d88" stroke-width="2.4"/><g font-size="11"><text x="662" y="52" text-anchor="end" fill="#61758f">sample</text><text x="662" y="68" text-anchor="end" fill="#e89016">blank</text><text x="662" y="84" text-anchor="end" fill="#078d88">sample − blank</text></g>`);
+      renderMetrics(root);return;
+    }
+    if(current===2){// 裁切窗：窗外變灰，讓學生看見自己丟掉了什麼
+      const d=signalData({noise:.35}),x0=46+1.4/20*620,x1=46+3.8/20*620;
+      svg.insertAdjacentHTML("beforeend",`<rect x="46" y="35" width="${(x0-46).toFixed(1)}" height="249" fill="rgba(97,117,143,.14)"/><rect x="${x1.toFixed(1)}" y="35" width="${(666-x1).toFixed(1)}" height="249" fill="rgba(97,117,143,.14)"/><path d="${linePath(d)}" fill="none" stroke="#1459a6" stroke-width="2.2"/><path d="M${x0.toFixed(1)} 35V284M${x1.toFixed(1)} 35V284" stroke="#078d88" stroke-width="1.8" stroke-dasharray="5 4"/><text x="${(x1+8).toFixed(1)}" y="52" fill="#078d88" font-size="11">保留 1.4–3.8 min</text><text x="${(x1+8).toFixed(1)}" y="70" fill="#61758f" font-size="11">灰色區域被裁掉（−88 %）</text>`);
+      renderMetrics(root);return;
+    }
+    if(current===7){// 跨樣品 RT 群集：橘點是只滿足單一條件的可疑配對
+      const X=s=>110+(s-1)/4*500,Y=r=>284-(r-5.2)/3.8*235;
+      const pts=[[1,8.15,0],[2,8.17,0],[3,8.21,0],[4,8.19,1],[5,8.44,1],[1,5.71,0],[2,5.73,0],[3,5.75,0],[4,5.70,0],[5,5.78,0]];
+      svg.innerHTML=frame+yAxis([6,7,8,9],Y,v=>v.toFixed(1))+`<rect x="92" y="${Y(8.55).toFixed(1)}" width="536" height="${(Y(8.05)-Y(8.55)).toFixed(1)}" fill="rgba(7,141,136,.10)"/><text x="624" y="${(Y(8.5)).toFixed(1)}" text-anchor="end" fill="#078d88" font-size="11">caffeine 群集</text>`
+        +pts.map(p=>`<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="6.5" fill="${p[2]?"#e89016":"#078d88"}" stroke="#fff" stroke-width="2"/>`).join("")
+        +`<g fill="#61758f" font-size="11"><text x="337" y="318">樣品</text><text transform="translate(15 205) rotate(-90)">保留時間 (min)</text>`
+        +[1,2,3,4,5].map(s=>`<text x="${X(s).toFixed(1)}" y="302" text-anchor="middle">${s===1?"std":"s0"+(s-1)}</text>`).join("")+`</g>`;
+      renderMetrics(root);return;
+    }
+    if(current===9){// 各 stage 的警告與失敗分布
+      const st=[["crop",0,0],["baseline",2,0],["find peaks",5,0],["deconvolve",7,1],["cluster",3,0],["refine",1,0],["naming",0,0]],bw=620/7;
+      svg.innerHTML=frame+yAxis([0,2,4,6,8],v=>284-v/8*180)+st.map((s,i)=>{const h=s[1]/8*180,hf=s[2]?s[2]/8*180:0,x=46+i*bw+11,w=bw-22;
+        return `<rect x="${x.toFixed(1)}" y="${(284-h).toFixed(1)}" width="${w.toFixed(1)}" height="${Math.max(0,h).toFixed(1)}" fill="#e89016" opacity=".85"/>`
+          +(hf?`<rect x="${x.toFixed(1)}" y="${(284-h-hf).toFixed(1)}" width="${w.toFixed(1)}" height="${hf.toFixed(1)}" fill="#c74747"/>`:"")
+          +`<text x="${(x+w/2).toFixed(1)}" y="${(284-h-hf-7).toFixed(1)}" text-anchor="middle" fill="#0b2348" font-size="10">${s[1]}${s[2]?" +"+s[2]:""}</text>`
+          +`<text x="${(x+w/2).toFixed(1)}" y="300" text-anchor="middle" fill="#61758f" font-size="9">${s[0]}</text>`}).join("")
+        +`<g font-size="11"><text x="560" y="55" fill="#e89016">警告</text><text x="612" y="55" fill="#c74747">失敗</text></g><text transform="translate(15 190) rotate(-90)" fill="#61758f" font-size="11">件數</text>`;
+      renderMetrics(root);return;
+    }
+    if(current===10){// 每項指標除以自己的允收值：超過 1.0 就是不通過
+      const m=[["Precision",.94],["Recall",.98],["錯配率",.84],["面積 Bias",.42],["QC RSD",1.13]],bw=620/5,base=284,top=68,lim=base-(1/1.3)*(base-top);
+      svg.innerHTML=frame+yAxis([0,.5,1],v=>base-v/1.3*(base-top),v=>v.toFixed(1))+m.map((s,i)=>{const h=s[1]/1.3*(base-top),x=46+i*bw+17,w=bw-34,ok=s[1]<=1;
+        return `<rect x="${x.toFixed(1)}" y="${(base-h).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${ok?"#078d88":"#c74747"}" opacity=".9"/><text x="${(x+w/2).toFixed(1)}" y="${(base-h-7).toFixed(1)}" text-anchor="middle" fill="#0b2348" font-size="10">${s[1].toFixed(2)}</text><text x="${(x+w/2).toFixed(1)}" y="300" text-anchor="middle" fill="#61758f" font-size="9">${s[0]}</text>`}).join("")
+        +`<path d="M46 ${lim.toFixed(1)}H666" stroke="#c74747" stroke-width="1.6" stroke-dasharray="6 4"/><text x="662" y="${(lim-7).toFixed(1)}" text-anchor="end" fill="#c74747" font-size="11">允收界線 1.0</text><text transform="translate(15 225) rotate(-90)" fill="#61758f" font-size="11">實測 ÷ 允收</text>`;
+      renderMetrics(root);return;
+    }
+    if(current===11){// 可重現性的五個來源匯流成一份結果
+      const it=[["raw data","唯讀 + checksum"],["code","腳本與版本"],["parameters","ProcessingSettings"],["environment","套件版本"],["decisions","排除與理由"]],bw=118,gap=6,x0=48;
+      svg.innerHTML=`<rect x="46" y="35" width="620" height="249" fill="#fff"/>`
+        +it.map((s,i)=>{const x=x0+i*(bw+gap);
+          return `<rect x="${x}" y="58" width="${bw}" height="58" rx="10" fill="#eef6f7" stroke="#078d88"/><text x="${x+bw/2}" y="81" text-anchor="middle" fill="#0b2348" font-size="12" font-weight="600">${s[0]}</text><text x="${x+bw/2}" y="100" text-anchor="middle" fill="#61758f" font-size="10">${s[1]}</text><path d="M${x+bw/2} 116V148" stroke="#9fb6c9" stroke-width="1.5"/>`}).join("")
+        +`<path d="M${x0+bw/2} 148H${x0+4*(bw+gap)+bw/2}" stroke="#9fb6c9" stroke-width="1.5"/><path d="M355 148V184" stroke="#078d88" stroke-width="2.2"/><polygon points="355,195 349,182 361,182" fill="#078d88"/>`
+        +`<rect x="195" y="197" width="320" height="62" rx="12" fill="#078d88"/><text x="355" y="223" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">可重現的分析結果</text><text x="355" y="244" text-anchor="middle" fill="#d9f2f0" font-size="11">缺任一項，別人就重跑不出同一張表</text>`;
+      renderMetrics(root);return;
+    }
+    if(current===6){
+      const total=[],a=[],b=[];for(let i=0;i<=260;i++){const t=i/13,g=(m,s,h)=>h*Math.exp(-.5*((t-m)/s)**2),ya=g(8.55,.72,96),yb=g(9.55,.62,78);a.push({t,y:ya});b.push({t,y:yb});total.push({t,y:8+ya+yb+.9*Math.sin(i*.8)})}
+      svg.insertAdjacentHTML("beforeend",`<path d="${linePath(total)}" fill="none" stroke="#0b2348" stroke-width="2.8"/><path d="${linePath(a)}" fill="none" stroke="#078d88" stroke-width="2.1"/><path d="${linePath(b)}" fill="none" stroke="#c74747" stroke-width="2.1"/><text x="450" y="55" fill="#61758f" font-size="12">總訊號＋2 個候選 components</text>`);
+    }else{
+      const d=signalData({baseline:current===3?1.35:0,noise:current===4?1.5:.45});
+      svg.insertAdjacentHTML("beforeend",`<path d="${linePath(d)}" fill="none" stroke="#1459a6" stroke-width="2.35"/>`);
+      if(current===3){const corr=d.map(p=>({...p,y:p.y-baselineStrength*p.b+8}));svg.insertAdjacentHTML("beforeend",`<path d="${linePath(d,"b")}" fill="none" stroke="#e89016" stroke-width="2" stroke-dasharray="6 4"/><path d="${linePath(corr)}" fill="none" stroke="#078d88" stroke-width="2"/>`)}
+      if(current===4){const n=Math.max(2,Math.round(11-minHeight*1.5)),centers=[3.2,5.7,8.15,10.8,14.05,16.5,18.4,12.4,2.4,15.3,6.8];svg.insertAdjacentHTML("beforeend",centers.slice(0,n).map((t,i)=>`<circle cx="${46+t/20*620}" cy="${i<7?80+(i%3)*28:230-(i%2)*18}" r="6" fill="${i<7?"#078d88":"#c74747"}" stroke="#fff" stroke-width="2"/>`).join(""))}
+      if(current===5){const NY=n=>284-n*235,WX=l=>46+(l-220)/162*620;
+        svg.innerHTML=frame+yAxis([0,.25,.5,.75,1],v=>NY(v),v=>v.toFixed(2))+`${[["#078d88",0],["#1459a6",.55],["#e89016",1.1]].map((x,j)=>{let p="";for(let i=0;i<=120;i++){const l=220+i*1.35;const v=28+92*Math.exp(-.5*((l-(246+j*2))/13)**2)+55*Math.exp(-.5*((l-(292-j*2))/17)**2)+7*Math.sin(i/8+x[1]);p+=`${i?"L":"M"}${46+i/120*620},${NY(v/145)} `}return `<path d="${p}" fill="none" stroke="${x[0]}" stroke-width="2.3"/>`}).join("")}<g fill="#61758f" font-size="10">${[220,260,300,340,380].map(l=>`<text x="${WX(l).toFixed(1)}" y="302" text-anchor="middle">${l}</text>`).join("")}</g><g fill="#61758f" font-size="11"><text x="338" y="318">波長 (nm)</text><text transform="translate(15 195) rotate(-90)">正規化吸光度</text></g><g font-size="11"><text x="662" y="52" text-anchor="end" fill="#078d88">峰前</text><text x="662" y="68" text-anchor="end" fill="#1459a6">峰頂</text><text x="662" y="84" text-anchor="end" fill="#e89016">峰後</text></g>`}
+      if(current===8){// 座標與「輸出」頁的校正表同一組數字，圖表不會與表格互相矛盾
+        const CX=c=>70+c/1.1*560,AY=a=>274-a/1.1*225,
+          std=[[.143,.150],[.357,.366],[.571,.578],[.786,.790],[1.000,.995]],uk=.672,ukC=.669;
+        svg.innerHTML=frame+yAxis([0,.25,.5,.75,1],AY,v=>v.toFixed(2))
+          +`<path d="M${CX(0).toFixed(1)} ${AY(.006).toFixed(1)}L${CX(1.08).toFixed(1)} ${AY(1.075).toFixed(1)}" fill="none" stroke="#1459a6" stroke-width="2.4"/>`
+          +std.map((p,i)=>`<circle cx="${CX(p[0]).toFixed(1)}" cy="${AY(p[1]).toFixed(1)}" r="6" fill="#078d88"/><text x="${(CX(p[0])+9).toFixed(1)}" y="${(AY(p[1])-8).toFixed(1)}" fill="#61758f" font-size="10">S${i+1}</text>`).join("")
+          +`<path d="M46 ${AY(uk).toFixed(1)}H${CX(ukC).toFixed(1)}V284" fill="none" stroke="#e89016" stroke-width="1.6" stroke-dasharray="5 4"/><circle cx="${CX(ukC).toFixed(1)}" cy="${AY(uk).toFixed(1)}" r="6.5" fill="#e89016" stroke="#fff" stroke-width="2"/><text x="${(CX(ukC)+10).toFixed(1)}" y="${(AY(uk)+16).toFixed(1)}" fill="#e89016" font-size="11">未知樣品（落在 S3–S4 之間）</text>`
+          +`<g fill="#61758f" font-size="10">${[0,.25,.5,.75,1].map(c=>`<text x="${CX(c).toFixed(1)}" y="302" text-anchor="middle">${c.toFixed(2)}</text>`).join("")}</g><g fill="#61758f" font-size="11"><text x="330" y="318">C / C_IS</text><text transform="translate(15 195) rotate(-90)">A / A_IS</text></g>`}
+    }
+    renderMetrics(root);
+  }
+  function renderMetrics(root=$(".lesson-panel.active")){
+    const m=metricsFor(current),d=decisionFor(current);
+    const holder=root?.querySelector("#liveMetrics");if(!holder)return;
+    holder.innerHTML=m.map(x=>`<div class="metric"><small>${x[0]}</small><strong>${x[1]}</strong><span>${x[2]}</span></div>`).join("");
+    const decision=root.querySelector("#decisionBox");
+    decision.className=`decision ${d.tone}`;decision.innerHTML=`<strong>判讀：</strong>${d.text}`;
+  }
+  function conceptControls(){
+    if(current===3)return `<div class="control"><label>教材基線移除係數 α <span id="baseOut">${baselineStrength.toFixed(2)}</span></label><input id="baseSlider" type="range" min="0" max="100" value="${baselineStrength*100}" aria-label="教材基線移除係數"></div><div class="parameter-note">α 只控制本頁模擬：X<sub>c,α</sub>=X−αb̂；它不是 <code>correct_baseline()</code> 的正式參數。品質請看 RMSE 與面積偏差。</div>`;
+    if(current===4)return `<div class="control"><label>min_height <span id="heightOut">${minHeight.toFixed(1)}</span></label><input id="heightSlider" type="range" min="5" max="50" value="${minHeight*10}" aria-label="minimum peak height"></div><div class="parameter-note">正式參數：最小 prominence。請同時觀察真峰、假陽性、漏峰與峰邊界。</div>`;
+    if(current===5)return `<div class="control"><label>explained_threshold <span id="purityOut">${purityThreshold.toFixed(3)}</span></label><input id="puritySlider" type="range" min="990" max="1000" value="${purityThreshold*1000}" aria-label="explained threshold"></div><div class="parameter-note">門檻越高越嚴格，但仍需用已知純峰與混合峰驗證 false positive / false negative。</div>`;
+    if(current===6)return `<div class="control"><label>min_r2 <span id="r2Out">${minR2.toFixed(3)}</span></label><input id="r2Slider" type="range" min="980" max="1000" value="${minR2*1000}" aria-label="minimum R squared"></div><div class="control"><label>max_comps <span id="compsOut">${maxComps}</span></label><input id="compsSlider" type="range" min="1" max="7" value="${maxComps}" aria-label="maximum components"></div>`;
+    return `<div class="parameter-note">${chapters[current].chartNote||"本章先檢查物件、單位與輸出，再進入下一個分析步驟。"}<br>圖形為教學模擬；程式碼使用套件內建資料，可在 Python 中重跑。</div>`;
+  }
+  function renderLesson(){
+    const c=chapters[current];$("#lessonTitle").textContent=`第 ${current+1} 章｜${c.title}`;$("#lessonGoal").textContent=c.goal;$("#lessonPrereq").textContent=c.prereq;renderSidebar();
+    $("#conceptPanel").innerHTML=`<div class="content-card objectives"><h3>本章教學目標</h3><ol>${c.objectives.map(o=>`<li>${o}</li>`).join("")}</ol><p class="obj-note">後面五個步驟依序服務這些目標：<strong>概念</strong>建立判斷依據 → <strong>程式碼</strong>產生證據 → <strong>輸出</strong>確認拿到的是什麼物件 → <strong>判讀</strong>做出決定 → <strong>練習</strong>檢查你是否真的能判斷。</p></div><div class="explain-grid"><div class="content-card"><h3>先建立概念</h3><p>${c.concept}</p><div class="formula">${c.formula}</div><div class="callout"><strong>本章問題：</strong>${c.desc}</div></div><div class="content-card"><h3>符號與分析量</h3><table class="symbol-table"><thead><tr><th>符號／參數</th><th>定義</th></tr></thead><tbody>${c.symbols.map(s=>`<tr><td><code>${s[0]}</code></td><td>${s[1]}</td></tr>`).join("")}</tbody></table><div class="callout"><strong>方法限制：</strong>${c.error}</div></div></div>`;
+    $("#codePanel").innerHTML=`<div class="workspace"><div class="panel"><div class="panel-head"><span>Python 程式碼｜${c.func}</span><button class="copy" data-copy>複製</button></div><div class="codebox"><pre id="lessonCode">${esc(c.code)}</pre></div><div class="parameter-note">程式碼依據官方 manual / vignette；第一次執行可能需要安裝 dependencies。</div></div><div class="panel"><div class="panel-head"><span>輸出預覽與參數實驗</span><span class="legend"><span><i style="background:#078d88"></i>保留／處理後</span><span><i style="background:#c74747"></i>疑似錯誤</span></span></div><div class="chart-wrap"><svg id="lessonChart" viewBox="0 0 700 330" role="img" aria-label="${c.title}教學圖"></svg></div><div class="controls">${conceptControls()}</div></div></div><div class="metrics" id="liveMetrics"></div><div class="decision" id="decisionBox"></div>`;
+    const cols=c.outputCols,rows=c.outputRows;
+    $("#outputPanel").innerHTML=`<div class="explain-grid"><div class="content-card"><h3>預期輸出：先問物件代表什麼</h3><table class="output-table"><thead><tr>${cols.map(x=>`<th>${x}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table><div class="callout">本表是教學預覽，用途是讓你知道<strong>應該拿到什麼樣的東西</strong>；實際數值與內容以你自己的 Python 執行結果為準。</div></div><div class="content-card"><h3>確認你拿到的是對的東西</h3><p class="obj-note" style="margin-top:0">這一步只回答一個問題：<strong>輸出的物件、單位與範圍對不對。</strong>「該怎麼辦」留到下一頁的判讀。</p><ol>${c.why.map(x=>`<li>${x}</li>`).join("")}</ol><h4>常見錯誤</h4><p>${c.error}</p></div></div>`;
+    $("#interpretPanel").innerHTML=`<div class="workspace"><div class="panel"><div class="panel-head"><span>圖形證據</span><span class="legend"><span><i style="background:#078d88"></i>可接受</span><span><i style="background:#e89016"></i>需檢查</span></span></div><div class="chart-wrap"><svg id="lessonChart" viewBox="0 0 700 330" role="img" aria-label="${c.title}判讀圖"></svg></div><div class="controls">${conceptControls()}</div></div><div class="content-card"><h3>本章判讀順序</h3><p class="obj-note" style="margin-top:0">輸出頁確認的是「東西對不對」；這一頁要做的是<strong>看著圖與數字決定下一步：保留、調參數，還是停下來。</strong></p><ol class="read-steps">${c.readSteps.map(s=>`<li>${s}</li>`).join("")}</ol><div class="metrics" id="liveMetrics"></div><div class="decision" id="decisionBox"></div></div></div>`;
+    $("#practicePanel").innerHTML=`<div class="explain-grid"><div class="content-card"><h3>形成性練習</h3><p><strong>${c.q}</strong></p>${c.opts.map((o,i)=>`<label class="quiz-option"><input type="radio" name="quiz" value="${i}"> ${String.fromCharCode(65+i)}. ${o}</label>`).join("")}<button class="secondary" id="checkQuiz">檢查答案</button><div class="feedback" id="feedback">選擇後再檢查。答對會記錄本章進度。</div></div><div class="content-card"><h3>把答案連回證據</h3><p>不要只記函式名稱。請用一句話說明本章的輸入、輸出，以及至少一個品質檢查。</p><div class="formula">${c.formula}</div><div class="callout">完成本章後，建議在自己的 Jupyter 或 Python 環境重跑程式碼，再比較實際輸出。</div></div></div>`;
+    $$("[data-copy]").forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(c.code);b.textContent="已複製 ✓"}catch{b.textContent="請手動複製"}});
+    $("#checkQuiz").onclick=()=>{const p=$('input[name="quiz"]:checked'),f=$("#feedback");if(!p){f.textContent="請先選擇一個答案。";return}if(+p.value===c.ans){completed.add(current);localStorage.setItem("mocca2Progress",JSON.stringify([...completed]));f.innerHTML="<strong>正確。</strong>本章已完成；請再用自己的話說出判斷證據。";f.style.background="var(--teal2)";renderSidebar()}else{f.innerHTML="<strong>還不對。</strong>回到「概念」與「判讀」，找出能支持答案的證據。";f.style.background="#fff0f0"}};
+    bindControls();showStep(step);$("#prevChapter").disabled=current===0;$("#nextChapter").disabled=current===chapters.length-1;
+  }
+  function bindControls(root=$(".lesson-panel.active")){
+    if(!root)return;
+    const b=root.querySelector("#baseSlider");if(b)b.oninput=()=>{baselineStrength=+b.value/100;root.querySelector("#baseOut").textContent=baselineStrength.toFixed(2);drawLessonChart(root)};
+    const h=root.querySelector("#heightSlider");if(h)h.oninput=()=>{minHeight=+h.value/10;root.querySelector("#heightOut").textContent=minHeight.toFixed(1);drawLessonChart(root)};
+    const p=root.querySelector("#puritySlider");if(p)p.oninput=()=>{purityThreshold=+p.value/1000;root.querySelector("#purityOut").textContent=purityThreshold.toFixed(3);drawLessonChart(root)};
+    const r=root.querySelector("#r2Slider");if(r)r.oninput=()=>{minR2=+r.value/1000;root.querySelector("#r2Out").textContent=minR2.toFixed(3);drawLessonChart(root)};
+    const c=root.querySelector("#compsSlider");if(c)c.oninput=()=>{maxComps=+c.value;root.querySelector("#compsOut").textContent=maxComps;drawLessonChart(root)};
+    drawLessonChart(root);
+  }
+  function showStep(s){step=s;$$(".step-tab").forEach(b=>b.classList.toggle("active",b.dataset.step===s));$$(".lesson-panel").forEach(p=>p.classList.remove("active"));$("#"+s+"Panel").classList.add("active");if(s==="code"||s==="interpret")requestAnimationFrame(()=>{bindControls();drawLessonChart()})}
+  function openLesson(i){current=Math.max(0,Math.min(chapters.length-1,i));step="concept";$("#homeView").classList.add("hidden");$("#lessonView").classList.add("active");window.scrollTo(0,0);renderLesson()}
+  function backHome(){$("#lessonView").classList.remove("active");$("#homeView").classList.remove("hidden");renderHome();window.scrollTo({top:$("#course-map").offsetTop-72,behavior:"smooth"})}
+  $$(".step-tab").forEach(b=>b.onclick=()=>showStep(b.dataset.step));
+  $("#prevChapter").onclick=()=>openLesson(current-1);$("#nextChapter").onclick=()=>openLesson(current+1);
+  $("#backMap").onclick=backHome;$("#homeLink").onclick=e=>{e.preventDefault();$("#lessonView").classList.remove("active");$("#homeView").classList.remove("hidden");renderHome();window.scrollTo(0,0)};
+  $("#headerStart").onclick=()=>openLesson(0);$("#heroStart").onclick=()=>openLesson(0);
+  $("#resetProgress").onclick=()=>{if(confirm("要清除這個瀏覽器中的 12 章完成紀錄嗎？")){completed.clear();localStorage.removeItem("mocca2Progress");renderHome()}};
+  renderHome();drawHero();
+  </script>
+</body>
+</html>

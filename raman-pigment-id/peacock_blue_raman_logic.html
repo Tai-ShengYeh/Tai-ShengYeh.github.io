@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>孔雀藍拉曼判讀邏輯 · Peacock-blue Raman logic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4f7f8;
+    --paper-2:#ffffff;
+    --ink:#0e2630;
+    --ink-soft:#3f5a63;
+    --line:#d5e0e3;
+    --phthalo:#0b7ba6;      /* phthalocyanine blue — the pigment itself */
+    --phthalo-deep:#075975;
+    --phthalo-wash:#e2eff4;
+    --copper:#b3703f;       /* the Cu metal centre */
+    --copper-wash:#f3e6da;
+    --yes:#0d8a63;
+    --yes-wash:#dcf1e9;
+    --no:#a8792a;
+    --no-wash:#f6ecd6;
+    --shadow:0 1px 2px rgba(14,38,48,.06),0 8px 30px rgba(14,38,48,.07);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Noto Sans TC","Space Grotesk",system-ui,sans-serif;
+    line-height:1.65;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:clamp(20px,4vw,56px) clamp(16px,4vw,40px) 80px}
+  .mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+
+  /* ---------- header ---------- */
+  header{margin-bottom:34px}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--phthalo-deep);
+    display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  }
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--copper)}
+  h1{
+    font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-weight:700;
+    font-size:clamp(28px,5vw,46px);line-height:1.08;margin:0 0 12px;letter-spacing:-.01em;
+  }
+  h1 em{font-style:normal;color:var(--phthalo)}
+  .thesis{font-size:clamp(15px,2.2vw,18px);color:var(--ink-soft);max-width:60ch;margin:0}
+  .thesis b{color:var(--ink);font-weight:700;border-bottom:2px solid var(--copper);padding-bottom:1px}
+
+  /* ---------- section shell ---------- */
+  section{margin-top:46px}
+  .sec-label{
+    font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--ink-soft);margin-bottom:16px;
+    display:flex;align-items:baseline;gap:10px;
+  }
+  .sec-num{color:var(--phthalo);font-weight:600}
+  h2{font-family:"Space Grotesk","Noto Sans TC",sans-serif;font-size:clamp(20px,3vw,26px);
+     margin:0 0 6px;font-weight:600;letter-spacing:-.01em}
+  .lead{color:var(--ink-soft);margin:0 0 22px;max-width:66ch}
+
+  /* ---------- spectrum panel ---------- */
+  .spectrum-card{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:16px;
+    padding:22px 22px 10px;box-shadow:var(--shadow);
+  }
+  .spec-hint{font-size:13px;color:var(--ink-soft);margin:0 0 6px;display:flex;
+    align-items:center;gap:8px;flex-wrap:wrap}
+  .tap-dot{display:inline-block;width:9px;height:9px;border-radius:50%;
+    background:var(--phthalo);box-shadow:0 0 0 4px var(--phthalo-wash)}
+  svg#spec{display:block;width:100%;height:auto;touch-action:manipulation}
+  .pk-marker{cursor:pointer}
+  .pk-hit{fill:transparent;cursor:pointer}
+  .pk-line{stroke:var(--phthalo);stroke-width:1.4;opacity:.35;transition:opacity .15s,stroke-width .15s}
+  .pk-dot{fill:var(--paper-2);stroke:var(--phthalo);stroke-width:2;transition:r .15s,fill .15s}
+  .pk-label{font-family:"IBM Plex Mono",monospace;font-size:11px;fill:var(--ink-soft);
+    text-anchor:middle;transition:fill .15s;pointer-events:none}
+  .pk-marker.active .pk-line{opacity:1;stroke-width:2.4;stroke:var(--copper)}
+  .pk-marker.active .pk-dot{fill:var(--copper);stroke:var(--copper)}
+  .pk-marker.active .pk-label{fill:var(--copper);font-weight:600}
+  .pk-marker:hover .pk-line{opacity:.8}
+  .trace{fill:none;stroke:var(--phthalo-deep);stroke-width:2;stroke-linejoin:round}
+  .axis{stroke:var(--line);stroke-width:1}
+  .axis-txt{font-family:"IBM Plex Mono",monospace;font-size:10.5px;fill:var(--ink-soft)}
+
+  /* ---------- assignment readout ---------- */
+  .readout{
+    margin-top:14px;border-top:1px dashed var(--line);padding-top:16px;min-height:96px;
+  }
+  .readout-empty{color:var(--ink-soft);font-size:14px}
+  .ro-top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .ro-cm{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:24px;color:var(--phthalo-deep)}
+  .ro-name{font-size:15px;font-weight:500}
+  .ro-detail{color:var(--ink-soft);font-size:14.5px;margin:0 0 12px}
+  .badges{display:flex;gap:10px;flex-wrap:wrap}
+  .badge{font-size:12.5px;padding:5px 11px;border-radius:999px;display:inline-flex;
+    align-items:center;gap:6px;font-weight:500}
+  .badge.mol{background:var(--yes-wash);color:var(--yes)}
+  .badge.poly{background:var(--no-wash);color:var(--no)}
+  .badge b{font-family:"IBM Plex Mono",monospace}
+
+  /* ---------- decision branch ---------- */
+  .flow{display:grid;gap:14px}
+  .flow-q{
+    background:var(--phthalo);color:#fff;border-radius:14px;padding:16px 20px;
+    box-shadow:var(--shadow);
+  }
+  .flow-q .qk{font-family:"IBM Plex Mono",monospace;font-size:13px;opacity:.85;letter-spacing:.05em}
+  .flow-q .qt{font-size:clamp(15px,2.4vw,18px);font-weight:600;margin-top:4px}
+  .branches{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:560px){.branches{grid-template-columns:1fr}}
+  .branch{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+  .branch.hit{border-color:var(--yes);border-width:1.5px;background:linear-gradient(var(--yes-wash),var(--paper-2) 60%)}
+  .branch.other{border-color:var(--no)}
+  .branch .tag{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;
+    letter-spacing:.05em;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+  .branch.hit .tag{color:var(--yes)}
+  .branch.other .tag{color:var(--no)}
+  .branch h3{margin:2px 0 6px;font-size:16.5px;font-family:"Space Grotesk","Noto Sans TC",sans-serif}
+  .branch p{margin:0;font-size:14px;color:var(--ink-soft)}
+  .branch .cm{font-family:"IBM Plex Mono",monospace;color:var(--ink);font-size:13px}
+
+  /* ---------- resolution ladder ---------- */
+  .ladder-card{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;
+    padding:8px 6px;box-shadow:var(--shadow);overflow:hidden}
+  .toggle-row{display:flex;gap:8px;padding:16px 18px 6px;flex-wrap:wrap;align-items:center}
+  .toggle-row .lbl{font-size:13.5px;color:var(--ink-soft);margin-right:4px}
+  .tbtn{font-family:"IBM Plex Mono",monospace;font-size:13px;border:1px solid var(--line);
+    background:var(--paper);color:var(--ink);padding:7px 14px;border-radius:999px;cursor:pointer;
+    transition:all .15s}
+  .tbtn[aria-pressed="true"]{background:var(--phthalo);color:#fff;border-color:var(--phthalo)}
+  .rung{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;
+    padding:18px;margin:10px;border-radius:12px;border:1px solid var(--line);
+    transition:opacity .3s,transform .3s,border-color .3s,background .3s}
+  .rung .icon{width:44px;height:44px;border-radius:11px;display:grid;place-items:center;
+    font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:20px;color:#fff}
+  .rung.mol .icon{background:var(--yes)}
+  .rung.poly .icon{background:var(--no)}
+  .rung h3{margin:0 0 3px;font-size:17px;font-family:"Space Grotesk","Noto Sans TC",sans-serif}
+  .rung .verdict{font-family:"IBM Plex Mono",monospace;font-size:12.5px;font-weight:600;
+    letter-spacing:.03em;margin-bottom:6px}
+  .rung.mol .verdict{color:var(--yes)}
+  .rung.poly .verdict{color:var(--no)}
+  .rung p{margin:0;font-size:14px;color:var(--ink-soft)}
+  .rung .ex{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink);
+    background:var(--paper);padding:2px 6px;border-radius:5px}
+  .ladder-card[data-view="mol"] .rung.poly{opacity:.32;filter:grayscale(.4)}
+  .ladder-card[data-view="poly"] .rung.mol{opacity:.5}
+
+  /* ---------- method chips ---------- */
+  .methods{display:grid;gap:12px}
+  .method{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;
+    background:var(--paper-2);border:1px solid var(--line);border-left:3px solid var(--copper);
+    border-radius:0 12px 12px 0;padding:14px 18px}
+  .method .k{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;color:var(--copper);
+    white-space:nowrap}
+  .method .v{font-size:14px;color:var(--ink-soft)}
+  .method .v b{color:var(--ink);font-weight:600}
+
+  /* ---------- caveats ---------- */
+  .caveats{border-top:1px solid var(--line);margin-top:56px;padding-top:24px}
+  .caveats h2{font-size:19px}
+  .cav{display:grid;grid-template-columns:auto 1fr;gap:12px;margin-bottom:14px}
+  .cav .n{font-family:"IBM Plex Mono",monospace;color:var(--phthalo);font-weight:600;font-size:13px}
+  .cav p{margin:0;font-size:14px;color:var(--ink-soft)}
+  .cav b{color:var(--ink)}
+  footer{margin-top:40px;font-size:12.5px;color:var(--ink-soft);font-family:"IBM Plex Mono",monospace}
+
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  :focus-visible{outline:2px solid var(--copper);outline-offset:2px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="index.html" style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#075975;text-decoration:none;display:inline-block;margin-bottom:16px">← 回課程入口</a>
+
+  <header>
+    <div class="eyebrow">Raman 判讀邏輯 · pigment identification</div>
+    <h1>孔雀藍的拉曼光譜<br>能告訴你<em>什麼</em>,不能告訴你什麼</h1>
+    <p class="thesis">同一組峰能鎖定<b>分子是銅酞菁</b>,卻分不出<b>是哪一個 PB15 亞型</b>——因為亞型的差別在晶型,不在分子振動。這頁把這條界線畫清楚。</p>
+  </header>
+
+  <!-- 1. interactive spectrum -->
+  <section>
+    <div class="sec-label"><span class="sec-num">01</span> 特徵峰 → 歸屬</div>
+    <h2>先認分子:銅酞菁的指紋峰</h2>
+    <p class="lead">點任一根標記峰,看它的振動歸屬。注意每一顆的兩個徽章——它們都能確認「這是 CuPc 分子」,但沒有一顆能告訴你晶型/亞型。</p>
+    <div class="spectrum-card">
+      <p class="spec-hint"><span class="tap-dot"></span> 點擊峰標記查看歸屬(示意光譜,峰位依你上傳的 File 1 相對強度繪製)</p>
+      <svg id="spec" viewBox="0 0 920 300" role="img" aria-label="銅酞菁示意拉曼光譜與可點擊的特徵峰">
+        <!-- axis -->
+        <line class="axis" x1="46" y1="262" x2="900" y2="262"></line>
+        <text class="axis-txt" x="46" y="280">150</text>
+        <text class="axis-txt" x="470" y="280" text-anchor="middle">Raman shift (cm⁻¹)</text>
+        <text class="axis-txt" x="900" y="280" text-anchor="end">1650</text>
+        <path id="trace" class="trace"></path>
+        <g id="markers"></g>
+      </svg>
+      <div class="readout" id="readout" aria-live="polite">
+        <div class="readout-empty">＿ 尚未選取。點上方任一根峰。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. decision branch -->
+  <section>
+    <div class="sec-label"><span class="sec-num">02</span> 分流判斷</div>
+    <h2>藍色色料的第一個岔路</h2>
+    <p class="lead">拿到任何一張藍色樣品的拉曼光譜,先問一個問題,就能把兩大類分開。</p>
+    <div class="flow">
+      <div class="flow-q">
+        <div class="qk">Q</div>
+        <div class="qt">有沒有 pyrrole / isoindole 四峰組 &nbsp;<span class="mono">748 · 1337 · 1450 · 1526</span> cm⁻¹?</div>
+      </div>
+      <div class="branches">
+        <div class="branch hit">
+          <div class="tag">✓ 有 → 你的情況</div>
+          <h3>銅酞菁 CuPc（PB15 家族）</h3>
+          <p>大共軛環的 pyrrole/isoindole 振動。<span class="cm">1526</span> 最強,配 <span class="cm">1450 / 1337 / 748</span> 即可鎖定。</p>
+        </div>
+        <div class="branch other">
+          <div class="tag">✗ 沒有</div>
+          <h3>改查芳香環模態</h3>
+          <p>若主要是 <span class="cm">~1580–1620</span> 環伸縮而無 pyrrole 組 → 可能是三芳基甲烷(PB24 / 亮藍 FCF 那類),另循一套參考峰。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. resolution ladder -->
+  <section>
+    <div class="sec-label"><span class="sec-num">03</span> 解析層級</div>
+    <h2>拉曼的解析力,停在哪一層?</h2>
+    <p class="lead">這是整頁的重點。切換下面兩個視角,看拉曼在「分子」與「晶型/亞型」兩層的解析力差異。</p>
+    <div class="ladder-card" id="ladder" data-view="both">
+      <div class="toggle-row">
+        <span class="lbl">聚焦:</span>
+        <button class="tbtn" data-view="mol" aria-pressed="false">分子層</button>
+        <button class="tbtn" data-view="poly" aria-pressed="false">晶型/亞型層</button>
+        <button class="tbtn" data-view="both" aria-pressed="true">兩層並看</button>
+      </div>
+      <div class="rung mol">
+        <div class="icon">✓</div>
+        <div>
+          <div class="verdict">RAMAN 可判定 · high confidence</div>
+          <h3>分子 = 銅酞菁</h3>
+          <p>指紋峰是分子振動,<b>所有 CuPc 亞型都共有</b>。看到那組峰 → 「這是酞菁藍」這句話成立,可以結案。</p>
+        </div>
+      </div>
+      <div class="rung poly">
+        <div class="icon">✗</div>
+        <div>
+          <div class="verdict">RAMAN 單獨不足 · needs other data</div>
+          <h3>亞型 = PB15 / 15:1 / 15:3 / 15:6…</h3>
+          <p>亞型差在<b>晶型(α / β / ε 多晶型)與是否氯化</b>,而不是分子結構。指紋區幾乎一樣,所以
+          <span class="ex">15:1</span> 和 <span class="ex">15:3</span> 光靠這些峰分不開。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. how to resolve subtype -->
+  <section>
+    <div class="sec-label"><span class="sec-num">04</span> 要分到亞型的話</div>
+    <h2>補哪些資料才能往下分</h2>
+    <div class="methods">
+      <div class="method">
+        <div class="k">XRD</div>
+        <div class="v"><b>分多晶型的標準做法。</b>PB15 vs 15:1 vs 15:3 主要就是 α / β 晶型差異,繞射圖最直接。</div>
+      </div>
+      <div class="method">
+        <div class="k">&lt;200 cm⁻¹</div>
+        <div class="v"><b>低波數晶格模</b>對堆疊/晶型敏感。但這段常被 notch filter 邊緣蓋掉——你這次的資料 150 cm⁻¹ 以下就不可用,要分晶型得換 filter 或量到更低。</div>
+      </div>
+      <div class="method">
+        <div class="k">主峰微移</div>
+        <div class="v">同分子不同晶型,主峰可能位移 <b>1–數 cm⁻¹</b>。需良好波數校正(如矽 520.7 cm⁻¹)才可靠,否則被校正漂移淹沒。</div>
+      </div>
+      <div class="method">
+        <div class="k">C–Cl</div>
+        <div class="v">懷疑<b>氯化型(如 15:6)</b>時,留意氯取代帶來的額外峰,可作為旁證。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- caveats -->
+  <div class="caveats">
+    <h2>三個容易踩的坑</h2>
+    <div class="cav"><span class="n">01</span><p><b>命名陷阱。</b>顏料界傳統的「Peacock Blue」有時指三芳基甲烷 CI 42090:1(PB24),不是 PB15。標籤未必等於實物——但你這份的拉曼證據就是 CuPc,以光譜為準。</p></div>
+    <div class="cav"><span class="n">02</span><p><b>notch 邊緣假峰。</b>~120 cm⁻¹ 那顆異常高值是濾波邊緣殘留,不是拉曼峰;判讀前先切掉 150 cm⁻¹ 以下。</p></div>
+    <div class="cav"><span class="n">03</span><p><b>共振增強。</b>CuPc 在紅光(633 / 785 nm)下有共振,峰的<b>相對強度</b>會隨激發波長改變;比對強度比例前先對齊雷射波長,峰位置則不受影響。</p></div>
+  </div>
+
+  <footer>孔雀藍 · CuPc · PB15 家族 &nbsp;|&nbsp; 判讀邏輯教學頁 &nbsp;|&nbsp; 示意光譜依實測峰位繪製,非原始資料</footer>
+
+</div>
+
+<script>
+(function(){
+  // peak: [cm-1, relative intensity 0..1, name, detail]
+  var peaks = [
+    [488,0.34,"大環變形 macrocycle deformation","酞菁大環的骨架變形模,低波數側的辨識點之一。"],
+    [593,0.16,"環變形 ring deformation","中等強度的環變形,常與 488、680 一起出現。"],
+    [680,0.54,"大環呼吸 macrocycle breathing","isoindole 相關的呼吸模,中低波數的顯著峰。"],
+    [748,0.63,"Eg 面外振動 out-of-plane","C–H / 大環面外彎曲(Eg),CuPc 的招牌峰之一。"],
+    [1337,0.62,"Cα–Cβ pyrrole 伸縮","吡咯環 Cα–Cβ 伸縮,強且穩定,核心診斷峰。"],
+    [1450,0.24,"isoindole 伸縮 (B1g)","異吲哚骨架伸縮,與 1526 構成高波數診斷對。"],
+    [1526,1.00,"Cβ–Cβ pyrrole 伸縮 (A1g)","全對稱 Cβ–Cβ 伸縮,通常全譜最強——最好認的一顆。"]
+  ];
+  var X0=150, X1=1650, PX0=46, PX1=900, BASE=262, TOP=40;
+  function xpx(cm){return PX0+(cm-X0)/(X1-X0)*(PX1-PX0);}
+  function ypx(v){return BASE-(v*(BASE-TOP));}
+
+  // build synthetic trace: sum of gaussians
+  var allpk = [[232,0.5],[254,0.55],[488,0.34],[593,0.16],[680,0.54],[748,0.63],
+               [951,0.22],[1140,0.37],[1190,0.20],[1303,0.19],[1337,0.62],
+               [1450,0.24],[1526,1.0]];
+  var d="", started=false;
+  for(var cm=X0; cm<=X1; cm+=3){
+    var v=0.02;
+    for(var i=0;i<allpk.length;i++){
+      var w=allpk[i][0]<300?16:12;
+      var dx=(cm-allpk[i][0])/w;
+      v+=allpk[i][1]*Math.exp(-dx*dx);
+    }
+    if(v>1)v=1;
+    d += (started?" L":"M")+xpx(cm).toFixed(1)+" "+ypx(v).toFixed(1);
+    started=true;
+  }
+  document.getElementById("trace").setAttribute("d",d);
+
+  // markers
+  var g=document.getElementById("markers");
+  var svgns="http://www.w3.org/2000/svg";
+  peaks.forEach(function(p,idx){
+    var x=xpx(p[0]), yTop=ypx(Math.min(p[1]+0.06,1));
+    var wrap=document.createElementNS(svgns,"g");
+    wrap.setAttribute("class","pk-marker");
+    wrap.setAttribute("tabindex","0");
+    wrap.setAttribute("role","button");
+    wrap.setAttribute("aria-label",p[0]+" 波數 "+p[2]);
+    wrap.innerHTML =
+      '<line class="pk-line" x1="'+x+'" y1="'+yTop+'" x2="'+x+'" y2="'+BASE+'"></line>'+
+      '<circle class="pk-dot" cx="'+x+'" cy="'+yTop+'" r="5"></circle>'+
+      '<text class="pk-label" x="'+x+'" y="'+(yTop-9)+'">'+p[0]+'</text>'+
+      '<rect class="pk-hit" x="'+(x-14)+'" y="'+TOP+'" width="28" height="'+(BASE-TOP)+'"></rect>';
+    function sel(){
+      document.querySelectorAll(".pk-marker").forEach(function(m){m.classList.remove("active");});
+      wrap.classList.add("active");
+      render(p);
+    }
+    wrap.addEventListener("click",sel);
+    wrap.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();sel();}});
+    g.appendChild(wrap);
+  });
+
+  var ro=document.getElementById("readout");
+  function render(p){
+    ro.innerHTML =
+      '<div class="ro-top"><span class="ro-cm">'+p[0]+' cm⁻¹</span>'+
+      '<span class="ro-name">'+p[2]+'</span></div>'+
+      '<p class="ro-detail">'+p[3]+'</p>'+
+      '<div class="badges">'+
+        '<span class="badge mol">✓ 確認分子 · <b>CuPc</b></span>'+
+        '<span class="badge poly">✗ 分不出亞型 · <b>PB15 / 15:x</b></span>'+
+      '</div>';
+  }
+
+  // ladder toggle
+  var ladder=document.getElementById("ladder");
+  document.querySelectorAll(".tbtn").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll(".tbtn").forEach(function(x){x.setAttribute("aria-pressed","false");});
+      b.setAttribute("aria-pressed","true");
+      ladder.setAttribute("data-view",b.getAttribute("data-view"));
+    });
+  });
+})();
+</script>
+</body>
+</html>
