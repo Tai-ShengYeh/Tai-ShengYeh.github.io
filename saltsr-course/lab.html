@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>互動實驗室 ─ SaltsR 鹽害分析入門</title>
+<meta name="description" content="拉滑桿就能看懂電荷平衡、Pathway 判定、Runsalt 曲線與石膏飽和度。不用寫任何程式。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E7C7B'/%3E%3Cpath d='M7 22 L11 10 L16 19 L21 8 L25 22' fill='none' stroke='%23F5F2E9' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='25' cy='22' r='2.6' fill='%23C8941F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/course.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span>SaltsR 鹽害分析入門</a>
+    <a class="nlink" href="index.html">課程入口</a>
+    <a class="nlink" href="lesson.html">講義</a>
+    <a class="nlink active" href="lab.html">互動實驗室</a>
+    <a class="nlink" href="quiz.html">測驗</a>
+    
+  </div>
+</nav>
+
+<header class="hero" style="padding:36px 0 30px">
+  <div class="wrap">
+    <p class="kicker">互動實驗室</p>
+    <h1 style="font-size:clamp(1.6rem,3.6vw,2.3rem)">先有感覺，再看公式</h1>
+    <p class="lead" style="font-size:1rem">
+      這三個工具不需要寫程式，也不需要等 R 環境載入 —— 拉滑桿，畫面立刻跟著變。
+      建議搭配講義單元 05、06、08 一起用：<strong>先在這裡玩到有直覺，再回去看數學</strong>。
+    </p>
+  </div>
+</header>
+
+<main class="wrap" style="padding-top:32px">
+
+<!-- ============ LAB 1 ============ -->
+<section id="lab1" style="padding-top:0">
+  <div class="sec-head">
+    <p class="kicker">實驗室 1 · 對應講義單元 05</p>
+    <h2>電荷平衡即時模擬器</h2>
+    <p class="muted">
+      拉動任何一個離子的濃度，看陰陽離子的當量長條怎麼變、Δe 怎麼變、
+      判定路徑什麼時候會翻轉，以及 Pathway 2 的逐級扣除一步一步在做什麼。
+    </p>
+  </div>
+
+  <div class="callout task">
+    <span class="ct">建議的玩法（依序試試看）</span>
+    <ol style="margin:0">
+      <li>載入 <strong>MH-01</strong>，注意鈣被扣到 0、鎂被扣掉一部分。</li>
+      <li>把<strong>硝酸根</strong>從 30 往上拉。看 Δe 怎麼縮小，
+        以及在哪個值路徑會從 Pathway 2 翻成 Pathway 1。</li>
+      <li>翻轉之後，回頭看鈣 —— 它還是 0 嗎？為什麼會變？</li>
+      <li>載入 <strong>MH-08</strong>，看飽和度警告。然後把萃取水量往上拉，看警告什麼時候消失。</li>
+      <li>把<strong>鎂</strong>從 5 拉到 50，觀察它的 ppm 只增加 45，但 mEq/kg 增加了多少 ——
+        為什麼鎂的影響力這麼大？（提示：回單元 04 看當量重）</li>
+    </ol>
+  </div>
+
+  <div class="lab">
+    <div class="lab-head">
+      <span class="lb">LAB 01</span>
+      <h3>七離子電荷平衡</h3>
+      <span class="small" style="margin-left:auto;color:#B8B2A4">
+        計算引擎與 R 版 SaltsR 逐項比對，誤差 0</span>
+    </div>
+    <div class="lab-body" id="lab1-body"></div>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ LAB 2 ============ -->
+<section id="lab2">
+  <div class="sec-head">
+    <p class="kicker">實驗室 2 · 對應講義單元 08</p>
+    <h2>Runsalt RH–莫耳曲線判讀器</h2>
+    <p class="muted">
+      這是 MH-01 在 20 °C 的真實 ECOS 模擬輸出，七個鹽相。
+      拖動濕度游標，看在那個濕度下哪些鹽是固體、哪些已經溶掉。
+    </p>
+  </div>
+
+  <div class="callout task">
+    <span class="ct">建議的玩法</span>
+    <ol style="margin:0">
+      <li>把游標放在 <strong>40 %RH</strong> —— 幾乎所有鹽都是固體。這是「乾燥保存」的狀態。</li>
+      <li>慢慢拉到 <strong>75 %RH</strong> —— 看鹽一個一個消失。每消失一個，
+        就代表在真實環境中跨過了一次結晶／溶解界線。</li>
+      <li>停在 <strong>65 %RH</strong>（台灣室內很常見的濕度），看還剩幾個固體、
+        哪一個離臨界點最近。</li>
+      <li>表格中<strong>被標黃的結晶 RH</strong> 落在 55–80 % 之間 ——
+        這些就是在台灣氣候下會反覆被跨越、因此最危險的鹽。</li>
+    </ol>
+  </div>
+
+  <div class="lab">
+    <div class="lab-head">
+      <span class="lb">LAB 02</span>
+      <h3>ECOS / Runsalt 輸出判讀</h3>
+      <span class="small" style="margin-left:auto;color:#B8B2A4">資料：SaltsRExample20C.txt（官方範例）</span>
+    </div>
+    <div class="lab-body" id="lab2-body"></div>
+  </div>
+
+  <div class="callout">
+    <span class="ct">怎麼把它變成一句建議</span>
+    <p style="margin-bottom:0">
+      找出<strong>所有結晶 RH 的最大值</strong>（這個樣品是 69.78 %，岩鹽）。
+      如果能把環境濕度<strong>穩定</strong>維持在明顯高於它（例如 80 % 以上），
+      所有鹽都會保持溶解狀態，不結晶 —— 但材料會長期潮濕，可能引發生物危害。<br>
+      反過來，維持在<strong>明顯低於最小值</strong>（這裡是 16.66 %）幾乎不可能，也會傷害有機材料。<br>
+      所以實務上的目標通常是：<strong>選一個落在鹽相之間的「安靜區間」並且穩住它</strong>，
+      重點是<em>不要反覆進出</em>臨界值。這比追求某個「理想濕度」重要得多。
+    </p>
+  </div>
+</section>
+
+<hr class="sep">
+
+<!-- ============ LAB 3 ============ -->
+<section id="lab3">
+  <div class="sec-head">
+    <p class="kicker">實驗室 3 · 對應講義單元 06</p>
+    <h2>石膏飽和度與稀釋計算機</h2>
+    <p class="muted">
+      實驗設計的問題：你加的水夠不夠把石膏全部溶掉？如果不夠，
+      離子層析根本測不到那些沒溶進去的鈣和硫酸根。
+    </p>
+  </div>
+
+  <div class="lab">
+    <div class="lab-head">
+      <span class="lb">LAB 03</span>
+      <h3>水樣比與石膏溶解度</h3>
+      <span class="small" style="margin-left:auto;color:#B8B2A4">20 °C，CaSO₄·2H₂O 溶解度 2.14 g/L</span>
+    </div>
+    <div class="lab-body" id="lab3-body"></div>
+  </div>
+
+  <div class="callout note">
+    <span class="ct">為什麼這件事在實務上很重要</span>
+    <p style="margin-bottom:0">
+      石膏是古蹟牆體最常見的鹽之一（空汙的 SO₂ 沉降到石灰岩上就會生成它）。
+      它同時也是<strong>最容易被低估</strong>的鹽 —— 因為它太難溶了。
+      如果你的標準作業程序永遠是「1 g 樣品配 100 mL 水」，
+      那麼在石膏含量高的樣品上，你會系統性地低估硫酸根與鈣。<br>
+      <strong>好的實驗設計不是固定一個水樣比，而是根據預期的鹽含量調整，
+      並且用飽和度檢查來驗證這次的萃取是否有效。</strong>
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="grid">
+    <div class="card c-teal">
+      <span class="tag">下一步</span>
+      <h3>回講義把數學看懂</h3>
+      <p>玩過之後再讀公式，會清楚很多。單元 05 的兩條路徑、單元 06 的石膏扣除都有完整推導。</p>
+      <div class="links"><a class="go" href="lesson.html#u5">單元 05 →</a><a class="repo" href="lesson.html#u6">單元 06</a></div>
+    </div>
+    <div class="card c-coral">
+      <span class="tag t-coral">檢核</span>
+      <h3>測驗一下</h3>
+      <p>37 題分階測驗，做完就知道自己哪一段還沒懂。</p>
+      <div class="links"><a class="go" href="quiz.html">開始測驗 →</a></div>
+    </div>
+    <div class="card c-gold">
+      <span class="tag t-gold">自己跑</span>
+      <h3>在瀏覽器裡執行真的 R</h3>
+      <p>講義裡每個深色框都能按下執行。想改參數、想跑自己的資料都可以。</p>
+      <div class="links"><a class="go" href="lesson.html#u1">去講義 →</a></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div><h4>課程</h4>
+        <p style="margin:0;line-height:2"><a href="index.html">課程入口</a><br>
+        <a href="lesson.html">講義</a><br><a href="quiz.html">測驗</a></p></div>
+      <div><h4>原始工具</h4>
+        <p style="margin:0;line-height:2">
+        <a href="https://github.com/BhavShah01/SaltsR" target="_blank" rel="noopener">SaltsR on GitHub</a><br>
+        <a href="http://science.sdf-eu.org/runsalt/" target="_blank" rel="noopener">Runsalt / ECOS</a><br>
+        <a href="https://predict.kikirpa.be/index.php/tools/" target="_blank" rel="noopener">KIK-IRPA PREDICT</a></p></div>
+      <div><h4>計算依據</h4>
+        <p style="margin:0;line-height:1.9;font-size:.86rem">
+        Godts et al. (2022) <em>Sci Data</em> 9(1), 324<br>
+        <a href="lesson.html#refs">完整參考文獻</a></p></div>
+      <div><h4>關於</h4>
+        <p style="margin:0;line-height:1.9;font-size:.86rem">葉泰聖 · 美和科技大學<br>
+        <a href="https://orcid.org/0000-0002-7798-2669" target="_blank" rel="noopener">ORCID 0000-0002-7798-2669</a></p></div>
+    </div>
+    <div class="fbot">
+      本頁的計算引擎為 SaltsR <code>fun_salt_balance()</code> 的 JavaScript 移植，
+      已與原 R 套件以 68 組指定案例逐項比對，所有欄位相對誤差為 0。
+    </div>
+  </div>
+</footer>
+
+<script src="assets/salt_engine.js"></script>
+<script src="assets/labs.js"></script>
+</body>
+</html>

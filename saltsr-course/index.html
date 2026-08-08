@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SaltsR 鹽害分析入門 ─ 從零開始的 R 資料科學課</title>
+<meta name="description" content="給沒有程式基礎的大一學生：用 SaltsR 學會離子層析數據的電荷平衡校正、ECOS/Runsalt 模型判讀，全部在瀏覽器裡執行真正的 R。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E7C7B'/%3E%3Cpath d='M7 22 L11 10 L16 19 L21 8 L25 22' fill='none' stroke='%23F5F2E9' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='25' cy='22' r='2.6' fill='%23C8941F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/course.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span>SaltsR 鹽害分析入門</a>
+    <a class="nlink active" href="index.html">課程入口</a>
+    <a class="nlink" href="lesson.html">講義</a>
+    <a class="nlink" href="lab.html">互動實驗室</a>
+    <a class="nlink" href="quiz.html">測驗</a>
+    
+    <a class="nlink" href="../index.html">↖ 課程總站</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">Meiho University · 分析化學／資料科學整合課程</p>
+    <h1>鹽害在牆上寫了什麼？<br>用 R 把離子層析數據讀懂</h1>
+    <p class="lead">
+      古蹟牆面剝落、磚材粉化、石雕起皮 —— 幕後兇手常常是牆體裡的可溶鹽。
+      這門課從「你完全沒寫過程式」開始，一路帶到能自己完成
+      <strong>離子層析 → 電荷平衡校正 → ECOS/Runsalt 模擬 → 濕度控制建議</strong>
+      的整套分析。所有 R 程式碼都能直接在這個網頁裡執行，不必安裝任何東西。
+    </p>
+    <div class="pill-row">
+      <span class="pill" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">零程式基礎可入</span>
+      <span class="pill" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">瀏覽器直接跑 R</span>
+      <span class="pill" style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">真實文資分析流程</span>
+    </div>
+    <div class="stats">
+      <div><b>10</b><span>教學單元</span></div>
+      <div><b>3</b><span>互動實驗室</span></div>
+      <div><b>37</b><span>測驗題目</span></div>
+      <div><b>0</b><span>需要安裝的軟體</span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="wrap">
+  <div class="sec-head">
+    <p class="kicker">開始之前</p>
+    <h2>這門課要解決一個真實問題</h2>
+  </div>
+  <div class="two-col">
+    <div>
+      <p>
+        你拿到一份古蹟牆面的取樣報告：乾樣重 1.000 公克，用 100 毫升去離子水萃取，
+        離子層析儀吐出七個數字 —— 氯 50 ppm、硝酸根 30 ppm、硫酸根 20 ppm、
+        鈉 40 ppm、鉀 10 ppm、鈣 15 ppm、鎂 5 ppm。
+      </p>
+      <p>
+        然後呢？這七個數字沒辦法直接告訴你「這面牆在什麼濕度下會開始長鹽結晶」。
+        中間隔著三道關卡：<strong>單位換算</strong>、<strong>電荷平衡校正</strong>、
+        <strong>熱力學模型模擬</strong>。這門課就是帶你把這三道關卡一一打通。
+      </p>
+      <p class="muted small">
+        課程使用的分析套件是 <a href="https://github.com/BhavShah01/SaltsR" target="_blank" rel="noopener">SaltsR</a>
+        （Shah、Godts 與 Orr 開發，GPL-3 授權），演算法出自
+        Godts 等人 2022 年發表於 <em>Scientific Data</em> 的電荷平衡計算方法。
+      </p>
+    </div>
+    <div class="card c-gold" style="background:var(--paper3)">
+      <span class="tag t-gold">學完之後你會</span>
+      <ul style="margin:2px 0 0; padding-left:1.15em; font-size:.94rem; line-height:1.85">
+        <li>看懂並自己寫出基本的 R 程式（變數、向量、資料框、函式、迴圈）</li>
+        <li>把 ppm 正確換算成重量百分比與 mEq/kg，並解釋為什麼要換</li>
+        <li>判斷一筆數據該走 Pathway 1 還是 Pathway 2，並說明理由</li>
+        <li>解釋為什麼要把石膏扣掉，以及扣掉之後遺失了什麼資訊</li>
+        <li>讀 Runsalt 的 RH–莫耳曲線，指出最危險的鹽與最危險的濕度區間</li>
+        <li>用一行迴圈把整批樣品跑完，並產出可交付的圖表</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" style="padding-top:10px">
+  <div class="sec-head">
+    <p class="kicker">01 · 主要教材</p>
+    <h2>課程講義：十個單元，由淺入深</h2>
+    <p class="muted">每個單元都有可以直接按下「執行」的 R 程式碼，改了數字馬上看到結果。</p>
+  </div>
+  <div class="grid">
+
+    <div class="card c-gold">
+      <span class="tag t-gold">單元 00</span>
+      <h3>鹽為什麼會把牆吃掉</h3>
+      <p>潮解、結晶壓、水合膨脹三種破壞機制；相對濕度為什麼是關鍵變數；SaltsR 在整個分析鏈上的位置。不寫程式，先把問題想清楚。</p>
+      <div class="links"><a class="go" href="lesson.html#u0">開始 →</a></div>
+    </div>
+
+    <div class="card c-teal">
+      <span class="tag">單元 01</span>
+      <h3>R 的第一行：把它當計算機</h3>
+      <p>主控台、變數指派 <code>&lt;-</code>、註解、函式呼叫、常見錯誤訊息怎麼讀。這一單元結束時你會寫出人生第一個 R 運算式。</p>
+      <div class="links"><a class="go" href="lesson.html#u1">開始 →</a></div>
+    </div>
+
+    <div class="card c-teal">
+      <span class="tag">單元 02</span>
+      <h3>向量、資料框與管線</h3>
+      <p>一次處理七個離子而不是複製貼上七次；用 <code>data.frame</code> 裝一整張樣品表；認識 <code>|&gt;</code> 管線運算子。</p>
+      <div class="links"><a class="go" href="lesson.html#u2">開始 →</a></div>
+    </div>
+
+    <div class="card c-coral">
+      <span class="tag t-coral">單元 03</span>
+      <h3>從 ppm 到重量百分比</h3>
+      <p>式 1：<code>w = C×V /(10000×m)</code>。單位是怎麼消掉的、分率與百分比差在哪、為什麼一個小數點會讓結果差 100 倍。自己動手寫第一個函式。</p>
+      <div class="links"><a class="go" href="lesson.html#u3">開始 →</a></div>
+    </div>
+
+    <div class="card c-coral">
+      <span class="tag t-coral">單元 04</span>
+      <h3>當量濃度 mEq/kg：電荷的語言</h3>
+      <p>式 2。為什麼 1 莫耳鈣抵得過 2 莫耳鈉；為什麼談電荷平衡一定要用當量而不是莫耳；七個離子一次算完。</p>
+      <div class="links"><a class="go" href="lesson.html#u4">開始 →</a></div>
+    </div>
+
+    <div class="card c-plum">
+      <span class="tag t-plum">單元 05</span>
+      <h3>電荷平衡與兩條校正路徑</h3>
+      <p>式 3–5：Δe 是什麼、2% 準則怎麼來的、Pathway 1 的等比例縮放 vs Pathway 2 的 Ca→Mg→Na→K 逐級扣除，以及被扣掉的那些電荷跑去哪了。<strong>本課程的核心單元。</strong></p>
+      <div class="links"><a class="go" href="lesson.html#u5">開始 →</a><a class="repo" href="lab.html#lab1">配套實驗室</a></div>
+    </div>
+
+    <div class="card c-plum">
+      <span class="tag t-plum">單元 06</span>
+      <h3>石膏扣除與 ECOS 輸入檔</h3>
+      <p>式 6–11：為什麼熱力學模型不收石膏、min(SO₄, Ca) 的物理意義、莫耳分率怎麼算、飽和度警告什麼時候該相信，以及套件裡一個容易誤讀的欄位。</p>
+      <div class="links"><a class="go" href="lesson.html#u6">開始 →</a><a class="repo" href="lab.html#lab3">石膏計算機</a></div>
+    </div>
+
+    <div class="card c-teal">
+      <span class="tag">單元 07</span>
+      <h3>讀進 Runsalt 的輸出檔</h3>
+      <p>寬表變長表、<code>Salt_X</code>／<code>Salt_Y</code> 的命名規則、怎麼把混亂的文字檔整理成乾淨的資料框。這是資料清理的基本功。</p>
+      <div class="links"><a class="go" href="lesson.html#u7">開始 →</a></div>
+    </div>
+
+    <div class="card c-coral">
+      <span class="tag t-coral">單元 08</span>
+      <h3>畫圖，然後看懂它</h3>
+      <p>RH–莫耳曲線怎麼讀、結晶點在哪、為什麼混合鹽比純鹽危險、把曲線翻譯成一句「濕度請控制在 X–Y % 之間」的建議。</p>
+      <div class="links"><a class="go" href="lesson.html#u8">開始 →</a><a class="repo" href="lab.html#lab2">曲線判讀器</a></div>
+    </div>
+
+    <div class="card c-plum">
+      <span class="tag t-plum">單元 09</span>
+      <h3>批次處理與綜合實作</h3>
+      <p>八個樣品一次跑完：<code>for</code> 迴圈與 <code>lapply</code>、把結果併成一張表、匯出 CSV，最後寫出一份完整的牆體診斷報告。</p>
+      <div class="links"><a class="go" href="lesson.html#u9">開始 →</a></div>
+    </div>
+
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <p class="kicker">02 · 動手玩</p>
+    <h2>互動實驗室：先有感覺，再看公式</h2>
+    <p class="muted">不用寫任何程式，拉滑桿就能看到整條計算鏈怎麼跟著動。</p>
+  </div>
+  <div class="grid">
+    <div class="card c-plum">
+      <span class="tag t-plum">實驗室 1</span>
+      <h3>電荷平衡即時模擬器</h3>
+      <p>七個離子濃度滑桿。即時顯示陰陽離子當量長條、Δe、路徑判定，以及 Pathway 2 的 Ca→Mg→Na→K 扣除過程一步步跑給你看。改一個數字，看整條鏈怎麼翻轉。</p>
+      <div class="links"><a class="go" href="lab.html#lab1">打開 →</a></div>
+    </div>
+    <div class="card c-teal">
+      <span class="tag">實驗室 2</span>
+      <h3>Runsalt 曲線判讀器</h3>
+      <p>載入真實的 Runsalt 輸出（20 °C，七個鹽相）。滑動濕度游標，看哪些鹽在該濕度下是固體、哪些已經溶解，並自動列出結晶 RH 排序與風險提示。</p>
+      <div class="links"><a class="go" href="lab.html#lab2">打開 →</a></div>
+    </div>
+    <div class="card c-gold">
+      <span class="tag t-gold">實驗室 3</span>
+      <h3>石膏飽和度與稀釋計算機</h3>
+      <p>調整乾樣重與萃取水量，看石膏什麼時候會超過 20 °C 的溶解上限、飽和度警告什麼時候亮起、該稀釋幾倍才可信。</p>
+      <div class="links"><a class="go" href="lab.html#lab3">打開 →</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="sec-head">
+    <p class="kicker">03 · 檢核與資源</p>
+    <h2>測驗、資料與教師資源</h2>
+  </div>
+  <div class="grid">
+    <div class="card c-coral">
+      <span class="tag t-coral">自我檢核</span>
+      <h3>37 題分階測驗</h3>
+      <p>四個階段對應課程四大主題，共 37 題。每題作答後立刻回饋、指出該回去複習哪個單元，70 分通過。</p>
+      <div class="links"><a class="go" href="quiz.html">開始測驗 →</a></div>
+    </div>
+    <div class="card c-teal">
+      <span class="tag">資料與腳本</span>
+      <h3>下載區</h3>
+      <p>八個樣品的離子層析數據、Runsalt 範例輸出、各單元的 <code>.R</code> 腳本，以及課堂版 SaltsR 函式庫。可直接在 RStudio 使用。</p>
+      <div class="links">
+        <a class="go" href="lesson.html#downloads">檔案清單 →</a>
+        <a class="repo" href="data/salt_samples.csv" download>樣品 CSV</a>
+      </div>
+    </div>
+    <div class="card c-grey" style="border-color:#D6CFB8">
+      <span class="tag t-grey">教師用</span>
+      <h3>教師版解答與帶課建議</h3>
+      <p>全部測驗與練習的解答、每單元的教學重點與常見迷思、時間分配建議、評分要點與延伸作業。</p>
+      <div class="links"><span class="muted small">未公開 —— 請向授課教師索取</span></div>
+    </div>
+    <div class="card c-gold">
+      <span class="tag t-gold">工具連結</span>
+      <h3>真正的分析工具</h3>
+      <p>課程結束後，實際研究請使用官方工具：PREDICT 的鹽含量計算器（最新演算法）、Runsalt 模擬軟體、SaltsR 線上版。</p>
+      <div class="links">
+        <a class="repo" href="https://predict.kikirpa.be/index.php/tools/moisture-and-salt-sample-data-analysis-tool/" target="_blank" rel="noopener">PREDICT</a>
+        <a class="repo" href="http://science.sdf-eu.org/runsalt/" target="_blank" rel="noopener">Runsalt</a>
+        <a class="repo" href="https://oceanonline.shinyapps.io/SaltsRApp/" target="_blank" rel="noopener">SaltsR 線上版</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="callout warn">
+    <span class="ct">請務必先讀這一段</span>
+    <p style="margin-bottom:.5em">
+      這是<strong>教學用</strong>網站。課程裡的 R 函式是 SaltsR 的簡化重寫版，
+      雖然已用 268 組資料逐項比對、與原套件結果一致（相對誤差 &lt; 10⁻¹³），
+      但真實的文化資產診斷請使用官方工具與最新演算法。
+    </p>
+    <p style="margin-bottom:0">
+      SaltsR 作者本人也在套件說明中指出：最新的計算請以
+      <a href="https://predict.kikirpa.be/index.php/tools/moisture-and-salt-sample-data-analysis-tool/" target="_blank" rel="noopener">PREDICT 鹽含量計算器</a>為準。
+      這門課的目的是讓你<em>看懂</em>那個計算器在做什麼，而不是取代它。
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <h4>課程</h4>
+        <p style="margin:0; line-height:2">
+          <a href="lesson.html">十單元講義</a><br>
+          <a href="lab.html">互動實驗室</a><br>
+          <a href="quiz.html">分階測驗</a>
+        </p>
+      </div>
+      <div>
+        <h4>原始工具</h4>
+        <p style="margin:0; line-height:2">
+          <a href="https://github.com/BhavShah01/SaltsR" target="_blank" rel="noopener">SaltsR on GitHub</a><br>
+          <a href="https://bhavshah01.github.io/SaltsR/" target="_blank" rel="noopener">SaltsR 套件文件</a><br>
+          <a href="http://science.sdf-eu.org/runsalt/" target="_blank" rel="noopener">Runsalt / ECOS</a><br>
+          <a href="https://predict.kikirpa.be/index.php/tools/" target="_blank" rel="noopener">KIK-IRPA PREDICT</a>
+        </p>
+      </div>
+      <div>
+        <h4>方法出處</h4>
+        <p style="margin:0; line-height:1.9; font-size:.86rem">
+          Godts et al. (2022) <em>Sci Data</em> 9, 324<br>
+          Godts et al. (2022) <em>Heritage</em> 5(4), 3648<br>
+          Price (2000)；Bionda (2005)
+        </p>
+      </div>
+      <div>
+        <h4>關於</h4>
+        <p style="margin:0; line-height:1.9; font-size:.86rem">
+          葉泰聖 · 美和科技大學<br>
+          <a href="https://orcid.org/0000-0002-7798-2669" target="_blank" rel="noopener">ORCID 0000-0002-7798-2669</a><br>
+          <a href="../index.html">課程總站</a>
+        </p>
+      </div>
+    </div>
+    <div class="fbot">
+      SaltsR 套件為 Bhavesh Shah、Sebastiaan Godts、Scott Orr 所著，採 GPL-3 授權。
+      本課程網頁之教學內容與互動工具由葉泰聖編寫，用於教學目的；
+      課堂版 R 函式改寫自原套件並保留同一授權。
+    </div>
+  </div>
+</footer>
+
+<script>
+/* 用 file:// 直接開啟時，先在入口就把問題講清楚，免得學生進到講義才卡住。 */
+(function () {
+  if (location.protocol !== 'file:') return;
+  var d = document.createElement('div');
+  d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:300;background:#B3402C;' +
+    'color:#fff;padding:14px 20px;font-size:.9rem;line-height:1.6;box-shadow:0 -2px 14px rgba(0,0,0,.2)';
+  d.innerHTML =
+    '<b>這樣開啟課程，R 會跑不起來。</b><br>' +
+    '你目前是用「按兩下 HTML 檔」的方式瀏覽（網址是 file://），' +
+    '瀏覽器會禁止網頁讀取教材檔案。<br>' +
+    '請回到課程資料夾，改成按兩下 <code style="background:rgba(255,255,255,.22);padding:1px 5px;border-radius:4px">start-course.bat</code>（Windows）' +
+    '或 <code style="background:rgba(255,255,255,.22);padding:1px 5px;border-radius:4px">start-course.command</code>（macOS），' +
+    '再用它開啟的 <code style="background:rgba(255,255,255,.22);padding:1px 5px;border-radius:4px">http://localhost:8000</code> 瀏覽。' +
+    '<button type="button" style="float:right;background:none;border:1px solid rgba(255,255,255,.6);' +
+    'color:#fff;border-radius:6px;padding:3px 10px;cursor:pointer">知道了</button>';
+  d.querySelector('button').onclick = function () { d.remove(); };
+  document.body.appendChild(d);
+})();
+</script>
+
+</body>
+</html>

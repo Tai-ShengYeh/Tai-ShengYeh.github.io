@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分階測驗 ─ SaltsR 鹽害分析入門</title>
+<meta name="description" content="37 題四階段測驗，每題即時回饋並指出該複習哪個單元。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E7C7B'/%3E%3Cpath d='M7 22 L11 10 L16 19 L21 8 L25 22' fill='none' stroke='%23F5F2E9' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='25' cy='22' r='2.6' fill='%23C8941F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/course.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span>SaltsR 鹽害分析入門</a>
+    <a class="nlink" href="index.html">課程入口</a>
+    <a class="nlink" href="lesson.html">講義</a>
+    <a class="nlink" href="lab.html">互動實驗室</a>
+    <a class="nlink active" href="quiz.html">測驗</a>
+    
+  </div>
+</nav>
+
+<header class="hero" style="padding:34px 0 28px">
+  <div class="wrap">
+    <p class="kicker">自我檢核</p>
+    <h1 style="font-size:clamp(1.55rem,3.4vw,2.2rem)">37 題，四個階段</h1>
+    <p class="lead" style="font-size:1rem">
+      每一題選完就會立刻告訴你對不對、為什麼，以及該回去看哪個單元。
+      不用一次做完，做到哪算到哪。答對 70 % 以上算通過。
+    </p>
+  </div>
+</header>
+
+<main class="wrap-narrow" style="padding-top:28px">
+
+  <div class="callout note">
+    <span class="ct">作答說明</span>
+    <p style="margin-bottom:0">
+      每題<strong>只能作答一次</strong>，選下去就會判定並解鎖說明 —— 所以請先想清楚再選。
+      解說的部分往往比題目本身重要，答對了也建議讀一遍。<br>
+      成績不會上傳到任何地方，重新整理頁面就會歸零。
+    </p>
+  </div>
+
+  <div id="stagebars" class="stagebars"></div>
+
+  <div id="quiz-root"></div>
+
+  <div id="result" class="callout" style="display:none"></div>
+
+  <p style="margin:24px 0 40px">
+    <button class="btn btn-ghost" id="restart" type="button"
+            style="background:var(--paper2);color:var(--ink);border:1px solid var(--line)">↺ 重新作答</button>
+    <a class="go" href="lesson.html" style="margin-left:8px">回講義</a>
+    <a class="repo" href="lab.html">互動實驗室</a>
+  </p>
+
+</main>
+
+<div class="scorebox">
+  <div>
+    <div class="lbl">答對</div>
+    <div class="big" id="sc-correct">0 / 0</div>
+  </div>
+  <div>
+    <div class="lbl">正確率</div>
+    <div class="big" id="sc-pct">0%</div>
+  </div>
+  <div class="progbar"><i id="sc-prog"></i></div>
+  <div class="lbl" id="sc-left">37 題未作答</div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div><h4>課程</h4>
+        <p style="margin:0;line-height:2"><a href="index.html">課程入口</a><br>
+        <a href="lesson.html">講義</a><br><a href="lab.html">互動實驗室</a></p></div>
+      <div><h4>原始工具</h4>
+        <p style="margin:0;line-height:2">
+        <a href="https://github.com/BhavShah01/SaltsR" target="_blank" rel="noopener">SaltsR on GitHub</a><br>
+        <a href="http://science.sdf-eu.org/runsalt/" target="_blank" rel="noopener">Runsalt / ECOS</a></p></div>
+      <div><h4>命題依據</h4>
+        <p style="margin:0;line-height:1.9;font-size:.86rem">
+        全部題目對應講義單元 00–09，<br>
+        解說中的數值均取自課程驗證過的計算結果。<br>
+        <a href="lesson.html#refs">參考文獻</a></p></div>
+      <div><h4>關於</h4>
+        <p style="margin:0;line-height:1.9;font-size:.86rem">葉泰聖 · 美和科技大學<br>
+        <a href="https://orcid.org/0000-0002-7798-2669" target="_blank" rel="noopener">ORCID 0000-0002-7798-2669</a></p></div>
+    </div>
+    <div class="fbot">成績僅存在你的瀏覽器中，不會上傳。</div>
+  </div>
+</footer>
+
+<script src="assets/quiz.js"></script>
+</body>
+</html>

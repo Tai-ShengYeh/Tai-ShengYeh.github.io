@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>課程講義 ─ SaltsR 鹽害分析入門</title>
+<meta name="description" content="十個單元，從 R 的第一行到完整的鹽害診斷報告。每段程式碼都能在瀏覽器裡直接執行。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230E7C7B'/%3E%3Cpath d='M7 22 L11 10 L16 19 L21 8 L25 22' fill='none' stroke='%23F5F2E9' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='25' cy='22' r='2.6' fill='%23C8941F'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/course.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="brand" href="index.html"><span class="dot"></span>SaltsR 鹽害分析入門</a>
+    <a class="nlink" href="index.html">課程入口</a>
+    <a class="nlink active" href="lesson.html">講義</a>
+    <a class="nlink" href="lab.html">互動實驗室</a>
+    <a class="nlink" href="quiz.html">測驗</a>
+    
+  </div>
+</nav>
+
+<header class="hero" style="padding:38px 0 32px">
+  <div class="wrap">
+    <p class="kicker">課程講義</p>
+    <h1 style="font-size:clamp(1.6rem,3.6vw,2.4rem)">十個單元，從一行程式到一份診斷報告</h1>
+    <p class="lead" style="font-size:1rem">
+      這一頁包含全部教材。網頁上每個深色框都是<strong>可以編輯、可以執行的真 R 環境</strong> ——
+      按下「▶ 執行」就會在你的瀏覽器裡跑真正的 R，不會上傳到任何伺服器。
+      第一次執行需要下載約 30 MB 的 R 執行環境，請耐心等 20–40 秒。
+    </p>
+    <p style="margin:0">
+      <a href="#" id="webr-warmup" class="go" style="background:#fff;color:var(--teal)">先預熱 R 環境</a>
+    </p>
+  </div>
+</header>
+
+<main class="wrap-narrow" style="padding-top:34px">
+
+<nav class="toc" aria-label="目錄">
+  <strong style="display:block;margin-bottom:8px">單元目錄</strong>
+  <ol>
+    <li><a href="#u0">鹽為什麼會把牆吃掉</a></li>
+    <li><a href="#u1">R 的第一行</a></li>
+    <li><a href="#u2">向量、資料框與管線</a></li>
+    <li><a href="#u3">從 ppm 到重量百分比</a></li>
+    <li><a href="#u4">當量濃度 mEq/kg</a></li>
+    <li><a href="#u5">電荷平衡與兩條路徑</a></li>
+    <li><a href="#u6">石膏扣除與 ECOS 輸入</a></li>
+    <li><a href="#u7">讀進 Runsalt 輸出檔</a></li>
+    <li><a href="#u8">畫圖，然後看懂它</a></li>
+    <li><a href="#u9">批次處理與綜合實作</a></li>
+  </ol>
+  <p class="tiny muted" style="margin:10px 0 0">
+    附錄：<a href="#appendix">疑難排解</a> ·
+    <a href="#glossary">詞彙對照</a> ·
+    <a href="#downloads">檔案下載</a> ·
+    <a href="#refs">參考文獻</a>
+  </p>
+</nav>
+
+
+<!-- ==================== UNIT 0 ==================== -->
+<article class="unit u-gold" id="u0">
+  <span class="unit-badge">UNIT 00</span>
+  <h2>鹽為什麼會把牆吃掉</h2>
+
+  <p>
+    走進任何一座老磚造建築，你大概都看過這種景象：離地面半公尺以下的牆面，
+    表層剝落、磚粉簌簌掉、有時還泛著一層白霜。
+    那層白霜是<strong>可溶鹽</strong>，而剝落是它造成的。
+  </p>
+
+  <h3>鹽從哪裡來</h3>
+  <p>
+    地下水沿著磚石的毛細孔往上爬（稱為<strong>毛細上升</strong>，rising damp），
+    沿途溶解土壤和建材裡的鹽類帶上來。水在牆面蒸發，鹽留下。
+    幾十年下來，牆體下段就累積了高濃度的鹽。常見來源還有：
+  </p>
+  <ul>
+    <li><strong>硝酸鹽</strong>（NO₃⁻）—— 動物排泄、有機物分解、農地施肥，是「人為活動史」的化學指紋</li>
+    <li><strong>氯化物</strong>（Cl⁻）—— 海鹽氣膠、道路除冰鹽、早期不當的清潔劑</li>
+    <li><strong>硫酸鹽</strong>（SO₄²⁻）—— 空氣汙染 SO₂ 沉降後氧化、水泥砂漿、石膏灰泥</li>
+    <li><strong>鈉、鉀、鈣、鎂</strong>（Na⁺, K⁺, Ca²⁺, Mg²⁺）—— 上面那些陰離子的搭檔，來自建材本身與地下水</li>
+  </ul>
+
+  <h3>三種破壞機制</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>機制</th><th>發生時機</th><th>破壞方式</th></tr></thead>
+    <tbody>
+      <tr><td><strong>結晶壓</strong></td><td>濕度下降、溶液過飽和</td>
+          <td>鹽晶體在孔隙裡長大，對孔壁施加壓力。過飽和度高時可達數十 MPa，遠超過砂岩的抗拉強度。</td></tr>
+      <tr><td><strong>潮解／再結晶循環</strong></td><td>濕度在臨界值上下反覆</td>
+          <td>每一次「吸水溶解 → 乾燥結晶」都在同一個孔隙裡再擠一次。循環次數比單次結晶壓更致命。</td></tr>
+      <tr><td><strong>水合膨脹</strong></td><td>溫濕度變化使鹽改變含水形式</td>
+          <td>例如 Na₂SO₄（無水芒硝）吸水變成 Na₂SO₄·10H₂O（芒硝），體積膨脹約 3 倍。這是最惡名昭彰的破壞鹽。</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout">
+    <span class="ct">關鍵變數：相對濕度（RH）</span>
+    <p style="margin-bottom:0">
+      每一種鹽都有一個<strong>潮解相對濕度</strong>（deliquescence RH, DRH）：
+      環境濕度高於它，鹽會自發吸水變成溶液；低於它，鹽會結晶析出。
+      純氯化鈉在 20–25 °C 的 DRH 約 75 %。
+      所以理論上，只要把室內濕度<em>穩定</em>控制在遠離 DRH 的一側，破壞就會停止。
+      問題是 —— 牆裡從來不會只有一種鹽。
+    </p>
+  </div>
+
+  <h3>混合鹽：為什麼這件事沒那麼簡單</h3>
+  <p>
+    當兩種以上的鹽共存於同一份溶液，離子之間的交互作用會<strong>降低</strong>水的活性，
+    使混合物的潮解點低於任何單一組分。<sup><a href="#r-rorig">[4]</a></sup>
+    也就是說：<strong>混合鹽會在比純鹽更低的濕度下就開始吸水</strong>，
+    因而在一年之中跨越臨界濕度的次數更多、循環更頻繁、破壞更快。
+  </p>
+  <p>
+    這正是為什麼我們不能只看「這面牆有多少鹽」，而必須算出
+    <strong>七個離子的完整組成</strong>，再丟進熱力學模型去算整個混合系統的行為。
+    那個模型叫 <strong>ECOS</strong>（Environmental Control of Salts），
+    它的圖形介面叫 <strong>Runsalt</strong>。
+  </p>
+
+  <h3>SaltsR 站在哪個位置</h3>
+  <div class="eq" style="text-align:left; font-family:var(--mono); font-size:.86rem; line-height:2.1">
+    ① 現場取樣（鑽粉／刮取，記錄取樣高度與深度）<br>
+    ② 乾燥、秤重 → 得到乾樣重 <code>m<sub>dry</sub></code>（g）<br>
+    ③ 加去離子水萃取 → 記錄水量 <code>V<sub>water</sub></code>（mL）<br>
+    ④ <strong>離子層析（IC）</strong> → 得到七個離子的 ppm<br>
+    <span style="color:var(--coral);font-weight:700">⑤ SaltsR：單位換算 → 電荷平衡校正 → 扣除石膏 → 產生 ECOS 輸入檔　←── 本課程</span><br>
+    ⑥ Runsalt／ECOS 熱力學模擬 → 得到 RH vs 各鹽相莫耳量的曲線<br>
+    <span style="color:var(--coral);font-weight:700">⑦ SaltsR：讀入 Runsalt 輸出 → 整理 → 繪圖 → 判讀　　　　　←── 本課程</span><br>
+    ⑧ 提出濕度控制與保存處置建議
+  </div>
+
+  <div class="callout note">
+    <span class="ct">為什麼第 ⑤ 步不能跳過</span>
+    <p style="margin-bottom:0">
+      離子層析量出來的七個數字，加起來的正電荷和負電荷<strong>幾乎永遠不會相等</strong>。
+      可能是分析誤差，也可能是有些離子（最常見的是碳酸根 CO₃²⁻）根本沒被測到。
+      但熱力學模型要求電中性 —— 你不能餵它一組會違反電中性的組成。
+      所以必須先做校正。<strong>怎麼校正、把差額算到誰頭上，會直接改變模擬結果。</strong>
+      這就是單元 05 的主題，也是整門課的核心。
+    </p>
+  </div>
+
+  <div class="callout task">
+    <span class="ct">想一想（不用寫程式）</span>
+    <p style="margin-bottom:0">
+      如果一份樣品的陽離子當量總和明顯大於陰離子，最可能的解釋是什麼？
+      為什麼「多出來的陽離子」不太可能是儀器誤差？
+      <br><em>提示：想想離子層析通常會漏掉哪一種常見的陰離子。答案在單元 05。</em>
+    </p>
+  </div>
+</article>
+
+
+<!-- ==================== UNIT 1 ==================== -->
+<article class="unit" id="u1">
+  <span class="unit-badge">UNIT 01</span>
+  <h2>R 的第一行：把它當計算機</h2>
+
+  <p>
+    R 是一種為資料分析而生的程式語言。你不需要先懂「程式設計」，
+    只要能把一句話翻成一個算式，就可以開始用它。
+  </p>
+
+  <h3>1-1　它就是一台計算機</h3>
+  <p>
+    下面這個深色框就是一個真正的 R 環境。按「▶ 執行」試試看，
+    然後<strong>把數字改掉再執行一次</strong>。改壞了按「↺ 還原」。
+  </p>
+
+  <div class="runner" data-title="練習 1-1 · 四則運算">
+<textarea>
+50 + 30 + 20      # 三個陰離子的 ppm 加總
+
+100 / 1000        # 100 毫升換算成公升
+
+2 ^ 10            # 次方
+
+(50 * 100) / (10000 * 1)   # 這其實就是單元 3 的公式
+</textarea>
+  </div>
+
+  <div class="callout">
+    <span class="ct">兩件馬上要記住的事</span>
+    <p style="margin-bottom:0">
+      <code>#</code> 後面的文字是<strong>註解</strong>，R 完全不看它，它是寫給人看的。
+      養成寫註解的習慣 —— 三個月後回來看自己的程式，你會感謝當初的自己。<br>
+      執行結果前面的 <code>[1]</code> 不是答案的一部分，它是「這是輸出的第 1 個元素」的意思，
+      等到單元 2 處理一長串數字時你就會明白它的用處。
+    </p>
+  </div>
+
+  <h3>1-2　把值存起來：變數與 <code>&lt;-</code></h3>
+  <p>
+    一直重複打同一個數字既累又容易錯。給它一個名字：
+  </p>
+
+  <div class="runner" data-title="練習 1-2 · 變數">
+<textarea>
+dry_g    <- 1.000     # 乾樣重（公克）
+water_ml <- 100       # 萃取用水量（毫升）
+cl_ppm   <- 50        # 氯離子濃度（ppm）
+
+dry_g                 # 打變數名字就會印出它的值
+
+# 用變數做運算，比直接打數字清楚太多了
+cl_ppm * water_ml / (10000 * dry_g)
+</textarea>
+  </div>
+
+  <div class="callout note">
+    <span class="ct">命名的規矩與慣例</span>
+    <ul style="margin:0">
+      <li>用 <code>&lt;-</code> 指派（鍵盤上是「小於號」加「減號」）。<code>=</code> 也能用，但 R 社群習慣用 <code>&lt;-</code>。</li>
+      <li>名字要能<strong>看名字就知道是什麼、單位是什麼</strong>：<code>dry_g</code> 好過 <code>x</code>；<code>water_ml</code> 好過 <code>w</code>。</li>
+      <li>不能以數字開頭，不能有空格。多字之間用底線，例如 <code>chloride_ppm</code>。</li>
+      <li>R <strong>區分大小寫</strong>：<code>Dry_g</code> 和 <code>dry_g</code> 是兩個不同的變數。這是初學者最常見的錯誤來源。</li>
+    </ul>
+  </div>
+
+  <h3>1-3　函式：別人寫好的工具</h3>
+  <p>
+    函式的長相是「名字加括號」：<code>round(3.14159, 2)</code>。
+    括號裡的東西叫<strong>引數</strong>（argument），是你交給它處理的材料。
+  </p>
+
+  <div class="runner" data-title="練習 1-3 · 常用函式">
+<textarea>
+round(141.03298, 2)          # 四捨五入到小數點後 2 位
+sqrt(16)                     # 開平方根
+sum(50, 30, 20)              # 加總
+max(231.06, 315.56)          # 取最大值
+abs(231.06 - 315.56)         # 取絕對值 —— 這個在單元 5 會用到
+
+# 引數可以用名字指定，順序就不重要了
+round(x = 141.03298, digits = 3)
+round(digits = 3, x = 141.03298)
+</textarea>
+  </div>
+
+  <h3>1-4　讀懂錯誤訊息</h3>
+  <p>
+    程式出錯是常態，不是你笨。重點是<strong>看懂 R 在抱怨什麼</strong>。
+    下面這段刻意寫了三個錯，執行看看，每一行的訊息長什麼樣子：
+  </p>
+
+  <div class="runner" data-title="練習 1-4 · 故意出錯">
+<textarea>
+# 錯誤 1：變數還沒定義就使用
+try(print(sulphate_ppm))
+
+# 錯誤 2：大小寫不一致
+Chloride <- 50
+try(print(chloride))
+
+# 錯誤 3：函式名字打錯
+try(rond(3.14159, 2))
+</textarea>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>錯誤訊息</th><th>意思</th><th>怎麼修</th></tr></thead>
+    <tbody>
+      <tr><td><code>object '…' not found</code></td><td>這個變數不存在</td><td>檢查有沒有打錯字、大小寫、是不是忘了先執行上面那行</td></tr>
+      <tr><td><code>could not find function "…"</code></td><td>這個函式不存在</td><td>函式名打錯，或是該函式所屬的套件還沒載入</td></tr>
+      <tr><td><code>unexpected ')' / '&lt;-'</code></td><td>括號或符號沒配對好</td><td>從左到右數括號，通常是少了一個 <code>)</code></td></tr>
+      <tr><td><code>non-numeric argument</code></td><td>你把文字丟給數學運算</td><td>檢查資料型別，可能是 CSV 讀進來變成文字了</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <details>
+    <summary>👉 換你做：用變數把 MH-01 的總鹽量算出來</summary>
+    <p>把七個離子的 ppm 各存成一個變數，然後算出「總離子重量百分比」。<br>
+    公式：每個離子的 wt% = <code>ppm × 水量(mL) / (10000 × 乾重(g))</code>，然後全部加起來。<br>
+    正確答案是 <strong>1.7 wt%</strong>。</p>
+  </details>
+</article>
+
+
+<!-- ==================== UNIT 2 ==================== -->
+<article class="unit" id="u2">
+  <span class="unit-badge">UNIT 02</span>
+  <h2>向量、資料框與管線</h2>
+
+  <p>
+    上一個單元你為七個離子各開了一個變數。七個還撐得住，
+    但如果有八個樣品 × 七個離子 = 56 個變數呢？這樣不行。
+    R 之所以好用，就是因為它讓你<strong>一次處理一整排數字</strong>。
+  </p>
+
+  <h3>2-1　向量：一排數字當成一個東西</h3>
+
+  <div class="runner" data-title="練習 2-1 · 建立與運算向量">
+<textarea>
+# c() 是 "combine"，把幾個值串成一個向量
+ppm <- c(50, 30, 20, 40, 10, 15, 5)
+ppm
+
+# 給每個位置取名字，之後就能用名字取值
+names(ppm) <- c("chloride","nitrate","sulfate",
+                "sodium","potassium","calcium","magnesium")
+ppm
+
+ppm["calcium"]        # 用名字取
+ppm[1]                # 用位置取（R 從 1 開始數，不是 0）
+ppm[c(1,2,3)]         # 一次取三個 —— 三個陰離子
+
+# 關鍵：算術運算會自動作用在「每一個」元素上
+ppm * 2
+ppm / 1000
+</textarea>
+  </div>
+
+  <div class="callout">
+    <span class="ct">向量化：R 最重要的觀念</span>
+    <p style="margin-bottom:0">
+      <code>ppm * 2</code> 不是把向量乘以 2，而是<strong>把裡面每一個數字都乘以 2</strong>。
+      這叫<strong>向量化運算</strong>（vectorisation）。
+      它讓你用一行取代七行，而且不會有「第五個忘了改」這種錯。
+      單元 3 之後，我們幾乎所有計算都是這樣寫的。
+    </p>
+  </div>
+
+  <div class="runner" data-title="練習 2-2 · 兩個向量一起算">
+<textarea>
+ppm <- c(chloride=50, nitrate=30, sulfate=20,
+         sodium=40, potassium=10, calcium=15, magnesium=5)
+
+# 七個離子的分子量（g/mol）
+M <- c(chloride=35.4527, nitrate=62.0049, sulfate=96.064,
+       sodium=22.989768, potassium=39.0983,
+       calcium=40.078, magnesium=24.305)
+
+# 兩個等長向量相除 = 對應位置相除
+ppm / M
+
+# 常用摘要函式
+sum(ppm)
+sum(ppm[c("chloride","nitrate","sulfate")])   # 只加陰離子
+mean(ppm)
+length(ppm)
+round(ppm / M, 4)
+</textarea>
+  </div>
+
+  <h3>2-2　資料框：一張表格</h3>
+  <p>
+    向量是一排，<strong>資料框</strong>（<code>data.frame</code>）是一張表：
+    每一欄可以是不同型別，每一列是一筆觀測。
+    離子層析報告、Excel 工作表，在 R 裡都長這樣。
+  </p>
+
+  <div class="runner" data-title="練習 2-3 · 讀入八個樣品的真實資料">
+<textarea>
+# DATA() 是這個課程網站提供的小工具，會指向資料檔的位置
+samples <- read.csv(DATA("salt_samples.csv"))
+
+samples                 # 整張表
+str(samples)            # 看結構：幾列幾欄、每欄是什麼型別
+nrow(samples)           # 幾列
+names(samples)          # 欄位名稱
+</textarea>
+  </div>
+
+  <div class="runner" data-title="練習 2-4 · 從表格取值">
+<textarea>
+samples <- read.csv(DATA("salt_samples.csv"))
+
+samples$chloride_ppm            # 用 $ 取一整欄
+samples$sample_name
+
+samples[1, ]                    # 第 1 列，全部欄位
+samples[, "chloride_ppm"]       # 全部列，chloride 欄
+samples[3, "nitrate_ppm"]       # 第 3 列的硝酸根
+
+# 條件篩選：氯離子大於 60 ppm 的樣品
+samples[samples$chloride_ppm > 60, c("sample_name","chloride_ppm")]
+
+# 新增一欄：氯離子的重量百分比
+samples$cl_wt_pct <- samples$chloride_ppm * samples$water_ml /
+                     (10000 * samples$dry_g)
+samples[, c("sample_name","chloride_ppm","cl_wt_pct")]
+</textarea>
+  </div>
+
+  <h3>2-3　管線 <code>|&gt;</code>：把句子從裡到外翻成從左到右</h3>
+  <p>
+    當你要「先算 A、再對結果算 B、再對結果算 C」，
+    傳統寫法是 <code>C(B(A(x)))</code> —— 讀的時候得從最裡面往外剝。
+    管線運算子 <code>|&gt;</code> 讓你照著做事的順序寫：
+  </p>
+
+  <div class="runner" data-title="練習 2-5 · 管線">
+<textarea>
+ppm <- c(50, 30, 20, 40, 10, 15, 5)
+
+# 傳統寫法：由內往外讀
+round(sqrt(sum(ppm)), 3)
+
+# 管線寫法：由左往右讀，跟你腦中的順序一致
+ppm |> sum() |> sqrt() |> round(3)
+
+# 左邊的東西會自動塞進右邊函式的第一個引數
+c(3.7, 1.2, 9.9) |> sort()
+c(3.7, 1.2, 9.9) |> sort() |> rev()
+</textarea>
+  </div>
+
+  <div class="callout note">
+    <span class="ct">兩種管線</span>
+    <p style="margin-bottom:0">
+      <code>|&gt;</code> 是 R 4.1 之後內建的管線。你在網路上還會看到 <code>%&gt;%</code>，
+      那是 <code>magrittr</code>／<code>dplyr</code> 套件提供的版本，功能幾乎一樣。
+      SaltsR 的官方文件用的是 <code>|&gt;</code>，本課程也統一用它。
+    </p>
+  </div>
+
+  <details>
+    <summary>👉 換你做：找出最髒的那面牆</summary>
+    <p>用 <code>salt_samples.csv</code>，計算每個樣品「七個離子 ppm 的總和」，
+    再找出總和最高的樣品名稱。<br>
+    提示：可以先把七個 ppm 欄位相加成新的一欄，再用
+    <code>samples[which.max(samples$total), ]</code>。<br>
+    答案應該是 <strong>MH-08（屋簷滴水線）</strong> —— 而且它的問題不只是「髒」，
+    單元 06 會告訴你為什麼它的數據根本不可信。</p>
+  </details>
+</article>
+
+
+<!-- ==================== UNIT 3 ==================== -->
+<article class="unit u-coral" id="u3">
+  <span class="unit-badge">UNIT 03</span>
+  <h2>從 ppm 到重量百分比（式 1）</h2>
+
+  <p>
+    離子層析儀給你的是<strong>萃取液</strong>的濃度（ppm，也就是 mg/L）。
+    但你真正想知道的是<strong>這塊磚裡</strong>有多少鹽。這兩件事不一樣。
+  </p>
+
+  <h3>3-1　為什麼要換算</h3>
+  <p>
+    假設兩份樣品的萃取液都測到 50 ppm 氯離子。第一份用 1 g 磚粉配 100 mL 水，
+    第二份用 5 g 磚粉配 100 mL 水。哪一面牆比較危險？
+    顯然是第一份 —— 同樣多的鹽，來自更少的材料。
+    所以必須把濃度<strong>正規化到乾樣重</strong>。
+  </p>
+
+  <div class="eq">
+    <div class="lbl">式 1 · 離子的重量分率</div>
+    <p style="font-size:1.15rem;margin:0">
+      <em>w<sub>i</sub></em> =
+      <span style="display:inline-block;text-align:center;vertical-align:middle">
+        <span style="display:block;border-bottom:1.5px solid var(--ink);padding:0 8px">C<sub>ppm</sub> × V<sub>water</sub></span>
+        <span style="display:block;padding:0 8px">10 000 × m<sub>dry</sub></span>
+      </span>
+      &nbsp;&nbsp;［wt %］
+    </p>
+  </div>
+
+  <h3>3-2　單位是怎麼消掉的</h3>
+  <p>一步一步跟著單位走，你就不會再背錯公式：</p>
+  <ol class="steps">
+    <li><strong>萃取液裡有多少鹽？</strong><br>
+      濃度 <code>C</code>（mg/L）× 體積 <code>V</code>（L）= 質量（mg）。<br>
+      但我們的 <code>V</code> 是毫升，所以要先除 1000：<code>C × V/1000</code> mg。</li>
+    <li><strong>換成公克</strong><br>
+      再除 1000：<code>C × V / 1 000 000</code> g。</li>
+    <li><strong>除以乾樣重，得到分率</strong><br>
+      <code>C × V / (1 000 000 × m)</code>，單位是 g/g，也就是 kg/kg —— 一個沒有單位的<strong>分率</strong>。</li>
+    <li><strong>要百分比就再乘 100</strong><br>
+      <code>C × V × 100 / (1 000 000 × m)</code> = <code>C × V / (10 000 × m)</code>。這就是式 1。</li>
+  </ol>
+
+  <div class="callout warn">
+    <span class="ct">陷阱：分率還是百分比？差 100 倍</span>
+    <p style="margin-bottom:0">
+      SaltsR 套件裡有兩處寫法看起來很像，其實差 100 倍：<br>
+      · <code>fun_salt_wt()</code> 用 <code>/(10000 × m)</code>，輸出<strong>百分比</strong>（例如 0.5 代表 0.5 %）<br>
+      · <code>fun_salt_balance()</code> 內部用 <code>C×(V/1000)/(m×1000)</code>，輸出<strong>分率</strong>（0.005 代表 0.5 %）<br>
+      兩個都對，但你必須知道自己手上拿的是哪一個。
+      <strong>報告數字時永遠把單位寫出來</strong>，這是分析化學最基本的自我保護。
+    </p>
+  </div>
+
+  <h3>3-3　動手算</h3>
+
+  <div class="runner" data-title="練習 3-1 · 單一離子">
+<textarea>
+# MH-01：乾重 1.000 g、水量 100 mL、氯離子 50 ppm
+cl_ppm   <- 50
+water_ml <- 100
+dry_g    <- 1.000
+
+cl_wt_pct <- (cl_ppm * water_ml) / (10000 * dry_g)
+cl_wt_pct        # 應該是 0.5，代表 0.5 wt%
+
+# 課程函式庫已經幫你寫好了，結果一樣
+fun_salt_wt(cl_ppm, dry_g, water_ml)
+</textarea>
+  </div>
+
+  <div class="runner" data-title="練習 3-2 · 七個離子一次算完（向量化）">
+<textarea>
+ppm <- c(chloride=50, nitrate=30, sulfate=20,
+         sodium=40, potassium=10, calcium=15, magnesium=5)
+dry_g <- 1.000; water_ml <- 100
+
+wt_pct <- fun_salt_wt(ppm, dry_g, water_ml)
+round(wt_pct, 4)
+
+cat("總可溶鹽含量：", round(sum(wt_pct), 3), "wt%\n")
+</textarea>
+  </div>
+
+  <h3>3-4　自己寫一個函式</h3>
+  <p>
+    你已經用了好幾次別人寫的函式，現在自己寫一個。
+    語法是 <code>名字 &lt;- function(引數) { 內容 }</code>：
+  </p>
+
+  <div class="runner" data-title="練習 3-3 · 定義自己的函式">
+<textarea>
+my_wt <- function(ppm, dry_g, water_ml) {
+  (ppm * water_ml) / (10000 * dry_g)
+}
+
+my_wt(50, 1.0, 100)
+my_wt(c(50, 30, 20), 1.0, 100)     # 向量也能吃
+
+# 加上預設值：沒指定時就用 100 mL
+my_wt2 <- function(ppm, dry_g, water_ml = 100) {
+  (ppm * water_ml) / (10000 * dry_g)
+}
+my_wt2(50, 1.0)              # 不寫 water_ml 也可以
+my_wt2(50, 1.0, water_ml = 250)
+</textarea>
+  </div>
+
+  <div class="callout task">
+    <span class="ct">👉 換你做</span>
+    <p style="margin-bottom:0">
+      MH-05 的資料是：乾重 0.980 g、水量 100 mL、氯離子 66.824 ppm。
+      把上面的程式改成這組數字，算出氯離子的 wt%。<br>
+      再想一想：如果實驗室助理把乾重打成 9.80 g（多了一個零），
+      算出來的鹽含量會變成原本的幾倍？這種錯誤在最終的判讀上會造成什麼後果？
+    </p>
+  </div>
+</article>
+
+
+<!-- ==================== UNIT 4 ==================== -->
+<article class="unit u-coral" id="u4">
+  <span class="unit-badge">UNIT 04</span>
+  <h2>當量濃度 mEq/kg：電荷的語言（式 2）</h2>
+
+  <p>
+    重量百分比告訴你「有多少鹽」，但它沒辦法回答下一個問題：
+    <strong>正負電荷平不平衡？</strong>要談電荷，就得換一種單位。
+  </p>
+
+  <h3>4-1　為什麼莫耳不夠用</h3>
+  <p>
+    一個 Na⁺ 帶 +1 電荷，一個 Ca²⁺ 帶 +2。
+    所以 1 莫耳的 Ca²⁺ 在「電荷」這件事上，抵得過 2 莫耳的 Na⁺。
+    如果你只比較莫耳數，就會嚴重低估鈣和鎂的份量。
+  </p>
+  <p>
+    解法是用<strong>當量</strong>（equivalent, Eq）：把莫耳數乘以電荷數 <em>z</em>。
+    這樣一來，1 Eq 的任何離子都帶同樣多的電荷，可以直接相加相減。
+    因為數值通常很小，實務上用<strong>毫當量／公斤乾樣</strong>（mEq/kg）。
+  </p>
+
+  <div class="eq">
+    <div class="lbl">式 2 · 每公斤乾樣的毫當量</div>
+    <p style="font-size:1.15rem;margin:0">
+      <em>e<sub>i</sub></em> =
+      <span style="display:inline-block;text-align:center;vertical-align:middle">
+        <span style="display:block;border-bottom:1.5px solid var(--ink);padding:0 8px">C<sub>ppm</sub> × V<sub>water</sub></span>
+        <span style="display:block;padding:0 8px">m<sub>dry</sub> × (M / z)</span>
+      </span>
+      &nbsp;&nbsp;［mEq/kg］
+    </p>
+  </div>
+  <p class="small muted">
+    分母裡的 <em>M/z</em> 叫<strong>當量重</strong>（equivalent weight）：
+    分子量除以電荷數。例如 SO₄²⁻ 的 M = 96.064、z = 2，當量重就是 48.03 g/Eq。
+  </p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>離子</th><th>符號</th><th class="num">分子量 M</th><th class="num">電荷 z</th><th class="num">當量重 M/z</th></tr></thead>
+    <tbody>
+      <tr><td>氯離子</td><td>Cl⁻</td><td class="num">35.4527</td><td class="num">1</td><td class="num">35.45</td></tr>
+      <tr><td>硝酸根</td><td>NO₃⁻</td><td class="num">62.0049</td><td class="num">1</td><td class="num">62.00</td></tr>
+      <tr><td>硫酸根</td><td>SO₄²⁻</td><td class="num">96.064</td><td class="num">2</td><td class="num">48.03</td></tr>
+      <tr><td>鈉離子</td><td>Na⁺</td><td class="num">22.9898</td><td class="num">1</td><td class="num">22.99</td></tr>
+      <tr><td>鉀離子</td><td>K⁺</td><td class="num">39.0983</td><td class="num">1</td><td class="num">39.10</td></tr>
+      <tr><td>鈣離子</td><td>Ca²⁺</td><td class="num">40.078</td><td class="num">2</td><td class="num">20.04</td></tr>
+      <tr><td>鎂離子</td><td>Mg²⁺</td><td class="num">24.305</td><td class="num">2</td><td class="num">12.15</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout">
+    <span class="ct">看出來了嗎</span>
+    <p style="margin-bottom:0">
+      鎂的當量重只有 12.15，是所有離子中最小的。
+      也就是說<strong>同樣 1 ppm 的鎂，貢獻的電荷是同樣 1 ppm 氯的 2.9 倍</strong>。
+      這解釋了一個常見的困惑：明明鎂的 ppm 數字看起來很小，
+      為什麼在電荷平衡表上卻很有份量。
+    </p>
+  </div>
+
+  <h3>4-2　算給你看</h3>
+
+  <div class="runner" data-title="練習 4-1 · MH-01 的七個離子當量">
+<textarea>
+ppm <- c(chloride=50, nitrate=30, sulfate=20,
+         sodium=40, potassium=10, calcium=15, magnesium=5)
+M <- c(chloride=35.4527, nitrate=62.0049, sulfate=96.064,
+       sodium=22.989768, potassium=39.0983,
+       calcium=40.078, magnesium=24.305)
+z <- c(chloride=1, nitrate=1, sulfate=2,
+       sodium=1, potassium=1, calcium=2, magnesium=2)
+
+dry_g <- 1.000; water_ml <- 100
+
+mEq <- (ppm * water_ml) / (dry_g * (M / z))
+round(mEq, 3)
+
+# 分成陰陽兩邊
+anions  <- c("chloride","nitrate","sulfate")
+cations <- c("sodium","potassium","calcium","magnesium")
+
+cat("陰離子總和：", round(sum(mEq[anions]),  3), "mEq/kg\n")
+cat("陽離子總和：", round(sum(mEq[cations]), 3), "mEq/kg\n")
+cat("差額 Δe   ：", round(abs(sum(mEq[cations]) - sum(mEq[anions])), 3), "mEq/kg\n")
+</textarea>
+  </div>
+
+  <p>你應該會看到：</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>離子</th><th class="num">ppm</th><th class="num">wt %</th><th class="num">mEq/kg</th><th>觀察</th></tr></thead>
+    <tbody>
+      <tr><td>Cl⁻</td><td class="num">50</td><td class="num">0.50</td><td class="num">141.03</td><td>陰離子中最多</td></tr>
+      <tr><td>NO₃⁻</td><td class="num">30</td><td class="num">0.30</td><td class="num">48.38</td><td>當量重大，換算後縮水</td></tr>
+      <tr><td>SO₄²⁻</td><td class="num">20</td><td class="num">0.20</td><td class="num">41.64</td><td>雙價，稍微補回來一些</td></tr>
+      <tr><td>Na⁺</td><td class="num">40</td><td class="num">0.40</td><td class="num">173.99</td><td>當量重最小的一價離子 → 份量最重</td></tr>
+      <tr><td>K⁺</td><td class="num">10</td><td class="num">0.10</td><td class="num">25.58</td><td></td></tr>
+      <tr><td>Ca²⁺</td><td class="num">15</td><td class="num">0.15</td><td class="num">74.85</td><td>ppm 只有鈉的 3/8，當量卻有 43 %</td></tr>
+      <tr><td>Mg²⁺</td><td class="num">5</td><td class="num">0.05</td><td class="num">41.14</td><td class="hi">ppm 最小，當量卻和硫酸根相當</td></tr>
+      <tr style="border-top:2px solid var(--ink)"><td><strong>陰離子計</strong></td><td class="num">100</td><td class="num">1.00</td><td class="num"><strong>231.06</strong></td><td></td></tr>
+      <tr><td><strong>陽離子計</strong></td><td class="num">70</td><td class="num">0.70</td><td class="num"><strong>315.56</strong></td><td class="hi">比陰離子多 36 %！</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout warn">
+    <span class="ct">注意這個反轉</span>
+    <p style="margin-bottom:0">
+      看 ppm：陰離子 100、陽離子 70 —— 陰離子比較多。<br>
+      看 mEq/kg：陰離子 231、陽離子 316 —— <strong>陽離子反而多出 36 %</strong>。<br>
+      同一份數據，換個單位，結論完全相反。
+      這就是為什麼電荷平衡<strong>一定</strong>要在當量的尺度上做，不能用 ppm 或 wt% 目測。
+    </p>
+  </div>
+
+  <h3>4-3　順便：含水率</h3>
+  <p>
+    SaltsR 還提供兩個秤重就能算的指標，常和鹽含量一起報告：
+  </p>
+  <ul>
+    <li><strong>AMC（實際含水率）</strong>：樣品剛取下來時的含水量，反映當下的潮濕狀態。</li>
+    <li><strong>HMC（吸濕含水率）</strong>：把乾樣放進 20 °C / 95 %RH 平衡後吸了多少水。
+      <strong>HMC 高就代表鹽多</strong> —— 因為吸水的主要是鹽而不是材料本身，
+      所以 HMC 可以當成快速的鹽害篩檢指標。</li>
+  </ul>
+
+  <div class="runner" data-title="練習 4-2 · AMC 與 HMC">
+<textarea>
+# 秤重資料：空容器 8.45 g、初始樣品+容器 15.619 g、
+#           烘乾後 15.198 g、95%RH 平衡後 15.837 g
+fun_salt_AMC(8.45, 15.619, 15.198)    # 實際含水率 wt%
+fun_salt_HMC(8.45, 15.198, 15.837)    # 吸濕含水率 wt%
+</textarea>
+  </div>
+
+  <details>
+    <summary>👉 換你做：哪一個離子「最會膨脹」？</summary>
+    <p>把七個離子各設成 100 ppm（其他條件不變：乾重 1 g、水 100 mL），
+    算出各自的 mEq/kg，然後由大到小排序。<br>
+    提示：<code>sort(mEq, decreasing = TRUE)</code>。<br>
+    你會發現順序是 Mg &gt; Ca &gt; Na &gt; Cl &gt; K &gt; SO₄ &gt; NO₃。
+    這個順序完全由當量重 M/z 決定 —— 當量重越小，同樣 ppm 換出來的當量越大。</p>
+  </details>
+</article>
+
+
+<!-- ==================== UNIT 5 ==================== -->
+<article class="unit u-plum" id="u5">
+  <span class="unit-badge">UNIT 05</span>
+  <h2>電荷平衡與兩條校正路徑（式 3–5）</h2>
+
+  <p style="font-size:1.04rem">
+    這是整門課最重要的單元。上一單元我們算出 MH-01 的陽離子比陰離子多了
+    <strong>84.51 mEq/kg</strong>。現在的問題是：<strong>這 84.51 該怎麼處理？</strong>
+  </p>
+
+  <h3>5-1　為什麼會不平衡</h3>
+  <p>
+    一杯溶液必須電中性 —— 正電荷總數等於負電荷總數，這是物理定律，沒有例外。
+    所以量出來不平衡，只可能有兩個原因：
+  </p>
+  <ol class="steps">
+    <li><strong>分析誤差。</strong>每個離子的測定都有不確定度，七個誤差疊起來就會有幾個百分點的落差。
+      這種誤差是<em>隨機</em>的，可能偏正也可能偏負，而且通常不大。</li>
+    <li><strong>有離子沒被測到。</strong>標準的離子層析套組測七個離子，
+      但真實牆體裡還有別的 —— 最重要的是<strong>碳酸根 CO₃²⁻ 與碳酸氫根 HCO₃⁻</strong>。
+      石灰砂漿、水泥、石灰岩本身都會釋放碳酸根，但它在一般的 IC 條件下測不到。
+      這種缺漏是<em>系統性</em>的，而且<strong>只會讓陽離子看起來過剩</strong>。</li>
+  </ol>
+
+  <div class="callout">
+    <span class="ct">回答單元 0 的那道思考題</span>
+    <p style="margin-bottom:0">
+      陽離子大幅過剩 → 幾乎確定是<strong>漏測了碳酸根</strong>，而不是儀器誤差。
+      因為儀器誤差不會有方向性，而且很少大到 20 %、30 %。
+      這個判斷正是接下來兩條路徑的分歧點。
+    </p>
+  </div>
+
+  <h3>5-2　式 3：算出 Δe，然後選路</h3>
+
+  <div class="eq">
+    <div class="lbl">式 3 · 初始電荷不平衡量</div>
+    <p style="font-size:1.1rem;margin:0">
+      Δ<em>e</em> = | Σ<em>e</em><sub>陽離子</sub> − Σ<em>e</em><sub>陰離子</sub> |
+    </p>
+  </div>
+
+  <p>SaltsR 的判斷規則是：</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>條件</th><th>路徑</th><th>物理假設</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Δ<em>e</em> ≤ 2 % × max(Σ陰, Σ陽)<br><span class="small muted">（不平衡量很小）</span></td>
+        <td rowspan="2"><span class="pathbadge p1">Pathway 1</span></td>
+        <td rowspan="2">差額歸因於<strong>分析誤差</strong>。<br>誤差是隨機的，所以把七個離子<em>全部按比例</em>調到中點，
+          不特別怪罪任何一個離子。</td>
+      </tr>
+      <tr><td>或　Σ陰離子 &gt; Σ陽離子<br><span class="small muted">（陰離子過剩）</span></td></tr>
+      <tr>
+        <td>Δ<em>e</em> &gt; 2 % × Σ陽<br><strong>且</strong>　Σ陽離子 &gt; Σ陰離子</td>
+        <td><span class="pathbadge p2">Pathway 2</span></td>
+        <td>差額歸因於<strong>沒測到的碳酸根</strong>。<br>把過剩的陽離子當成碳酸鹽移除，
+          並依碳酸鹽溶解度由小到大逐一扣除。</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout note">
+    <span class="ct">為什麼「陰離子過剩」也走 Pathway 1</span>
+    <p style="margin-bottom:0">
+      因為漏測碳酸根只會造成<em>陽離子</em>過剩。如果反而是陰離子多，
+      那就沒有「漏測某個陰離子」這種現成的解釋，只能歸因於分析誤差 —— 所以走等比例調整。
+      這條規則是不對稱的，而且它的不對稱是有物理根據的，不是隨便定的。
+    </p>
+  </div>
+
+  <h3>5-3　式 4：Pathway 1 的等比例縮放</h3>
+  <p>
+    做法很直接：把陰離子總和與陽離子總和「各自往中間拉」，讓兩邊都等於平均值。
+  </p>
+  <div class="eq">
+    <div class="lbl">式 4</div>
+    <p style="margin:0;font-size:1.02rem">
+      <em>e</em><sub>陰,adj</sub> = <em>e</em><sub>陰</sub> ×
+      <span style="display:inline-block;text-align:center;vertical-align:middle">
+        <span style="display:block;border-bottom:1.5px solid var(--ink);padding:0 6px">Σ陰 + Σ陽</span>
+        <span style="display:block">2 × Σ陰</span></span>
+      &nbsp;&nbsp;&nbsp;
+      <em>e</em><sub>陽,adj</sub> = <em>e</em><sub>陽</sub> ×
+      <span style="display:inline-block;text-align:center;vertical-align:middle">
+        <span style="display:block;border-bottom:1.5px solid var(--ink);padding:0 6px">Σ陰 + Σ陽</span>
+        <span style="display:block">2 × Σ陽</span></span>
+    </p>
+  </div>
+  <p class="small muted">
+    調整後兩邊都會等於 (Σ陰 + Σ陽)/2，而且<strong>每個離子彼此的相對比例完全不變</strong> ——
+    這正是「不怪罪任何特定離子」的數學表現。
+  </p>
+
+  <div class="runner" data-title="練習 5-1 · Pathway 1 實作（MH-04）">
+<textarea>
+# MH-04：南牆 0.3 m，陰離子過剩的案例
+ppm <- c(chloride=120, nitrate=80, sulfate=45,
+         sodium=60, potassium=15, calcium=25, magnesium=10)
+M <- c(chloride=35.4527, nitrate=62.0049, sulfate=96.064,
+       sodium=22.989768, potassium=39.0983, calcium=40.078, magnesium=24.305)
+z <- c(chloride=1, nitrate=1, sulfate=2,
+       sodium=1, potassium=1, calcium=2, magnesium=2)
+dry_g <- 1.0; water_ml <- 100
+
+mEq <- (ppm * water_ml) / (dry_g * (M / z))
+an <- c("chloride","nitrate","sulfate"); ca <- c("sodium","potassium","calcium","magnesium")
+Sa <- sum(mEq[an]); Sc <- sum(mEq[ca])
+cat("陰離子", round(Sa,2), " 陽離子", round(Sc,2),
+    " Δe =", round(abs(Sc-Sa),2),
+    " 佔比", round(100*abs(Sc-Sa)/max(Sa,Sc),2), "%\n")
+cat("陰離子過剩 → Pathway 1\n\n")
+
+adj <- mEq
+adj[an] <- mEq[an] * (Sa+Sc) / (2*Sa)     # 陰離子被壓下來
+adj[ca] <- mEq[ca] * (Sa+Sc) / (2*Sc)     # 陽離子被拉上去
+round(rbind(原始=mEq, 調整後=adj), 2)
+
+cat("\n調整後：陰離子", round(sum(adj[an]),4),
+    " 陽離子", round(sum(adj[ca]),4), " → 平衡 ✓\n")
+</textarea>
+  </div>
+
+  <h3>5-4　式 5a–5d：Pathway 2 的逐級扣除</h3>
+  <p>
+    Pathway 2 的邏輯完全不同。我們相信「多出來的陽離子是碳酸鹽」，
+    那就必須決定：<strong>是哪一個陽離子的碳酸鹽？</strong>
+  </p>
+  <p>
+    答案是：<strong>從最不溶的碳酸鹽開始扣</strong>。因為最難溶的鹽最可能以固體形式
+    穩定存在於牆體中而不被水帶走。碳酸鹽的溶解度順序是：
+  </p>
+
+  <div class="eq" style="text-align:center">
+    CaCO₃（方解石，極難溶）&nbsp;→&nbsp; MgCO₃ &nbsp;→&nbsp; Na₂CO₃ &nbsp;→&nbsp; K₂CO₃（極易溶）
+  </div>
+  <p style="text-align:center;font-weight:700;color:var(--coral);margin-top:-6px">
+    所以扣除順序就是　Ca²⁺ → Mg²⁺ → Na⁺ → K⁺
+  </p>
+
+  <p>演算法是一個「水桶接力」：</p>
+  <ol class="steps">
+    <li>拿 Δ<em>e</em> 去扣 Ca²⁺。<strong>如果 Ca 夠扣</strong>，扣完就平衡了，結束。</li>
+    <li><strong>如果 Ca 不夠扣</strong>（會扣成負數），就把 Ca 歸零，
+      算出「還差多少」，把剩下的差額交給 Mg²⁺。</li>
+    <li>Mg 不夠就歸零，剩下的交給 Na⁺。</li>
+    <li>Na 不夠就歸零，剩下的交給 K⁺。</li>
+  </ol>
+  <p class="small muted">
+    每一級都用 <code>max(目前值 − 待扣量, 0)</code> 保證不會出現負濃度，
+    然後重新計算陰陽差額，把餘額往下傳。
+  </p>
+
+  <div class="runner" data-title="練習 5-2 · Pathway 2 逐級扣除（MH-01）">
+<textarea>
+ppm <- c(chloride=50, nitrate=30, sulfate=20,
+         sodium=40, potassium=10, calcium=15, magnesium=5)
+M <- c(chloride=35.4527, nitrate=62.0049, sulfate=96.064,
+       sodium=22.989768, potassium=39.0983, calcium=40.078, magnesium=24.305)
+z <- c(chloride=1, nitrate=1, sulfate=2,
+       sodium=1, potassium=1, calcium=2, magnesium=2)
+
+mEq <- (ppm * 100) / (1.0 * (M / z))
+an <- c("chloride","nitrate","sulfate"); ct <- c("sodium","potassium","calcium","magnesium")
+adj  <- mEq
+left <- abs(sum(mEq[ct]) - sum(mEq[an]))
+cat("待扣除的過剩陽離子 Δe =", round(left, 3), "mEq/kg\n\n")
+
+for (ion in c("calcium","magnesium","sodium","potassium")) {
+  before <- adj[[ion]]
+  adj[[ion]] <- max(before - left, 0)
+  used <- before - adj[[ion]]
+  left <- max(sum(adj[ct]) - sum(adj[an]), 0)
+  cat(sprintf("%-10s %8.3f  − %8.3f  →  %8.3f   還剩 %8.3f\n",
+              ion, before, used, adj[[ion]], left))
+}
+cat("\n最終：陰", round(sum(adj[an]),4), " 陽", round(sum(adj[ct]),4), "\n")
+round(rbind(原始=mEq, 校正後=adj), 3)
+</textarea>
+  </div>
+
+  <p>執行結果會像這樣 —— 請仔細看第一行和第二行的關係：</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>級</th><th>離子</th><th class="num">扣除前</th><th class="num">扣掉</th><th class="num">扣除後</th><th class="num">還剩差額</th></tr></thead>
+    <tbody>
+      <tr><td>5a</td><td>Ca²⁺</td><td class="num">74.854</td><td class="num">74.854</td><td class="num hi">0.000</td><td class="num">9.656</td></tr>
+      <tr><td>5b</td><td>Mg²⁺</td><td class="num">41.144</td><td class="num">9.656</td><td class="num">31.488</td><td class="num hi">0.000</td></tr>
+      <tr><td>5c</td><td>Na⁺</td><td class="num">173.990</td><td class="num">0.000</td><td class="num">173.990</td><td class="num">0.000</td></tr>
+      <tr><td>5d</td><td>K⁺</td><td class="num">25.577</td><td class="num">0.000</td><td class="num">25.577</td><td class="num">0.000</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout warn">
+    <span class="ct">請務必注意這件事</span>
+    <p style="margin-bottom:0">
+      MH-01 原本測到 15 ppm 的鈣，走完 Pathway 2 之後<strong>鈣變成 0</strong>。
+      這不是說牆裡沒有鈣 —— 而是模型假設「這些鈣全部以 CaCO₃ 的形式存在」，
+      而 CaCO₃ 難溶、不參與潮解結晶循環，所以在鹽害模擬中被排除。<br><br>
+      這是一個<strong>假設，不是測量結果</strong>。如果實際上那些鈣是以 CaCl₂ 存在
+      （CaCl₂ 極易潮解，是很危險的鹽），這個假設就會嚴重低估風險。
+      所以在報告裡一定要寫明走的是哪條路徑、扣掉了多少 —— 這是可重現性的基本要求。
+    </p>
+  </div>
+
+  <h3>5-5　一次做完：<code>fun_salt_balance()</code></h3>
+  <p>上面那些步驟，套件都幫你封好了：</p>
+
+  <div class="runner" data-title="練習 5-3 · 完整計算與報告">
+<textarea>
+r <- fun_salt_balance(
+  sample_name   = "MH-01",
+  dry_g         = 1.000,
+  water_ml      = 100,
+  chloride_ppm  = 50,  nitrate_ppm   = 30,  sulfate_ppm = 20,
+  sodium_ppm    = 40,  potassium_ppm = 10,
+  calcium_ppm   = 15,  magnesium_ppm = 5
+)
+
+print_salt_report(r)      # 好讀的完整報告
+
+cat("\n--- Pathway 2 的逐級過程 ---\n")
+print(round(r$steps[,2:5], 3))
+</textarea>
+  </div>
+
+  <div class="callout task">
+    <span class="ct">👉 換你做：讓路徑翻轉</span>
+    <p style="margin-bottom:0">
+      把上面 MH-01 的 <code>nitrate_ppm</code> 從 30 慢慢往上調（試試 60、90、120…），
+      找出讓判定從 Pathway 2 翻成 Pathway 1 的臨界值。<br>
+      翻轉之後，鈣還會被歸零嗎？為什麼？<br>
+      <em>做完之後強烈建議打開 <a href="lab.html#lab1">實驗室 1</a>，用滑桿把整個過程「玩」一遍。</em>
+    </p>
+  </div>
+</article>
+
+
+<!-- ==================== UNIT 6 ==================== -->
+<article class="unit u-plum" id="u6">
+  <span class="unit-badge">UNIT 06</span>
+  <h2>石膏扣除與 ECOS 輸入檔（式 6–11）</h2>
+
+  <p>
+    電荷平衡好了，但還不能直接餵給 Runsalt。還有最後一道手續：<strong>把石膏拿掉</strong>。
+  </p>
+
+  <h3>6-1　為什麼要拿掉石膏</h3>
+  <p>
+    ECOS 熱力學模型有一個硬性限制：它<strong>最多只處理六種離子</strong>，
+    而且 SO₄²⁻ 與 Ca²⁺ 不能同時完整存在。<sup><a href="#r-godts-h">[2]</a></sup>
+    原因有兩個：
+  </p>
+  <ul>
+    <li><strong>物理上</strong>：CaSO₄·2H₂O（石膏）在水中的溶解度極低
+      —— 20 °C 約 2.14 g/L。它幾乎不會潮解，也不會參與濕度循環，
+      在鹽害模擬中是「惰性的」。</li>
+    <li><strong>數值上</strong>：把一個幾乎不溶的鹽留在系統裡，
+      會讓模型花力氣算一個不重要的相，還可能造成收斂問題。</li>
+  </ul>
+
+  <div class="eq">
+    <div class="lbl">式 6 · 石膏上限</div>
+    <p style="font-size:1.1rem;margin:0">
+      <em>e</em><sub>lim,CaSO₄</sub> = min( <em>e</em><sub>SO₄,adj</sub> , <em>e</em><sub>Ca,adj</sub> )
+    </p>
+  </div>
+  <p>
+    為什麼是取<strong>最小值</strong>？因為 CaSO₄ 是 1:1 的化合物 ——
+    要形成 1 當量的石膏，需要 1 當量的 Ca 加 1 當量的 SO₄。
+    誰先用完，石膏就停在哪裡。這就是化學裡的<strong>限量試劑</strong>概念。
+  </p>
+
+  <div class="eq">
+    <div class="lbl">式 7 · 扣除</div>
+    <p style="margin:0">
+      <em>e</em><sub>SO₄,final</sub> = <em>e</em><sub>SO₄,adj</sub> − <em>e</em><sub>lim</sub>
+      <em>e</em><sub>Ca,final</sub> = <em>e</em><sub>Ca,adj</sub> − <em>e</em><sub>lim</sub>
+    </p>
+  </div>
+  <p class="small muted">
+    兩邊各扣掉同樣的當量，所以<strong>電荷平衡不會被破壞</strong> —— 扣完仍然是中性的。
+  </p>
+
+  <h3>6-2　三種典型結果</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>樣品</th><th>路徑</th><th class="num">SO₄ adj</th><th class="num">Ca adj</th><th class="num">石膏上限</th><th>結果</th></tr></thead>
+    <tbody>
+      <tr><td>MH-01</td><td>Pathway 2</td><td class="num">41.64</td><td class="num">0.00</td><td class="num">0.00</td>
+          <td>鈣早在式 5a 就被扣光 → <strong>沒有石膏</strong>，硫酸根全部保留</td></tr>
+      <tr><td>MH-02</td><td>Pathway 1</td><td class="num">111.03</td><td class="num">419.19</td><td class="num">111.03</td>
+          <td>硫酸根先用完 → <strong>SO₄ 歸零</strong>，還剩 308 mEq 的鈣</td></tr>
+      <tr><td>MH-08</td><td>Pathway 2</td><td class="num">3331.11</td><td class="num">3262.36</td><td class="num">3262.36</td>
+          <td>鈣先用完 → Ca 歸零，硫酸根剩 68.75；石膏高達 <strong>22.2 wt%</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>6-3　式 8：換成莫耳分率 —— ECOS 真正要的輸入</h3>
+  <p>
+    Runsalt 不吃 mEq/kg，它要的是<strong>莫耳分率</strong>（每個離子占總莫耳數的比例，加起來等於 1）。
+  </p>
+  <div class="eq">
+    <div class="lbl">式 8 · 兩步</div>
+    <p style="margin:0">
+      ① <em>c<sub>i</sub></em> = <em>e</em><sub>i,final</sub> / <em>z<sub>i</sub></em> / 1000　［mol/kg］
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      ② <em>x<sub>i</sub></em> = <em>c<sub>i</sub></em> / Σ<em>c<sub>j</sub></em>　［無單位］
+    </p>
+  </div>
+
+  <div class="runner" data-title="練習 6-1 · 產生 ECOS 輸入檔">
+<textarea>
+r <- fun_salt_balance("MH-01", 1.0, 100, 50, 30, 20, 40, 10, 15, 5)
+
+cat("莫耳分率（ECOS 輸入）：\n")
+print(round(r$x, 6))
+cat("總和 =", sum(r$x), "（必須等於 1）\n\n")
+
+cat("--- 可以直接存成 .txt 丟給 Runsalt ---\n")
+cat(make_ecos_input(r))
+</textarea>
+  </div>
+
+  <div class="callout">
+    <span class="ct">驗證一下</span>
+    <p style="margin-bottom:0">
+      把上面產生的內容，跟課程附的
+      <a href="data/SaltsR_upload_Example.txt" download><code>SaltsR_upload_Example.txt</code></a>
+      比對 —— <strong>每一位小數都會一模一樣</strong>。
+      那個檔案就是 SaltsR 官方範例產生的，而我們剛剛用同一組輸入自己重現了它。
+      這是驗證自己算對了最好的方式：<em>拿已知答案的例子回頭檢查</em>。
+    </p>
+  </div>
+
+  <h3>6-4　式 11：石膏含量與飽和度警告</h3>
+  <p>
+    最後一個檢查，是問一個很實際的實驗問題：
+    <strong>你加的水，夠不夠把石膏全部溶掉？</strong>
+  </p>
+  <p>
+    20 °C 下石膏的溶解度約 2.14 g/L。如果樣品裡的石膏超過這個量，
+    有一部分根本沒進到萃取液，離子層析就<strong>測不到它</strong>，
+    你算出來的鈣和硫酸根會偏低 —— 而且你不會知道偏低了多少。
+  </p>
+
+  <div class="eq">
+    <div class="lbl">石膏飽和度</div>
+    <p style="margin:0">
+      S<sub>CaSO₄</sub> =
+      <span style="display:inline-block;text-align:center;vertical-align:middle">
+        <span style="display:block;border-bottom:1.5px solid var(--ink);padding:0 6px">石膏含量（wt 分率）</span>
+        <span style="display:block">(0.214 × V<sub>water</sub> / 10000) / m<sub>dry</sub> × 100</span></span>
+      &nbsp;&nbsp;　S &gt; 1 就要警告
+    </p>
+  </div>
+
+  <div class="runner" data-title="練習 6-2 · 飽和度檢查（MH-08）">
+<textarea>
+# MH-08：屋簷滴水線 —— 一個「數據不能信」的樣品
+r8 <- fun_salt_balance("MH-08", 1.0, 100, 40, 25, 1600, 30, 10, 700, 8)
+
+cat("石膏含量  ：", round(r8$gypsum_content * 100, 3), "wt%\n")
+cat("溶解上限  ：", round(r8$gypsum_capacity * 100, 3), "wt%\n")
+cat("飽和度    ：", round(r8$saturation_gypsum_content, 4), "\n")
+cat("警告      ：", r8$ECOS_warnings, "\n\n")
+
+# 把水量加倍會怎樣？
+r8b <- fun_salt_balance("MH-08(稀釋)", 1.0, 250, 40, 25, 1600, 30, 10, 700, 8)
+cat("水量改成 250 mL 後的飽和度：", round(r8b$saturation_gypsum_content, 4), "\n")
+cat("警告：", r8b$ECOS_warnings, "\n")
+</textarea>
+  </div>
+
+  <div class="callout warn">
+    <span class="ct">飽和度警告的正確反應</span>
+    <p style="margin-bottom:0">
+      看到警告時，<strong>不要</strong>在報告上寫「石膏 22.2 wt%」然後繼續。
+      正確的做法是<strong>回實驗室，用更多水（或更少樣品）重新萃取一次</strong>。
+      演算法能告訴你「這個數字不可信」，但它沒辦法幫你把沒溶掉的石膏變出來。
+      <br><br>
+      注意上面練習的結果：光是把水量從 100 mL 提高到 250 mL，
+      飽和度就從 1.04 降到 0.42 —— 但這只是<em>計算上</em>的變化。
+      真正的重測會得到<em>不同的（更高的）</em>硫酸根 ppm 讀數。
+    </p>
+  </div>
+
+  <h3>6-5　誠實面對：套件的一個欄位名稱容易誤讀</h3>
+  <div class="callout note">
+    <span class="ct">給想深入的同學</span>
+    <p>
+      SaltsR 的輸出裡有一欄叫 <code>total_ion_content</code>。
+      從名字看，你會以為它是「總離子含量」。但檢查它的算式會發現：
+    </p>
+    <pre><code>total_wt_adj_gypsum = total_wt - total_wt_adj      # 被移除的量
+total_ion_content   = total_wt_adj_gypsum - gypsum_content</code></pre>
+    <p>
+      以 MH-01 為例：原始總量 1.700 wt%、校正後 1.538 wt%、石膏 0。
+      <code>total_ion_content</code> 會給你 <strong>0.162 wt%</strong>，
+      但這面牆實際的可溶鹽含量是 <strong>1.538 wt%</strong>。
+      這個欄位算的其實是<strong>「被校正掉的差額」</strong>，不是總離子含量。
+    </p>
+    <p style="margin-bottom:0">
+      本課程的函式庫因此另外提供 <code>$total_salt_content</code>
+      （= 校正後總量 + 石膏），並保留 <code>$removed_wt</code> 讓你看到被扣掉多少。<br>
+      <strong>這件事的教訓比這個欄位本身更重要：</strong>
+      拿到任何分析軟體的輸出，都要問「這一欄的定義到底是什麼」，
+      而不是照著欄位名稱猜。開源軟體的好處就是 —— 你可以打開來看。
+    </p>
+  </div>
+</article>
+
+
+<!-- ==================== UNIT 7 ==================== -->
+<article class="unit" id="u7">
+  <span class="unit-badge">UNIT 07</span>
+  <h2>讀進 Runsalt 的輸出檔</h2>
+
+  <p>
+    現在假設你已經把 ECOS 輸入檔丟進 Runsalt，跑完模擬，
+    用選單 <em>Plot → Export Plot Data…</em> 匯出結果。
+    那個檔案長這樣：
+  </p>
+
+  <pre><code>NaCl_X  15.0 16.66 18.32 19.98 ... 68.12 69.78
+NaCl_Y  0.3314 0.3314 0.3314 ... 0.1268 0.03012
+
+Na2SO4.MgSO4.4H2O_X  18.32 19.98 ... 66.46 68.12
+Na2SO4.MgSO4.4H2O_Y  0.3433 0.3433 ... 0.2035 0.1302
+
+KNO3_X  15.0 16.66 ... 59.82 61.48
+KNO3_Y  0.3915 0.3915 ... 0.3155</code></pre>
+
+  <h3>7-1　解讀這個格式</h3>
+  <ul>
+    <li>每個鹽相佔<strong>兩列</strong>：<code>鹽名_X</code> 是相對濕度，<code>鹽名_Y</code> 是該鹽的莫耳量。</li>
+    <li>不同鹽的 X 範圍<strong>不一樣長</strong> —— 因為每個鹽只在自己的穩定濕度區間裡存在。</li>
+    <li>鹽名用礦物學／化學式表示：<code>NaCl</code>（岩鹽 halite）、
+      <code>KNO3</code>（硝石 niter）、<code>Na2SO4.MgSO4.4H2O</code>（鈉鎂礬 blödite）等。
+      課程資料夾附了
+      <a href="data/ECOS_phases.csv" download>ECOS_phases.csv</a> 供對照。</li>
+  </ul>
+
+  <div class="callout warn">
+    <span class="ct">這是「寬格式」，很難分析</span>
+    <p style="margin-bottom:0">
+      每個鹽兩列、每列一長串數字 —— 這種格式人看得懂，但程式很難處理。
+      資料分析的第一步幾乎永遠是<strong>把它轉成長格式</strong>：
+      每一列代表「一個鹽、在一個濕度、有多少莫耳」。
+      一旦變成長格式，畫圖、篩選、分組統計全都變得很簡單。
+      這個轉換叫做 <strong>tidy</strong>，是資料科學的核心技能之一。
+    </p>
+  </div>
+
+  <h3>7-2　目標格式</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Salt</th><th class="num">RH</th><th class="num">mol</th><th class="num">Temp</th><th class="num">Crystallisation</th></tr></thead>
+    <tbody>
+      <tr><td>NaCl</td><td class="num">15.00</td><td class="num">0.3314</td><td class="num">20</td><td class="num">NA</td></tr>
+      <tr><td>NaCl</td><td class="num">16.66</td><td class="num">0.3314</td><td class="num">20</td><td class="num">NA</td></tr>
+      <tr><td>…</td><td class="num">…</td><td class="num">…</td><td class="num">…</td><td class="num">…</td></tr>
+      <tr><td>NaCl</td><td class="num">69.78</td><td class="num">0.0301</td><td class="num">20</td><td class="num hi">69.78</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="small muted">
+    <code>Crystallisation</code> 欄只在該鹽存在的<strong>最高濕度</strong>那一列有值，
+    其他都是 <code>NA</code>（缺值）。這個 RH 就是該鹽的結晶／潮解臨界點。
+  </p>
+
+  <h3>7-3　實際讀進來</h3>
+
+  <div class="runner" data-title="練習 7-1 · 讀取 Runsalt 輸出">
+<textarea>
+d <- tidy_runsalt(DATA("SaltsRExample20C.txt"), Temp_value = 20)
+
+str(d)
+head(d, 8)
+cat("\n總共", nrow(d), "列，", length(unique(d$Salt)), "個鹽相\n")
+unique(d$Salt)
+</textarea>
+  </div>
+
+  <div class="runner" data-title="練習 7-2 · 這個函式在做什麼">
+<textarea>
+# 把 tidy_runsalt() 拆開來看，一次只做一件事
+lines <- readLines(DATA("SaltsRExample20C.txt"))
+lines <- lines[nzchar(trimws(lines))]      # 去掉空白行
+cat("原始行數：", length(lines), "\n")
+cat(lines[1], "\n\n")
+
+# 1) 用空白切開
+p <- strsplit(trimws(lines[1]), "[[:space:]]+")[[1]]
+cat("第一格（標頭）：", p[1], "\n")
+cat("後面是", length(p)-1, "個數字\n\n")
+
+# 2) 把標頭拆成「鹽名」和「X 還是 Y」
+salt  <- sub("_[XY]$", "", p[1])
+which <- substring(p[1], nchar(p[1]))
+cat("鹽名：", salt, "　軸：", which, "\n\n")
+
+# 3) 把後面的字串轉成數字
+vals <- as.numeric(p[-1])
+cat("前 5 個 RH 值：", head(vals, 5), "\n")
+</textarea>
+  </div>
+
+  <div class="callout note">
+    <span class="ct">正規表示式速查</span>
+    <p style="margin-bottom:0">
+      <code>sub("_[XY]$", "", x)</code> 的意思是：把「字串<strong>結尾</strong>（<code>$</code>）
+      的一個底線加上 X 或 Y」換成空字串。<br>
+      <code>[[:space:]]+</code> 代表「一個以上的空白字元」，所以不管中間隔幾個空格都能正確切開。<br>
+      正規表示式不用一次學會，用到再查就好，但知道它存在很重要。
+    </p>
+  </div>
+
+  <h3>7-4　整個資料夾一次讀</h3>
+  <p>
+    真實研究裡，你可能為同一份樣品跑了 5 °C、10 °C、20 °C、30 °C 四個溫度，
+    或是一整批樣品各一個檔案。<code>tidy_runsalt_folder()</code> 會把它們全部讀進來、
+    黏成一張大表，並用 <code>filename</code> 欄記住每列來自哪個檔案。
+  </p>
+  <pre><code># 在你自己的電腦上（RStudio）
+all <- tidy_runsalt_folder("runsalt_outputs/", Temp_value = 20)
+table(all$filename)          # 看每個檔案讀進幾列</code></pre>
+
+  <details>
+    <summary>👉 換你做：找出每個鹽的結晶 RH</summary>
+    <p>用讀進來的 <code>d</code>，對每個鹽找出 RH 的最大值。<br>
+    提示一：<code>tapply(d$RH, d$Salt, max)</code><br>
+    提示二：課程函式庫直接提供 <code>crystallisation_table(d)</code>。<br>
+    做完之後把結果由大到小排序 —— 下一個單元就要用它。</p>
+  </details>
+</article>
+
+
+<!-- ==================== UNIT 8 ==================== -->
+<article class="unit u-coral" id="u8">
+  <span class="unit-badge">UNIT 08</span>
+  <h2>畫圖，然後看懂它</h2>
+
+  <p>
+    七個鹽相、一百多列數字，光看表格沒有人能得出結論。畫成圖才看得出故事。
+  </p>
+
+  <div class="runner" data-title="練習 8-1 · 畫出 RH–莫耳曲線">
+<textarea>
+d <- tidy_runsalt(DATA("SaltsRExample20C.txt"), Temp_value = 20)
+graph_runsalt(d, Temp_value = 20)
+</textarea>
+  </div>
+
+  <h3>8-1　怎麼讀這張圖</h3>
+  <ul>
+    <li><strong>X 軸</strong>是相對濕度，從低（乾）到高（濕）。</li>
+    <li><strong>Y 軸</strong>是該鹽<em>以固體形式存在</em>的莫耳量。</li>
+    <li>曲線<strong>水平的一段</strong> = 這個濕度區間裡，該鹽全部是固體，量不變。</li>
+    <li>曲線<strong>往右下掉</strong> = 濕度升高，鹽開始溶解。</li>
+    <li>曲線<strong>結束的那一點</strong>（最右端）= 全部溶解完的濕度，
+      也就是<strong>結晶／潮解臨界 RH</strong>。從高濕往低濕走時，就是在這裡開始結晶。</li>
+  </ul>
+
+  <div class="runner" data-title="練習 8-2 · 結晶 RH 排序">
+<textarea>
+d <- tidy_runsalt(DATA("SaltsRExample20C.txt"))
+crystallisation_table(d)
+</textarea>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>鹽相</th><th>礦物名</th><th class="num">結晶 RH (%)</th><th>意義</th></tr></thead>
+    <tbody>
+      <tr><td>NaCl</td><td>岩鹽 halite</td><td class="num">69.78</td><td class="hi">最先結晶 —— 最危險</td></tr>
+      <tr><td>Na₂SO₄·MgSO₄·4H₂O</td><td>鈉鎂礬 blödite</td><td class="num">68.12</td><td>緊接著</td></tr>
+      <tr><td>KNO₃</td><td>硝石 niter</td><td class="num">61.48</td><td></td></tr>
+      <tr><td>NaNO₃</td><td>鈉硝石 nitratine</td><td class="num">59.82</td><td></td></tr>
+      <tr><td>MgSO₄·4H₂O</td><td>starkeyite</td><td class="num">58.16</td><td></td></tr>
+      <tr><td>MgSO₄·H₂O</td><td>kieserite</td><td class="num">26.62</td><td>只在很乾的環境出現</td></tr>
+      <tr><td>Na₂SO₄</td><td>無水芒硝 thenardite</td><td class="num">16.66</td><td>極乾才出現</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>8-2　三個關鍵解讀</h3>
+
+  <div class="callout">
+    <span class="ct">① 混合鹽把臨界濕度拉低了</span>
+    <p style="margin-bottom:0">
+      純 NaCl 在 20 °C 的潮解 RH 約 <strong>75 %</strong>。
+      但在這個混合系統裡，岩鹽的臨界點掉到 <strong>69.78 %</strong>。
+      這正是單元 0 提到的「混合鹽的潮解點低於任何單一組分」。<sup><a href="#r-rorig">[4]</a></sup><br>
+      實務後果：如果你按照「純鹽表」把室內濕度控制在 72 % 以為很安全，
+      實際上這面牆早就在 70 % 就開始結晶了。<strong>必須用混合系統的模擬結果，不能查單鹽表。</strong>
+    </p>
+  </div>
+
+  <div class="callout warn">
+    <span class="ct">② 最危險的不是「最多」，是「最先」</span>
+    <p style="margin-bottom:0">
+      在自然的日夜／季節濕度波動中，環境濕度會反覆掃過某個區間。
+      <strong>臨界 RH 落在這個波動區間內的鹽，才會反覆溶解再結晶</strong>，
+      每一次循環都在孔隙裡再擠一次。<br>
+      這個樣品裡，NaCl（69.78 %）和鈉鎂礬（68.12 %）的臨界點正好落在
+      台灣室內常見的 60–80 % 波動帶裡 —— 它們是主要威脅。
+      而無水芒硝的 16.66 % 在台灣幾乎不會被跨越，所以雖然它是最惡名昭彰的破壞鹽，
+      在<em>這個</em>環境下反而不構成問題。<strong>風險 = 鹽的性質 × 當地氣候</strong>。
+    </p>
+  </div>
+
+  <div class="callout note">
+    <span class="ct">③ 陡峭的地方最要小心</span>
+    <p style="margin-bottom:0">
+      曲線越陡，代表「濕度只要變動一點點，就有大量的鹽在溶解或結晶」。
+      看 NaCl 的曲線：從 RH 59.8 到 69.8 這 10 個百分點之間，
+      莫耳量從 0.29 直落到 0.03。這 10 % 的濕度區間就是這面牆的<strong>高風險帶</strong>。
+    </p>
+  </div>
+
+  <h3>8-3　把圖翻成一句建議</h3>
+  <p>
+    分析的終點不是一張圖，是一句古蹟管理者看得懂的話。以這個樣品為例：
+  </p>
+  <div class="callout task" style="border-left-color:var(--teal)">
+    <span class="ct" style="color:var(--teal)">診斷建議（範例寫法）</span>
+    <p style="margin-bottom:0">
+      本樣品主要風險鹽為<strong>岩鹽（NaCl）與鈉鎂礬</strong>，
+      模擬結晶臨界濕度分別為 69.8 % 與 68.1 %（20 °C）。<br>
+      建議將室內相對濕度<strong>穩定控制在 55 % 以下或 78 % 以上</strong>，
+      並<strong>避免在 60–72 % 區間反覆進出</strong>。<br>
+      相較於絕對濕度值，<strong>濕度的穩定性更為關鍵</strong> ——
+      長期維持在 65 % 不動，會比在 55 %–75 % 之間每天來回，破壞小得多。<br>
+      <span class="small muted">（若採低濕方案，須留意木構件與彩繪層的乾裂風險，
+      實務上常需在不同材質的需求之間取捨。）</span>
+    </p>
+  </div>
+
+  <h3>8-4　在 RStudio 用 ggplot2 畫</h3>
+  <p>
+    網頁上我們用 base R 畫圖（快、不用裝套件）。
+    在你自己的電腦上，SaltsR 提供 ggplot2 版本，出圖品質更適合投稿：
+  </p>
+  <pre><code># 在 RStudio 執行（需先安裝真正的 SaltsR）
+library(SaltsR)
+library(ggplot2)
+
+graph_salt_balance("SaltsRExample20C.txt",
+                   Temp_value   = 20,
+                   add_crystal  = TRUE,    # 標出結晶點
+                   add_eqm      = FALSE)   # 標出平衡點
+
+# 自己用 ggplot2 畫，可以完全控制樣式
+d &lt;- tidyRunsalt("SaltsRExample20C.txt")
+ggplot(d, aes(RH, mol, colour = Salt)) +
+  geom_line(linewidth = 1.4, alpha = .85) +
+  labs(x = "相對濕度 (%)", y = "物質的量 (mol)",
+       title = "ECOS 模型輸出", subtitle = "20 °C") +
+  theme_classic(base_size = 14)</code></pre>
+
+  <div class="callout note">
+    <span class="ct">Godts 等人的建議：改用「體積」而不是「莫耳」</span>
+    <p style="margin-bottom:0">
+      同樣 1 莫耳的不同鹽，佔的體積差很多。
+      要評估「孔隙會不會被塞爆」，用<strong>體積（cm³）</strong>比用莫耳更貼近物理現實。<sup><a href="#r-godts-h">[2]</a></sup>
+      Runsalt 可以切換輸出單位；做正式研究時建議兩種都看。
+    </p>
+  </div>
+</article>
+
+
+<!-- ==================== UNIT 9 ==================== -->
+<article class="unit u-plum" id="u9">
+  <span class="unit-badge">UNIT 09</span>
+  <h2>批次處理與綜合實作</h2>
+
+  <p>
+    到目前為止我們一次只處理一個樣品。真實計畫裡一面牆可能取 20 個點。
+    這個單元教你用<strong>迴圈</strong>一次跑完，然後產出可以交出去的報告。
+  </p>
+
+  <h3>9-1　<code>for</code> 迴圈</h3>
+
+  <div class="runner" data-title="練習 9-1 · 最基本的迴圈">
+<textarea>
+for (i in 1:5) {
+  cat("這是第", i, "圈\n")
+}
+
+cat("\n---\n")
+
+samples <- read.csv(DATA("salt_samples.csv"))
+for (i in 1:nrow(samples)) {
+  cat(samples$sample_name[i], "—", samples$location[i], "\n")
+}
+</textarea>
+  </div>
+
+  <div class="runner" data-title="練習 9-2 · 跑完全部八個樣品">
+<textarea>
+samples <- read.csv(DATA("salt_samples.csv"))
+out <- NULL
+
+for (i in 1:nrow(samples)) {
+  s <- samples[i, ]
+  r <- fun_salt_balance(s$sample_name, s$dry_g, s$water_ml,
+                        s$chloride_ppm, s$nitrate_ppm, s$sulfate_ppm,
+                        s$sodium_ppm, s$potassium_ppm,
+                        s$calcium_ppm, s$magnesium_ppm)
+  out <- rbind(out, data.frame(
+    樣品      = r$sample_name,
+    位置      = s$location,
+    總鹽_wt   = round(r$total_wt * 100, 3),
+    陰離子    = round(r$total_mEq_anions, 1),
+    陽離子    = round(r$total_mEq_cations, 1),
+    Δe        = round(r$charge_imbalance_initial, 1),
+    Δe_pct    = round(r$charge_imbalance_pct, 1),
+    路徑      = r$Pathway,
+    石膏_wt   = round(r$gypsum_content * 100, 3),
+    飽和度    = round(r$saturation_gypsum_content, 3),
+    可溶鹽_wt = round(r$total_wt_adj * 100, 3),
+    stringsAsFactors = FALSE))
+}
+out
+</textarea>
+  </div>
+
+  <h3>9-2　用 <code>lapply</code> 寫得更簡潔</h3>
+  <p>
+    <code>for</code> 迴圈很好懂，但 R 更習慣的寫法是 <code>lapply</code>：
+    「把這個函式套用到清單裡的每一個元素」。
+  </p>
+
+  <div class="runner" data-title="練習 9-3 · lapply 版本">
+<textarea>
+samples <- read.csv(DATA("salt_samples.csv"))
+
+results <- lapply(1:nrow(samples), function(i) {
+  s <- samples[i, ]
+  fun_salt_balance(s$sample_name, s$dry_g, s$water_ml,
+                   s$chloride_ppm, s$nitrate_ppm, s$sulfate_ppm,
+                   s$sodium_ppm, s$potassium_ppm,
+                   s$calcium_ppm, s$magnesium_ppm)
+})
+
+# results 是一個長度 8 的清單，每個元素是一份完整結果
+length(results)
+results[[2]]$Pathway
+results[[2]]$sample_name
+
+# 用 sapply 一次抽出所有樣品的某一個欄位
+sapply(results, function(r) r$Pathway)
+round(sapply(results, function(r) r$charge_imbalance_pct), 2)
+</textarea>
+  </div>
+
+  <h3>9-3　視覺化整批結果</h3>
+
+  <div class="runner" data-title="練習 9-4 · 陰陽離子比較圖">
+<textarea>
+samples <- read.csv(DATA("salt_samples.csv"))
+res <- lapply(1:nrow(samples), function(i) { s <- samples[i,]
+  fun_salt_balance(s$sample_name, s$dry_g, s$water_ml, s$chloride_ppm,
+    s$nitrate_ppm, s$sulfate_ppm, s$sodium_ppm, s$potassium_ppm,
+    s$calcium_ppm, s$magnesium_ppm) })
+
+nm  <- sapply(res, function(r) r$sample_name)
+an  <- sapply(res, function(r) r$total_mEq_anions)
+ct  <- sapply(res, function(r) r$total_mEq_cations)
+pw  <- sapply(res, function(r) r$Pathway)
+
+m <- rbind(陰離子 = an, 陽離子 = ct)
+par(mar = c(5, 5, 4, 2))
+bp <- barplot(m, beside = TRUE, names.arg = nm, las = 2,
+        col = c("#E36414", "#3D7EA6"), border = NA,
+        ylab = "mEq/kg", main = "各樣品的陰陽離子當量",
+        legend.text = TRUE,
+        args.legend = list(x = "topleft", bty = "n"))
+# 在每組上方標出路徑
+text(colMeans(bp), pmax(an, ct) * 1.06,
+     labels = sub("Pathway ", "P", pw), cex = .8, font = 2, col = "#1A1A1A")
+</textarea>
+  </div>
+
+  <h3>9-4　匯出結果</h3>
+  <div class="runner" data-title="練習 9-5 · 存成 CSV">
+<textarea>
+samples <- read.csv(DATA("salt_samples.csv"))
+res <- lapply(1:nrow(samples), function(i) { s <- samples[i,]
+  fun_salt_balance(s$sample_name, s$dry_g, s$water_ml, s$chloride_ppm,
+    s$nitrate_ppm, s$sulfate_ppm, s$sodium_ppm, s$potassium_ppm,
+    s$calcium_ppm, s$magnesium_ppm) })
+
+tab <- do.call(rbind, lapply(res, function(r) data.frame(
+  sample = r$sample_name, pathway = r$Pathway,
+  total_wt_pct = r$total_wt*100, soluble_wt_pct = r$total_wt_adj*100,
+  gypsum_wt_pct = r$gypsum_content*100, saturation = r$saturation_gypsum_content,
+  x_Na = r$x[["sodium"]], x_K = r$x[["potassium"]], x_Mg = r$x[["magnesium"]],
+  x_Ca = r$x[["calcium"]], x_Cl = r$x[["chloride"]],
+  x_NO3 = r$x[["nitrate"]], x_SO4 = r$x[["sulfate"]])))
+
+write.csv(tab, "salt_results.csv", row.names = FALSE)
+cat("已寫出 salt_results.csv\n\n")
+round(tab[, 3:6], 3)
+
+# 在瀏覽器裡檔案存在虛擬檔案系統，重新整理就消失了。
+# 在 RStudio 裡它會出現在你的工作目錄。
+list.files(".", pattern = "csv")
+</textarea>
+  </div>
+
+  <h3>9-5　兩種常見的混合型態</h3>
+  <p>
+    Godts 等人分析了歐洲 338 個場址、11 412 個樣品，發現真實牆體的鹽混合
+    絕大多數落在<strong>兩種型態</strong>之一。<sup><a href="#r-godts-mix">[3]</a></sup>
+    知道自己手上是哪一型，就能快速預判風險等級：
+  </p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>型態</th><th>主導離子（由多到少）</th><th>吸濕性</th><th>意義</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Type 1<br>硫酸鹽型</strong></td>
+          <td>SO&#8324;<sup>2&minus;</sup> &gt; Na&#8314; &gt; K&#8314; &gt; NO&#8323;<sup>&minus;</sup> &gt; Cl<sup>&minus;</sup> &gt; Mg<sup>2+</sup></td>
+          <td>較低</td>
+          <td>臨界 RH 偏高，一年中被跨越的次數較少；但含硫酸鈉時要留意水合膨脹。
+              在完整資料集中約占三分之二，且傾向分布到較深處。</td></tr>
+      <tr><td><strong>Type 2<br>鈣型</strong></td>
+          <td>NO&#8323;<sup>&minus;</sup> &gt; Ca<sup>2+</sup> &gt; Cl<sup>&minus;</sup> &gt; Na&#8314; &gt; K&#8314; &gt; Mg<sup>2+</sup></td>
+          <td class="hi">明顯較高</td>
+          <td>硝酸鈣、氯化鈣極易潮解，臨界 RH 低，牆面容易長期保持潮濕。
+              一般認為破壞潛勢較高。</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="callout note">
+    <span class="ct">回頭看我們的資料</span>
+    <p style="margin-bottom:0">
+      MH-02 的莫耳分率是 NO&#8323;<sup>&minus;</sup> 0.323 &gt; Na&#8314; 0.248 &gt; Cl<sup>&minus;</sup> 0.242 &gt; Ca<sup>2+</sup> 0.083 &mdash;&mdash;
+      硝酸根主導、且鈣沒有被扣光（走 Pathway 1），整體比較接近 <strong>Type 2</strong> 的輪廓。<br>
+      但請注意一個重要的方法學陷阱：<strong>樣品走 Pathway 2 時鈣常常被歸零</strong>，
+      這會讓它在事後看起來「不像鈣型」。
+      所以判斷混合型態時，要看的是<em>校正前</em>的離子組成，
+      而不是餵給 ECOS 的那組數字。
+    </p>
+  </div>
+
+  <h3>9-5　綜合實作：寫一份牆體診斷</h3>
+  <div class="callout task">
+    <span class="ct">期末練習</span>
+    <p>用 <code>salt_samples.csv</code> 的八個樣品，寫一份 A4 一頁的診斷報告，必須包含：</p>
+    <ol style="margin:0">
+      <li><strong>資料品質檢查</strong>：哪些樣品的數據可信？哪些需要重測？理由是什麼？</li>
+      <li><strong>空間分布</strong>：北牆三個高度（MH-01/02/03）的鹽含量趨勢說明了什麼？
+        這符合毛細上升的預期嗎？</li>
+      <li><strong>路徑分布</strong>：八個樣品各走哪條路徑？走 Pathway 2 的樣品，
+        被歸類為碳酸鹽的陽離子占多少？這個假設合理嗎（提示：這是石灰砂漿的老建築）？</li>
+      <li><strong>主要威脅</strong>：從離子組成判斷，哪些樣品的硝酸鹽比例特別高？
+        這暗示什麼歷史使用？</li>
+      <li><strong>處置建議</strong>：至少一項濕度控制建議與一項後續調查建議。</li>
+    </ol>
+    <p style="margin:.7em 0 0" class="small muted">
+      提示：MH-02 的硝酸根莫耳分率高達 0.323，是八個樣品之最。
+      硝酸鹽的來源通常是有機物分解或動物活動 —— 這棟建築的這個位置以前可能是什麼用途？
+    </p>
+  </div>
+
+  <details>
+    <summary>參考解答骨架（先自己寫過再看）</summary>
+    <ul>
+      <li><strong>資料品質</strong>：MH-08 飽和度 1.038 &gt; 1，石膏未完全溶解，
+        鈣與硫酸根被低估，必須提高稀釋倍率重測。其餘七個樣品飽和度均 &lt; 0.05，數據可用。</li>
+      <li><strong>空間分布</strong>：北牆 0.3 m（1.70 wt%）→ 1.0 m（8.38 wt%）→ 1.8 m（1.24 wt%）。
+        <strong>不是</strong>單調遞減，而是在 1.0 m 出現峰值。這其實正符合毛細上升的典型模式 ——
+        鹽會在<em>蒸發前緣</em>累積，也就是水分上升到達的最高處附近，而非最底部。</li>
+      <li><strong>路徑</strong>：MH-02、MH-04 走 Pathway 1（前者因 Δe 僅 0.52 % 落在 2 % 容忍內，
+        後者因陰離子過剩）；其餘六個走 Pathway 2。石灰砂漿建築中碳酸根假設相當合理。</li>
+      <li><strong>主要威脅</strong>：MH-02 的 NO₃⁻ 莫耳分率 0.323、Cl⁻ 0.242，
+        是硝酸鹽主導的系統，暗示長期的有機物／動物活動（如舊時的畜舍、廁所或鴿害）。
+        硝酸鹽極易潮解，且 KNO₃/NaNO₃ 的臨界 RH 落在 60 % 附近，風險高。</li>
+      <li><strong>建議</strong>：(a) MH-08 重新萃取；(b) 針對 MH-02 位置追查歷史用途與現行水源，
+        並將該區室內 RH 穩定控制於 55 % 以下；(c) 建議加做各樣品的 Runsalt 模擬以取得個別臨界 RH。</li>
+    </ul>
+  </details>
+</article>
+
+
+<!-- ==================== 附錄 ==================== -->
+<article class="unit" id="appendix">
+  <span class="unit-badge">附錄 A</span>
+  <h2>疑難排解</h2>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>症狀</th><th>原因</th><th>處理方式</th></tr></thead>
+    <tbody>
+      <tr><td>網頁上按「執行」一直轉圈</td><td>第一次要下載約 30 MB 的 R 環境</td>
+          <td>等 20–40 秒。網路慢時可能到 2 分鐘。之後會被瀏覽器快取，就很快了。</td></tr>
+      <tr><td>右下角顯示「R 環境載入失敗」</td><td>網路被擋，或瀏覽器太舊</td>
+          <td>用較新版的 Chrome / Edge / Firefox / Safari；若在校園網路，可能需要開放 <code>webr.r-wasm.org</code>。</td></tr>
+      <tr><td><code>object 'DATA' not found</code></td><td>R 環境還沒初始化完</td>
+          <td>等右下角出現「R 環境就緒 ✓」再執行。</td></tr>
+      <tr><td><code>could not find function "fun_salt_balance"</code></td><td>課程函式庫沒載入成功</td>
+          <td>重新整理頁面。</td></tr>
+      <tr><td>算出來的 wt% 大 100 倍</td><td>混用了「分率」與「百分比」兩種公式</td>
+          <td>回單元 3-2 檢查你用的是 <code>/(10000×m)</code> 還是 <code>/(1000000×m)</code>。</td></tr>
+      <tr><td>陰陽離子看起來差很多，卻判成 Pathway 1</td><td>陰離子過剩</td>
+          <td>這是正確行為。Pathway 1 的條件是「Δe ≤ 2 % <em>或</em> 陰離子過剩」，見單元 5-2。</td></tr>
+      <tr><td>某個離子被算成 0，覺得不合理</td><td>Pathway 2 把它當碳酸鹽扣光了</td>
+          <td>這是模型假設，不是錯誤。要在報告中明確說明，見單元 5-4 的警告。</td></tr>
+      <tr><td>RStudio 裡 <code>pak::pak()</code> 安裝失敗</td><td>缺少編譯工具或相依套件</td>
+          <td>Windows 需先裝 Rtools；或改用 <code>remotes::install_github("BhavShah01/SaltsR")</code>。</td></tr>
+      <tr><td>中文在圖上變成方框</td><td>系統缺中文字型設定</td>
+          <td>R 裡執行 <code>par(family = "Noto Sans CJK TC")</code>，或改用英文標籤。</td></tr>
+    </tbody>
+  </table>
+  </div>
+</article>
+
+<article class="unit" id="glossary">
+  <span class="unit-badge">附錄 B</span>
+  <h2>詞彙對照</h2>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>中文</th><th>英文</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr><td>可溶鹽</td><td>soluble salt</td><td>能被水溶解、參與潮解結晶循環的鹽；鹽害的主角</td></tr>
+      <tr><td>毛細上升</td><td>rising damp</td><td>地下水沿毛細孔上升，把鹽帶進牆體</td></tr>
+      <tr><td>潮解</td><td>deliquescence</td><td>鹽從空氣中吸水自發溶解</td></tr>
+      <tr><td>潮解相對濕度</td><td>DRH / RH<sub>del</sub></td><td>發生潮解的臨界濕度</td></tr>
+      <tr><td>結晶相對濕度</td><td>RH<sub>cry</sub></td><td>濕度下降時開始結晶的臨界值</td></tr>
+      <tr><td>離子層析</td><td>ion chromatography (IC)</td><td>定量陰陽離子的分析方法</td></tr>
+      <tr><td>當量</td><td>equivalent (Eq)</td><td>莫耳數 × 電荷數；比較電荷的通用單位</td></tr>
+      <tr><td>電荷平衡</td><td>charge balance</td><td>正負電荷總量相等的要求</td></tr>
+      <tr><td>莫耳分率</td><td>mole fraction</td><td>某離子莫耳數 ÷ 總莫耳數；ECOS 的輸入格式</td></tr>
+      <tr><td>石膏</td><td>gypsum, CaSO₄·2H₂O</td><td>難溶硫酸鈣；模擬前要扣除</td></tr>
+      <tr><td>限量試劑</td><td>limiting reagent</td><td>反應中先耗盡的那個成分，決定產物上限</td></tr>
+      <tr><td>吸濕含水率</td><td>HMC</td><td>20 °C/95 %RH 平衡後的吸水量；鹽含量的快速指標</td></tr>
+      <tr><td>向量化</td><td>vectorisation</td><td>對整排資料一次運算，R 的核心特性</td></tr>
+      <tr><td>長格式／寬格式</td><td>long / wide format</td><td>資料排列方式；分析前通常要轉成長格式</td></tr>
+    </tbody>
+  </table>
+  </div>
+</article>
+
+<article class="unit" id="downloads">
+  <span class="unit-badge">附錄 C</span>
+  <h2>檔案下載</h2>
+  <p>所有檔案都可以下載後在 RStudio 使用。</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(250px,1fr))">
+    <div class="card c-teal">
+      <span class="tag">資料</span>
+      <h3>八個樣品的離子層析數據</h3>
+      <p>MH-01 到 MH-08，含取樣位置、乾重、水量、七個離子的 ppm。</p>
+      <div class="links"><a class="go" href="data/salt_samples.csv" download>salt_samples.csv</a></div>
+    </div>
+    <div class="card c-teal">
+      <span class="tag">資料</span>
+      <h3>Runsalt 模擬輸出範例</h3>
+      <p>MH-01 在 20 °C 的 ECOS 模擬結果，七個鹽相。單元 07–08 使用。</p>
+      <div class="links"><a class="go" href="data/SaltsRExample20C.txt" download>SaltsRExample20C.txt</a></div>
+    </div>
+    <div class="card c-teal">
+      <span class="tag">資料</span>
+      <h3>ECOS 輸入檔範例</h3>
+      <p>MH-01 校正後的莫耳分率，可直接匯入 Runsalt。</p>
+      <div class="links"><a class="go" href="data/SaltsR_upload_Example.txt" download>SaltsR_upload_Example.txt</a></div>
+    </div>
+    <div class="card c-gold">
+      <span class="tag t-gold">對照表</span>
+      <h3>八個樣品的完整計算結果</h3>
+      <p>每個樣品的 130 個中間欄位（式 1 到式 11 的每一步），由原始 SaltsR 套件產生。
+        想自己驗算時可以逐欄比對。</p>
+      <div class="links"><a class="go" href="data/salt_balance_full.csv" download>salt_balance_full.csv</a></div>
+    </div>
+    <div class="card c-gold">
+      <span class="tag t-gold">對照表</span>
+      <h3>ECOS 鹽相與礦物名對照</h3>
+      <p>75 個 ECOS 鹽相的化學式與礦物學名稱。</p>
+      <div class="links"><a class="go" href="data/ECOS_phases.csv" download>ECOS_phases.csv</a></div>
+    </div>
+    <div class="card c-coral">
+      <span class="tag t-coral">程式</span>
+      <h3>課堂版函式庫</h3>
+      <p>本課程使用的純 base R 版 SaltsR 核心函式，含完整註解。</p>
+      <div class="links"><a class="go" href="assets/saltsr_teaching.R" download>saltsr_teaching.R</a></div>
+    </div>
+    <div class="card c-coral">
+      <span class="tag t-coral">程式</span>
+      <h3>各單元練習腳本</h3>
+      <p>單元 1–9 的所有練習程式碼，可在 RStudio 逐行執行。</p>
+      <div class="links">
+        <a class="repo" href="scripts/unit01_basics.R" download>01</a>
+        <a class="repo" href="scripts/unit02_vectors.R" download>02</a>
+        <a class="repo" href="scripts/unit03_weight.R" download>03</a>
+        <a class="repo" href="scripts/unit04_equivalents.R" download>04</a>
+        <a class="repo" href="scripts/unit05_balance.R" download>05</a>
+        <a class="repo" href="scripts/unit06_gypsum.R" download>06</a>
+        <a class="repo" href="scripts/unit07_runsalt.R" download>07</a>
+        <a class="repo" href="scripts/unit08_plot.R" download>08</a>
+        <a class="repo" href="scripts/unit09_batch.R" download>09</a>
+      </div>
+    </div>
+    <div class="card c-plum">
+      <span class="tag t-plum">安裝</span>
+      <h3>在自己電腦裝真正的 SaltsR</h3>
+      <p>課程結束後的下一步。需要先安裝 R 與 RStudio。</p>
+      <div class="links"><a class="go" href="scripts/install_saltsr.R" download>install_saltsr.R</a></div>
+    </div>
+  </div>
+</article>
+
+<article class="unit" id="refs">
+  <span class="unit-badge">附錄 D</span>
+  <h2>參考文獻與資料來源</h2>
+
+  <h3>本課程使用的方法出處</h3>
+  <ol style="line-height:1.9; font-size:.94rem">
+    <li id="r-godts-sd">Godts, S.; Steiger, M.; Orr, S. A.; et al. (2022).
+      Charge balance calculations for mixed salt systems applied to a large
+      dataset from the built environment. <em>Scientific Data</em>, 9(1), 324.
+      <a href="https://doi.org/10.1038/s41597-022-01445-9" target="_blank" rel="noopener">doi:10.1038/s41597-022-01445-9</a>
+      <br><span class="small muted">— 式 1 到式 11 的原始出處，SaltsR 全部依此實作。</span></li>
+    <li id="r-godts-h">Godts, S.; Steiger, M.; Orr, S. A.; et al. (2022).
+      Modeling salt behavior with ECOS/RUNSALT: Terminology,
+      methodology, limitations, and solutions. <em>Heritage</em>, 5(4), 3648–3663.
+      <a href="https://doi.org/10.3390/heritage5040190" target="_blank" rel="noopener">doi:10.3390/heritage5040190</a>
+      <br><span class="small muted">— ECOS 只收六種離子、不處理碳酸鹽與石膏、不考慮動力學與孔隙結構、
+      不含結冰，以及「建議用體積而非莫耳判讀」等限制，均出自本文。</span></li>
+    <li id="r-godts-mix">Godts, S.; Orr, S. A.; Steiger, M. (2023). Salt mixtures in stone weathering.
+      <em>Scientific Reports</em>, 13(1).
+      <a href="https://doi.org/10.1038/s41598-023-40590-y" target="_blank" rel="noopener">doi:10.1038/s41598-023-40590-y</a>
+      <br><span class="small muted">&mdash; 從 11412 個真實樣品歸納出兩種常見混合型態，
+      以及 14 種最常出現的鹽相與其臨界 RH。單元 09 的分型判讀依據。</span></li>
+    <li id="r-rorig">R&#xf6;rig-Dalgaard, I. (2021). Direct measurements of the deliquescence relative
+      humidity in salt mixtures including the contribution from metastable phases.
+      <em>ACS Omega</em>, 6(25), 16297–16306.
+      <a href="https://doi.org/10.1021/acsomega.1c00538" target="_blank" rel="noopener">doi:10.1021/acsomega.1c00538</a>
+      <br><span class="small muted">— 「混合鹽的潮解點永遠低於任一單組分」的實驗證據。</span></li>
+    <li>Price, C. A. (ed.) (2000). <em>An Expert Chemical Model for Determining the Environmental
+      Conditions Needed to Prevent Salt Damage in Porous Materials</em> (ECOS). European Commission
+      Research Report No. 11, Archetype Publications, London.</li>
+    <li>Bionda, D. (2005). <em>RUNSALT — A graphical user interface to the ECOS thermodynamic model
+      for the prediction of the behaviour of salt mixtures under changing climate conditions.</em>
+      <a href="http://science.sdf-eu.org/runsalt/" target="_blank" rel="noopener">science.sdf-eu.org/runsalt</a></li>
+    <li>Shah, B.; Godts, S.; Orr, S. A. <em>SaltsR: Tools for the analysis of salt formation data</em>
+      (R package, GPL-3). <a href="https://github.com/BhavShah01/SaltsR" target="_blank" rel="noopener">github.com/BhavShah01/SaltsR</a></li>
+  </ol>
+
+  <h3>資料來源說明</h3>
+  <div class="callout note">
+    <span class="ct">哪些是真實資料、哪些是教學用資料</span>
+    <ul style="margin:0">
+      <li><strong>SaltsRExample20C.txt</strong> 與 <strong>SaltsR_upload_Example.txt</strong> ——
+        取自 SaltsR 套件的 <code>data-raw/</code>，是套件作者提供的官方範例，未經修改。</li>
+      <li><strong>salt_samples.csv 的八個樣品</strong> ——
+        <strong>為本課程設計的教學資料</strong>，不是真實古蹟的測量值。
+        設計原則是讓八個樣品剛好涵蓋所有教學情境：Pathway 1 的兩種觸發條件、
+        Pathway 2 的兩種扣除深度、無石膏／石膏受限於硫酸根／石膏受限於鈣、
+        以及一個會觸發飽和度警告的樣品。<br>
+        其中 MH-01 的組成刻意設為與套件官方範例完全相同，
+        因此它的 ECOS 輸出可以直接對照 <code>SaltsR_upload_Example.txt</code> 驗證。
+        <strong>這些數字不可引用為實驗證據。</strong></li>
+      <li><strong>課堂版 R 函式</strong> —— 改寫自 SaltsR 原始碼（GPL-3），
+        以 268 組資料（68 組指定案例 + 200 組隨機案例）逐項與原套件比對，
+        所有欄位的相對誤差 &lt; 10⁻¹³。網頁互動實驗室使用的 JavaScript 版本
+        亦以相同方式驗證，最大相對誤差為 0。</li>
+    </ul>
+  </div>
+</article>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <h4>課程</h4>
+        <p style="margin:0; line-height:2">
+          <a href="index.html">課程入口</a><br>
+          <a href="lab.html">互動實驗室</a><br>
+          <a href="quiz.html">分階測驗</a>
+        </p>
+      </div>
+      <div>
+        <h4>原始工具</h4>
+        <p style="margin:0; line-height:2">
+          <a href="https://github.com/BhavShah01/SaltsR" target="_blank" rel="noopener">SaltsR on GitHub</a><br>
+          <a href="http://science.sdf-eu.org/runsalt/" target="_blank" rel="noopener">Runsalt / ECOS</a><br>
+          <a href="https://predict.kikirpa.be/index.php/tools/" target="_blank" rel="noopener">KIK-IRPA PREDICT</a>
+        </p>
+      </div>
+      <div>
+        <h4>技術</h4>
+        <p style="margin:0; line-height:1.9; font-size:.86rem">
+          瀏覽器內的 R 由 <a href="https://docs.r-wasm.org/webr/latest/" target="_blank" rel="noopener">webR</a> 提供<br>
+          （R 編譯為 WebAssembly，程式碼不會離開你的電腦）
+        </p>
+      </div>
+      <div>
+        <h4>關於</h4>
+        <p style="margin:0; line-height:1.9; font-size:.86rem">
+          葉泰聖 · 美和科技大學<br>
+          <a href="https://orcid.org/0000-0002-7798-2669" target="_blank" rel="noopener">ORCID 0000-0002-7798-2669</a>
+        </p>
+      </div>
+    </div>
+    <div class="fbot">
+      SaltsR 套件為 Bhavesh Shah、Sebastiaan Godts、Scott Orr 所著，採 GPL-3 授權。
+      課堂版 R 函式改寫自原套件並保留同一授權。
+    </div>
+  </div>
+</footer>
+
+<script src="assets/webr-runner.js"></script>
+</body>
+</html>
