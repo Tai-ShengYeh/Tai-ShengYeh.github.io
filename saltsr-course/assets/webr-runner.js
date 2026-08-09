@@ -16,8 +16,44 @@
 (function () {
   'use strict';
 
-  const WEBR_BASE = window.WEBR_BASE_URL ||
-    'https://webr.r-wasm.org/v0.5.4/';
+  // webR 的來源，依序：
+  //   1. 頁面自己設定的 window.WEBR_BASE_URL（最優先）
+  //   2. 課程資料夾旁邊的 ../webr/（離線包會放這個，完全不需要網路）
+  //   3. 官方 CDN
+  const WEBR_CDN   = 'https://webr.r-wasm.org/v0.5.4/';
+  // 同層的 webr/ 優先（GitHub Pages 自架與離線包都用這個位置，
+  // service worker 的 scope 也才涵蓋得到）；'../webr/' 是舊版離線包的相容路徑。
+  const WEBR_LOCAL_CANDIDATES = ['webr/', '../webr/'];
+  let   WEBR_BASE  = window.WEBR_BASE_URL || null;
+  let   WEBR_IS_LOCAL = false;   // 是否用的是課程旁邊的離線副本
+
+  // 一律換算成絕對網址再用。
+  // 原因：fetch() 的相對路徑是以「文件網址」為基準，但 import() 在外部
+  // classic script 裡是以「腳本網址」為基準（assets/ 底下），兩者不一致，
+  // 會出現「探測得到卻載不到」的怪現象。
+  const abs = (u) => new URL(u, document.baseURI).href;
+
+  // 探測本機是否附了 webR。只在沒指定 WEBR_BASE_URL 時才問一次。
+  async function resolveWebrBase() {
+    if (WEBR_BASE) { WEBR_BASE = abs(WEBR_BASE); return WEBR_BASE; }
+    // 去重：課程放在網站根目錄時，'webr/' 與 '../webr/' 會解析成同一個網址，
+    // 不去重就會對同一個位置探測兩次（主控台出現兩筆一模一樣的 404）。
+    const seen = new Set();
+    const candidates = WEBR_LOCAL_CANDIDATES
+      .map(abs)
+      .filter((u) => (seen.has(u) ? false : (seen.add(u), true)));
+
+    for (const local of candidates) {
+      try {
+        // 用 GET 而不是 HEAD：Cache API 預設不會用 HEAD 去比對已快取的 GET 回應，
+        // 離線（走 Service Worker）時 HEAD 一定落空，會誤判成「本機沒有 webR」。
+        const r = await fetch(local + 'webr.mjs');
+        if (r.ok) { WEBR_BASE = local; WEBR_IS_LOCAL = true; return WEBR_BASE; }
+      } catch (e) { /* 這個位置沒有，試下一個 */ }
+    }
+    WEBR_BASE = WEBR_CDN;
+    return WEBR_BASE;
+  }
   const ASSET_BASE = window.SALTSR_ASSET_BASE || 'assets/';
   const DATA_BASE  = window.SALTSR_DATA_BASE  || 'data/';
 
@@ -73,6 +109,12 @@
     '<code>window.WEBR_BASE_URL</code> 指向該位置</li>' +
     '</ol>';
 
+  const LOCAL_WEBR_HELP =
+    '<p>偵測到旁邊有本機的 <code>webr/</code> 資料夾，但載入失敗，' +
+    '通常是離線包的檔案不完整（例如解壓縮時中斷）。</p>' +
+    '<p>請把整包重新解壓一次，確認 <code>webr/</code> 和課程資料夾是「並排」的：</p>' +
+    '<ol><li><code>saltsr-course\\</code></li><li><code>webr\\</code></li></ol>';
+
   /* ---------------- 狀態列 ---------------- */
   function status(msg, cls) {
     if (!statusEl) {
@@ -99,18 +141,23 @@
         err.saltsrHelp = ['無法在 file:// 下執行 R', FILE_PROTOCOL_HELP];
         throw err;
       }
-      status('正在下載 R 執行環境（約 30 MB，第一次比較久）…');
+      const base = await resolveWebrBase();
+      const isLocal = WEBR_IS_LOCAL;
+      status(isLocal
+        ? '正在載入 R 執行環境（本機離線副本）…'
+        : '正在下載 R 執行環境（約 20 MB，第一次比較久）…');
+
       let mod;
       try {
-        mod = await import(WEBR_BASE + 'webr.mjs');
+        mod = await import(base + 'webr.mjs');
       } catch (e) {
-        const err = new Error('連不到 R 執行環境（' + WEBR_BASE + '）。');
-        err.saltsrHelp = ['下載 R 環境失敗', NETWORK_HELP];
+        const err = new Error('連不到 R 執行環境（' + base + '）。');
+        err.saltsrHelp = ['下載 R 環境失敗', isLocal ? LOCAL_WEBR_HELP : NETWORK_HELP];
         err.cause = e;
         throw err;
       }
       const { WebR, ChannelType } = mod;
-      webR = new WebR({ baseUrl: WEBR_BASE, channelType: ChannelType.PostMessage });
+      webR = new WebR({ baseUrl: base, channelType: ChannelType.PostMessage });
       await webR.init();
 
       status('正在載入課程用的 SaltsR 函式…');

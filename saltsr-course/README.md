@@ -24,6 +24,8 @@ R 編譯成 WebAssembly），不需要安裝 R、RStudio 或註冊任何帳號�
 | `start-course.bat` / `start-course.command` | 本機預覽：按兩下就啟動（Windows / macOS） |
 | `serve.py` / `serve.js` | 本機預覽伺服器本體（Python 版 / Node 版） |
 | `deploy.ps1` / `deploy.sh` | 部署到 GitHub Pages（Windows / macOS·Linux） |
+| `sw.js` / `assets/offline.js` | Service Worker：讓學生把整套課程存進瀏覽器離線使用 |
+| `webr/` | 自備的 R 執行環境（選用，約 46 MB，要離線功能才需要） |
 
 ### 單元
 
@@ -134,6 +136,34 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 反過來也成立：之前用 `--with-teacher` 部署過，下次不加就會把線上的 `teacher.html` 移除。
 
+### 讓學生可以離線上課（PWA）
+
+網路慢的教室，最好的解法是**上課當天完全不用網路**。做法：
+
+1. 把 `webr/` 資料夾放進課程資料夾（`saltsr-course/webr/`）。
+   離線包裡的 `webr` 就是這個東西，直接搬過來即可。
+2. 部署時加上參數，把它一起上線：
+
+```powershell
+.\deploy.ps1 -Repo D:\你的路徑\Tai-ShengYeh.github.io -WithWebR
+```
+
+```bash
+./deploy.sh ~/Tai-ShengYeh.github.io --with-webr
+```
+
+3. 請學生**在家或網路順暢時**開課程首頁，按一次「準備離線使用」，
+   等進度條跑完（約 46 MB）。
+
+之後這台電腦即使完全沒有網路，四個頁面與 R 都能正常運作 —— 不用安裝任何東西、
+不用隨身碟、不用解壓縮。實測方式是用瀏覽器真正切斷網路連線後重新開啟課程。
+
+技術上是 Service Worker 把課程外殼與 `webr/` 存進 Cache Storage。
+兩者用不同的快取名稱：更新講義只會讓外殼失效，學生**不會**因此重抓 46 MB。
+部署腳本會自動把 `sw.js` 裡的 `__BUILD__` 換成時間戳記，所以每次上線學生都會拿到新版。
+
+> 沒有 `webr/` 也完全能用，只是學生每次都要連 `webr.r-wasm.org`，且無法離線。
+
 ### 部署前後的差異
 
 | 項目 | 本機（`serve.py`） | GitHub Pages |
@@ -141,7 +171,8 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 | 需要先開伺服器 | 是 | 否，直接給網址 |
 | `teacher.html` | 有 | 預設沒有 |
 | `serve.py` 等預覽工具 | 有 | 不會上傳 |
-| webR 下載來源 | `webr.r-wasm.org` | 同左 |
+| webR 來源 | 有 `webr/` 就用它，否則 CDN | 同左 |
+| 學生可離線使用 | — | 有 `--with-webr` 才可以 |
 
 ---
 
@@ -151,7 +182,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 * 使用 **PostMessage 通道**，因為 GitHub Pages 無法設定 COOP/COEP 標頭
   （沒有 SharedArrayBuffer）。代價是不支援 `readline()` 等阻塞式輸入 —— 課程沒用到。
-* 第一次執行需下載約 30 MB，之後由瀏覽器快取。頁面採**延遲載入**：
+* 第一次執行需下載約 20 MB（實測 21.7 MB 未壓縮，經 CDN 壓縮後更少），之後由瀏覽器快取。頁面採**延遲載入**：
   使用者捲到程式碼區塊附近才開始下載。
 * 中文標籤在 webR 的 canvas 繪圖裝置上可正常顯示（實測 Chromium）。
 * 若要改用其他 CDN 或自架，在載入 `webr-runner.js` 前設定
