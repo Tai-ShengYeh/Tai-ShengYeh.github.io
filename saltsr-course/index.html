@@ -20,7 +20,7 @@
     <a class="nlink" href="lab.html">互動實驗室</a>
     <a class="nlink" href="quiz.html">測驗</a>
     
-    <a class="nlink" href="../index.html">↖ 課程總站</a>
+    <a class="nlink portal-link" href="../index.html">↖ 課程總站</a>
   </div>
 </nav>
 
@@ -289,7 +289,7 @@
         <p style="margin:0; line-height:1.9; font-size:.86rem">
           葉泰聖 · 美和科技大學<br>
           <a href="https://orcid.org/0000-0002-7798-2669" target="_blank" rel="noopener">ORCID 0000-0002-7798-2669</a><br>
-          <a href="../index.html">課程總站</a>
+          <a class="portal-link" href="../index.html">課程總站</a>
         </p>
       </div>
     </div>
@@ -324,5 +324,17 @@
 
 <script src="assets/webr-files.js"></script>
 <script src="assets/offline.js"></script>
+<script>
+/* 「課程總站」只有在課程被放在個人網站的子資料夾底下才有意義。
+   單獨部署（Cloudflare Pages、Netlify 等）時上一層沒有東西，直接隱藏。 */
+(function () {
+  var standalone = location.pathname.replace(/\/index\.html$/, '/').split('/').filter(Boolean).length === 0;
+  if (!standalone) return;
+  document.querySelectorAll('.portal-link').forEach(function (a) {
+    var li = a.closest('p') && a.closest('p').children.length === 1 ? a.closest('p') : a;
+    a.style.display = 'none';
+  });
+})();
+</script>
 </body>
 </html>

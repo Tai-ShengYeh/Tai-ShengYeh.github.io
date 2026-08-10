@@ -30,7 +30,7 @@
     <p class="lead" style="font-size:1rem">
       這一頁包含全部教材。網頁上每個深色框都是<strong>可以編輯、可以執行的真 R 環境</strong> ——
       按下「▶ 執行」就會在你的瀏覽器裡跑真正的 R，不會上傳到任何伺服器。
-      第一次執行需要下載約 30 MB 的 R 執行環境，請耐心等 20–40 秒。
+      第一次執行需要下載約 20 MB 的 R 執行環境，請耐心等 20–40 秒。
     </p>
     <p style="margin:0">
       <a href="#" id="webr-warmup" class="go" style="background:#fff;color:var(--teal)">先預熱 R 環境</a>
@@ -57,6 +57,7 @@
   <p class="tiny muted" style="margin:10px 0 0">
     附錄：<a href="#appendix">疑難排解</a> ·
     <a href="#glossary">詞彙對照</a> ·
+    <a href="#symbols">符號速查</a> ·
     <a href="#downloads">檔案下載</a> ·
     <a href="#refs">參考文獻</a>
   </p>
@@ -418,6 +419,45 @@ c(3.7, 1.2, 9.9) |> sort() |> rev()
   </div>
 
   <div class="callout note">
+    <span class="ct">這個符號怎麼打出來？</span>
+    <p>
+      <code>|&gt;</code> 是<strong>兩個字元</strong>：先打直槓 <code>|</code>，再打大於號 <code>&gt;</code>，
+      中間不留空白。放大看是這樣 ——
+      <span class="bigop">|</span> 加上 <span class="bigop">&gt;</span> 等於 <span class="bigop">|&gt;</span>。
+      它不是三角形，也不是箭頭符號。
+    </p>
+
+    <table class="keytab">
+      <thead><tr><th>你要打的</th><th>Windows</th><th>Mac</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>直槓 <code>|</code></td>
+          <td><kbd>Shift</kbd> + <kbd>\</kbd><br><span class="muted tiny">在 Enter 鍵上方，和 <code>\</code> 同一顆</span></td>
+          <td><kbd>Shift</kbd> + <kbd>\</kbd><br><span class="muted tiny">在 Return 鍵上方，和 <code>\</code> 同一顆</span></td>
+        </tr>
+        <tr>
+          <td>大於號 <code>&gt;</code></td>
+          <td><kbd>Shift</kbd> + <kbd>.</kbd></td>
+          <td><kbd>Shift</kbd> + <kbd>.</kbd></td>
+        </tr>
+        <tr>
+          <td>在 RStudio 一次插入管線</td>
+          <td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd></td>
+          <td><kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="small" style="margin-bottom:0">
+      在<strong>這個網頁</strong>的程式碼框裡沒有快捷鍵，直接打兩個字元就好。<br>
+      在 <strong>RStudio</strong> 裡按上面的快捷鍵預設會插入 <code>%&gt;%</code>；
+      要讓它插入 <code>|&gt;</code>，到
+      <em>Tools → Global Options → Code → Editing</em> 勾選
+      <em>Use native pipe operator</em>。
+    </p>
+  </div>
+
+  <div class="callout note">
     <span class="ct">兩種管線</span>
     <p style="margin-bottom:0">
       <code>|&gt;</code> 是 R 4.1 之後內建的管線。你在網路上還會看到 <code>%&gt;%</code>，
@@ -465,6 +505,59 @@ c(3.7, 1.2, 9.9) |> sort() |> rev()
         <span style="display:block;padding:0 8px">10 000 × m<sub>dry</sub></span>
       </span>
       &nbsp;&nbsp;［wt %］
+    </p>
+  </div>
+
+  <table class="symtab">
+    <caption>式 1 裡每個符號代表什麼</caption>
+    <thead><tr><th>符號</th><th>唸法／全名</th><th>意思</th><th>單位</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><em>w<sub>i</sub></em></td>
+        <td>w sub i（weight）</td>
+        <td>第 i 種離子的<strong>重量分率</strong> —— 這種離子佔乾樣重的百分之多少</td>
+        <td>wt %</td>
+      </tr>
+      <tr>
+        <td>C<sub>ppm</sub></td>
+        <td>C sub ppm（concentration）</td>
+        <td>離子層析儀量到的<strong>萃取液濃度</strong></td>
+        <td>ppm（= mg/L）</td>
+      </tr>
+      <tr>
+        <td>V<sub>water</sub></td>
+        <td>V sub water</td>
+        <td>萃取時加進去的<strong>去離子水體積</strong></td>
+        <td>mL</td>
+      </tr>
+      <tr>
+        <td><strong>m<sub>dry</sub></strong></td>
+        <td><strong>m sub dry</strong>（mass, dry）</td>
+        <td><strong>乾樣重</strong> —— 樣品烘乾後秤到的質量。
+            注意是「乾燥後」的重量，不是剛採下來含水的重量；
+            水分會讓分母虛胖，算出來的鹽含量就偏低。</td>
+        <td>g（公克）</td>
+      </tr>
+      <tr>
+        <td>10 000</td>
+        <td>—</td>
+        <td>單位換算常數：把 mg/L × mL ÷ g 一路換成百分比，
+            剛好是 10<sup>6</sup> ÷ 100 = 10<sup>4</sup>。下一節會一步步拆給你看。</td>
+        <td>無</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout note">
+    <span class="ct">下標怎麼讀</span>
+    <p style="margin-bottom:0">
+      <code>m<sub>dry</sub></code> 那個縮小的 <code>dry</code> 是<strong>下標</strong>，
+      不是把它唸成「mdry」這個字。它的作用是「這是哪一種 m」——
+      因為公式裡可能同時出現好幾種質量，用下標區分。
+      本課程用到的下標：
+      <code>dry</code> = 乾燥後、<code>ppm</code> = 以 ppm 為單位、
+      <code>water</code> = 水的、<code>i</code> = 第 i 種離子、
+      <code>adj</code> = 校正後（adjusted）、<code>final</code> = 最終值。
     </p>
   </div>
 
@@ -1608,7 +1701,7 @@ list.files(".", pattern = "csv")
   <table>
     <thead><tr><th>症狀</th><th>原因</th><th>處理方式</th></tr></thead>
     <tbody>
-      <tr><td>網頁上按「執行」一直轉圈</td><td>第一次要下載約 30 MB 的 R 環境</td>
+      <tr><td>網頁上按「執行」一直轉圈</td><td>第一次要下載約 20 MB 的 R 環境</td>
           <td>等 20–40 秒。網路慢時可能到 2 分鐘。之後會被瀏覽器快取，就很快了。</td></tr>
       <tr><td>右下角顯示「R 環境載入失敗」</td><td>網路被擋，或瀏覽器太舊</td>
           <td>用較新版的 Chrome / Edge / Firefox / Safari；若在校園網路，可能需要開放 <code>webr.r-wasm.org</code>。</td></tr>
@@ -1652,6 +1745,34 @@ list.files(".", pattern = "csv")
       <tr><td>吸濕含水率</td><td>HMC</td><td>20 °C/95 %RH 平衡後的吸水量；鹽含量的快速指標</td></tr>
       <tr><td>向量化</td><td>vectorisation</td><td>對整排資料一次運算，R 的核心特性</td></tr>
       <tr><td>長格式／寬格式</td><td>long / wide format</td><td>資料排列方式；分析前通常要轉成長格式</td></tr>
+      <tr><td>管線運算子</td><td>pipe operator <code>|&gt;</code></td><td>直槓加大於號兩個字元；把左邊的結果送進右邊函式的第一個引數</td></tr>
+      <tr><td>乾樣重</td><td>dry mass, m<sub>dry</sub></td><td>樣品烘乾後秤得的質量（g）；所有濃度換算的分母</td></tr>
+    </tbody>
+  </table>
+  </div>
+</article>
+
+<article class="unit" id="symbols">
+  <span class="unit-badge">附錄 B-2</span>
+  <h2>符號速查</h2>
+  <p class="muted">下標（縮小的那個字）是用來區分「哪一種」，不是把它連起來唸成一個字。</p>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>符號</th><th>意思</th><th>單位</th><th>出現在</th></tr></thead>
+    <tbody>
+      <tr><td>C<sub>ppm</sub></td><td>萃取液的離子濃度</td><td>ppm（mg/L）</td><td>式 1、式 2</td></tr>
+      <tr><td>V<sub>water</sub></td><td>萃取用的去離子水體積</td><td>mL</td><td>式 1、式 2</td></tr>
+      <tr><td>m<sub>dry</sub></td><td><strong>乾樣重</strong>：烘乾後的樣品質量</td><td>g</td><td>式 1、式 2、式 11</td></tr>
+      <tr><td><em>w<sub>i</sub></em></td><td>第 i 種離子的重量分率</td><td>wt %</td><td>式 1</td></tr>
+      <tr><td><em>e<sub>i</sub></em></td><td>第 i 種離子的當量濃度</td><td>mEq/kg</td><td>式 2 之後全部</td></tr>
+      <tr><td>M</td><td>莫耳質量</td><td>g/mol</td><td>式 2</td></tr>
+      <tr><td><em>z</em></td><td>離子電荷數（絕對值）</td><td>無</td><td>式 2</td></tr>
+      <tr><td>Δ<em>e</em></td><td>陰陽離子當量的差；電荷平衡誤差</td><td>mEq/kg</td><td>式 3</td></tr>
+      <tr><td><em>e</em><sub>adj</sub></td><td>校正後（adjusted）的當量</td><td>mEq/kg</td><td>式 4、式 5</td></tr>
+      <tr><td><em>e</em><sub>final</sub></td><td>扣除石膏後的最終當量</td><td>mEq/kg</td><td>式 9、式 10</td></tr>
+      <tr><td><em>c<sub>i</sub></em></td><td>莫耳濃度</td><td>mol/kg</td><td>式 7</td></tr>
+      <tr><td><em>x<sub>i</sub></em></td><td>莫耳分率；ECOS 的輸入</td><td>無單位</td><td>式 8</td></tr>
+      <tr><td>S<sub>CaSO₄</sub></td><td>石膏飽和度</td><td>%</td><td>式 11</td></tr>
     </tbody>
   </table>
   </div>
