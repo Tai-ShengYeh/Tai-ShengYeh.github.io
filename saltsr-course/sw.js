@@ -15,7 +15,7 @@
 // BUILD 由部署腳本在每次上線時改寫，用來讓「課程內容」的快取自動更新。
 // R 執行環境的快取用另一組名字（跟著 webR 版本走），所以更新講義不會害
 // 學生重抓 45 MB。
-const BUILD      = '20260810120853';
+const BUILD      = '20260810131849';
 const WEBR_VER   = '0.5.4';
 const SHELL      = 'saltsr-shell-' + BUILD;
 const WEBR       = 'saltsr-webr-' + WEBR_VER;
