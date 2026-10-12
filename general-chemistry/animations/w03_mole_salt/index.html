@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>W03 莫耳與化學式｜鈉 1800 mg 等於幾克鹽？</title>
+  <style>
+    :root{--blue:#2a75b5;--ink:#1a2c40;--soft:#eef7ff;--line:#c5ddec;--red:#d54f5d;--teal:#21a699}
+    *{box-sizing:border-box} body{margin:0;font-family:"Microsoft JhengHei",system-ui,sans-serif;background:#f6fbff;color:var(--ink);line-height:1.65}
+    main{max-width:980px;margin:0 auto;padding:32px 18px 56px} .hero{background:white;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:0 18px 50px #2a75b51a}
+    h1{font-size:clamp(1.8rem,4vw,3rem);line-height:1.15;margin:0 0 8px} .tag{color:var(--blue);font-weight:700;letter-spacing:.04em}.lead{font-size:1.15rem;color:#466277;margin:0 0 22px}
+    video{width:100%;border-radius:18px;border:1px solid var(--line);background:#dfeff8}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:20px}.card{background:var(--soft);border:1px solid var(--line);border-radius:18px;padding:16px}.card b{color:var(--blue)}
+    code{background:#eaf4fb;border-radius:6px;padding:2px 6px}.formula{font-size:1.45rem;font-weight:800;color:var(--teal)} .warn{color:var(--red);font-weight:800}.meta{font-size:.92rem;color:#607688;margin-top:18px}
+    a{color:var(--blue);font-weight:700}.downloads a{display:inline-block;margin-right:12px;margin-top:8px;padding:8px 12px;border-radius:999px;background:#e6f2fb;text-decoration:none}
+  </style>
+</head>
+<body>
+<main>
+  <p class="tag">General Chemistry W03｜The Mole and Chemical Formulas</p>
+  <section class="hero">
+    <h1>鈉 1800 mg，等於幾克食鹽？</h1>
+    <p class="lead">依據第 3 週「莫耳與化學式」教材製作的程式碼教學動畫：用營養標示情境說明元素鈉與化合物食鹽的換算。</p>
+    <video controls playsinline preload="metadata" poster="review_frame_34s.jpg">
+      <source src="w03_mole_salt_animation.mp4" type="video/mp4">
+      您的瀏覽器不支援影片播放。
+    </video>
+    <div class="grid">
+      <div class="card"><b>核心觀念</b><br><span class="warn">鈉 Na 不是食鹽 NaCl</span>；營養標示管理的是鈉離子攝取。</div>
+      <div class="card"><b>換算橋樑</b><br>用莫耳質量：Na = 22.99 g/mol，NaCl = 58.44 g/mol。</div>
+      <div class="card"><b>關鍵公式</b><br><span class="formula">Na × 2.54 ≈ NaCl</span></div>
+      <div class="card"><b>錨點答案</b><br>1800 mg 鈉約等於 <b>4.6 g 食鹽</b>，約為 2400 mg 鈉上限的 75%。</div>
+    </div>
+    <p class="downloads"><a href="w03_mole_salt_animation.mp4">下載 MP4</a><a href="w03_mole_salt_animation.srt">下載 SRT 字幕</a><a href="storyboard.json">分鏡 JSON</a></p>
+    <p class="meta">來源：<a href="../%E6%96%B0W03_%E8%8E%AB%E8%80%B3%E8%88%87%E5%8C%96%E5%AD%B8%E5%BC%8F.html">普通化學 第 3 週：莫耳與化學式</a>。製作方式參考 code-animation-explainer 的「腳本 → 分鏡 → 程式碼渲染 → 配音字幕 → 檢查」流程。</p>
+  </section>
+</main>
+</body>
+</html>
