@@ -1,0 +1,146 @@
+{
+ "title": "鹽的天氣地圖：兩條藍線與一年 303 次跨線",
+ "style": "math-dark",
+ "duration_sec": 180,
+ "fps": "time-driven (rAF)",
+ "hero_elements": [
+  "T–RH 相圖座標系（全片貫穿）",
+  "兩條藍色相邊界線"
+ ],
+ "facts": {
+  "triple_point": "32.38 °C / 87.42 %RH",
+  "records": 53779,
+  "period": "2021-08-09 ~ 2022-09-22",
+  "crossings": {
+   "dehydration": 145,
+   "hydration": 144,
+   "deliquescence": 7,
+   "recrystallization": 7
+  },
+  "upper_line_dates": [
+   "2022-04-24",
+   "2022-07-04~05",
+   "2022-07-10~12"
+  ],
+  "micro_RH_max": 66.9,
+  "micro_crossings": 0,
+  "source_model": "Steiger & Asmussen (2008) GCA 72, 4291-4306 (Pitzer model, mmc2.xls VBA port)",
+  "source_data": "黃土水《南國（水牛群像）》IoT 監測 (sampled 708/53779 points per sensor)"
+ },
+ "scenes": [
+  {
+   "id": "S1",
+   "t": [
+    0,
+    16
+   ],
+   "role": "hook",
+   "shot": "wide",
+   "narr": "天氣地圖開場",
+   "visual": "深底座標系畫出",
+   "key_motion": "axes draw-on",
+   "check_times": [
+    8,
+    14
+   ]
+  },
+  {
+   "id": "S2",
+   "t": [
+    16,
+    48
+   ],
+   "role": "concept",
+   "shot": "wide",
+   "narr": "兩條藍線與三相點",
+   "visual": "潮解線/變身線 draw-on, 三區上色",
+   "key_motion": "line draw + zone fill",
+   "check_times": [
+    25,
+    40,
+    46
+   ]
+  },
+  {
+   "id": "S3",
+   "t": [
+    48,
+    78
+   ],
+   "role": "mechanism",
+   "shot": "medium",
+   "narr": "一日迴圈與變身",
+   "visual": "紅色軌跡走兩圈, ⚡閃光計數",
+   "key_motion": "moving dot with trail",
+   "check_times": [
+    56,
+    66,
+    74
+   ]
+  },
+  {
+   "id": "S4",
+   "t": [
+    78,
+    108
+   ],
+   "role": "evidence",
+   "shot": "wide",
+   "narr": "53,779 筆真實資料",
+   "visual": "708 抽樣點依序落點, 依相區上色",
+   "key_motion": "staggered pop-in",
+   "check_times": [
+    90,
+    104
+   ]
+  },
+  {
+   "id": "S5",
+   "t": [
+    108,
+    140
+   ],
+   "role": "evidence",
+   "shot": "close(panel)",
+   "narr": "289+14 次跨線統計與日期",
+   "visual": "計數器 + 14 事件點閃爍",
+   "key_motion": "count-up",
+   "check_times": [
+    114,
+    122,
+    130
+   ]
+  },
+  {
+   "id": "S6",
+   "t": [
+    140,
+    166
+   ],
+   "role": "contrast",
+   "shot": "wide",
+   "narr": "微環境 0 次跨線",
+   "visual": "紫色方點落入無水區, 0次徽章",
+   "key_motion": "staggered pop-in",
+   "check_times": [
+    150,
+    160
+   ]
+  },
+  {
+   "id": "S7",
+   "t": [
+    166,
+    180
+   ],
+   "role": "outro",
+   "shot": "card",
+   "narr": "結論與出處",
+   "visual": "結語卡",
+   "key_motion": "fade veil",
+   "check_times": [
+    172
+   ]
+  }
+ ]
+}
