@@ -148,7 +148,7 @@ function draw(t){
      cx.strokeStyle=TK.yellow;cx.lineWidth=4;cx.globalAlpha=a*g;cx.stroke();cx.globalAlpha=1;
      txt(lab,X(pt[0])+22,Y(pt[1])-16,26,TK.yellow,"left",true,a*g);}}
    const nCross=u<=0?0:Math.floor(u)*2+(((u%1)>=.25)?1:0)+(((u%1)>=.8)?1:0);
-   txt("變身次數："+nCross,X(33),Y(60),28,TK.yellow,"left",true,a);
+   txt("變身次數："+nCross,X(33),Y(52),28,TK.yellow,"left",true,a);
    txt("清晨",X(P1[0])-14,Y(P1[1])-16,22,TK.ink,"right",false,a);
    txt("下午",X(P3[0])+16,Y(P3[1])+8,22,TK.ink,"left",false,a);
    cx.restore();}}
@@ -187,7 +187,7 @@ function draw(t){
    cx.fillRect(X(d[0])-s/2,Y(d[1])-s/2,s,s);cx.globalAlpha=1;}
   const a6=M.eo(M.ph(t,152,155));
   txt("展示櫃微環境 · RH 最高 66.9%",X(25.5),Y(27.5),25,TK.violet,"left",true,a6);
-  if(a6>0){const bx2=X(10.6),by2=Y(68);cx.save();cx.globalAlpha=a6;
+  if(a6>0){const bx2=X(10.6),by2=Y(60);cx.save();cx.globalAlpha=a6;
    cx.strokeStyle=TK.green;cx.lineWidth=3;rrect(bx2,by2,320,64,12);cx.stroke();
    txt("✓ 全年 0 次跨線",bx2+160,by2+43,30,TK.green,"center",true,a6);cx.restore();}
  }
