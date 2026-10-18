@@ -221,5 +221,7 @@ function tick(now){if(!playing)return;if(last==null)last=now;
 playB.onclick=function(){if(t>=DUR)t=0;playing=!playing;playB.textContent=playing?"⏸ 暫停":"▶ 播放";last=null;if(playing)requestAnimationFrame(tick);};
 seek.oninput=function(){t=parseFloat(seek.value);last=null;playing=false;playB.textContent="▶ 播放";sync();};
 sync();
+/* 開啟即自動播放（無聲動畫，瀏覽器允許） */
+playing=true;playB.textContent="⏸ 暫停";requestAnimationFrame(tick);
 </script>
 </body></html>
