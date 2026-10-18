@@ -221,6 +221,13 @@ function tick(now){if(!playing)return;if(last==null)last=now;
 playB.onclick=function(){if(t>=DUR)t=0;playing=!playing;playB.textContent=playing?"⏸ 暫停":"▶ 播放";last=null;if(playing)requestAnimationFrame(tick);};
 seek.oninput=function(){t=parseFloat(seek.value);last=null;playing=false;playB.textContent="▶ 播放";sync();};
 sync();
+/* 版面自適應: 讓 畫面+字幕+控制列 一次進入視窗, 不需捲動 */
+function fitLayout(){
+ var avail=window.innerHeight-300;              /* 預留標題/控制列/分幕鈕 */
+ var w=Math.min(1100,Math.max(480,avail/0.5625));
+ document.querySelector(".wrap").style.maxWidth=w+"px";
+}
+window.addEventListener("resize",fitLayout);fitLayout();
 /* 開啟即自動播放（無聲動畫，瀏覽器允許） */
 playing=true;playB.textContent="⏸ 暫停";requestAnimationFrame(tick);
 </script>
