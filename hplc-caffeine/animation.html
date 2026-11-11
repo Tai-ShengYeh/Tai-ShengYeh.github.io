@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HPLC 咖啡因定量 · 語音動畫</title>
+<style>
+:root{
+  --bg:#fbfaf7; --panel:#fff; --ink:#1d2430; --ink2:#4d5866; --ink3:#8b96a5;
+  --line:#e8e6e1; --line2:#cfd4da; --brand:#c0392b; --blue:#2563eb;
+  --ok:#0f9d58; --warn:#d93025; --soft:#f4f2ee; --track:#e67e22; --trackSoft:#e67e2233; --range:#0f9d5822;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#12151a; --panel:#1a1f27; --ink:#e9edf3; --ink2:#aab4c2; --ink3:#6e7987;
+         --line:#252b34; --line2:#3a424e; --brand:#ff7a6b; --blue:#6ba5ff;
+         --ok:#41c98a; --warn:#ff7a70; --soft:#1f242c; --track:#ffa04d; --trackSoft:#ffa04d33; --range:#41c98a22; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.6}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+nav{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:15px;margin-bottom:6px}
+nav a{color:var(--blue);text-decoration:none}
+nav a:hover{text-decoration:underline}
+h1{font-size:clamp(22px,3.6vw,32px);margin:6px 0 2px}
+.lede{color:var(--ink2);margin:0 0 12px;font-size:15.5px}
+.stage{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.stage svg{display:block;width:100%;height:auto}
+.stage:fullscreen{display:flex;align-items:center;justify-content:center;background:var(--panel);border:0;border-radius:0}
+.stage:fullscreen svg{width:min(100vw,177.78vh);height:auto}
+.cap{position:absolute;left:4%;right:4%;bottom:3%;text-align:center;pointer-events:none}
+.cap span{display:inline-block;background:#000000b8;color:#fff;border-radius:8px;padding:4px 12px;
+  font-size:clamp(13px,2.1vw,19px);line-height:1.5}
+.cap.off,.cap.hide{display:none}
+.gate{margin-top:10px;background:var(--panel);border:2px solid var(--track);border-radius:12px;
+  padding:12px 14px;box-shadow:0 6px 20px #0002;display:none}
+.gate.show{display:block}
+.gate h2{font-size:clamp(15px,2.2vw,19px);margin:0 0 8px}
+.gate .opts{display:flex;flex-wrap:wrap;gap:8px}
+.gate button.opt{flex:1 1 200px;text-align:left;font:inherit;font-size:clamp(13px,1.9vw,16px);padding:8px 12px;border-radius:9px;
+  border:1px solid var(--line2);background:var(--soft);color:var(--ink);cursor:pointer}
+.gate button.opt:hover,.gate button.opt:focus-visible{border-color:var(--track);outline:none}
+.gate button.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--panel))}
+.gate button.opt.wrong{border-color:var(--warn);opacity:.75}
+.gate .fb{margin:8px 0 0;font-size:clamp(13px,1.9vw,15.5px);min-height:1.5em}
+.gate .fb.ok{color:var(--ok)} .gate .fb.hint{color:var(--warn)}
+.gate .go{margin-top:8px;font:inherit;font-weight:700;padding:7px 18px;border-radius:9px;border:0;background:var(--track);color:#fff;cursor:pointer;display:none}
+.gate .go.show{display:inline-block}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0}
+.bar button,.bar select{font:inherit;font-size:15px;padding:6px 12px;border-radius:9px;border:1px solid var(--line2);background:var(--panel);color:var(--ink);cursor:pointer}
+.bar button.primary{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700;min-width:84px}
+.bar input[type=range]{flex:1 1 220px;accent-color:var(--brand)}
+.bar .time{font-variant-numeric:tabular-nums;color:var(--ink2);font-size:14px;min-width:92px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.chips button{font:inherit;font-size:13.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--line2);background:var(--panel);color:var(--ink2);cursor:pointer}
+.chips button.on{border-color:var(--track);color:var(--ink);background:var(--trackSoft);font-weight:700}
+.chips button .q{color:var(--track);font-weight:700}
+.status{color:var(--ink2);font-size:14px;margin:0 0 10px}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;font-weight:700}
+details p,details li{font-size:15px;color:var(--ink2)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;margin:8px 0}
+th,td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:right}
+th:first-child,td:first-child{text-align:left}
+.keys{font-size:13.5px;color:var(--ink3)}
+kbd{border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:0 5px;font-size:12.5px;background:var(--soft)}
+footer{font-size:13px;color:var(--ink3);margin:18px 0 30px}
+@media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a href="index.html">← HPLC 咖啡因定量 入門版</a>
+  <a href="index.html#s1">互動練習：五步驟</a>
+  <a href="advanced.html">進階版</a>
+</nav>
+<h1>從峰到濃度：咖啡因定量語音動畫</h1>
+<p class="lede">6 幕、約 2 分半鐘，有 3 個停格提問。題目出現時先自己想，再選答案；答錯會先給提示。</p>
+
+<div class="stage" id="stage">
+  <svg id="svg" viewBox="0 0 960 540" role="img" aria-labelledby="svgTitle">
+    <title id="svgTitle">咖啡因定量動畫畫面</title>
+    <g id="scene"></g>
+  </svg>
+  <div class="cap" id="cap" aria-hidden="true"><span id="capText"></span></div>
+</div>
+<div class="gate" id="gate" role="dialog" aria-modal="false" aria-labelledby="gateQ">
+  <h2 id="gateQ"></h2>
+  <div class="opts" id="gateOpts"></div>
+  <p class="fb" id="gateFb" aria-live="polite"></p>
+  <button class="go" id="gateGo">繼續 ▶</button>
+</div>
+
+<div class="bar">
+  <button class="primary" id="play" aria-label="播放">▶ 播放</button>
+  <button id="prev" aria-label="上一幕">⏮</button>
+  <button id="next" aria-label="下一幕">⏭</button>
+  <input type="range" id="seek" min="0" step="0.05" value="0" aria-label="播放進度">
+  <span class="time" id="time">0:00 / 0:00</span>
+  <select id="speed" aria-label="播放速度">
+    <option value="0.8">0.8×</option><option value="1" selected>1×</option><option value="1.25">1.25×</option>
+  </select>
+  <button id="ccBtn" aria-pressed="true" aria-label="字幕開關">字幕 開</button>
+  <button id="fsBtn" aria-label="全螢幕">⛶ 全螢幕</button>
+</div>
+<div class="chips" id="chips" aria-label="幕次"></div>
+<p class="status" id="status" aria-live="polite">按「播放」開始。</p>
+<p class="keys">鍵盤：<kbd>空白鍵</kbd> 播放／暫停　<kbd>←</kbd><kbd>→</kbd> 上一幕／下一幕　<kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 選答案　<kbd>Enter</kbd> 繼續　<kbd>C</kbd> 字幕</p>
+
+<details>
+  <summary>逐字稿（旁白全文）</summary>
+  <ol id="transcript"></ol>
+</details>
+<details>
+  <summary>文字版數據表</summary>
+  <p>標準品與未知樣品為 Shimadzu LabSolutions 實測層析圖（280 nm，注射 10 µL）的峰面積；檢量線以六個標準品做未加權線性迴歸。</p>
+  <table id="dataTable"><thead><tr><th>溶液</th><th>濃度 (mg/L)</th><th>滯留時間 (分)</th><th>峰面積 (×10⁶ µV·s)</th></tr></thead><tbody></tbody></table>
+  <p id="calText"></p>
+  <p>第 5–6 幕的「樣品 X」為<strong>教學模擬數據</strong>：假設原樣 320 mg/L，未稀釋時峰面積約 15.4 ×10⁶ µV·s，超出校正範圍；稀釋為五分之一後測得 64 mg/L。</p>
+  <p>單位：稀水溶液中 1 ppm ≈ 1 mg/L，入門版網頁使用的 ppm 與本動畫的 mg/L 數值相同。</p>
+</details>
+<footer>
+  數據來源：Shimadzu LabSolutions 實測層析圖（標準品 0–200 mg/L、4 個未知樣品）。樣品 X 為教學模擬數據。<br>
+  配音：ElevenLabs（聲音 Door Chow，模型 eleven_v3），Voice generated with ElevenLabs。腳本與數值經教師審定；動畫以程式即時繪製。
+</footer>
+</div>
+
+<script src="animation/data.js"></script>
+<script>
+"use strict";
+const META = {"scenes": [{"id": "s1", "title": "這杯有多少咖啡因？", "narration": "先想一想：這杯飲料裡，有多少咖啡因？液相層析儀不會直接告訴你濃度。它只給你一張圖：訊號隨著時間變化。這張圖，叫做層析圖。", "tts": "先想一想：這杯飲料裡，有多少咖啡因？液相層析儀，不會直接告訴你濃度。它只給你一張圖：訊號隨著時間變化。這張圖，叫做層析圖。", "pause": false, "cues": [0, 4.06, 7.33, 12.04]}, {"id": "s2", "title": "滯留時間與空白", "narration": "這是 50 mg/L 的咖啡因標準品。大約在 4.6 分鐘出現一個峰，這叫做滯留時間。再看空白溶液：在同一個時間，沒有峰。表示溶劑本身不會在這裡干擾我們。現在請你預測：濃度從 50 變成 100 mg/L，峰面積會怎樣？", "tts": "這是每公升五十毫克的咖啡因標準品。大約在四點六分鐘，出現一個峰，這叫做滯留時間。再看空白溶液：在同一個時間，沒有峰。表示溶劑本身，不會在這裡干擾我們。現在請你預測：濃度從每公升五十毫克，變成每公升一百毫克，峰面積會怎樣？", "pause": true, "cues": [0, 4.25, 10.55, 15.41, 19.83]}, {"id": "s3", "title": "看峰面積", "narration": "答案是：峰面積大約變成兩倍。定量的時候，我們看的是峰底下這塊面積。如果峰變寬，峰高會下降，但面積幾乎不變，因為分子的總數沒有改變。", "tts": "答案是：峰面積，大約變成兩倍。定量的時候，我們看的是峰底下這塊面積。如果峰變寬，峰高會下降，但是面積幾乎不變，因為分子的總數沒有改變。", "pause": false, "cues": [0, 4.57, 9.43]}, {"id": "s4", "title": "峰變成點：檢量線", "narration": "每一個標準品，都可以變成圖上的一個點：橫向是濃度，縱向是峰面積。六個點排成一條直線，這就是檢量線。這些點和直線貼得非常近。換你試試：未知樣品的峰面積已經標在左邊，請找出它的濃度。", "tts": "每一個標準品，都可以變成圖上的一個點：橫向是濃度，縱向是峰面積。六個點排成一條直線，這就是檢量線。這些點和直線，貼得非常近。換你試試：未知樣品的峰面積，已經標在左邊，請找出它的濃度。", "pause": true, "cues": [0, 8.37, 12.66, 16.76]}, {"id": "s5", "title": "超出校正範圍", "narration": "我們來看答案。從這個峰面積往右走，碰到檢量線，再往下讀濃度，大約是 93 mg/L。再看另一個樣品：它的峰面積，比最高的標準品還大。檢量線只在 0 到 200 mg/L 之間驗證過，超出這個範圍，我們不知道它還是不是直線。這時候該怎麼做？", "tts": "我們來看答案。從這個峰面積往右走，碰到檢量線，再往下讀濃度，大約是每公升九十三毫克。再看另一個樣品：它的峰面積，比最高的標準品還大。檢量線只在每公升零到兩百毫克之間驗證過，超出這個範圍，我們不知道它還是不是直線。這時候，該怎麼做？", "pause": true, "cues": [0, 1.74, 12.13, 18.49, 29.15]}, {"id": "s6", "title": "稀釋重測，再換算", "narration": "把樣品稀釋成原來的五分之一，再測一次，得到 64 mg/L，落在檢量線範圍內。乘回稀釋倍數 5，原樣是 320 mg/L。標準品、峰面積、檢量線、測樣品、換算回原樣，這就是儀器定量的五個步驟。", "tts": "把樣品稀釋成原來的五分之一，再測一次，得到每公升六十四毫克，落在檢量線範圍內。乘回稀釋倍數五，原樣是每公升三百二十毫克。標準品、峰面積、檢量線、測樣品、換算回原樣，這就是儀器定量的五個步驟。", "pause": false, "cues": [0, 10.46, 17.21]}], "durations": [14.392, 29.848, 17.544, 24.372, 30.804, 27.344]};
+const H = window.HPLC;
+const SC = META.scenes;
+const TAIL = 1.0;                         // seconds after narration before the scene ends
+SC.forEach((s,i)=>{ s.dur = META.durations[i] + TAIL; });
+let acc = 0; SC.forEach(s=>{ s.start = acc; acc += s.dur; });
+const TOTAL = acc;
+
+/* ---------- sentence cues: split narration, time by weighted tts length ---------- */
+function splitSent(txt){ return txt.match(/[^。？！]+[。？！]?/g).map(s=>s.trim()).filter(Boolean); }
+function weight(s){ let w=0; for(const ch of s){ if('，、：；'.includes(ch)) w+=1.6; else if('。？！'.includes(ch)) w+=2.4; else if(ch.trim()) w+=1; } return w; }
+SC.forEach((s,i)=>{
+  s.sent = splitSent(s.narration);
+  const ts = splitSent(s.tts);
+  const ws = (ts.length===s.sent.length ? ts : s.sent).map(weight);
+  const tot = ws.reduce((a,b)=>a+b,0), audio = META.durations[i];
+  if(s.cues && s.cues.length===s.sent.length) s.cue = s.cues.slice();      // measured sentence starts
+  else { let t=0; s.cue = ws.map(w=>{ const c=t; t += w/tot*audio; return c; }); }
+  s.cue.push(audio);
+});
+
+/* ---------- data ---------- */
+const STD = ['std-0','std-25','std-50','std-100','std-150','std-200'].map(k=>({k,...H.traces[k]}));
+const S1 = H.traces['sample-1'];
+const SLOPE = H.slope, ICPT = H.intercept;
+const A = c => (SLOPE*c + ICPT)/1e6;          // area (×1e6) from concentration
+const C = a => (a*1e6 - ICPT)/SLOPE;           // concentration from area (×1e6)
+const X_AREA = A(320), X_DIL = A(64);
+const UNK = S1.area/1e6, UNK_C = C(UNK);
+
+/* ---------- helpers ---------- */
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const ease=x=>{x=clamp(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;};
+const seg=(t,a,b)=>ease((t-a)/(b-a));
+const lerp=(a,b,p)=>a+(b-a)*p;
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let COL={};
+function readColors(){ COL={ink:css('--ink'),ink2:css('--ink2'),ink3:css('--ink3'),line:css('--line'),line2:css('--line2'),
+  brand:css('--brand'),blue:css('--blue'),ok:css('--ok'),warn:css('--warn'),soft:css('--soft'),track:css('--track'),
+  trackSoft:css('--trackSoft'),range:css('--range'),panel:css('--panel')}; }
+readColors(); matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{readColors();render(true);});
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function txt(x,y,s,o={}){ return `<text x="${x}" y="${y}" font-size="${o.size||18}" fill="${o.fill||COL.ink}" text-anchor="${o.anchor||'start'}" font-weight="${o.weight||400}" opacity="${o.op??1}">${esc(s)}</text>`; }
+function line(x1,y1,x2,y2,o={}){ return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${o.stroke||COL.ink2}" stroke-width="${o.w||1.5}" ${o.dash?`stroke-dasharray="${o.dash}"`:''} opacity="${o.op??1}"/>`; }
+
+/* chromatogram axes: returns mapper + svg */
+function chromAxes(box, ymax, o={}){
+  const [x0,y0,w,h]=box, t0=4.0, t1=5.3;
+  const X=t=>x0+(t-t0)/(t1-t0)*w, Y=v=>y0+h-(v/ymax)*h;
+  let s=line(x0,y0+h,x0+w,y0+h,{stroke:COL.ink3})+line(x0,y0,x0,y0+h,{stroke:COL.ink3});
+  for(const t of [4.2,4.6,5.0]){ s+=line(X(t),y0+h,X(t),y0+h+5,{stroke:COL.ink3})+txt(X(t),y0+h+22,t.toFixed(1),{size:o.fs||15,fill:COL.ink2,anchor:'middle'}); }
+  s+=txt(x0+w/2,y0+h+44,'時間（分）',{size:o.fs||15,fill:COL.ink2,anchor:'middle'});
+  if(!o.noY) s+=`<text transform="translate(${x0-16},${y0+h/2}) rotate(-90)" font-size="${o.fs||15}" fill="${COL.ink2}" text-anchor="middle">訊號</text>`;
+  return {X,Y,svg:s,t0,t1};
+}
+function tracePath(tr, ax, p=1, scale=1){
+  const pts=tr.pts, n=Math.max(2,Math.round(pts.length*clamp(p)));
+  let d=''; for(let i=0;i<n;i++){ const [t,v]=pts[i]; d+=(i?'L':'M')+ax.X(t).toFixed(1)+','+ax.Y(Math.max(0,v*scale)).toFixed(1); }
+  return d;
+}
+function traceFill(tr, ax, lo=4.45, hi=4.95){
+  const pts=tr.pts.filter(([t])=>t>=lo&&t<=hi);
+  let d=`M${ax.X(pts[0][0]).toFixed(1)},${ax.Y(0)}`;
+  for(const [t,v] of pts) d+=`L${ax.X(t).toFixed(1)},${ax.Y(Math.max(0,v)).toFixed(1)}`;
+  return d+`L${ax.X(pts[pts.length-1][0]).toFixed(1)},${ax.Y(0)}Z`;
+}
+/* calibration axes */
+function calAxes(box, amax, o={}){
+  const [x0,y0,w,h]=box, cmax=o.cmax||400;
+  const X=c=>x0+c/cmax*w, Y=a=>y0+h-a/amax*h;
+  let s=line(x0,y0+h,x0+w,y0+h,{stroke:COL.ink3})+line(x0,y0,x0,y0+h,{stroke:COL.ink3});
+  for(let c=0;c<=cmax;c+=(cmax>250?100:50)){ s+=line(X(c),y0+h,X(c),y0+h+5,{stroke:COL.ink3})+txt(X(c),y0+h+22,c,{size:15,fill:COL.ink2,anchor:'middle'}); }
+  const step = amax>12?4:2;
+  for(let a=0;a<=amax+0.01;a+=step){ s+=line(x0-5,Y(a),x0,Y(a),{stroke:COL.ink3})+txt(x0-9,Y(a)+5,a,{size:14,fill:COL.ink2,anchor:'end'}); }
+  s+=txt(x0+w/2,y0+h+44,'濃度（mg/L）',{size:15,fill:COL.ink2,anchor:'middle'});
+  s+=`<text transform="translate(${x0-44},${y0+h/2}) rotate(-90)" font-size="15" fill="${COL.ink2}" text-anchor="middle">峰面積（×10⁶ µV·s）</text>`;
+  return {X,Y,svg:s};
+}
+function title(s){ return txt(480,38,s,{size:24,weight:700,anchor:'middle'}); }
+function badge(x,y,s,color){ const w=s.length*15+24; return `<rect x="${x}" y="${y-20}" width="${w}" height="28" rx="14" fill="${color}" opacity=".16"/>`+txt(x+12,y,s,{size:15,fill:color,weight:700}); }
+
+/* ---------- scenes ---------- */
+const DRAW = [
+/* S1 */ (t,c)=>{
+  let s=title('這杯飲料裡，有多少咖啡因？');
+  const a=seg(t,0,1.2);
+  // cup
+  s+=`<g opacity="${a}"><path d="M70,200 L170,200 L158,330 L82,330 Z" fill="#6f4e37"/><path d="M70,200 L170,200 L166,226 L74,226 Z" fill="#a47551"/>
+      <path d="M170,230 q32,6 26,40 q-6,24 -32,22" fill="none" stroke="#6f4e37" stroke-width="8"/></g>`;
+  s+=txt(120,365,'飲料樣品',{size:16,fill:COL.ink2,anchor:'middle',op:a});
+  const b=seg(t,c[1]-0.3,c[1]+1.0);
+  s+=`<g opacity="${b}">`+line(215,265,262,265,{stroke:COL.ink3,w:3})+`<path d="M262,257 L276,265 L262,273Z" fill="${COL.ink3}"/>
+     <rect x="290" y="190" width="170" height="150" rx="12" fill="${COL.soft}" stroke="${COL.line2}"/>
+     <path d="M318,215 v90" stroke="${COL.ink2}" stroke-width="10" stroke-linecap="round"/>
+     ${txt(395,240,'HPLC',{size:22,weight:700,anchor:'middle'})}${txt(395,268,'液相層析儀',{size:15,fill:COL.ink2,anchor:'middle'})}
+     ${txt(395,320,'≠ 直接顯示濃度',{size:15,fill:COL.warn,anchor:'middle'})}</g>`;
+  const d=seg(t,c[2]-0.3,c[2]+0.8);
+  if(d>0){
+    s+=`<g opacity="${d}">`+line(470,265,515,265,{stroke:COL.ink3,w:3})+`<path d="M515,257 L529,265 L515,273Z" fill="${COL.ink3}"/>`;
+    s+=`<rect x="540" y="110" width="390" height="320" rx="12" fill="${COL.panel}" stroke="${COL.line2}"/>`;
+    const ax=chromAxes([585,140,320,220],280000,{fs:13});
+    s+=ax.svg+`<path d="${tracePath(S1,ax,seg(t,c[2],c[3]))}" fill="none" stroke="${COL.ink}" stroke-width="2"/></g>`;
+  }
+  const e=seg(t,c[3],c[3]+0.8);
+  s+=`<g opacity="${e}">`+badge(650,470,'層析圖（chromatogram）',COL.blue)+`</g>`;
+  return s;
+},
+/* S2 */ (t,c)=>{
+  let s=title('滯留時間與空白');
+  const ax=chromAxes([110,80,740,330],460000);
+  s+=ax.svg;
+  const p=seg(t,0.2,c[1]);
+  s+=`<path d="${tracePath(STD[2],ax,p)}" fill="none" stroke="${COL.track}" stroke-width="3"/>`;
+  s+=txt(ax.X(4.72)+14,ax.Y(205000),'50 mg/L 標準品',{size:17,fill:COL.track,weight:700,op:seg(t,1,2)});
+  const r=seg(t,c[1],c[1]+1); const rx=ax.X(STD[2].rt);
+  s+=line(rx,ax.Y(0),rx,lerp(ax.Y(0),ax.Y(440000),r),{stroke:COL.ink2,dash:'6 6'});
+  s+=txt(rx,ax.Y(440000)-6,`滯留時間 ≈ ${STD[2].rt.toFixed(2)} 分`,{size:17,anchor:'middle',weight:700,op:r});
+  const b=seg(t,c[2],c[2]+2.2);
+  // blank: drawn as a separate lane just above the axis so it is not hidden by the axis line
+  const BL=ax.Y(0)-26;
+  if(b>0){ const pts=STD[0].pts, n=Math.max(2,Math.round(pts.length*b)); let d='';
+    for(let i=0;i<n;i++){ const [tt,v]=pts[i]; d+=(i?'L':'M')+ax.X(tt).toFixed(1)+','+(BL-v/460000*330).toFixed(1); }
+    s+=`<path d="${d}" fill="none" stroke="${COL.ink2}" stroke-width="3"/>`;
+    s+=txt(ax.X(4.98),BL-8,'空白（0 mg/L，為看清楚往上平移）',{size:16,fill:COL.ink2,weight:700,op:b}); }
+  const q=seg(t,c[3],c[3]+0.8);
+  if(q>0){ s+=`<rect x="${rx-34}" y="${BL-18}" width="68" height="30" rx="6" fill="${COL.range}" stroke="${COL.ok}" opacity="${q}"/>`;
+    s+=txt(ax.X(4.93),ax.Y(150000),'空白在 4.6 分沒有峰',{size:16,fill:COL.ok,weight:700,op:q});
+    s+=txt(ax.X(4.93),ax.Y(150000)+24,'→ 溶劑不在這裡干擾',{size:16,fill:COL.ok,weight:700,op:q}); }
+  const k=seg(t,c[4],c[4]+0.8);
+  s+=`<g opacity="${k}">`+badge(560,140,'預測：100 mg/L 的峰面積會怎樣？',COL.track)+`</g>`;
+  return s;
+},
+/* S3 */ (t,c)=>{
+  let s=title('看峰面積，不只看峰高');
+  const wide=seg(t,c[2]-0.2,c[2]+0.8);
+  const ax=chromAxes([110,80,500,330],460000);
+  s+=`<g opacity="${1-wide}">`+ax.svg;
+  const a=seg(t,0,1.2), b=seg(t,0.8,2.6);
+  s+=`<path d="${traceFill(STD[2],ax)}" fill="${COL.trackSoft}" opacity="${a}"/><path d="${tracePath(STD[2],ax)}" fill="none" stroke="${COL.track}" stroke-width="2.5" opacity="${a}"/>`;
+  s+=`<path d="${traceFill(STD[3],ax)}" fill="${COL.track}" opacity="${0.35*b}"/><path d="${tracePath(STD[3],ax,b)}" fill="none" stroke="${COL.track}" stroke-width="3"/>`;
+  s+=txt(650,170,'50 mg/L',{size:17,fill:COL.ink2,op:a})+txt(650,198,`面積 ${(STD[2].area/1e6).toFixed(2)} ×10⁶`,{size:20,weight:700,op:a});
+  s+=txt(650,250,'100 mg/L',{size:17,fill:COL.ink2,op:b})+txt(650,278,`面積 ${(STD[3].area/1e6).toFixed(2)} ×10⁶`,{size:20,weight:700,op:b});
+  const r=seg(t,c[0]+2.6,c[0]+3.6);
+  s+=txt(650,330,`≈ ${(STD[3].area/STD[2].area).toFixed(1)} 倍`,{size:28,weight:700,fill:COL.track,op:r});
+  s+=`</g>`;
+  if(wide>0){
+    // schematic: same area, broader peak
+    const x0=170,y0=110,w=620,h=300, base=y0+h;
+    const sig=lerp(0.035,0.075,seg(t,c[2]+0.6,c[2]+3.2)), mu=4.65, hgt=0.035/sig;
+    const X=tt=>x0+(tt-4.3)/0.7*w;
+    let dn=`M${X(4.3)},${base}`, dw=dn;
+    for(let i=0;i<=140;i++){ const tt=4.3+0.7*i/140; dn+=`L${X(tt).toFixed(1)},${(base-h*0.9*Math.exp(-((tt-mu)**2)/(2*0.035**2))).toFixed(1)}`;
+      dw+=`L${X(tt).toFixed(1)},${(base-h*0.9*hgt*Math.exp(-((tt-mu)**2)/(2*sig**2))).toFixed(1)}`; }
+    s+=`<g opacity="${wide}">`+line(x0,base,x0+w,base,{stroke:COL.ink3});
+    s+=`<path d="${dn}" fill="none" stroke="${COL.ink3}" stroke-width="2" stroke-dasharray="6 5"/>`;
+    s+=`<path d="${dw}L${X(5.0)},${base}Z" fill="${COL.trackSoft}" stroke="${COL.track}" stroke-width="3"/>`;
+    s+=txt(x0+w-10,y0+30,'示意圖',{size:14,fill:COL.ink3,anchor:'end'});
+    s+=txt(x0+w-10,y0+80,`峰高 ${Math.round(hgt*100)}%`,{size:22,weight:700,anchor:'end',fill:COL.warn});
+    s+=txt(x0+w-10,y0+116,'面積 100%',{size:22,weight:700,anchor:'end',fill:COL.ok});
+    const z=seg(t,c[2]+4,c[2]+4.8);
+    s+=`<g opacity="${z}">`+badge(250,470,'分子總數沒變 → 面積不變 → 定量看面積',COL.ok)+`</g></g>`;
+  }
+  return s;
+},
+/* S4 */ (t,c)=>{
+  let s=title('每個標準品 → 檢量線上的一個點');
+  const cx=chromAxes([70,90,340,300],900000,{fs:13});
+  s+=cx.svg;
+  const ca=calAxes([530,80,380,320],10.5,{cmax:220});
+  s+=ca.svg;
+  const t0=0.4, t1=c[1]; const step=(t1-t0)/6;
+  STD.forEach((sd,i)=>{
+    const st=t0+i*step, p=seg(t,st,st+step*0.8);
+    const active = t>=st && t<st+step;
+    s+=`<path d="${tracePath(sd,cx,t>=st?1:0)}" fill="none" stroke="${active?COL.track:COL.ink3}" stroke-width="${active?3:1.4}" opacity="${t>=st?1:0}"/>`;
+    if(t>=st){
+      const peakX=cx.X(sd.rt||4.65), peakY=cx.Y(Math.max(...sd.pts.map(q=>q[1])));
+      const px=ca.X(sd.conc), py=ca.Y(sd.area/1e6);
+      const x=lerp(peakX,px,p), y=lerp(peakY,py,p)-Math.sin(p*Math.PI)*60;
+      s+=`<circle cx="${x}" cy="${y}" r="${p<1?8:6.5}" fill="${p<1?COL.track:COL.ink}"/>`;
+      if(active) s+=txt(px+12,py-10,`${sd.conc} mg/L`,{size:14,fill:COL.track,weight:700});
+    }
+  });
+  const L=seg(t,c[1],c[1]+1.4);
+  if(L>0){ const xe=lerp(0,210,L); s+=line(ca.X(0),ca.Y(A(0)/1)+0,ca.X(xe),ca.Y(A(xe)),{stroke:COL.brand,w:2.5}); }
+  const r=seg(t,c[2],c[2]+0.8);
+  s+=`<g opacity="${r}"><rect x="560" y="92" width="200" height="54" rx="8" fill="${COL.soft}" stroke="${COL.line2}"/>`+
+     txt(572,114,`面積 = ${(SLOPE/1e6).toFixed(4)}×10⁶ × 濃度 ${ICPT<0?'−':'+'} ${Math.abs(ICPT/1e6).toFixed(2)}×10⁶`,{size:11.5,fill:COL.ink2})+
+     txt(572,138,`R² = ${H.r2.toFixed(4)}`,{size:17,weight:700})+`</g>`;
+  const u=seg(t,c[3],c[3]+0.8);
+  if(u>0){ const uy=ca.Y(UNK);
+    s+=`<circle cx="${ca.X(0)}" cy="${uy}" r="7" fill="${COL.blue}" opacity="${u}"/>`+txt(ca.X(0)+12,uy-10,`未知樣品 ${UNK.toFixed(2)}`,{size:15,fill:COL.blue,weight:700,op:u});
+    s+=txt(ca.X(110),ca.Y(0)-12,'濃度 = ?',{size:18,fill:COL.blue,weight:700,anchor:'middle',op:u}); }
+  return s;
+},
+/* S5 */ (t,c)=>{
+  let s=title('超出校正範圍怎麼辦？');
+  const grow=seg(t,c[2],c[2]+1.2);
+  const ca=calAxes([150,80,640,320],lerp(10.5,16.5,grow),{cmax:lerp(220,400,grow)});
+  // calibrated range band
+  const rb=seg(t,c[3],c[3]+0.8);
+  if(rb>0) s+=`<rect x="${ca.X(0)}" y="80" width="${ca.X(200)-ca.X(0)}" height="320" fill="${COL.range}" opacity="${rb}"/>`+txt(ca.X(100),ca.Y(12.5),'校正範圍 0–200 mg/L',{size:16,fill:COL.ok,weight:700,anchor:'middle',op:rb});
+  s+=ca.svg;
+  STD.forEach(sd=>{ const hi = STATE.hint5 && sd.conc===200;
+    s+=`<circle cx="${ca.X(sd.conc)}" cy="${ca.Y(sd.area/1e6)}" r="${hi?10:6}" fill="${hi?COL.warn:COL.ink}"/>`;
+    if(hi) s+=txt(ca.X(200)+14,ca.Y(A(200))+5,'最高標準品 200 mg/L',{size:15,fill:COL.warn,weight:700}); });
+  s+=line(ca.X(0),ca.Y(A(0)),ca.X(200),ca.Y(A(200)),{stroke:COL.brand,w:2.5});
+  // reveal unknown answer
+  const p1=seg(t,c[1],c[1]+1.6), p2=seg(t,c[1]+1.4,c[1]+2.6), fade=1-seg(t,c[2],c[2]+0.8);
+  const uy=ca.Y(UNK), ux=ca.X(UNK_C);
+  s+=`<g opacity="${fade}">`;
+  s+=`<circle cx="${ca.X(0)}" cy="${uy}" r="7" fill="${COL.blue}"/>`;
+  s+=line(ca.X(0),uy,lerp(ca.X(0),ux,p1),uy,{stroke:COL.blue,w:2.5,dash:'7 5'});
+  if(p2>0) s+=line(ux,uy,ux,lerp(uy,ca.Y(0),p2),{stroke:COL.blue,w:2.5,dash:'7 5'});
+  s+=txt(ux,ca.Y(0)-12,`≈ ${Math.round(UNK_C)} mg/L`,{size:20,fill:COL.blue,weight:700,anchor:'middle',op:p2});
+  s+=`</g>`;
+  // out-of-range sample
+  const o=seg(t,c[2]+0.8,c[2]+1.8);
+  if(o>0){ const oy=ca.Y(X_AREA);
+    s+=`<circle cx="${ca.X(0)}" cy="${oy}" r="8" fill="${COL.track}" opacity="${o}"/>`;
+    s+=line(ca.X(0),oy,ca.X(0)+lerp(0,300,o),oy,{stroke:COL.track,w:2.5,dash:'7 5'});
+    s+=txt(ca.X(0)+14,oy-12,`樣品 X：面積 ${X_AREA.toFixed(1)} ×10⁶（教學模擬數據）`,{size:15,fill:COL.track,weight:700,op:o}); }
+  const ex=seg(t,c[3]+0.6,c[3]+2);
+  if(ex>0){ const xe=lerp(200,330,ex); s+=line(ca.X(200),ca.Y(A(200)),ca.X(xe),ca.Y(A(xe)),{stroke:COL.ink3,w:2.5,dash:'4 6'});
+    s+=txt(ca.X(xe)+8,ca.Y(A(xe))-4,'還是直線嗎？',{size:18,fill:COL.warn,weight:700,op:ex}); }
+  return s;
+},
+/* S6 */ (t,c)=>{
+  let s=title('稀釋重測，再乘回稀釋倍數');
+  const a=seg(t,0,1.2);
+  // dilution graphic
+  s+=`<g opacity="${a}">`;
+  s+=`<rect x="60" y="120" width="44" height="120" rx="6" fill="none" stroke="${COL.ink2}" stroke-width="2"/><rect x="62" y="210" width="40" height="28" fill="${COL.track}"/>`;
+  s+=txt(82,262,'1 份樣品',{size:14,anchor:'middle',fill:COL.ink2});
+  s+=txt(140,190,'+',{size:28,anchor:'middle'});
+  s+=`<rect x="176" y="120" width="44" height="120" rx="6" fill="none" stroke="${COL.ink2}" stroke-width="2"/><rect x="178" y="126" width="40" height="112" fill="${COL.blue}" opacity=".25"/>`;
+  s+=txt(198,262,'4 份溶劑',{size:14,anchor:'middle',fill:COL.ink2});
+  s+=txt(140,305,'→ 稀釋為 1/5',{size:18,anchor:'middle',weight:700,fill:COL.track});
+  s+=`</g>`;
+  const ca=calAxes([370,80,520,300],16.5,{cmax:400});
+  s+=`<rect x="${ca.X(0)}" y="80" width="${ca.X(200)-ca.X(0)}" height="300" fill="${COL.range}"/>`+ca.svg;
+  STD.forEach(sd=>{ s+=`<circle cx="${ca.X(sd.conc)}" cy="${ca.Y(sd.area/1e6)}" r="5.5" fill="${COL.ink}"/>`; });
+  s+=line(ca.X(0),ca.Y(A(0)),ca.X(200),ca.Y(A(200)),{stroke:COL.brand,w:2.5});
+  const p=seg(t,1.0,3.2), q=seg(t,2.8,4.4);
+  const dy=ca.Y(X_DIL), dx=ca.X(64);
+  s+=`<circle cx="${ca.X(0)}" cy="${dy}" r="7" fill="${COL.track}" opacity="${p}"/>`;
+  s+=line(ca.X(0),dy,lerp(ca.X(0),dx,p),dy,{stroke:COL.track,w:2.5,dash:'7 5'});
+  if(q>0) s+=line(dx,dy,dx,lerp(dy,ca.Y(0),q),{stroke:COL.track,w:2.5,dash:'7 5'});
+  s+=txt(dx+8,ca.Y(0)-12,'64 mg/L',{size:18,fill:COL.track,weight:700,op:q});
+  const e=seg(t,c[1],c[1]+1);
+  s+=`<g opacity="${e}"><rect x="40" y="340" width="300" height="64" rx="10" fill="${COL.soft}" stroke="${COL.track}" stroke-width="2"/>`+
+     txt(190,382,'64 × 5 = 320 mg/L',{size:26,weight:700,anchor:'middle'})+`</g>`;
+  const steps=['① 標準品','② 峰面積','③ 檢量線','④ 測樣品','⑤ 換算回原樣'];
+  steps.forEach((st,i)=>{ const v=seg(t,c[2]+i*0.9,c[2]+i*0.9+0.6);
+    const x=60+i*176; s+=`<g opacity="${v}"><rect x="${x}" y="448" width="160" height="40" rx="20" fill="${COL.trackSoft}" stroke="${COL.track}"/>`+txt(x+80,474,st,{size:17,weight:700,anchor:'middle'})+`</g>`; });
+  return s;
+}
+];
+
+/* ---------- gates ---------- */
+const GATES = {
+  1:{q:'濃度從 50 變成 100 mg/L，峰面積會怎樣？',
+     opts:['大約變成兩倍','幾乎不變','峰會移到別的時間出現'], ans:0,
+     ok:'對！進到偵測器的咖啡因變成兩倍，面積也約變成兩倍。按「繼續」看實測結果。',
+     hint:{1:'提示：濃度是兩倍，代表同樣體積裡的咖啡因分子也是兩倍。再想一次。',
+           2:'提示：同樣的分析條件下，滯留時間是咖啡因的「身分」，不會因濃度改變。再想一次。'}},
+  3:{q:'未知樣品的峰面積是 '+UNK.toFixed(2)+' ×10⁶ µV·s，濃度大約是多少？',
+     opts:['約 45 mg/L','約 '+Math.round(UNK_C)+' mg/L','約 150 mg/L'], ans:1,
+     ok:'對！濃度 = (面積 − 截距) ÷ 斜率 ≈ '+UNK_C.toFixed(1)+' mg/L。按「繼續」看怎麼在圖上讀出來。',
+     hint:{0:'提示：從縱軸 '+UNK.toFixed(2)+' 往右走，碰到紅色檢量線後再往下讀橫軸。再想一次。',
+           2:'提示：150 mg/L 標準品的面積約 '+(STD[4].area/1e6).toFixed(1)+' ×10⁶，比這個樣品大很多。再想一次。'}},
+  4:{q:'樣品 X 的峰面積比最高標準品還大，該怎麼做？',
+     opts:['直接把檢量線延長，讀出濃度','把樣品稀釋後重測，讓它落回校正範圍','用最高標準品 200 mg/L 當答案'], ans:1,
+     ok:'對！稀釋後重測，再乘回稀釋倍數。按「繼續」。',
+     hint:{0:'提示：請先找出最高標準品（200 mg/L）的位置——檢量線只驗證到這裡，再往外沒有證據。再想一次。',
+           2:'提示：樣品的面積比 200 mg/L 標準品大，濃度一定超過 200，寫 200 會低估。再想一次。'}}
+};
+const STATE = {hint5:false};
+
+/* ---------- player ---------- */
+const $=id=>document.getElementById(id);
+const audios = SC.map(s=>{ const a=new Audio(`animation/${s.id}.mp3`); a.preload='auto'; return a; });
+let time=0, playing=false, last=null, answered=new Set(), gateOpen=null, tries=0, lastKey='';
+const speed=()=>Number($('speed').value);
+const sceneAt=t=>{ for(let i=SC.length-1;i>=0;i--) if(t>=SC[i].start-1e-6) return i; return 0; };
+const fmt=x=>`${Math.floor(x/60)}:${String(Math.floor(x%60)).padStart(2,'0')}`;
+
+function render(force){
+  const i=sceneAt(time), sc=SC[i], lt=time-sc.start;
+  const key=i+':'+lt.toFixed(2)+':'+STATE.hint5;
+  if(!force && key===lastKey) return; lastKey=key;
+  $('scene').innerHTML=`<rect width="960" height="540" fill="${COL.panel}"/>`+DRAW[i](lt,sc.cue);
+  // caption
+  let k=0; for(let j=0;j<sc.sent.length;j++) if(lt>=sc.cue[j]-0.05) k=j;
+  $('capText').textContent = lt<=sc.cue[sc.sent.length]+0.3 ? sc.sent[k] : '';
+  $('seek').value=time; $('time').textContent=`${fmt(time)} / ${fmt(TOTAL)}`;
+  [...$('chips').children].forEach((b,j)=>b.classList.toggle('on',j===i));
+}
+function status(){ const i=sceneAt(time); $('status').textContent=`第 ${i+1} / ${SC.length} 幕：${SC[i].title}${playing?'':'（已暫停）'}`; }
+function syncAudio(force){
+  const i=sceneAt(time);
+  audios.forEach((a,j)=>{
+    const lt=time-SC[j].start;
+    if(playing && j===i && lt < META.durations[j]){
+      if(force || Math.abs(a.currentTime-lt)>0.3) a.currentTime=Math.max(0,lt);
+      a.playbackRate=speed(); if(a.paused) a.play().catch(()=>{ $('status').textContent='瀏覽器擋住了聲音，請再按一次播放。'; });
+    } else if(!a.paused) a.pause();
+  });
+}
+function setPlay(on){
+  playing=on; $('play').textContent=on?'❚❚ 暫停':'▶ 播放'; $('play').setAttribute('aria-label',on?'暫停':'播放');
+  if(!on){ audios.forEach(a=>a.pause()); last=null; } else { last=null; syncAudio(true); requestAnimationFrame(tick); }
+  status();
+}
+function tick(now){
+  if(!playing) return;
+  if(last!==null){
+    let next=Math.min(TOTAL,time+(now-last)/1000*speed());
+    const i=sceneAt(time), sc=SC[i];
+    if(sc.pause && !answered.has(i) && next>=sc.start+sc.dur-0.02){ time=sc.start+sc.dur-0.02; render(); setPlay(false); openGate(i); return; }
+    time=next;
+  }
+  last=now; render(); syncAudio(false);
+  if(time>=TOTAL){ setPlay(false); $('status').textContent='播完了。可以點上方幕次重看，或回到互動練習自己操作。'; return; }
+  requestAnimationFrame(tick);
+}
+function jump(t){
+  closeGate(); const was=playing; if(playing) setPlay(false);
+  time=clamp(t,0,TOTAL-0.01);
+  const i=sceneAt(time); answered=new Set(SC.map((s,j)=>j).filter(j=>j<i));
+  if(i!==4) STATE.hint5=false;
+  render(true); status(); if(was) setPlay(true);
+}
+function openGate(i){
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  const g=GATES[i]; gateOpen=i; tries=0;
+  $('gateQ').textContent='想一想：'+g.q; $('gateFb').textContent=''; $('gateFb').className='fb';
+  $('gateGo').classList.remove('show');
+  $('gateOpts').innerHTML='';
+  g.opts.forEach((o,j)=>{ const b=document.createElement('button'); b.className='opt'; b.textContent=`${j+1}. ${o}`;
+    b.onclick=()=>choose(j); $('gateOpts').appendChild(b); });
+  $('gate').classList.add('show'); $('cap').classList.add('hide');
+  $('gateOpts').firstChild.focus();
+  $('status').textContent=`第 ${i+1} 幕停格：先想一想，再選答案。`;
+}
+function choose(j){
+  const i=gateOpen; if(i===null) return; const g=GATES[i]; const btns=[...$('gateOpts').children];
+  if(btns[j].disabled) return;
+  if(j===g.ans){
+    btns[j].classList.add('right'); btns.forEach(b=>b.disabled=true);
+    $('gateFb').textContent=g.ok; $('gateFb').className='fb ok'; $('gateGo').classList.add('show'); $('gateGo').focus();
+  } else {
+    tries++; btns[j].classList.add('wrong'); btns[j].disabled=true;
+    if(i===4 && j===0){ STATE.hint5=true; render(true); }
+    if(tries>=2){ btns[g.ans].classList.add('right'); btns.forEach(b=>b.disabled=true);
+      $('gateFb').textContent=g.hint[j].replace('再想一次。','')+'正確答案是「'+g.opts[g.ans]+'」。'; $('gateFb').className='fb hint'; $('gateGo').classList.add('show'); $('gateGo').focus(); }
+    else { $('gateFb').textContent=g.hint[j]; $('gateFb').className='fb hint'; }
+  }
+}
+function closeGate(){ gateOpen=null; $('gate').classList.remove('show'); $('cap').classList.remove('hide'); }
+$('gateGo').onclick=()=>{ const i=gateOpen; answered.add(i); closeGate(); time=SC[i+1].start; STATE.hint5=false; render(true); setPlay(true); };
+
+$('play').onclick=()=>{ if(gateOpen!==null) return; if(playing){ setPlay(false); return; } if(time>=TOTAL-0.05){ time=0; answered.clear(); } setPlay(true); };
+$('prev').onclick=()=>{ const i=sceneAt(time); const lt=time-SC[i].start; jump(SC[lt>1.5||i===0?i:i-1].start); };
+$('next').onclick=()=>{ const i=sceneAt(time); if(i<SC.length-1) jump(SC[i+1].start); };
+$('seek').max=TOTAL; $('seek').oninput=e=>jump(Number(e.target.value));
+$('speed').onchange=()=>syncAudio(true);
+$('ccBtn').onclick=()=>{ const on=$('cap').classList.toggle('off'); $('ccBtn').textContent=on?'字幕 關':'字幕 開'; $('ccBtn').setAttribute('aria-pressed',String(!on)); };
+$('fsBtn').onclick=()=>{ const st=$('stage');
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  else if(st.requestFullscreen) st.requestFullscreen().then(()=>{ try{ screen.orientation.lock('landscape'); }catch(e){} }).catch(()=>{});
+  else if(st.webkitRequestFullscreen) st.webkitRequestFullscreen(); };
+if(!document.fullscreenEnabled && !document.documentElement.webkitRequestFullscreen) $('fsBtn').hidden=true;
+SC.forEach((s,i)=>{ const b=document.createElement('button'); b.innerHTML=`${i+1}. ${esc(s.title)}${s.pause?' <span class="q" title="有停格提問">?</span>':''}`; b.onclick=()=>jump(s.start); $('chips').appendChild(b); });
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='SELECT'||e.target.tagName==='INPUT'&&e.target.type!=='range') return;
+  if(gateOpen!==null){
+    if(['1','2','3'].includes(e.key)){ choose(Number(e.key)-1); e.preventDefault(); }
+    else if(e.key==='Enter' && $('gateGo').classList.contains('show')){ $('gateGo').click(); e.preventDefault(); }
+    return;
+  }
+  if(e.key===' '||e.key==='k'){ if(e.target.tagName==='BUTTON'&&e.key===' ') return; $('play').click(); e.preventDefault(); }
+  else if(e.key==='ArrowLeft'&&e.target.type!=='range'){ $('prev').click(); e.preventDefault(); }
+  else if(e.key==='ArrowRight'&&e.target.type!=='range'){ $('next').click(); e.preventDefault(); }
+  else if(e.key==='c'||e.key==='C'){ $('ccBtn').click(); }
+});
+/* transcript + table */
+SC.forEach(s=>{ const li=document.createElement('li'); li.innerHTML=`<strong>${esc(s.title)}</strong>　${esc(s.narration)}`; $('transcript').appendChild(li); });
+const tb=$('dataTable').querySelector('tbody');
+[...STD,{k:'sample-1',conc:null,...S1}].forEach(r=>{ const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${r.k==='std-0'?'空白 (0 mg/L)':r.k==='sample-1'?'未知樣品 1':r.conc+' mg/L 標準品'}</td><td>${r.conc===null?'≈ '+UNK_C.toFixed(1):r.conc}</td><td>${r.rt?r.rt.toFixed(2):'—（無峰）'}</td><td>${(r.area/1e6).toFixed(2)}</td>`; tb.appendChild(tr); });
+$('calText').textContent=`檢量線：面積 = ${SLOPE.toFixed(1)} × 濃度 ${ICPT<0?'−':'+'} ${Math.abs(ICPT).toFixed(0)}（µV·s），R² = ${H.r2.toFixed(4)}。`;
+render(true); status();
+</script>
+</body>
+</html>

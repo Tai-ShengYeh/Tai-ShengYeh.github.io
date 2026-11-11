@@ -151,6 +151,7 @@ footer a{color:var(--blue)}
   <b>HPLC 入門</b>
   <a href="#s1">1 層析圖</a><a href="#s2">2 峰面積</a><a href="#s3">3 檢量線</a>
   <a href="#s4">4 測樣品</a><a href="#s5">5 小測驗</a>
+  <a href="animation.html">▶ 語音動畫</a>
   <a href="hplc_teaching.html" class="adv">進階版 →</a>
 </div></nav>
 
@@ -159,6 +160,7 @@ footer a{color:var(--blue)}
   <p class="sub">用真實的 HPLC 儀器資料，五個步驟帶你算出答案。不需要任何背景知識。</p>
   <div class="q">先講結論：儀器不會直接告訴你濃度
     <small>它只會給你一張「訊號隨時間變化」的圖。濃度要自己算出來。</small></div>
+  <p class="sub" style="margin-top:14px"><a href="animation.html" style="color:inherit;font-weight:700">▶ 先看 2 分半語音動畫（有停格提問）</a>，再往下自己動手做。</p>
 </div></header>
 
 <!-- =============================== 1 =============================== -->
@@ -192,7 +194,7 @@ footer a{color:var(--blue)}
   <div class="key"><b>觀察到什麼？</b>
     <p>① 峰<strong>永遠出現在 4.6 分鐘左右</strong>——這是咖啡因的「身分證」，每個化合物都有自己固定的出場時間。</p>
     <p>② 濃度越高，峰<strong>越高也越胖</strong>。這就是我們能拿來定量的線索。</p>
-    <p>③ 0 ppm 那一杯（純溶劑）在 4.6 分鐘<strong>完全沒有峰</strong>——證明那個峰真的是咖啡因，不是雜質。</p>
+    <p>③ 0 mg/L 那一杯（純溶劑）在 4.6 分鐘<strong>完全沒有峰</strong>——代表溶劑本身不會在這個時間干擾。要確認這個峰就是咖啡因，還要比對標準品的滯留時間，必要時再用光譜等方法確認。</p>
   </div>
 </div></section>
 
@@ -257,7 +259,7 @@ footer a{color:var(--blue)}
   </figure>
 
   <div class="key"><b>檢量線在說什麼</b>
-    <p><b>面積 = 斜率 × 濃度 + 截距</b>。斜率代表「每 1 ppm 能換到多少面積」，
+    <p><b>面積 = 斜率 × 濃度 + 截距</b>。斜率代表「每 1 mg/L 能換到多少面積」，
        也就是這台儀器對咖啡因有多<strong>靈敏</strong>。</p>
     <p>把公式反過來，就能從面積算回濃度——這正是下一步要做的事。</p>
   </div>
@@ -287,7 +289,7 @@ footer a{color:var(--blue)}
   <div class="card">
     <h3>換你算算看</h3>
     <p>假設某個樣品量到的峰面積是 <b id="calcArea" style="color:var(--brand)">—</b>，
-       用上面的公式算出濃度是多少 ppm？（取到小數點後一位）</p>
+       用上面的公式算出濃度是多少 mg/L？（取到小數點後一位）</p>
     <div class="calc">
       <input type="number" id="calcIn" placeholder="輸入答案" step="0.1">
       <button class="b" id="calcGo">對答案</button>
@@ -310,12 +312,12 @@ footer a{color:var(--blue)}
   <div class="step-head"><div class="badge">✓</div><h2>最後的答案</h2></div>
   <p class="lead">四個未知樣品的咖啡因濃度：</p>
   <div class="card tbl"><table id="finalTbl">
-    <thead><tr><th>樣品</th><th>峰出現時間 (分)</th><th>峰面積</th><th>咖啡因濃度 (ppm)</th></tr></thead>
+    <thead><tr><th>樣品</th><th>峰出現時間 (分)</th><th>峰面積</th><th>咖啡因濃度 (mg/L)</th></tr></thead>
     <tbody></tbody>
   </table></div>
 
-  <div class="key blue"><b>ppm 是什麼單位</b>
-    <p>1 ppm = 1 µg/mL = 每毫升含 1 微克。所以 <b id="unitEx">—</b> ppm 的溶液，
+  <div class="key blue"><b>mg/L 是什麼單位</b>
+    <p>1 mg/L = 1 µg/mL = 每毫升含 1 微克（稀水溶液中也常寫成 1 ppm）。所以 <b id="unitEx">—</b> mg/L 的溶液，
        每 250 mL 大約含 <b id="unitMg">—</b> 毫克咖啡因。</p>
     <p style="font-size:15px;color:var(--ink3)">註：這是<strong>注射進儀器那一管</strong>的濃度。
        實際飲料通常會先稀釋再上機，所以原始飲料的濃度要再乘上稀釋倍數。</p>
@@ -449,11 +451,11 @@ function fitOf(k){                       // 只用前 k 個標準品做迴歸
         let bi = 0, bv = -Infinity;
         for (let i = Math.floor(iOf(LO)); i <= iOf(HI); i++) if (s.y[i] > bv){ bv = s.y[i]; bi = i; }
         const t = el("text",{x:x(tOf(bi))+8, y:y(bv/1000)-4,"font-size":11.5,fill:"var(--ink3)"},svg);
-        t.textContent = s.conc + " ppm";
+        t.textContent = s.conc + " mg/L";
       }
     });
 
-    document.getElementById("s1conc").textContent = r.conc + " ppm";
+    document.getElementById("s1conc").textContent = r.conc + " mg/L";
     if (r.caf){
       document.getElementById("s1rt").textContent = r.caf.rt.toFixed(2) + " 分";
       document.getElementById("s1h").textContent = fmt(r.caf.h/1000, 0) + " mV";
@@ -558,7 +560,7 @@ function fitOf(k){                       // 只用前 k 個標準品做迴歸
     const xmax = 215, ymax = Math.max(...CAL.ys)*1.1;
     const x = sc(-8, xmax, pad.l, pad.w-pad.r);
     const y = sc(-ymax*0.05, ymax, pad.h-pad.b, pad.t);
-    axes(svg, x, y, [0,xmax], [0,ymax], pad, "咖啡因濃度 (ppm)", "峰面積",
+    axes(svg, x, y, [0,xmax], [0,ymax], pad, "咖啡因濃度 (mg/L)", "峰面積",
          v => (v/1e6).toFixed(0)+"百萬");
 
     const fit = fitOf(k);
@@ -571,7 +573,7 @@ function fitOf(k){                       // 只用前 k 個標準品做迴歸
         fill:"var(--panel)", stroke:"var(--ink)","stroke-width":3}, svg);
       const t = el("text",{x:x(CAL.xs[i]), y:y(CAL.ys[i])+26,"text-anchor":"middle",
         "font-size":13, fill:"var(--ink2)"}, svg);
-      t.textContent = CAL.xs[i] + " ppm";
+      t.textContent = CAL.xs[i] + " mg/L";
     }
     if (k === 0){
       const t = el("text",{x:(pad.l+pad.w-pad.r)/2, y:(pad.t+pad.h-pad.b)/2,
@@ -581,7 +583,7 @@ function fitOf(k){                       // 只用前 k 個標準品做迴歸
 
     document.getElementById("s3n").textContent = k + " / 6";
     addBtn.textContent = k === 0 ? "加入第一個標準品"
-                       : k < 6 ? `加入第 ${k+1} 個標準品（${CAL.xs[k]} ppm）` : "六個都加完了";
+                       : k < 6 ? `加入第 ${k+1} 個標準品（${CAL.xs[k]} mg/L）` : "六個都加完了";
     addBtn.disabled = k >= 6;
     document.getElementById("s3eq").textContent = fit
       ? `面積 = ${fmt(fit.b1)} × 濃度 ${fit.b0>=0?"+":"−"} ${fmt(Math.abs(fit.b0))}`
@@ -622,7 +624,7 @@ let QUIZ_CONC = [];
     const xmax = 215, ymax = Math.max(...CAL.ys, area)*1.1;
     const x = sc(-8, xmax, pad.l, pad.w-pad.r);
     const y = sc(-ymax*0.05, ymax, pad.h-pad.b, pad.t);
-    axes(svg, x, y, [0,xmax], [0,ymax], pad, "咖啡因濃度 (ppm)", "峰面積",
+    axes(svg, x, y, [0,xmax], [0,ymax], pad, "咖啡因濃度 (mg/L)", "峰面積",
          v => (v/1e6).toFixed(0)+"百萬");
     el("line",{x1:x(-8), y1:y(CAL.b0+CAL.b1*(-8)), x2:x(xmax), y2:y(CAL.b0+CAL.b1*xmax),
       stroke:"var(--brand)","stroke-width":3}, svg);
@@ -645,10 +647,10 @@ let QUIZ_CONC = [];
     if (p2 >= 1){
       t = el("text",{x:x(conc), y:pad.h-pad.b-12,"text-anchor":"middle","font-size":17,
         fill:"var(--brand)","font-weight":700}, svg);
-      t.textContent = `③ ${conc.toFixed(1)} ppm`;
+      t.textContent = `③ ${conc.toFixed(1)} mg/L`;
     }
     document.getElementById("s4a").textContent = fmt(area);
-    document.getElementById("s4c").textContent = conc.toFixed(1) + " ppm";
+    document.getElementById("s4c").textContent = conc.toFixed(1) + " mg/L";
   }
   play();
   QUIZ_CONC = SAMPS.map(r => (r.caf.area - CAL.b0)/CAL.b1);
@@ -688,10 +690,10 @@ let QUIZ_CONC = [];
     fbEl.className = "fb show";
     if (isNaN(v)){ fbEl.innerHTML = "請先輸入一個數字。"; return; }
     if (Math.abs(v - target) <= 1.5){
-      fbEl.innerHTML = `<b style="color:var(--ok)">答對了！</b> 正確答案是 ${target} ppm。` +
+      fbEl.innerHTML = `<b style="color:var(--ok)">答對了！</b> 正確答案是 ${target} mg/L。` +
         `<br>算法：${work()}`;
     } else {
-      fbEl.innerHTML = `<b style="color:var(--warn)">再試一次。</b>正確答案是 ${target} ppm。` +
+      fbEl.innerHTML = `<b style="color:var(--warn)">再試一次。</b>正確答案是 ${target} mg/L。` +
         `<br>算法：${work()}` +
         `<br><span style="color:var(--ink3);font-size:14.5px">` +
         `這條檢量線的截距是 ${fmt(b0)}（負數），所以「減去截距」實際上是<b>加上 ${ABS0}</b>。</span>`;
@@ -710,13 +712,13 @@ let QUIZ_CONC = [];
              "儀器只能算面積，算不出峰高"],
       ans: 1,
       why: "峰變寬時分子總數沒變，只是散開了——面積守恆但峰高會降。管柱老化或樣品基質都會讓峰變寬，這時用峰高定量就會低估。" },
-    { q: "0 ppm 的空白溶液在 4.6 分鐘完全沒有峰。這件事最重要的意義是什麼？",
+    { q: "0 mg/L 的空白溶液在 4.6 分鐘完全沒有峰。這件事最重要的意義是什麼？",
       opts: ["證明儀器沒壞",
-             "證明 4.6 分鐘的那個峰真的來自咖啡因，不是溶劑或雜質",
+             "溶劑本身不會在 4.6 分鐘產生干擾峰",
              "代表可以不用跑空白"],
       ans: 1,
-      why: "空白是用來確認「這個位置的訊號確實來自待測物」。如果空白在同一個時間也有峰，就表示有干擾，所有結果都要重新檢討。" },
-    { q: "某個樣品量到的面積，比最高濃度標準品（200 ppm）還大。該怎麼做？",
+      why: "空白是用來確認「溶劑或試劑不會在這個位置產生訊號」。如果空白在同一個時間也有峰，就表示有干擾，所有結果都要重新檢討。空白乾淨只排除了一種干擾；要確認峰的身分，還要比對標準品的滯留時間等證據。" },
+    { q: "某個樣品量到的面積，比最高濃度標準品（200 mg/L）還大。該怎麼做？",
       opts: ["直接把檢量線延長出去讀數值",
              "把樣品稀釋後重測，讓它落回檢量線範圍內",
              "改用最高的那個標準品當答案"],

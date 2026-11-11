@@ -89,3 +89,12 @@ Python 需 `numpy / pandas / scipy / matplotlib`；`caffeine_calibration.R` 只�
 - Eilers, P. H. C. (2003). A perfect smoother. *Analytical Chemistry*, 75(14), 3631–3636. https://doi.org/10.1021/ac034173t
 - Danzer, K., & Currie, L. A. (1998). Guidelines for calibration in analytical chemistry. Part I (IUPAC Recommendations 1998). *Pure and Applied Chemistry*, 70(4), 993–1014. https://doi.org/10.1351/pac199870040993
 - DiNunzio, J. E. (1985). Determination of caffeine in beverages by high performance liquid chromatography. *Journal of Chemical Education*, 62(5), 446. https://doi.org/10.1021/ed062p446
+
+## 語音動畫（animation.html）
+
+6 幕、約 2 分半的停格互動動畫：層析圖 → 峰面積 → 檢量線 → 範圍外樣品 → 稀釋重測。每幕結束有提問，答錯先給提示。
+
+- 旁白腳本與分鏡：`animation/storyboard.json`（`narration` 為字幕，`tts` 為送去配音的念法）
+- 配音：ElevenLabs，聲音 Door Chow，模型 eleven_v3；以 ffmpeg `atempo=0.95` 放慢 5%，並以 code-animation-explainer 的 `pron_check.py` 做逐字聲調檢核
+- 數據：`animation/data.js`，取自本資料夾的 Shimadzu 實測層析圖；第 5–6 幕的「樣品 X」為教學模擬數據
+- 重建：修改 `animation/player_template.html` 或替換 `animation/s*.mp3` 後，在 `animation/` 目錄執行 `python build_animation.py`
